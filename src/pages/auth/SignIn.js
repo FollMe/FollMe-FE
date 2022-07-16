@@ -2,11 +2,11 @@ import clsx from "clsx";
 import { useState, useEffect } from "react"
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
-import styles from './Login.module.scss';
+import styles from './SignIn.module.scss';
 import ImageCarousel from "../../components/ImageCarousel";
 
 
-export default function Login() {
+export default function SignIn() {
     const [message, useMessage] = useState('');
     useEffect(() => {
         document.title = "Đăng nhập | FollMe";

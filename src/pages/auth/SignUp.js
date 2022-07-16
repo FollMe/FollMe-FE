@@ -5,7 +5,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import AddModeratorIcon from '@mui/icons-material/AddModerator';
 import ImageCarousel from "../../components/ImageCarousel";
 
-import styles from './Login.module.scss';
+import styles from './SignIn.module.scss';
 
 
 
@@ -50,7 +50,7 @@ export default function SignUp() {
 
                 </div>
                 <div className={styles.loginFoot}>
-                    Đã có tài khoản, vui lòng <a href="/login">đăng nhập</a>
+                    Đã có tài khoản, vui lòng <a href="/sign-in">đăng nhập</a>
                 </div>
                 <div className={styles.titleMethod}><hr />Hoặc đăng nhập bằng<hr /></div>
                 <div className={styles.login}>

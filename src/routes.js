@@ -1,5 +1,5 @@
 import { Navigate, useRoutes } from "react-router-dom";
-import Login from "./pages/auth/Login";
+import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
 import AuthLayout from "./layouts/AuthLayout";
 import MainLayout from "./layouts/MainLayout";
@@ -11,7 +11,7 @@ export default function Router() {
     {
       element: <AuthLayout />,
       children: [
-        { path: 'login', element: <Login /> },
+        { path: 'sign-in', element: <SignIn /> },
         { path: 'sign-up', element: <SignUp /> }
       ]
     },

@@ -1,4 +1,4 @@
-import '../auth/Login.module.scss';
+import '../auth/SignIn.module.scss';
 import './Home.css';
 
 export default function Home() {
