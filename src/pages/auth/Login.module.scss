@@ -144,8 +144,34 @@ header {
     background-color: white;
     border-radius: 4px;
     margin: auto;
-    min-height: 500px;
+    min-height: 520px;
     max-width: 523px;
     padding-top: 50px;
     position: relative;
+}
+
+.btnSendCode {
+    display: none;
+    position: absolute;
+    right: 8px;
+    line-height: 40px;
+    cursor: pointer;
+    color: var(--theme-color);
+}
+
+.ctnFunction {
+    color: var(--theme-color);
+    width: 60px;
+    text-align: right;
+    background-color: white;
+    position: absolute;
+    right: 8px;
+    line-height: 23px;
+    bottom: 8px;
+}
+
+.txtTimeDown {
+    color: rgb(194, 194, 194);
+    cursor: default;
+    pointer-events: none;
 }

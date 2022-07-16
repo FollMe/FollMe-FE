@@ -8,6 +8,7 @@ export default function ImageCarousel(props) {
         <Carousel
             indicatorIconButtonProps={{
                 style: {
+                    marginTop: '20px',
                     padding: '5px',
                     marginBottom: '20px',
                     color: '#ff6541',
@@ -30,7 +31,7 @@ export default function ImageCarousel(props) {
                 <img className={styles.imgCarousel} src="imgs/3 (2).jpg" />
                 <div className={styles.titleBio}>
                     Tôi cảm thấy tự hào khi được chia sẻ câu chuyện của mình đến với mọi người!
-                    <br />
+                    <br /><br />
                     <b> - Quốc Sum - </b>
                 </div>
             </div>
