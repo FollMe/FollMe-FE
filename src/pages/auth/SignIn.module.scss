@@ -4,30 +4,6 @@ header {
     justify-content: center;
 }
 
-.containerMain {
-    display: flex;
-    flex-wrap: wrap;
-    width: 100%;
-    height: 100px;
-}
-
-.mainSide {
-    text-align: center;
-    padding-top: 110px;
-    min-height: 100vh;
-    min-width: 350px;
-    width: 50%;
-    flex-grow: 1;
-}
-
-.sideIntro {
-    background-color: #ffe8e2;
-}
-
-.sideFeature {
-    background-color: #ffff;
-}
-
 .introTitle {
     font-size: 2.5rem;
 }
@@ -54,7 +30,6 @@ header {
 }
 
 .loginForm_Text {
-    /* height: 40px; */
     margin-bottom: 20px;
     position: relative;
 }

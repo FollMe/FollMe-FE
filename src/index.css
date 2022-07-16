@@ -63,3 +63,13 @@ input[type=number] {
 .dropdown-item {
   font-size: 1.5rem;
 }
+
+.arrowDownIcon {
+    width: 50px;
+}
+
+@media only screen and (min-width: 700px) {
+    .arrowDownIcon {
+        display: none;
+    }
+}

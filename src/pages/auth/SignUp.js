@@ -16,8 +16,8 @@ export default function SignUp() {
     const [message, useMessage] = useState('');
 
     return (
-        <div className={styles.containerMain}>
-            <div className={clsx(styles.sideFeature, styles.mainSide)}>
+        <div className="containerMain">
+            <div className="sideFeature mainSide">
                 <div className={styles.introTitle}>Tạo tài khoản dễ dàng</div>
                 <div className={styles.titleMethod}><hr />Đăng kí bằng email<hr /></div>
                 <div className={styles.login}>
@@ -67,7 +67,7 @@ export default function SignUp() {
                             Facebook
                         </div>
                     </a>
-                    <a className="div-button" href="/auth/google">
+                    <a className={styles.divButton} href="/auth/google">
                         <div className={clsx(styles.svg, styles.googleLogin)}>
                             <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 48 48" className="abcRioButtonSvg">
                                 <g><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z">
@@ -85,9 +85,9 @@ export default function SignUp() {
                         </div>
                     </a>
                 </div>
-
+                <img className="arrowDownIcon" src="imgs/arrow-down.gif" />
             </div>
-            <div className={clsx(styles.sideIntro, styles.mainSide)}>
+            <div className="sideIntro mainSide">
                 <div className={styles.containerCarousel}>
                     <ImageCarousel />
                 </div>

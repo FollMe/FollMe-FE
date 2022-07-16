@@ -1,4 +1,4 @@
-export default function AuthHeader() {
+export default function MainHeader() {
   return (
     <header>
       <nav className="navbar-me">

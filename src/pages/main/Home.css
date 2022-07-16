@@ -1,13 +1,14 @@
-.function-box {
+.functionBox {
   margin: 50px auto 0px;
-  width: 60%;
+  width: 65%;
+  min-height: 80%;
 }
 
-.function-box a {
+.functionBox > a {
   text-decoration: none;
 }
 
-.box-icon {
+.boxIcon {
   height: 290px;
   color: #d55353;
   border-radius: 20px;
@@ -20,31 +21,30 @@
 }
 
 
-.box-icon:hover {
+.boxIcon:hover {
   box-shadow: 0px 0px 2px rgba(247, 92, 3, 0.911);
   font-size: 5.5rem;
 }
 
-.box-icon:hover .box-img {
+.boxIcon:hover .boxImg {
   height: 170px;
 }
 
-.function-icon {
+.functionIcon {
   font-size: 250px;
 }
 
-.function-name {
+.functionName {
   height: 40px;
   padding: 15px;
   border-radius: 20px;
   font-size: 1.8rem;
-  color: black;
   font-weight: bold;
   text-decoration: none;
   transform: translateX(-5px);
 }
 
-.box-img {
+.boxImg {
   margin-top: 40px;
   height: 180px;
 }

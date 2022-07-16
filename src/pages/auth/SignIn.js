@@ -13,8 +13,8 @@ export default function SignIn() {
     }, [])
 
     return (
-        <div className={styles.containerMain}>
-            <div className={clsx(styles.sideFeature, styles.mainSide)}>
+        <div className="containerMain">
+            <div className="sideFeature mainSide">
                 <div className={styles.introTitle}> Chào mừng bạn </div>
                 <div className={styles.titleMethod}><hr /> Đăng nhập bằng email <hr /></div>
                 <div className={styles.login}>
@@ -78,9 +78,9 @@ export default function SignIn() {
                         </div>
                     </a>
                 </div>
-
+                <img className="arrowDownIcon" src="imgs/arrow-down.gif" />
             </div>
-            <div className={clsx(styles.sideIntro, styles.mainSide)}>
+            <div className="sideIntro mainSide">
                 <div className={styles.containerCarousel}>
                     <ImageCarousel />
                 </div>

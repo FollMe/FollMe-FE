@@ -1,30 +1,35 @@
+import { useEffect } from 'react';
 import '../auth/SignIn.module.scss';
 import './Home.css';
 
 export default function Home() {
-  return (
-    <div className="container-main">
-      <div className="side-feature main-side">
-        <div className="function-box">
-          <a href="story">
-            <div className="box-icon">
-              <img alt="Story" className="box-img" src="imgs/reading-book.png" />
-              <div className="function-name">Đọc truyện</div>
+    useEffect(() => {
+        document.title = "Trang chủ | FollMe";
+    }, [])
+    return (
+        <div className="containerMain">
+            <div className="sideFeature mainSide">
+                <div className="functionBox">
+                    <a href="story">
+                        <div className="boxIcon">
+                            <img alt="Story" className="boxImg" src="imgs/reading-book.png" />
+                        </div>
+                    </a>
+                    <div className="functionName">Đọc truyện</div>
+                </div>
+                <img className="arrowDownIcon" src="imgs/arrow-down.gif" />
             </div>
-          </a>
-        </div>
-      </div>
 
-      <div className="side-intro main-side">
-        <div className="function-box">
-          <a >
-            <div className="box-icon">
-              <img alt="Manage link" className="box-img" src="imgs/manage-link.png" />
-              <div className="function-name">Quản lý link của bạn<br /></div>
+            <div className="sideIntro mainSide">
+                <div className="functionBox">
+                    <a >
+                        <div className="boxIcon">
+                            <img alt="Manage link" className="boxImg" src="imgs/manage-link.png" />
+                        </div>
+                    </a>
+                    <div className="functionName">Chia sẻ câu chuyện của bạn<br /></div>
+                </div>
             </div>
-          </a>
         </div>
-      </div>
-    </div>
-  )
+    )
 }
