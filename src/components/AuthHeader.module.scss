@@ -1,0 +1,17 @@
+.navbarMe > h1 {
+    font-size: 1.8rem;
+}
+
+.navLogo {
+    width: 45px;
+    float: left;
+    margin-right: 10px;
+}
+
+.navbarMe {
+    position: absolute;
+    display: flex;
+    margin: 25px auto;
+    width: 90%;
+    align-items: center;
+}

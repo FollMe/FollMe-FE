@@ -1,0 +1,24 @@
+.btn-send-code {
+  display: none;
+  position: absolute;
+  right: 8px;
+  line-height: 40px;
+  cursor: pointer;
+  color: var(--theme-color);
+}
+.ctn-function {
+  color: var(--theme-color);
+  width: 60px;
+  text-align: right;
+  background-color: white;
+  position: absolute;
+  right: 8px;
+  line-height: 23px;
+  bottom: 8px;
+}
+.txtTimeDown {
+  color: rgb(194, 194, 194);
+  cursor: default;
+  pointer-events: none;
+  
+}

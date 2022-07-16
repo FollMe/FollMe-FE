@@ -1,0 +1,50 @@
+.function-box {
+  margin: 50px auto 0px;
+  width: 60%;
+}
+
+.function-box a {
+  text-decoration: none;
+}
+
+.box-icon {
+  height: 290px;
+  color: #d55353;
+  border-radius: 20px;
+  cursor: pointer;
+  background-color: rgb(250, 250, 250);
+  font-size: 6rem;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+  margin-bottom: 10px;
+  transition: all 0.2s;
+}
+
+
+.box-icon:hover {
+  box-shadow: 0px 0px 2px rgba(247, 92, 3, 0.911);
+  font-size: 5.5rem;
+}
+
+.box-icon:hover .box-img {
+  height: 170px;
+}
+
+.function-icon {
+  font-size: 250px;
+}
+
+.function-name {
+  height: 40px;
+  padding: 15px;
+  border-radius: 20px;
+  font-size: 1.8rem;
+  color: black;
+  font-weight: bold;
+  text-decoration: none;
+  transform: translateX(-5px);
+}
+
+.box-img {
+  margin-top: 40px;
+  height: 180px;
+}

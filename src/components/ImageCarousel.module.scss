@@ -1,0 +1,38 @@
+.imgCarousel {
+    width: 70%;
+    max-width: 400px;
+    border-radius: 50%;
+}
+
+.carousel {
+    height: 500px;
+}
+
+.carouselItem {
+    height: 450px;
+}
+
+.carouselItem > img {
+    margin-top: 10px;
+}
+
+.carouselIndicators {
+    margin-top: 10%;
+}
+
+.carouselIndicators [data-bs-target] {
+    background-color: var(--theme-color);
+    width: 11px;
+    height: 10px;
+    border-radius: 50%;
+    margin: auto 6px;
+}
+
+.titleBio {
+    display: block;
+    width: 100%;
+    /* position: absolute; */
+    margin-top: 6%;
+    color: black;
+    padding: 0 5px;
+}

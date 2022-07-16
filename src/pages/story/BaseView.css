@@ -1,0 +1,416 @@
+/* Đặt biến toàn cục trong :root vì
+*   - :root mạnh hơn
+    - Đối với các document khác thì :root chưa chắc là html
+*/
+:root {
+  --theme-color: #ff6541;
+  --foreign-color: #1faaf4;
+  --white-color: #fff;
+  --black-color: #000;
+  --text-color: #333;
+  --background-color: #f1f1f1;
+}
+
+* {
+  box-sizing: inherit;
+}
+
+html {
+  color: var(--text-color);
+  font-size: 62.5%;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+body {
+  overflow-x: hidden;
+  margin: 0 auto;
+  /* background: linear-gradient(to bottom, #E55D87, #5FC3E4); */
+  background: var(--background-color);
+}
+
+p {
+  font-size: 1.2rem ;
+  line-height: 1.6rem;
+}
+
+.grid {
+  width: 720px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.grid__full-width {
+  width: 100%;
+}
+
+.grid__row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.navbar__icon{
+  font-size: 1.8rem;
+}
+
+@keyframes FadeIn {
+  from {
+      opacity: 0;
+  }
+  to {
+      opacity: 1;
+  }
+}
+/* a {
+  display: block;
+  text-decoration: none;
+  color: black;
+} */
+
+/* .content {
+    margin: 0 auto;
+    width: 479px;
+    max-width: 100%;
+    height: 100vh;
+    background: linear-gradient(to bottom, #E55D87, #5FC3E4);
+} */
+
+/* REUSE COMPONENT */
+.modal-content {
+  border-radius: 10px;
+}
+.choosen-background-class div {
+  background-color: #cfcfcf;
+}
+
+.form-label {
+  font-size: 1.5rem;
+}
+
+/* 
+.navbar-me{
+  margin-top: 0px;
+  color:white;
+  position: fixed;
+  top: 0px;
+  display:flex;
+  flex: 1;
+  justify-content: space-between;
+  width: 720px;
+  max-width: calc(100%);
+  flex-grow: 1;
+  padding: 5px 10px;
+  align-items: center;
+  background-color: #5a5555;
+  z-index: 99999;
+} */
+/* .navbar-me img {
+  width: 40px;
+} */
+/* .navbar-me h1 {
+  display: none;
+} */
+.user-box span {
+  display: none;
+}
+.user-icon {
+  font-size: 3rem;
+}
+
+.container-view {
+  background-color: white;
+  position: relative;
+  min-height: calc(100vh - 40px);
+  padding-top: 50px;
+}
+h3 {
+  font-size: 160%;
+}
+/* h4 {
+  font-size: 130%;
+  color: #3d3d3d
+} */
+.header__infor {
+  /* position: absolute; */
+  /* width: 100vw; */
+  top: 0px;
+  left: 0px;
+  /* transition: 0.3s ease; */
+}
+
+.information {
+  background-color: white;
+  width: 85%;
+  margin: 0 auto;
+  margin-top: 60px;
+  display: flex;
+  border-radius: 20px;
+  box-shadow: 0px 2px 5px 1px #888888;
+  transition: 0.3s ease;
+}
+.infor__avatar {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 20px;
+  float: left;
+  position: relative;
+  top: -20px;
+  left: -1px;
+  transition: 0.3s ease;
+}
+
+.infor__description{
+  margin-left: 10px;
+}
+
+
+.sticky  {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+}
+
+.sticky .information {
+  margin-top: 0px;
+  width: 95%;
+}
+
+.sticky .infor__avatar {
+  top: 0px;
+  width: 70px;
+  height: 70px;
+}
+
+.sticky .infor__bio {
+  display: none;
+}
+
+
+.link-list {
+  flex: 1;
+  /* margin-top: 190px; */
+}
+.item {
+  border-radius: 20px;
+  padding: 10px;
+  margin: 0 auto;
+  background-color: white;
+  width: 95%;
+  display: flex;
+  align-items: center;
+}
+
+.sort-icon {
+  position: absolute;
+  right: 6%;
+}
+.sort-icon i {
+  color:rgb(126, 126, 126);
+  font-size: 2.8rem;
+}
+
+a + a {
+  margin-top: 10px;
+}
+
+.type-logo {
+  width: 50px;
+  margin-right: 20px;
+}
+
+footer {
+  /* position: absolute; */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 40px;
+  background-color: white;
+  text-align: center;
+  line-height: 50px;
+}
+
+.follme-logo {
+  width: 30px;
+  margin-top: 5px;
+}
+
+footer h4 {
+  margin: 0;
+  line-height: 35px;
+}
+.link-infor {
+  justify-content: space-between;
+  align-items: center;
+  display: flex;
+  margin: 10px;
+}
+.link-infor span {
+  color: var(--text-color);
+  font-size: 1.4rem;
+}
+.link-infor__qr i {
+  color: var(--theme-color);
+  font-size: 3.5rem;
+}
+.nav {
+  color: black;
+  font-size: 1.5rem;
+}
+
+
+span.link-text {
+  color: rgb(126, 126, 126);
+}
+
+.link-infor__text i {
+  margin-left: 10px;
+  font-size: 2.1rem;
+}
+
+.nav-link {
+  color: var(--text-color);
+  display: block;
+  padding: 0.8rem 1rem;
+}
+.nav-link.active {
+  background-color: var(--theme-color)!important;
+}
+
+.nav-pills::after {
+  display: block;
+  content: "";
+  width: 100%;
+  height: 1px;
+  background-color: rgb(202, 202, 202);
+}
+
+/*  */
+#pills-home{
+  text-align: center;
+}
+
+.config__avatar {
+  display: block;
+  margin: 50px auto 20px auto; 
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 20px;
+}
+.button {
+  font-weight: 500;
+  color: white;
+  font-size: 1.5rem;
+  border-radius: 5px;
+  margin: 0 auto;
+  margin-bottom: 30px;
+  display: inline-block;
+  padding: 10px 30px;
+}
+
+.button__upload-avatar {
+  background-color: var(--foreign-color);
+}
+.button__save-infor {
+  margin-top: 10px;
+  background-color: var(--theme-color);
+}
+.button__save-infor i {
+  margin-right: 10px;
+}
+
+#image-demo {
+  margin-top: 30px;
+}
+
+.avatar-modal {
+  width: 80%;
+  margin: 0 auto;
+  min-height: 100px;
+  position: fixed;
+  top: 50px;
+  background-color: aliceblue;
+}
+
+.modal h5 {
+  font-size: 1.6rem;
+}
+.modal .btn {
+  border: none;
+  padding: 0.4rem 1.75rem;
+  font-size: 1.5rem;
+}
+.btn-confirm {
+  background-color: var(--theme-color);
+}
+.container-infor {
+  font-size: 1.5rem;
+  text-align: left;
+  width: 77%;
+  margin: 0 auto;
+}
+
+
+.form-control {
+  font-size: 1.5rem;
+}
+input.form-control {
+  height: 40px;
+}
+textarea.form-control {
+  line-height: 30px;
+}
+.container-infor label {
+  font-weight: 500;
+}
+
+/*  */
+.infor__name {
+  margin: 10px 0;
+}
+
+.link-list {
+  margin-top: 30px;
+}
+
+.create-link {
+  cursor: pointer;
+  font-size: 150%;
+  text-align: center;
+  margin: 40px auto 10px;
+  width: 140px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border: 2px solid black;
+  border-radius: 4px;
+}
+
+.create-link i {
+  margin-right: 8px;
+}
+
+.create-link:hover {
+  background-color: black;
+  color: white;
+}
+.form-select {
+  height: 40px;
+  font-size: 1.7rem;
+}
+
+.form-select option {
+  padding: 50px 0;
+}
+
+.btn-modal {
+  border: none;
+  border-radius: 5px;
+  font-size: 1.5rem;
+  padding: 7px 15px;
+}
+
+.btn-primary {
+  background-color: var(--theme-color);
+}
+

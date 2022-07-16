@@ -1,0 +1,34 @@
+.body {
+  margin-top: 30px;
+  text-align: center;
+  height: calc(90vh);
+}
+
+.select-chap {
+  margin-top: 50px;
+  list-style: none;
+  padding-left: 0px;
+}
+
+.select-chap a {
+  display: inline-block;
+}
+.chap-number {
+  padding: 10px;
+  border-radius: 5px;
+  /* float: left; */
+  display: inline-block;
+  width: 50px;
+  background-color: var(--theme-color);
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: white;
+}
+
+a + a {
+  margin-left: 10px;
+}
+header {
+  display: flex;
+  justify-content: center;
+}
