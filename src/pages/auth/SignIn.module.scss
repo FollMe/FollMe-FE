@@ -13,8 +13,8 @@ header {
     align-items: center;
     justify-content: center;
     opacity: 0.9;
-    margin-top: 40px;
-    margin-bottom: 30px;
+    margin-top: 35px;
+    margin-bottom: 25px;
 }
 
 .titleMethod > hr {
@@ -79,9 +79,10 @@ header {
     color: white;
     position: relative;
     border-radius: 4px;
-    width: 100%;
+    width: 40px;
     height: 40px;
     line-height: 40px;
+    display: inline-block;
 }
 
 .fbLogin {
@@ -89,8 +90,6 @@ header {
 }
 
 .googleLogin {
-    margin-top: 10px;
-    margin-bottom: 50px;
     border: solid rgb(122, 122, 122) 1px;
     color: black;
 }

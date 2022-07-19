@@ -5,6 +5,7 @@ import AuthLayout from "./layouts/AuthLayout";
 import MainLayout from "./layouts/MainLayout";
 import Home from "./pages/main/Home";
 import SelectChap from "./pages/story/SelectChap";
+import Story from "./pages/story/Story";
 
 export default function Router() {
   return useRoutes([
@@ -19,7 +20,8 @@ export default function Router() {
       element: <MainLayout />,
       children: [
         { path: '/', element: <Home /> },
-        { path: '/story', element: <SelectChap /> }
+        { path: '/stories', element: <Story /> },
+        { path: '/stories/select-chap', element: <SelectChap /> }
       ]
     },
     { path: '*', element: <Navigate to="/404" replace /> }

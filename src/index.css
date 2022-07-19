@@ -65,7 +65,16 @@ input[type=number] {
 }
 
 .arrowDownIcon {
-    width: 50px;
+    position: fixed;
+    z-index: 99999;
+    bottom: 10px;
+    right: -60px;
+    width: 160px;
+    transition: 0.75s;
+}
+
+.arrowDownIconHide {
+    bottom: -200px;
 }
 
 @media only screen and (min-width: 700px) {

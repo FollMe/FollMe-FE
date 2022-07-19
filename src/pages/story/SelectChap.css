@@ -25,9 +25,6 @@
   color: white;
 }
 
-a + a {
-  margin-left: 10px;
-}
 header {
   display: flex;
   justify-content: center;

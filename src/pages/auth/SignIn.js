@@ -57,7 +57,6 @@ export default function SignIn() {
                         11.9-11.9V11.9C216 5.3 210.7 0 204.1 0z">
                                 </path>
                             </svg>
-                            Facebook
                         </div>
                     </a>
                     <a className={styles.divButton} href="/auth/google">
@@ -74,11 +73,10 @@ export default function SignIn() {
                                     <path fill="none" d="M0 0h48v48H0z">
                                     </path></g>
                             </svg>
-                            Google
                         </div>
                     </a>
                 </div>
-                <img className="arrowDownIcon" src="imgs/arrow-down.gif" />
+                <img className="arrowDownIcon" src="imgs/scroll-down.gif" />
             </div>
             <div className="sideIntro mainSide">
                 <div className={styles.containerCarousel}>

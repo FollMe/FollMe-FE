@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import '../auth/SignIn.module.scss';
-import './Home.css';
+import styles from './Home.module.scss';
 
 export default function Home() {
     useEffect(() => {
@@ -9,25 +9,24 @@ export default function Home() {
     return (
         <div className="containerMain">
             <div className="sideFeature mainSide">
-                <div className="functionBox">
-                    <a href="story">
-                        <div className="boxIcon">
-                            <img alt="Story" className="boxImg" src="imgs/reading-book.png" />
+                <div className={styles.functionBox}>
+                    <a href="stories">
+                        <div className={styles.boxIcon}>
+                            <img alt="Story" className={styles.boxImg} src="imgs/reading-book.png" />
                         </div>
                     </a>
-                    <div className="functionName">Đọc truyện</div>
+                    <div className={styles.functionName}>Đọc truyện</div>
                 </div>
-                <img className="arrowDownIcon" src="imgs/arrow-down.gif" />
             </div>
 
             <div className="sideIntro mainSide">
-                <div className="functionBox">
+                <div className={styles.functionBox}>
                     <a >
-                        <div className="boxIcon">
-                            <img alt="Manage link" className="boxImg" src="imgs/manage-link.png" />
+                        <div className={styles.boxIcon}>
+                            <img alt="Manage link" className={styles.boxImg} src="imgs/manage-link.png" />
                         </div>
                     </a>
-                    <div className="functionName">Chia sẻ câu chuyện của bạn<br /></div>
+                    <div className={styles.functionName}>Chia sẻ câu chuyện của bạn<br /></div>
                 </div>
             </div>
         </div>
