@@ -1,10 +1,10 @@
-import { Outlet } from "react-router-dom";
-import AuthHeader from "../../components/AuthHeader";
+import { Outlet } from "react-router-dom"
+import Header from "../../components/Header"
 
-export default function AuthLayout() {
+export default function MainLayout({ type }) {
   return (
     <>
-      <AuthHeader />
+      <Header type={type} />
       <Outlet />
     </>
   )

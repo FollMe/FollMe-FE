@@ -1,0 +1,26 @@
+.body {
+    margin-top: 30px;
+    text-align: center;
+    height: calc(90vh);
+}
+
+.selectChap {
+    margin-top: 50px;
+    list-style: none;
+    padding-left: 0px;
+}
+
+.selectChap>a {
+    display: inline-block;
+}
+
+.chapNumber {
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-block;
+    width: 50px;
+    background-color: var(--theme-color);
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: white;
+}

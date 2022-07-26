@@ -7,9 +7,17 @@ import ImageCarousel from "../../components/ImageCarousel";
 
 
 export default function SignIn() {
+    const [showScrollImg, setShowScrollImg] = useState(true);
     const [message, useMessage] = useState('');
     useEffect(() => {
         document.title = "Đăng nhập | FollMe";
+        window.addEventListener("scroll", () => {
+            if (window.scrollY > 50) {
+                setShowScrollImg(false);
+            } else {
+                setShowScrollImg(true);
+            }
+        })
     }, [])
 
     return (
@@ -76,7 +84,12 @@ export default function SignIn() {
                         </div>
                     </a>
                 </div>
-                <img className="arrowDownIcon" src="imgs/scroll-down.gif" />
+                <img
+                    className={clsx("arrowDownIcon", {
+                        "arrowDownIconHide": !showScrollImg
+                    })}
+                    src="imgs/scroll-down.gif"
+                />
             </div>
             <div className="sideIntro mainSide">
                 <div className={styles.containerCarousel}>

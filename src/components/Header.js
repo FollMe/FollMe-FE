@@ -1,6 +1,12 @@
-import styles from './AuthHeader.module.scss';
+import normalStyles from './NormalHeader.module.scss';
+import mobileStyles from './MobileHeader.module.scss';
+import { HEADER_TYPE } from "../config/enum";
 
-export default function AuthHeader() {
+export default function Header({ type }) {
+    let styles = normalStyles;
+    if (type === HEADER_TYPE.MOBILE) {
+        styles = mobileStyles;
+    }
     return (
         <header>
             <nav className={styles.navbarMe}>
@@ -8,9 +14,9 @@ export default function AuthHeader() {
                 <h1>FollMe</h1>
                 <div className="user-box">
                     <span className="user-name">
-                        quoc-sum
+                        Quoc Sum
                     </span>
-                    <img src="/img/user.svg" alt="FollMe Logo" className="nav-avt" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false"
+                    <img src="/img/user.svg" alt="FollMe Logo" className="nav-avt" id="dropdownMenuButton1" data-bs-toggle="dropdown"
                         onError={({ currentTarget }) => {
                             currentTarget.onerror = null;
                             currentTarget.src = "/imgs/user.svg";

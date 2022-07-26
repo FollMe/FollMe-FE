@@ -1,15 +1,21 @@
-import './BaseView.css';
-import './SelectChap.css'
+// import './SelectChap.css'
+import styles from './SelectChap.module.scss';
 
 export default function SelectChap() {
     return (
-        <div className="container-view grid">
-            <div className="body">
-                <h4>Truyện: Yêu nhầm chị hai, được nhầm em gái</h4>
-                <div className="box-select-chap">
-                    <ul className="select-chap">
+        <div className="container-view grid mobilePage">
+            <div className={styles.body}>
+                <h4>Truyện: Yêu nhầm chị hai, được nhầm em gái va cuoi cung la kha buon luon</h4>
+                <div>
+                    <ul className={styles.selectChap}>
                         <a href="story/view/?chap={{this.chap}}">
-                            <li className="chap-number">1</li>
+                            <li className={styles.chapNumber}>1</li>
+                        </a>
+                        <a href="story/view/?chap={{this.chap}}">
+                            <li className={styles.chapNumber}>2</li>
+                        </a>
+                        <a href="story/view/?chap={{this.chap}}">
+                            <li className={styles.chapNumber}>3</li>
                         </a>
                     </ul>
                 </div>

@@ -1,26 +1,26 @@
 import { Navigate, useRoutes } from "react-router-dom";
 import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
-import AuthLayout from "./layouts/AuthLayout";
-import MainLayout from "./layouts/MainLayout";
 import Home from "./pages/main/Home";
 import SelectChap from "./pages/story/SelectChap";
 import Story from "./pages/story/Story";
+import MainLayout from "./layouts/MainLayout";
+import { HEADER_TYPE } from "./config/enum";
 
 export default function Router() {
   return useRoutes([
     {
-      element: <AuthLayout />,
+      element: <MainLayout />,
       children: [
         { path: 'sign-in', element: <SignIn /> },
-        { path: 'sign-up', element: <SignUp /> }
+        { path: 'sign-up', element: <SignUp /> },
+        { path: '/', element: <Home /> },
+        { path: '/stories', element: <Story /> },
       ]
     },
     {
-      element: <MainLayout />,
+      element: <MainLayout type={HEADER_TYPE.MOBILE} />,
       children: [
-        { path: '/', element: <Home /> },
-        { path: '/stories', element: <Story /> },
         { path: '/stories/select-chap', element: <SelectChap /> }
       ]
     },
