@@ -1,0 +1,38 @@
+.boxContent {
+    margin: 0 auto;
+    width: 100%;
+    min-height: calc(100vh - 196px);
+}
+
+.chapNumber{
+    font-size: 1.8rem;
+    margin: 10px;
+}
+.content {
+    line-height: 2.9rem;
+    padding-right: 20px;
+    padding-left: 20px;
+    font-family: 'Roboto';
+    font-size: 1.7rem;
+    text-align: justify;
+    white-space: pre-line;
+}
+
+.buttonChap {
+    min-width: 40px;
+    text-align: center;
+    color: white;
+    border-radius: 5px;
+    padding: 2px;
+    display: inline-block;
+    font-size: 1.5rem;
+    background-color: var(--theme-color);
+    margin-top: 20px;
+}
+.paginateChap {
+    text-align: center;
+}
+
+.paginateChap > a {
+    display: inline-block;
+}

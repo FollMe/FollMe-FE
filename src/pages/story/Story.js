@@ -1,32 +1,35 @@
-import { useEffect } from 'react';
-import Grid from '@mui/material/Grid';
-import StoryItem from '../../components/StoryItem';
-import Typography from '@mui/material/Typography';
+import AppsIcon from '@mui/icons-material/Apps';
+import styles from "./Story.module.scss";
 
 export default function Story() {
-    useEffect(() => {
-        document.title = "Truyện | FollMe";
-    }, [])
     return (
-        <div className="containerMain">
-            <div className="containerStory">
-                <Typography gutterBottom variant="h4" component="div" sx={{ paddingLeft: 2 }}>
-                    DANH SÁCH TRUYỆN:
-                </Typography>
+        <div className="container-view grid">
+            <div className={styles.chapNumber}><b>Chap: 1</b></div>
+            <div className={styles.boxContent}>
+                <pre className={styles.content}>
+                    tính ra cái rank dưới này skill khủng nhiều. Cơ mà mấy bố ủ nó lên men lên mốc luôn nên k vào giải, còn mấy thằng vào giải toàn mấy thằng quèn quèn skill 5-7.
+                    điển hình như thằng dưới, có đợt nó rủ mình tập trận hoài, đánh oải luôn mà nó vẫn không ăn đc 😂😂 nay thấy nó top với vài đứa khác quen quen, toàn top 30/30.
+                </pre>
+                <div className={styles.paginateChap}>
+                    <span>Đang đọc: Chap 1 <br /> Tiếp theo:</span>
+                    {/* {{ #if nextChap }}
+                    <a href="/story/view/?chap={{nextChap.chap}}"><div className="button-chap">{{ nextChap.chap }}</div></a>
 
-                <Grid container columnSpacing={2} rowSpacing={4} sx={{ padding: 2 }} style={{ display: "flex", justifyItems: "center", alignContent: "center", alignItems: "center", direction: "row" }}>
-                    <Grid item xs={12} sm={6} md={4}>
-                        <StoryItem />
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={4}>
-                        <StoryItem />
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={4}>
-                        <StoryItem />
-                    </Grid>
-                </Grid>
+                    {{ else}}
+                    <span>Đang viết</span>
+                    {{/if}} */}
+                    <a href="/story">
+                        <div className={styles.buttonChap}>
+                            <AppsIcon sx={{ fontSize: 24 }} />
+                        </div>
+                    </a>
+                </div>
 
             </div>
+            <footer>
+                <img src="/imgs/follme-logo.png" alt="follme-logo" className="follme-logo" />
+                <h4>FollMe</h4>
+            </footer>
         </div>
     )
 }
