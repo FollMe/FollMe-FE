@@ -3,12 +3,12 @@ import { useState, useEffect } from "react"
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
 import styles from './SignIn.module.scss';
-import ImageCarousel from "../../components/ImageCarousel";
+import ImageCarousel from "components/ImageCarousel";
 
 
 export default function SignIn() {
     const [showScrollImg, setShowScrollImg] = useState(true);
-    const [message, useMessage] = useState('');
+    const [message] = useState('');
     useEffect(() => {
         document.title = "Đăng nhập | FollMe";
         window.addEventListener("scroll", () => {
@@ -89,6 +89,7 @@ export default function SignIn() {
                         "arrowDownIconHide": !showScrollImg
                     })}
                     src="imgs/scroll-down.gif"
+                    alt="arrow down"
                 />
             </div>
             <div className="sideIntro mainSide">

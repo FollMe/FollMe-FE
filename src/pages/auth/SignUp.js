@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
 import AddModeratorIcon from '@mui/icons-material/AddModerator';
-import ImageCarousel from "../../components/ImageCarousel";
+import ImageCarousel from "components/ImageCarousel";
 
 import styles from './SignIn.module.scss';
 
@@ -22,7 +22,7 @@ export default function SignUp() {
             }
         })
     }, [])
-    const [message, useMessage] = useState('');
+    const [message] = useState('');
 
     return (
         <div className="containerMain">
@@ -98,6 +98,7 @@ export default function SignUp() {
                         "arrowDownIconHide": !showScrollImg
                     })}
                     src="imgs/scroll-down.gif"
+                    alt="arrow down"
                 />
 
             </div>

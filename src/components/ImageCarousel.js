@@ -24,11 +24,11 @@ export default function ImageCarousel(props) {
             duration={600}
         >
             <div className={styles.carouselItem}>
-                <img className={styles.imgCarousel} src="imgs/S2_Lecture.jpg" />
+                <img className={styles.imgCarousel} alt="Share your story" src="imgs/S2_Lecture.jpg" />
                 <div className={styles.titleBio}> Chia sẻ câu chuyện cá nhân </div>
             </div>
             <div className={styles.carouselItem}>
-                <img className={styles.imgCarousel} src="imgs/3 (2).jpg" />
+                <img className={styles.imgCarousel} alt="Founder" src="imgs/3 (2).jpg" />
                 <div className={styles.titleBio}>
                     Tôi cảm thấy tự hào khi được chia sẻ câu chuyện của mình đến với mọi người!
                     <br /><br />

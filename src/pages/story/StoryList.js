@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import Grid from '@mui/material/Grid';
-import StoryItem from '../../components/StoryItem';
 import Typography from '@mui/material/Typography';
+import StoryItem from 'components/StoryItem';
 
 export default function StoryList() {
     useEffect(() => {
