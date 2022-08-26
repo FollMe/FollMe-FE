@@ -58,6 +58,7 @@ input[type=number] {
 }
 .nav-avt {
   width: 45px;
+  cursor: pointer;
 }
 
 .dropdown-item {

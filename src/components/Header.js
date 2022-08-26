@@ -2,9 +2,11 @@ import normalStyles from './NormalHeader.module.scss';
 import mobileStyles from './MobileHeader.module.scss';
 import { HEADER_TYPE } from "../config/enum";
 import { useUserInfo } from 'customHooks/useUserInfo';
+import UserMenu from './UserMenu';
 
 export default function Header({ type }) {
     const [ userInfo ] = useUserInfo();
+
     let styles = normalStyles;
     if (type === HEADER_TYPE.MOBILE) {
         styles = mobileStyles;
@@ -18,15 +20,9 @@ export default function Header({ type }) {
                     <span className="user-name">
                         {userInfo.slEmail}
                     </span>
-                    <img src={userInfo.avatar.link} alt="FollMe Logo" className="nav-avt" id="dropdownMenuButton1" data-bs-toggle="dropdown"
-                        onError={({ currentTarget }) => {
-                            currentTarget.onerror = null;
-                            currentTarget.src = "/imgs/user.svg";
-                        }}
-                    />
-                    {/* <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                        <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
-                    </ul> */}
+                    {
+                        Object.keys(userInfo).length !== 0 ?  <UserMenu picture={userInfo.avatar?.link} /> : <></>
+                    }
                 </div>
             </nav>
         </header>

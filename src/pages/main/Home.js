@@ -21,7 +21,7 @@ export default function Home() {
 
             <div className="sideIntro mainSide">
                 <div className={styles.functionBox}>
-                    <a >
+                    <a href="shares" disabled>
                         <div className={styles.boxIcon}>
                             <img alt="Manage link" className={styles.boxImg} src="imgs/manage-link.png" />
                         </div>

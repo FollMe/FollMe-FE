@@ -5,6 +5,8 @@ export default async function handleError(response, message) {
         case 401:
             toast.error(message ?? 'Please login!');
             setTimeout(() => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('userInfo');
                 if (window.location.pathname !== '/sign-in') {
                     window.location.assign('/sign-in');
                 }

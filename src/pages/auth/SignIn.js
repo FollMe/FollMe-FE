@@ -15,11 +15,15 @@ import { request, authRouteList } from "util/request";
 export default function SignIn() {
     const navigate = useNavigate();
     const [showScrollImg, setShowScrollImg] = useState(true);
-    const [, setUserInfo] = useUserInfo();
+    const [userInfo, setUserInfo] = useUserInfo();
     const [message] = useState('');
 
     useEffect(() => {
         document.title = "Đăng nhập | FollMe";
+
+        if (Object.keys(userInfo).length !== 0) {
+            navigate('/');
+        }    
         window.addEventListener("scroll", () => {
             if (window.scrollY > 50) {
                 setShowScrollImg(false);
@@ -27,7 +31,7 @@ export default function SignIn() {
                 setShowScrollImg(true);
             }
         })
-    }, [])
+    }, [userInfo, navigate])
 
     async function oauthFacebookCallback(res) {
         try {

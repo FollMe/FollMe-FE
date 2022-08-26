@@ -1,19 +1,32 @@
 import clsx from "clsx";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
 import AddModeratorIcon from '@mui/icons-material/AddModerator';
+import FacebookLogin from 'react-facebook-login';
+import { toast } from 'react-toastify';
+
+import { request, authRouteList } from "util/request";
 import ImageCarousel from "components/ImageCarousel";
+import { useUserInfo } from "customHooks/useUserInfo";
 
 import styles from './SignIn.module.scss';
 
 
 
 export default function SignUp() {
+    const navigate = useNavigate();
     const [showScrollImg, setShowScrollImg] = useState(true);
+    const [userInfo, setUserInfo] = useUserInfo();
+    const [message] = useState('');
 
     useEffect(() => {
         document.title = "Đăng kí | FollMe";
+
+        if (Object.keys(userInfo).length !== 0) {
+            navigate('/');
+        }
         window.addEventListener("scroll", () => {
             if (window.scrollY > 50) {
                 setShowScrollImg(false);
@@ -21,8 +34,23 @@ export default function SignUp() {
                 setShowScrollImg(true);
             }
         })
-    }, [])
-    const [message] = useState('');
+    }, [userInfo, navigate])
+
+    async function oauthFacebookCallback(res) {
+        try {
+            if (!res || !res.accessToken) {
+                toast.error("Đăng nhập thất bại!");
+            }
+
+            const userInfo = await request.authenticate(authRouteList.facebook, { accessToken: res.accessToken });
+            if (userInfo) {
+                setUserInfo(userInfo);
+                navigate('/');
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
 
     return (
         <div className="containerMain">
@@ -63,18 +91,25 @@ export default function SignUp() {
                 </div>
                 <div className={styles.titleMethod}><hr />Hoặc đăng nhập bằng<hr /></div>
                 <div className={styles.login}>
-                    <a className={styles.divButton} href="/auth/facebook">
-                        <div className={clsx(styles.svg, styles.fbLogin)}>
-                            <svg xmlns="http://www.w3.org/20svg" viewBox="0 0 216 216" className="_5h0m" color="#FFFFFF">
-                                <path fill="#FFFFFF" d="M204.1 0H11.9C5.3 0 0 5.3 0 11.9v192.2c0 6.6 5.3 11.9 11.9
-                        11.9h103.5v-83.6H87.2V99.8h28.1v-24c0-27.9 17-43.1 41.9-43.1
-                        11.9 0 22.2.9 25.2 1.3v29.2h-17.3c-13.5 0-16.2 6.4-16.2
-                        15.9v20.8h32.3l-4.2 32.6h-28V216h55c6.6 0 11.9-5.3
-                        11.9-11.9V11.9C216 5.3 210.7 0 204.1 0z">
-                                </path>
-                            </svg>
-                        </div>
-                    </a>
+                    <FacebookLogin
+                        appId="846535309333317"
+                        fields="name, picture"
+                        callback={oauthFacebookCallback}
+                        cssClass="oauth-button-class"
+                        icon={
+                            <div className={clsx(styles.svg, styles.fbLogin)}>
+                                <svg xmlns="http://www.w3.org/20svg" viewBox="0 0 216 216" className="_5h0m" color="#FFFFFF">
+                                    <path fill="#FFFFFF" d="M204.1 0H11.9C5.3 0 0 5.3 0 11.9v192.2c0 6.6 5.3 11.9 11.9
+                                            11.9h103.5v-83.6H87.2V99.8h28.1v-24c0-27.9 17-43.1 41.9-43.1
+                                            11.9 0 22.2.9 25.2 1.3v29.2h-17.3c-13.5 0-16.2 6.4-16.2
+                                            15.9v20.8h32.3l-4.2 32.6h-28V216h55c6.6 0 11.9-5.3
+                                            11.9-11.9V11.9C216 5.3 210.7 0 204.1 0z">
+                                    </path>
+                                </svg>
+                            </div>
+                        }
+                        textButton=""
+                    />
                     <a className={styles.divButton} href="/auth/google">
                         <div className={clsx(styles.svg, styles.googleLogin)}>
                             <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 48 48" className="abcRioButtonSvg">
