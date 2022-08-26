@@ -440,3 +440,8 @@ textarea.form-control {
     background: none;
     border: none;
 }
+
+.keyText {
+    color: var(--theme-color);
+    font-weight: bold;
+}
