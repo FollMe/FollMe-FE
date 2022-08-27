@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import { useState, useEffect } from "react"
 import { useNavigate } from 'react-router-dom';
+import { Formik, Field, ErrorMessage, Form } from 'formik';
 import FacebookLogin from 'react-facebook-login';
 import { toast } from 'react-toastify';
 import EmailIcon from '@mui/icons-material/Email';
@@ -12,6 +13,23 @@ import ImageCarousel from "components/ImageCarousel";
 import { useUserInfo } from "customHooks/useUserInfo";
 import { request, authRouteList } from "util/request";
 
+const validate = (values) => {
+    const errors = {};
+  
+    if (!values.email) {
+      errors.email = 'Vui lòng nhập email';
+    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
+      errors.email = 'Email không hợp lệ';
+    }
+
+    if (!values.password) {
+        errors.password = 'Vui lòng nhập mật khẩu';
+    } else if (values.password.length < 6) {
+        errors.password = 'Mật khẩu phải có ít nhất 6 kí tự';
+    }
+  
+    return errors;
+};
 
 export default function SignIn() {
     const navigate = useNavigate();
@@ -19,6 +37,7 @@ export default function SignIn() {
     const [userInfo, setUserInfo] = useUserInfo();
     const [isOauthFacebookLoading, setIsOauthFacebookLoading] = useState(false);
     const [isOauthGoogleLoading, setIsOauthGoogleLoading] = useState(false);
+    const [isAuthLocalLoading, setIsAuthLocalLoading] = useState(false);
     const [message] = useState('');
 
     useEffect(() => {
@@ -85,34 +104,63 @@ export default function SignIn() {
         }
     }
 
+    async function authLocalCallback({ email, password }) {
+        try {
+            setIsAuthLocalLoading(true);
+            const userInfo = await request.authenticate(authRouteList.local, { email, password });
+            setIsAuthLocalLoading(false);
+            if (userInfo) {
+                setUserInfo(userInfo);
+                navigate('/');
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
     return (
         <div className="containerMain">
             <div className="sideFeature mainSide">
                 <div className={styles.introTitle}> Chào mừng bạn </div>
                 <div className={styles.titleMethod}><hr /> Đăng nhập bằng email <hr /></div>
                 <div className={styles.login}>
-                    <form id="login-form" method="post" className={styles.loginForm}>
-                        <div className={styles.loginForm_Text}>
-                            <div className={styles.notifyInput}> {message} </div>
-                            <EmailIcon className={styles.fontIcon} style={{ fontSize: '2.2rem' }} />
-                            <input className={styles.inputField} name="email" type="text" placeholder="Tài khoản email" />
-                        </div>
-                        <div className={styles.loginForm_Text}>
-                            <div className={styles.notifyInput}> {message} </div>
-                            <LockIcon className={styles.fontIcon} style={{ fontSize: '2.2rem' }} />
-                            <input className={styles.inputField} name="password" type="password" placeholder="Mật khẩu" />
-                        </div>
-                        <div className={styles.loginFormRMB}>
-                            <div className={styles.formGroup}>
-                                <input type="checkbox" name="isRemember" />
-                                <label htmlFor="isRemember">Lưu trạng thái</label>
-                            </div>
-                            <div className={styles.titleForgetPassword}>Quên mật khẩu</div>
-                        </div>
-                        <div className={styles.loginForm_Submit}>
-                            <input type="button" value="Đăng nhập" />
-                        </div>
-                    </form>
+                    <Formik
+                        initialValues={{
+                            email: '',
+                            password: '',
+                        }}
+                        onSubmit={authLocalCallback}
+                        validate={validate}
+                    >
+                        {({}) => (
+                            <Form id="login-form" method="post" className={styles.loginForm}>
+                                <div className={styles.loginForm_Text}>
+                                    <div className={styles.notifyInput}> {message} </div>
+                                    <EmailIcon className={styles.fontIcon} style={{ fontSize: '2.2rem' }} />
+                                    <Field name="email" className={clsx(styles.inputField)} type="text" placeholder="Tài khoản email" />
+                                    <ErrorMessage name="email" render={msg => <div className="txtErrorInput">{msg}</div>} />
+                                </div>
+                                <div className={styles.loginForm_Text}>
+                                    <div className={styles.notifyInput}> {message} </div>
+                                    <LockIcon className={styles.fontIcon} style={{ fontSize: '2.2rem' }} />
+                                    <Field className={styles.inputField} name="password" type="password" placeholder="Mật khẩu" />
+                                    <ErrorMessage name="password" render={msg => <div className="txtErrorInput">{msg}</div>} />
+                                </div>
+                                <div className={styles.loginFormRMB}>
+                                    <div className={styles.formGroup}>
+                                        <Field type="checkbox" name="isRemember" />
+                                        <label htmlFor="isRemember">Lưu trạng thái</label>
+                                    </div>
+                                    <div className={styles.titleForgetPassword}>Quên mật khẩu</div>
+                                </div>
+                                <div className={styles.loginForm_Submit}>
+                                    <button type="submit" disabled={isAuthLocalLoading}> 
+                                        {isAuthLocalLoading ? <LoadingIcons.TailSpin style={{ width: 30 }} /> : "Đăng nhập"} 
+                                    </button>
+                                </div>
+                            </Form>
+                        )}
+                    </Formik>
 
                 </div>
                 <div className={styles.loginFoot}>

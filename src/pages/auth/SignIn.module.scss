@@ -65,7 +65,7 @@ header {
     margin-top: 30px;
 }
 
-.loginForm_Submit > input {
+.loginForm_Submit > button {
     cursor: pointer;
     width: 100%;
     height: 40px;
@@ -73,6 +73,10 @@ header {
     border-radius: 4px;
     color: white;
     background-color: var(--theme-color);
+}
+
+.loginForm_Submit > button:disabled {
+    opacity: 0.8;
 }
 
 .svg {

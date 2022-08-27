@@ -118,7 +118,7 @@ export default function SignUp() {
                         </div>
 
                         <div className={styles.loginForm_Submit}>
-                            <input type="button" value="Đăng kí" />
+                            <button type="submit"> Đăng kí </button>
                         </div>
                     </form>
 

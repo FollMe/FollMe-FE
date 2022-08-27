@@ -66,8 +66,8 @@ async function authenticate(route, data) {
 export const authRouteList = {
     'facebook': 'api/auth/facebook',
     'google': 'api/auth/google',
-    'local': 'sign-in',
-    'default': 'sign-in'
+    'local': 'api/auth/local',
+    'default': 'api/auth/local'
 }
 
 export const request = { get, post, authenticate };
