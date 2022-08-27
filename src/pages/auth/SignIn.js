@@ -120,7 +120,7 @@ export default function SignIn() {
                         appId={process.env.REACT_APP_FACEBOOK_APP_ID}
                         fields="name, picture"
                         callback={oauthFacebookCallback}
-                        cssClass="oauth-button-class"
+                        cssClass={clsx(styles.loginFacebookButton, styles.oauthButton)}
                         icon={
                             <div className={clsx(styles.svg, styles.fbLogin)}>
                                 <svg xmlns="http://www.w3.org/20svg" viewBox="0 0 216 216" className="_5h0m" color="#FFFFFF">
@@ -136,7 +136,7 @@ export default function SignIn() {
                         textButton=""
                     />
 
-                    <div id="login-google-button" className={clsx(styles.svg, styles.googleLogin)}></div>
+                    <div id="login-google-button" className={clsx(styles.svg, styles.googleLogin, styles.oauthButton)}></div>
                 </div>
                 <img
                     className={clsx("arrowDownIcon", {

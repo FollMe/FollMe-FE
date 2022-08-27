@@ -436,11 +436,6 @@ textarea.form-control {
     padding-left: 20px;
 }
 
-.oauth-button-class {
-    background: none;
-    border: none;
-}
-
 .keyText {
     color: var(--theme-color);
     font-weight: bold;
