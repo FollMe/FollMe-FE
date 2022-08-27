@@ -18,7 +18,7 @@ export default function Header({ type }) {
                 <h1>FollMe</h1>
                 <div className="user-box">
                     <span className="user-name">
-                        {userInfo.slEmail}
+                        {userInfo.name ?? userInfo.slEmail}
                     </span>
                     {
                         Object.keys(userInfo).length !== 0 ?  <UserMenu picture={userInfo.avatar?.link} /> : <></>
