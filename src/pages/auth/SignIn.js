@@ -44,7 +44,7 @@ export default function SignIn() {
         document.title = "Đăng nhập | FollMe";
 
         if (Object.keys(userInfo).length !== 0) {
-            navigate('/');
+            return navigate('/');
         }
         window.addEventListener("scroll", () => {
             if (window.scrollY > 50) {

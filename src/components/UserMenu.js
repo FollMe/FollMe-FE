@@ -1,8 +1,10 @@
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { styled, alpha } from '@mui/material/styles';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { useUserInfo } from 'customHooks/useUserInfo';
 
 const StyledMenu = styled((props) => (
     <Menu
@@ -47,6 +49,8 @@ const StyledMenu = styled((props) => (
 }));
 
 export default function UserMenu({ picture }) {
+    const navigate = useNavigate();
+    const [userInfo, setUserInfo] = useUserInfo();
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
     const handleClick = (event) => {
@@ -60,7 +64,8 @@ export default function UserMenu({ picture }) {
         localStorage.removeItem('token');
         localStorage.removeItem('userInfo');
         if (window.location.pathname !== '/sign-in') {
-            window.location.assign('/sign-in');
+            setUserInfo({});
+            return navigate('/sign-in');
         }
     }
 
