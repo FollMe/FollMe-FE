@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { useState, useEffect } from "react"
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Formik, Field, ErrorMessage, Form } from 'formik';
 import FacebookLogin from 'react-facebook-login';
 import { toast } from 'react-toastify';
@@ -83,6 +83,7 @@ export default function SignIn() {
             }
         } catch (err) {
             console.log(err);
+            setIsOauthFacebookLoading(false);
         }
     }
 
@@ -101,6 +102,7 @@ export default function SignIn() {
             }
         } catch (err) {
             console.log(err);
+            setIsOauthGoogleLoading(false);
         }
     }
 
@@ -115,6 +117,7 @@ export default function SignIn() {
             }
         } catch (err) {
             console.log(err);
+            setIsAuthLocalLoading(false);
         }
     }
 
@@ -132,7 +135,7 @@ export default function SignIn() {
                         onSubmit={authLocalCallback}
                         validate={validate}
                     >
-                        {({}) => (
+                        {() => (
                             <Form id="login-form" method="post" className={styles.loginForm}>
                                 <div className={styles.loginForm_Text}>
                                     <div className={styles.notifyInput}> {message} </div>
@@ -164,7 +167,7 @@ export default function SignIn() {
 
                 </div>
                 <div className={styles.loginFoot}>
-                    Nếu chưa có tài khoản, vui lòng <a href="/sign-up"> đăng kí </a>
+                    Nếu chưa có tài khoản, vui lòng <Link to="/sign-up"> đăng kí </Link>
                 </div>
                 <div className={styles.titleMethod}><hr />Hoặc đăng nhập bằng<hr /></div>
                 <div className={styles.login}>

@@ -50,6 +50,9 @@ header {
     line-height: 36px;
 }
 
+.inputField::placeholder {
+    padding: 2px;
+}
 .loginFormRMB {
     font-size: 1.3rem;
     display: flex;
@@ -129,7 +132,6 @@ header {
 }
 
 .btnSendCode {
-    display: none;
     position: absolute;
     right: 8px;
     line-height: 40px;
@@ -145,7 +147,7 @@ header {
     position: absolute;
     right: 8px;
     line-height: 23px;
-    bottom: 8px;
+    top: 8px;
 }
 
 .txtTimeDown {

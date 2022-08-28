@@ -1,6 +1,12 @@
 import { toast } from 'react-toastify';
 import handleError from './handleError';
 
+function ServerError(message) {
+    const error = new Error(message);
+    error.name = 'SERVER_ERROR';
+    return error;
+}
+
 async function post(url = '', data = {}, isHaveFile = false) {
     try {
         const token = localStorage.getItem('token');
@@ -23,13 +29,15 @@ async function post(url = '', data = {}, isHaveFile = false) {
 
         if (!dataRes.meta.ok) {
             handleError(response, dataRes.meta.message);
-            return new Error(dataRes.meta.message);
+            throw ServerError(dataRes.meta.message);
         }
 
         return dataRes.data;
     } catch (err) {
-        toast.error("Xảy ra lỗi, vui lòng thử lại!");
-        return err;
+        if (err.name !== 'SERVER_ERROR') {
+            toast.error("Xảy ra lỗi, vui lòng thử lại!");
+        }
+        throw err;
     }
 }
 

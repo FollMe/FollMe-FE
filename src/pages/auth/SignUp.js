@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { Formik, Field, ErrorMessage, Form } from 'formik';
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
 import AddModeratorIcon from '@mui/icons-material/AddModerator';
@@ -14,6 +15,24 @@ import { useUserInfo } from "customHooks/useUserInfo";
 
 import styles from './SignIn.module.scss';
 
+// unit: second
+const REQUEST_CODE_INTERVAL = 30;
+
+const validate = (values) => {
+    const errors = {};
+ 
+    if (!values.code) {
+        errors.code = 'Yêu cầu mã xác thực';
+    }
+
+    if (!values.password) {
+        errors.password = 'Yêu cầu mật khẩu';
+    } else if (values.password.length < 6) {
+        errors.password = 'Mật khẩu phải có ít nhất 6 kí tự';
+    }
+  
+    return errors;
+};
 
 
 export default function SignUp() {
@@ -22,7 +41,11 @@ export default function SignUp() {
     const [userInfo, setUserInfo] = useUserInfo();
     const [isOauthFacebookLoading, setIsOauthFacebookLoading] = useState(false);
     const [isOauthGoogleLoading, setIsOauthGoogleLoading] = useState(false);
-    const [message] = useState('');
+    const [isRequestCodeLoading, setIsRequestCodeLoading] = useState(false);
+    const [isRequestSignUpLoading, setIsRequestSignUpLoading] = useState(false);
+    const [email, setEmail] = useState('');
+    const [waitTime, setWaitTime] = useState(0);
+    const isValidEmail = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email);
 
     useEffect(() => {
         document.title = "Đăng kí | FollMe";
@@ -47,8 +70,8 @@ export default function SignUp() {
             window.google.accounts.id.prompt();
             window.google.accounts.id.renderButton(
                 document.getElementById("login-google-button"), {
-                    type: "icon"
-                }
+                type: "icon"
+            }
             )
         }
     }, [])
@@ -68,6 +91,7 @@ export default function SignUp() {
             }
         } catch (err) {
             console.log(err);
+            setIsOauthFacebookLoading(false);
         }
     }
 
@@ -86,7 +110,51 @@ export default function SignUp() {
             }
         } catch (err) {
             console.log(err);
+            setIsOauthGoogleLoading(false);
         }
+    }
+
+    async function signUpLocalCallback(data) {
+        try {
+            setIsRequestSignUpLoading(true);
+            data.email = email;
+            await request.post('api/auth/sign-up', data);
+            setIsRequestSignUpLoading(false);
+            toast.success("Đăng kí tài khoản thành công, vui lòng đăng nhập");
+
+            setTimeout(() => {
+                navigate('/sign-in');
+            }, 4000);
+        } catch (err) {
+            console.log(err);
+            setIsRequestSignUpLoading(false);
+        }
+    }
+
+    async function handRequestGetCode() {
+        try {
+            setIsRequestCodeLoading(true);
+            await request.post('api/auth/code', { email });
+            setIsRequestCodeLoading(false);
+            countDownRequestTime();
+            toast.success("Đã gửi mã đến email của bạn");
+        } catch (err) {
+            console.log(err);
+            setIsRequestCodeLoading(false);
+        }
+    }
+
+    function countDownRequestTime() {
+        setWaitTime(REQUEST_CODE_INTERVAL);
+        const threadId = setInterval(() => {
+            setWaitTime(waitTime => {
+                if (waitTime <= 0) {
+                    clearInterval(threadId);
+                    return 0;
+                }
+                return waitTime - 1
+            });
+        }, 1000) 
     }
 
     return (
@@ -95,36 +163,64 @@ export default function SignUp() {
                 <div className={styles.introTitle}>Tạo tài khoản dễ dàng</div>
                 <div className={styles.titleMethod}><hr />Đăng kí bằng email<hr /></div>
                 <div className={styles.login}>
-                    <form id="form-login" action="sign-up" method="POST" className={styles.loginForm}>
-                        <div className={styles.loginForm_Text}>
-                            <div className={styles.notifyInput}>{message}</div>
-                            <EmailIcon className={styles.fontIcon} style={{ fontSize: '2.2rem' }} />
-                            <input className={styles.inputField} name="email" type="text" placeholder="Tài khoản email" required />
+                    <Formik
+                        initialValues={{
+                            email: '',
+                            code: '',
+                            password: '',
+                        }}
+                        onSubmit={signUpLocalCallback}
+                        validate={validate}
+                    >
+                        {() => (
+                            <Form id="form-login" action="sign-up" method="POST" className={styles.loginForm}>
+                                <div className={styles.loginForm_Text}>
+                                    <EmailIcon className={styles.fontIcon} style={{ fontSize: '2.2rem' }} />
+                                    <Field
+                                        className={styles.inputField}
+                                        name="email"
+                                        type="text"
+                                        placeholder="Tài khoản email"
+                                        required
+                                        value={email}
+                                        onChange={(event) => setEmail(event.target.value.trim())}
+                                    />
+                                    <ErrorMessage name="email" render={msg => <div className="txtErrorInput">{msg}</div>} />
+                                </div>
+                                <div className={styles.loginForm_Text}>
+                                    <div className={styles.notifyInput}></div>
+                                    <AddModeratorIcon className={styles.fontIcon} style={{ fontSize: '2.2rem' }} />
+                                    <i className="fas fa-shield-alt font-icon"></i>
+                                    <span className={styles.btnSendCode} style={{ display: isValidEmail ? "inline" : "none" }}
+                                        onClick={handRequestGetCode}
+                                    >
+                                        Nhận mã
+                                    </span>
+                                    <div className={styles.ctnFunction}>
+                                        {waitTime > 0 ? waitTime : (isRequestCodeLoading ? <LoadingIcons.TailSpin stroke="#ff6541" style={{ width: 23, height: 23 }} /> : null)}
+                                    </div>
+                                    <Field className={styles.inputField} name="code" type="number" step="1" placeholder="Mã xác thực" />
+                                    <ErrorMessage name="code" render={msg => <div className="txtErrorInput">{msg}</div>} />
+                                </div>
+                                <div className={styles.loginForm_Text}>
+                                    <div className={styles.notifyInput}></div>
+                                    <LockIcon className={styles.fontIcon} style={{ fontSize: '2.2rem' }} />
+                                    <Field className={styles.inputField} name="password" type="password" placeholder="Mật khẩu" />
+                                    <ErrorMessage name="password" render={msg => <div className="txtErrorInput">{msg}</div>} />
+                                </div>
 
-                        </div>
-                        <div className={styles.loginForm_Text}>
-                            <div className={styles.notifyInput}></div>
-                            <AddModeratorIcon className={styles.fontIcon} style={{ fontSize: '2.2rem' }} />
-                            <i className="fas fa-shield-alt font-icon"></i>
-                            <span className={styles.btnSendCode}>Nhận mã</span>
-                            <div className={styles.ctnFunction}></div>
-                            <input className={styles.inputField} name="code" type="number" step="1" placeholder="Mã xác thực" />
-
-                        </div>
-                        <div className={styles.loginForm_Text}>
-                            <div className={styles.notifyInput}></div>
-                            <LockIcon className={styles.fontIcon} style={{ fontSize: '2.2rem' }} />
-                            <input className={styles.inputField} name="password" type="password" placeholder="Mật khẩu" />
-                        </div>
-
-                        <div className={styles.loginForm_Submit}>
-                            <button type="submit"> Đăng kí </button>
-                        </div>
-                    </form>
+                                <div className={styles.loginForm_Submit}>
+                                    <button type="submit" disabled={isRequestSignUpLoading}>
+                                        {isRequestSignUpLoading ? <LoadingIcons.TailSpin style={{ width: 30 }} /> : "Đăng kí"} 
+                                    </button>
+                                </div>
+                            </Form>
+                        )}
+                    </Formik>
 
                 </div>
                 <div className={styles.loginFoot}>
-                    Đã có tài khoản, vui lòng <a href="/sign-in">đăng nhập</a>
+                    Đã có tài khoản, vui lòng <Link to="/sign-in">đăng nhập</Link>
                 </div>
                 <div className={styles.titleMethod}><hr />Hoặc đăng nhập bằng<hr /></div>
                 <div className={styles.login}>
@@ -135,7 +231,7 @@ export default function SignUp() {
                         cssClass={clsx(styles.loginFacebookButton, styles.oauthButton)}
                         icon={
                             <div className={clsx(styles.svg, styles.fbLogin)}>
-                               {
+                                {
                                     isOauthFacebookLoading ? <LoadingIcons.TailSpin style={{ top: 1 }} /> : (
                                         <svg xmlns="http://www.w3.org/20svg" viewBox="0 0 216 216" className="_5h0m" color="#FFFFFF">
                                             <path fill="#FFFFFF" d="M204.1 0H11.9C5.3 0 0 5.3 0 11.9v192.2c0 6.6 5.3 11.9 11.9

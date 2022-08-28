@@ -33,6 +33,11 @@ p {
     line-height: 1.6rem;
 }
 
+button, input {
+    font-family: inherit;
+    font-size: 1.4rem;
+}
+
 .grid {
     width: 720px;
     max-width: 100%;
@@ -445,5 +450,5 @@ textarea.form-control {
     text-align: left;
     margin-top: 5px;
     color: var(--error-color);
-    font-size: 13px;
+    font-size: 1.3rem;
 }
