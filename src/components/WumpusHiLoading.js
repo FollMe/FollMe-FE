@@ -1,6 +1,6 @@
-import HashLoader from 'react-spinners/HashLoader';
+import WumpusHi from './animations/WumpusHi';
 
-function HashLoading() {
+function WumpusHiLoading() {
   return (
     <div
       style={{
@@ -14,9 +14,9 @@ function HashLoading() {
         alignItems: 'center',
       }}
     >
-      <HashLoader color="#ff6541" />
+      <WumpusHi />
     </div>
   );
 }
 
-export default HashLoading;
+export default WumpusHiLoading;

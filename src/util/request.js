@@ -50,15 +50,19 @@ async function get(url = '') {
                 Authorization: `Bearer ${token}`
             },
         });
-        if (!response.ok) {
-            handleError(response);
+        const dataRes = await response.json();
+
+        if (!dataRes.meta.ok) {
+            handleError(response, dataRes.meta.message);
+            throw ServerError(dataRes.meta.message);
         }
 
-        const dataRes = await response.json();
         return dataRes.data;
     } catch (err) {
-        console.log(err);
-        return {};
+        if (err.name !== 'SERVER_ERROR') {
+            toast.error("Xảy ra lỗi, vui lòng thử lại!");
+        }
+        throw err;
     }
 }
 

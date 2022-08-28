@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 export default async function handleError(response, message) {
     switch (response.status) {
         case 401:
-            toast.error(message ?? 'Please login!');
+            toast.error(message ?? 'Vui lòng đăng nhập!');
             setTimeout(() => {
                 localStorage.removeItem('token');
                 localStorage.removeItem('userInfo');
@@ -16,7 +16,7 @@ export default async function handleError(response, message) {
             toast.error(message);
             break;
         case 404:
-            toast.error("Xảy ra lỗi, vui lòng thử lại!");
+            toast.error('Xảy ra lỗi, vui lòng thử lại!');
             break;
         default:
             break;
