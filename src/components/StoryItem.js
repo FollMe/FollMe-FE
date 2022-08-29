@@ -5,27 +5,37 @@ import Typography from '@mui/material/Typography';
 import { CardActionArea } from '@mui/material';
 import Divider from '@mui/material/Divider';
 
-export default function StoryItem({ name, author }) {
+import { formatDate } from 'util/date.js';
+
+export default function StoryItem({ story }) {
+    const name = story.name;
+    const author = story.author.name ?? "Không xác định";
+    const picture = story.picture?.link ?? "#";
+    const updatedAt = formatDate(story.updatedAt);
+
     return (
         <Card>
             <CardActionArea>
                 <CardMedia
                     component="img"
                     height="170"
-                    image="/imgs/microservice.jpeg"
-                    alt="green iguana"
+                    image={picture}
+                    alt="Story picture"
                     sx={{ aspectRatio: 16 / 9 }}
+                    onError={e => {
+                        e.target.src = "/imgs/default-story-background.webp";
+                    }}
                 />
                 <Divider />
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="div">
-                        Yêu nhầm chị hai được nhầm em gái
+                        {name}
                     </Typography>
                     <Typography variant="body" color="text.secondary" component="div" sx={{ paddingBottom: 0.5}}>
-                        Tác giả:    Leo Aslan
+                        Tác giả: {author}
                     </Typography>
                     <Typography variant="body" color="text.secondary">
-                        Ngày cập nhật: 17-07-2022
+                        Ngày cập nhật: {updatedAt}
                     </Typography>
                 </CardContent>
             </CardActionArea>
