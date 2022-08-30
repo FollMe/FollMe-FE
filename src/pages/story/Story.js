@@ -59,7 +59,7 @@ export default function Story() {
                                         >
                                             <div className={styles.buttonChap}>
                                                 <KeyboardArrowLeftIcon sx={{ fontSize: 24 }} />
-                                                <span style={{ marginLeft: 8 }}> Chap trước </span>
+                                                <span style={{ marginLeft: 5 }}> Trước </span>
                                             </div>
                                         </Link>
                                         <Link to={`/stories/${story.slug}`}>
@@ -72,7 +72,7 @@ export default function Story() {
                                             className={(!nextChap && styles.btnDisabled) || ""}
                                         >
                                             <div className={styles.buttonChap}>
-                                                <span style={{ marginRight: 8 }}> Chap tiếp &ensp;&nbsp; </span>
+                                                <span style={{ marginRight: 5 }}> Tiếp &ensp; </span>
                                                 <KeyboardArrowRightIcon sx={{ fontSize: 24 }} />
                                             </div>
                                         </Link>

@@ -50,7 +50,7 @@ const StyledMenu = styled((props) => (
 
 export default function UserMenu({ picture }) {
     const navigate = useNavigate();
-    const [userInfo, setUserInfo] = useUserInfo();
+    const [, setUserInfo] = useUserInfo();
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
     const handleClick = (event) => {

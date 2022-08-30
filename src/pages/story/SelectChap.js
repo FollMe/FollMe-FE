@@ -30,7 +30,7 @@ export default function SelectChap() {
                 console.log(err.message);
             }    
         }
-    }, [])
+    }, [storySlug])
     return (
         <>
             <div className="container-view grid mobilePage">
