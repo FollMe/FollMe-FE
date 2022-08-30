@@ -13,6 +13,8 @@ export default function SelectChap() {
     useEffect(() => {
         if (!story) {
            getStory();
+        } else {
+            document.title = `${story.name} | FollMe`;
         }
 
         async function getStory() {
@@ -20,6 +22,7 @@ export default function SelectChap() {
             if (!data.story) {
                 return;
             }
+            document.title = `${data.story.name} | FollMe`;
             setStory(data.story);
             setIsLoading(false);
         }

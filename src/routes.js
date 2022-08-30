@@ -4,6 +4,7 @@ import SignUp from "./pages/auth/SignUp";
 import Home from "./pages/main/Home";
 import SelectChap from "./pages/story/SelectChap";
 import Story from "./pages/story/Story";
+import ShortStory from "pages/story/ShortStory";
 import StoryList from "./pages/story/StoryList";
 import FacebookDataDeletionInstructions from "pages/document/FacebookDataDeletionInstructions";
 import MainLayout from "./layouts/MainLayout";
@@ -25,6 +26,7 @@ export default function Router() {
             children: [
                 { path: '/stories/:storySlug', element: <SelectChap /> },
                 { path: '/stories/:storySlug/:chapSlug', element: <Story /> },
+                { path: '/short-stories/:storySlug', element: <ShortStory /> },
                 { path: '/documents/facebook-data-deletion-instructions-url', element: <FacebookDataDeletionInstructions /> }
             ]
         },

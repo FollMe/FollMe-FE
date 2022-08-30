@@ -8,12 +8,8 @@ import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import WumpusHiLoading from 'components/WumpusHiLoading';
 
-export default function Story({ storySlug, chapSlug }) {
-    const params = useParams();
-    if (!storySlug || !chapSlug) {
-        storySlug = params.storySlug;
-        chapSlug = params.chapSlug;
-    }
+export default function Story() {
+    const { storySlug, chapSlug } = useParams();
     const [story, setStory] = useState({});
     const [nextChap, setNextChap] = useState({});
     const [previousChap, setPreviousChap] = useState({});
@@ -28,7 +24,7 @@ export default function Story({ storySlug, chapSlug }) {
             if (!data.story || data.story.chaps.length <= 0) {
                 return;
             }
-            console.log(data);
+            document.title = `${data.story.name} - ${data.story.chaps[0].name} | FollMe`;
             setStory(data.story);
             setPreviousChap(data.previousChap);
             setNextChap(data.nextChap);

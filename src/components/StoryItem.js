@@ -17,10 +17,17 @@ export default function StoryItem({ story }) {
     const updatedAt = formatDate(story.updatedAt);
 
     function handleClickItem() {
-        navigate(`/stories/${story.slug}`, {
-            state: { chaps: story.chaps, name: story.name } 
-        })
-        return;
+        if (story.type === STORY_TYPE.SERIES) {
+            navigate(`/stories/${story.slug}`, {
+                state: { chaps: story.chaps, name: story.name } 
+            })
+            return;
+        }
+
+        if (story.type === STORY_TYPE.SHORT) {
+            navigate(`/short-stories/${story.slug}`);
+            return;
+        }
     }
 
     return (
