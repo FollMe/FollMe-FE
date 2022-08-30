@@ -15,7 +15,7 @@ export default function Home() {
             setTimeout(async () => {
                 await request.get('api/auth/is-logged-in');
                 setIsLoading(false);
-            }, 1000);
+            }, 500);
         }
         checkIsLoggedIn();
     }, [])

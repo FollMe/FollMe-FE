@@ -77,7 +77,6 @@ export default function UserMenu({ picture }) {
                 aria-haspopup="true"
                 aria-expanded={open ? 'true' : undefined}
                 variant="contained"
-                disableElevation
                 onClick={handleClick}
             >
                 <img src={picture ?? '#'} alt="User Logo" className="nav-avt"

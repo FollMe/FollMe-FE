@@ -9,6 +9,7 @@ import StoryList from "./pages/story/StoryList";
 import FacebookDataDeletionInstructions from "pages/document/FacebookDataDeletionInstructions";
 import MainLayout from "./layouts/MainLayout";
 import { HEADER_TYPE } from "./config/enum";
+import Page404 from "pages/main/Page404";
 
 export default function Router() {
     return useRoutes([
@@ -19,6 +20,7 @@ export default function Router() {
                 { path: 'sign-up', element: <SignUp /> },
                 { path: '/', element: <Home /> },
                 { path: '/stories', element: <StoryList /> },
+                { path: '/404', element: <Page404 /> }
             ]
         },
         {
