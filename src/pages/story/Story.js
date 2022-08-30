@@ -20,15 +20,19 @@ export default function Story() {
 
         async function getStory() {
             setIsLoading(true);
-            const data = await request.get(`api/stories/${storySlug}/${chapSlug}`);
-            if (!data.story || data.story.chaps.length <= 0) {
-                return;
+            try {
+                const data = await request.get(`api/stories/${storySlug}/${chapSlug}`);
+                if (!data.story || data.story.chaps.length <= 0) {
+                    return;
+                }
+                document.title = `${data.story.name} - ${data.story.chaps[0].name} | FollMe`;
+                setStory(data.story);
+                setPreviousChap(data.previousChap);
+                setNextChap(data.nextChap);
+                setIsLoading(false);
+            } catch (err) {
+                console.log(err);
             }
-            document.title = `${data.story.name} - ${data.story.chaps[0].name} | FollMe`;
-            setStory(data.story);
-            setPreviousChap(data.previousChap);
-            setNextChap(data.nextChap);
-            setIsLoading(false);
         }
     }, [storySlug, chapSlug])
 

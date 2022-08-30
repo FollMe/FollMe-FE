@@ -15,14 +15,18 @@ export default function ShortStory() {
         getStory();
 
         async function getStory() {
-            setIsLoading(true);
-            const data = await request.get(`api/short-stories/${storySlug}`);
-            if (!data.story || data.story.chaps.length !== 1) {
-                return;
+            try {
+                setIsLoading(true);
+                const data = await request.get(`api/short-stories/${storySlug}`);
+                if (!data.story || data.story.chaps.length !== 1) {
+                    return;
+                }
+                document.title = `${data.story.name} | FollMe`;
+                setStory(data.story);
+                setIsLoading(false);
+            } catch (err) {
+                console.log(err);
             }
-            document.title = `${data.story.name} | FollMe`;
-            setStory(data.story);
-            setIsLoading(false);
         }
     }, [storySlug])
 
