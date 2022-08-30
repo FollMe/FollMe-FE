@@ -17,6 +17,7 @@ export default async function handleError(response, message) {
             break;
         case 404:
             toast.error('Xảy ra lỗi, vui lòng thử lại!');
+            window.location.assign('/404');
             break;
         default:
             break;

@@ -23,8 +23,8 @@ export default function Router() {
         {
             element: <MainLayout type={HEADER_TYPE.MOBILE} />,
             children: [
-                { path: '/stories/select-chap', element: <SelectChap /> },
-                { path: '/stories/:nameSlug', element: <Story /> },
+                { path: '/stories/:storySlug', element: <SelectChap /> },
+                { path: '/stories/:storySlug/:chapSlug', element: <Story /> },
                 { path: '/documents/facebook-data-deletion-instructions-url', element: <FacebookDataDeletionInstructions /> }
             ]
         },

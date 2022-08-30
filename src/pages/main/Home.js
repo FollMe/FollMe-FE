@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import '../auth/SignIn.module.scss';
 import styles from './Home.module.scss';
 import WumpusHiLoading from 'components/WumpusHiLoading';
@@ -24,11 +25,11 @@ export default function Home() {
             <div className="sideFeature mainSide">
                 {!isLoading ?
                     <div className={styles.functionBox}>
-                        <a href="stories">
+                        <Link to="stories">
                             <div className={styles.boxIcon}>
                                 <img alt="Story" className={styles.boxImg} src="imgs/reading-book.png" />
                             </div>
-                        </a>
+                        </Link>
                         <div className={styles.functionName}>Đọc truyện</div>
                     </div>
                     : null
@@ -38,11 +39,11 @@ export default function Home() {
             <div className="sideIntro mainSide">
                 {!isLoading ?
                     <div className={styles.functionBox}>
-                        <a href="shares" disabled>
+                        <Link to="#" disabled>
                             <div className={styles.boxIcon}>
                                 <img alt="Manage link" className={styles.boxImg} src="imgs/manage-link.png" />
                             </div>
-                        </a>
+                        </Link>
                         <div className={styles.functionName}>Chia sẻ câu chuyện của bạn<br /></div>
                     </div>
                     : null

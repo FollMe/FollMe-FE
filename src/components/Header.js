@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import normalStyles from './NormalHeader.module.scss';
 import mobileStyles from './MobileHeader.module.scss';
 import { HEADER_TYPE } from "../config/enum";
@@ -14,7 +15,7 @@ export default function Header({ type }) {
     return (
         <header>
             <nav className={styles.navbarMe}>
-                <a href="/"><img src="/imgs/follme-logo.png" alt="FollMe Logo" className={styles.navLogo} /></a>
+                <Link to="/"><img src="/imgs/follme-logo.png" alt="FollMe Logo" className={styles.navLogo} /></Link>
                 <h1>FollMe</h1>
                 <div className="user-box">
                     <span className="user-name">

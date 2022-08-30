@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
@@ -6,15 +7,24 @@ import { CardActionArea } from '@mui/material';
 import Divider from '@mui/material/Divider';
 
 import { formatDate } from 'util/date.js';
+import { STORY_TYPE } from 'instants/story.instant';
 
 export default function StoryItem({ story }) {
+    const navigate = useNavigate();
     const name = story.name;
-    const author = story.author.name ?? "Không xác định";
+    const author = story.author?.name ?? "Không xác định";
     const picture = story.picture?.link ?? "#";
     const updatedAt = formatDate(story.updatedAt);
 
+    function handleClickItem() {
+        navigate(`/stories/${story.slug}`, {
+            state: { chaps: story.chaps, name: story.name } 
+        })
+        return;
+    }
+
     return (
-        <Card>
+        <Card onClick={handleClickItem}>
             <CardActionArea>
                 <CardMedia
                     component="img"

@@ -1,35 +1,92 @@
 import AppsIcon from '@mui/icons-material/Apps';
+import { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import styles from "./Story.module.scss";
+import { request } from 'util/request';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import WumpusHiLoading from 'components/WumpusHiLoading';
 
-export default function Story() {
+export default function Story({ storySlug, chapSlug }) {
+    const params = useParams();
+    if (!storySlug || !chapSlug) {
+        storySlug = params.storySlug;
+        chapSlug = params.chapSlug;
+    }
+    const [story, setStory] = useState({});
+    const [nextChap, setNextChap] = useState({});
+    const [previousChap, setPreviousChap] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        getStory();
+
+        async function getStory() {
+            setIsLoading(true);
+            const data = await request.get(`api/stories/${storySlug}/${chapSlug}`);
+            if (!data.story || data.story.chaps.length <= 0) {
+                return;
+            }
+            console.log(data);
+            setStory(data.story);
+            setPreviousChap(data.previousChap);
+            setNextChap(data.nextChap);
+            setIsLoading(false);
+        }
+    }, [storySlug, chapSlug])
+
     return (
-        <div className="container-view grid">
-            <div className={styles.chapNumber}><b>Chap: 1</b></div>
-            <div className={styles.boxContent}>
-                <pre className={styles.content}>
-                    tính ra cái rank dưới này skill khủng nhiều. Cơ mà mấy bố ủ nó lên men lên mốc luôn nên k vào giải, còn mấy thằng vào giải toàn mấy thằng quèn quèn skill 5-7.
-                    điển hình như thằng dưới, có đợt nó rủ mình tập trận hoài, đánh oải luôn mà nó vẫn không ăn đc 😂😂 nay thấy nó top với vài đứa khác quen quen, toàn top 30/30.
-                </pre>
-                <div className={styles.paginateChap}>
-                    <span>Đang đọc: Chap 1 <br /> Tiếp theo:</span>
-                    {/* {{ #if nextChap }}
-                    <a href="/story/view/?chap={{nextChap.chap}}"><div className="button-chap">{{ nextChap.chap }}</div></a>
+        <>
+            <div className="container-view grid">
+                {
+                    isLoading ? <WumpusHiLoading /> :
+                        <>
+                            <div className={styles.boxContent}>
+                                <div className={styles.chapNumber}>
+                                    <b><ArrowForwardIosIcon /> {story.name}</b>
+                                </div>
+                                <span>{story.chaps[0].name}</span>
+                                <pre className={styles.content}>
+                                    {story.chaps[0].content}
+                                </pre>
+                                <div className={styles.paginateChap}>
+                                    <span>Hết: {story.chaps[0].name}</span>
+                                    <div className={styles.functionBar}>
+                                        <Link
+                                            to={`/stories/${story.slug}/${previousChap?.slug}`}
+                                            className={!previousChap && styles.btnDisabled}
+                                        >
+                                            <div className={styles.buttonChap}>
+                                                <KeyboardArrowLeftIcon sx={{ fontSize: 24 }} />
+                                                <span style={{ marginLeft: 8 }}> Chap trước </span>
+                                            </div>
+                                        </Link>
+                                        <Link to={`/stories/${story.slug}`}>
+                                            <div className={styles.buttonChap}>
+                                                <AppsIcon sx={{ fontSize: 24 }} />
+                                            </div>
+                                        </Link>
+                                        <Link
+                                            to={`/stories/${story.slug}/${nextChap?.slug}`}
+                                            className={!nextChap && styles.btnDisabled}
+                                        >
+                                            <div className={styles.buttonChap}>
+                                                <span style={{ marginRight: 8 }}> Chap tiếp &ensp;&nbsp; </span>
+                                                <KeyboardArrowRightIcon sx={{ fontSize: 24 }} />
+                                            </div>
+                                        </Link>
+                                    </ div>
+                                </div>
 
-                    {{ else}}
-                    <span>Đang viết</span>
-                    {{/if}} */}
-                    <a href="/story">
-                        <div className={styles.buttonChap}>
-                            <AppsIcon sx={{ fontSize: 24 }} />
-                        </div>
-                    </a>
-                </div>
-
+                            </div>
+                        </>
+                }
             </div>
-            <footer>
+            <footer className='grid'>
                 <img src="/imgs/follme-logo.png" alt="follme-logo" className="follme-logo" />
                 <h4>FollMe</h4>
             </footer>
-        </div>
+        </>
     )
 }

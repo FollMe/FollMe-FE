@@ -1,29 +1,55 @@
-// import './SelectChap.css'
+import { useEffect, useState } from 'react';
+import { useLocation, useParams, Link } from 'react-router-dom';
 import styles from './SelectChap.module.scss';
+import WumpusHiLoading from 'components/WumpusHiLoading';
+import { request } from 'util/request';
 
 export default function SelectChap() {
+    const location = useLocation();
+    const { storySlug } = useParams();
+    const [story, setStory] = useState(location.state);
+    const [isLoading, setIsLoading] = useState(!location.state);
+
+    useEffect(() => {
+        if (!story) {
+           getStory();
+        }
+
+        async function getStory() {
+            const data = await request.get(`api/stories/${storySlug}`);
+            if (!data.story) {
+                return;
+            }
+            setStory(data.story);
+            setIsLoading(false);
+        }
+    }, [])
     return (
-        <div className="container-view grid mobilePage">
-            <div className={styles.body}>
-                <h4>Truyện: Yêu nhầm chị hai, được nhầm em gái va cuoi cung la kha buon luon</h4>
-                <div>
-                    <ul className={styles.selectChap}>
-                        <a href="story/view/?chap={{this.chap}}">
-                            <li className={styles.chapNumber}>1</li>
-                        </a>
-                        <a href="story/view/?chap={{this.chap}}">
-                            <li className={styles.chapNumber}>2</li>
-                        </a>
-                        <a href="story/view/?chap={{this.chap}}">
-                            <li className={styles.chapNumber}>3</li>
-                        </a>
-                    </ul>
-                </div>
+        <>
+            <div className="container-view grid mobilePage">
+                {
+                    isLoading ? <WumpusHiLoading /> : (
+                        <div className={styles.body}>
+                            <h4>Truyện: {story.name}</h4>
+                            <div>
+                                <ul className={styles.selectChap}>
+                                    {
+                                        story.chaps.map(chap =>
+                                            <Link to={chap.slug} key={chap._id} >
+                                                <li className={styles.chapNumber}> {chap.name} </li>
+                                            </Link>
+                                        )
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    )
+                }
             </div>
-            <footer>
+            <footer className='grid'>
                 <img src="/imgs/follme-logo.png" alt="follme-logo" className="follme-logo" />
                 <h4>FollMe</h4>
             </footer>
-        </div>
+        </>
     )
 }
