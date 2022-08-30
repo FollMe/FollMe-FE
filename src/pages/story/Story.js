@@ -55,7 +55,7 @@ export default function Story() {
                                     <div className={styles.functionBar}>
                                         <Link
                                             to={`/stories/${story.slug}/${previousChap?.slug}`}
-                                            className={!previousChap && styles.btnDisabled}
+                                            className={(!previousChap && styles.btnDisabled) || ""}
                                         >
                                             <div className={styles.buttonChap}>
                                                 <KeyboardArrowLeftIcon sx={{ fontSize: 24 }} />
@@ -69,7 +69,7 @@ export default function Story() {
                                         </Link>
                                         <Link
                                             to={`/stories/${story.slug}/${nextChap?.slug}`}
-                                            className={!nextChap && styles.btnDisabled}
+                                            className={(!nextChap && styles.btnDisabled) || ""}
                                         >
                                             <div className={styles.buttonChap}>
                                                 <span style={{ marginRight: 8 }}> Chap tiếp &ensp;&nbsp; </span>

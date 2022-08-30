@@ -18,13 +18,17 @@ export default function SelectChap() {
         }
 
         async function getStory() {
-            const data = await request.get(`api/stories/${storySlug}`);
-            if (!data.story) {
-                return;
-            }
-            document.title = `${data.story.name} | FollMe`;
-            setStory(data.story);
-            setIsLoading(false);
+            try {
+                const data = await request.get(`api/stories/${storySlug}`);
+                if (!data.story) {
+                    return;
+                }
+                document.title = `${data.story.name} | FollMe`;
+                setStory(data.story);
+                setIsLoading(false);
+            } catch (err) {
+                console.log(err.message);
+            }    
         }
     }, [])
     return (
