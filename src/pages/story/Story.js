@@ -6,7 +6,7 @@ import { request } from 'util/request';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import WumpusHiLoading from 'components/WumpusHiLoading';
+import OvalLoading from 'components/OvalLoading';
 
 export default function Story() {
     const { storySlug, chapSlug } = useParams();
@@ -36,7 +36,7 @@ export default function Story() {
         <>
             <div className="container-view grid">
                 {
-                    isLoading ? <WumpusHiLoading /> :
+                    isLoading ? <OvalLoading /> :
                         <>
                             <div className={styles.boxContent}>
                                 <div className={styles.chapNumber}>

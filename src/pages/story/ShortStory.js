@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import styles from "./Story.module.scss";
 import { request } from 'util/request';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import WumpusHiLoading from 'components/WumpusHiLoading';
+import OvalLoading from 'components/OvalLoading';
 
 export default function ShortStory() {
     const { storySlug } = useParams();
@@ -30,7 +30,7 @@ export default function ShortStory() {
         <>
             <div className="container-view grid">
                 {
-                    isLoading ? <WumpusHiLoading /> :
+                    isLoading ? <OvalLoading /> :
                         <>
                             <div className={styles.boxContent}>
                                 <div className={styles.chapNumber}>
