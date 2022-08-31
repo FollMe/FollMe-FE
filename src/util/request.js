@@ -1,4 +1,5 @@
 import { toast } from 'react-toastify';
+import jwt_decode from "jwt-decode";
 import handleError from './handleError';
 
 function ServerError(message) {
@@ -69,10 +70,20 @@ async function get(url = '') {
 async function authenticate(route, data) {
     const response = await post(route, data);
     const token = response.token;
+    if (!token) {
+        toast.error("Xảy ra lỗi, vui lòng thử lại!");
+        return null;
+    }
+
+    const { exp } = jwt_decode(token);
+    const userInfo = {
+        ...response.user,
+        sessionExp: exp
+    }
 
     localStorage.setItem("token", token);
-    localStorage.setItem("userInfo", JSON.stringify(response.user));
-    return response.user;
+    localStorage.setItem("userInfo", JSON.stringify(userInfo));
+    return userInfo;
 }
 
 export const authRouteList = {

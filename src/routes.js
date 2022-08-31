@@ -8,6 +8,7 @@ import ShortStory from "pages/story/ShortStory";
 import StoryList from "./pages/story/StoryList";
 import FacebookDataDeletionInstructions from "pages/document/FacebookDataDeletionInstructions";
 import MainLayout from "./layouts/MainLayout";
+import AuthMainLayout from "layouts/AuthMainLayout";
 import { HEADER_TYPE } from "./config/enum";
 import Page404 from "pages/main/Page404";
 
@@ -18,18 +19,30 @@ export default function Router() {
             children: [
                 { path: 'sign-in', element: <SignIn /> },
                 { path: 'sign-up', element: <SignUp /> },
-                { path: '/', element: <Home /> },
-                { path: '/stories', element: <StoryList /> },
                 { path: '/404', element: <Page404 /> }
             ]
         },
         {
             element: <MainLayout type={HEADER_TYPE.MOBILE} />,
             children: [
+                { path: '/documents/facebook-data-deletion-instructions-url', element: <FacebookDataDeletionInstructions /> }
+            ]
+        },
+
+        // Protected routes
+        {
+            element: <AuthMainLayout />,
+            children: [
+                { path: '/', element: <Home /> },
+                { path: '/stories', element: <StoryList /> },
+            ]
+        },
+        {
+            element: <AuthMainLayout type={HEADER_TYPE.MOBILE} />,
+            children: [
                 { path: '/stories/:storySlug', element: <SelectChap /> },
                 { path: '/stories/:storySlug/:chapSlug', element: <Story /> },
                 { path: '/short-stories/:storySlug', element: <ShortStory /> },
-                { path: '/documents/facebook-data-deletion-instructions-url', element: <FacebookDataDeletionInstructions /> }
             ]
         },
         { path: '*', element: <Navigate to="/404" replace /> }
