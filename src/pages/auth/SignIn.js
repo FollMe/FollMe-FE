@@ -173,9 +173,11 @@ export default function SignIn() {
                 <div className={styles.login}>
                     <FacebookLogin
                         appId={process.env.REACT_APP_FACEBOOK_APP_ID}
+                        scope="public_profile"
                         fields="name, picture"
                         callback={oauthFacebookCallback}
                         cssClass={clsx(styles.loginFacebookButton, styles.oauthButton)}
+                        redirectUri={window.location.origin + window.location.pathname}
                         icon={
                             <div className={clsx(styles.svg, styles.fbLogin)}>
                                 {
