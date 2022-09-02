@@ -17,12 +17,10 @@ export default function AuthMainLayout({ type }) {
     if (!isLoggedIn) {
         localStorage.removeItem('token');
         localStorage.removeItem('userInfo');
-
-        if (window.location.pathname !== '/sign-in') {
-            return <Navigate to='/sign-in' />
-        }
+        window.sessionStorage.setItem('redirect', window.location.pathname);
+        return <Navigate to='/sign-in' />
     }
-   
+
     return (
         <>
             <Header type={type} />

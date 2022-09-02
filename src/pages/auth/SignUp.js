@@ -87,7 +87,8 @@ export default function SignUp() {
             setIsOauthFacebookLoading(false);
             if (userInfo) {
                 setUserInfo(userInfo);
-                navigate('/');
+                navigate(window.sessionStorage.getItem('redirect') ?? '/');
+                window.sessionStorage.removeItem('redirect');
             }
         } catch (err) {
             console.log(err);
@@ -106,7 +107,8 @@ export default function SignUp() {
             setIsOauthGoogleLoading(false);
             if (userInfo) {
                 setUserInfo(userInfo);
-                navigate('/');
+                navigate(window.sessionStorage.getItem('redirect') ?? '/');
+                window.sessionStorage.removeItem('redirect');
             }
         } catch (err) {
             console.log(err);
