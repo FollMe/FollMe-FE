@@ -18,7 +18,6 @@ html {
 body {
   overflow-x: hidden;
   margin: 0 auto;
-  /* background: linear-gradient(to bottom, #E55D87, #5FC3E4); */
   background: var(--background-color);
   font-size: 1.5rem;
 }
@@ -53,12 +52,11 @@ input[type=number] {
 -moz-appearance: textfield;
 }
 
-.user-box {
-  margin-left: auto;
-}
 .nav-avt {
-  width: 45px;
+  width: 40px;
+  border-radius: 50%;
   cursor: pointer;
+  margin-left: 16px
 }
 
 .dropdown-item {

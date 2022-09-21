@@ -21,7 +21,7 @@ export default function Home() {
     }, [])
     return (
         <div className="containerMain">
-            {isLoading ? <WumpusHiLoading /> : null}
+            {/* {isLoading ? <WumpusHiLoading /> : null}
             <div className="sideFeature mainSide">
                 {!isLoading ?
                     <div className={styles.functionBox}>
@@ -48,7 +48,8 @@ export default function Home() {
                     </div>
                     : null
                 }
-            </div>
+            </div> */}
+            
         </div>
     )
 }

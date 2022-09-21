@@ -2,6 +2,7 @@ import { Outlet, Navigate } from "react-router-dom";
 import Header from "../../components/Header";
 import { useUserInfo } from "customHooks/useUserInfo";
 import { useEffect } from "react";
+import SideDrawer from "components/sidebar/SideDrawer";
 
 export default function AuthMainLayout({ type }) {
     const [userInfo, setUserInfo] = useUserInfo();
@@ -24,7 +25,10 @@ export default function AuthMainLayout({ type }) {
     return (
         <>
             <Header type={type} />
-            <Outlet />
+            <div className="root-content">
+                <SideDrawer />
+                <Outlet />
+            </div>
         </>
     )
 }

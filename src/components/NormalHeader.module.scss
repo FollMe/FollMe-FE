@@ -3,16 +3,26 @@
 }
 
 .navLogo {
-    width: 45px;
+    width: 40px;
     float: left;
     margin-right: 10px;
 }
 
 .navbarMe {
-    position: absolute;
+    background-color: white;
+    position: fixed;
+    top: 0;
     display: flex;
-    margin: 25px auto;
-    width: 90%;
+    padding: 5px 3%;
+    width: 100%;
     align-items: center;
     z-index: 1;
+    font-size: 40px;
+    box-shadow: 0 2px 5px rgb(219, 219, 219);
+}
+
+button.navbarWidget {
+    width: 40px;
+    height: 40px;
+    background-color: rgb(219, 218, 218, 0.5);
 }

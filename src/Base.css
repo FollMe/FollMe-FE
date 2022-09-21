@@ -17,7 +17,6 @@
 
 html {
     color: var(--text-color);
-    font-size: 62.5%;
     box-sizing: border-box;
     font-family: 'Roboto', sans-serif;
 }
@@ -58,6 +57,16 @@ button, input {
     font-size: 1.8rem;
 }
 
+
+.root-content {
+    position: relative;
+    margin-top: 61.68px;
+}
+
+.side-drawer {
+    margin-top: 61.68px;
+}
+
 @keyframes FadeIn {
     from {
         opacity: 0;
@@ -82,8 +91,9 @@ button, input {
 }
 
 .user-box {
+    height: 40px;
     display: flex;
-    align-items: center;
+    margin-left: auto;
 }
 
 .user-name {
