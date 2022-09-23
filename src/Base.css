@@ -462,3 +462,8 @@ textarea.form-control {
     color: var(--error-color);
     font-size: 1.3rem;
 }
+
+
+svg.MuiSvgIcon-root{
+    font-size: 2rem;
+}

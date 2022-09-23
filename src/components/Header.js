@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import MenuIcon from '@mui/icons-material/Menu';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { styled } from '@mui/material/styles';
@@ -21,7 +22,7 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
     },
 }));
 
-export default function Header({ type }) {
+export default function Header({ type, setIsOpenSideDrawer }) {
     const [ userInfo ] = useUserInfo();
 
     let styles = normalStyles;
@@ -31,6 +32,9 @@ export default function Header({ type }) {
     return (
         <header>
             <nav className={styles.navbarMe}>
+                <IconButton onClick={() => setIsOpenSideDrawer(curr => !curr)}>
+                    <MenuIcon />
+                </IconButton>
                 <Link to="/"><img src="/imgs/follme-logo.png" alt="FollMe Logo" className={styles.navLogo} /></Link>
                 <h1>FollMe</h1>
                 <div className="user-box">
