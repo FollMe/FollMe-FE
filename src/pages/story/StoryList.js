@@ -4,6 +4,7 @@ import Typography from '@mui/material/Typography';
 import StoryItem from 'components/StoryItem';
 import { request } from 'util/request';
 import StorySkeleton from 'components/skeletons/StorySkeleton';
+import styles from "./StoryList.module.scss";
 
 export default function StoryList() {
     const [stories, setStories] = useState([]);
@@ -30,8 +31,8 @@ export default function StoryList() {
     return (
         <div className="containerMain">
             <div className="containerStory">
-                <Typography gutterBottom variant="h4" component="div" sx={{ paddingLeft: 2 }}>
-                    DANH SÁCH TRUYỆN:
+                <Typography className={styles.txtPageTitle} gutterBottom variant="h4" component="div" sx={{ paddingLeft: 2 }}>
+                    Stories
                 </Typography>
         
                 <Grid container columnSpacing={2} rowSpacing={4} sx={{ padding: 2 }} style={{ display: "flex", justifyItems: "center", alignContent: "center", alignItems: "center", direction: "row" }}>

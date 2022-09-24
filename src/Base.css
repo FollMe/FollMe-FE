@@ -60,7 +60,7 @@ button, input {
 
 
 .root-content {
-    position: relative;
+    display: flex;
     margin-top: 61.68px;
 }
 
@@ -444,7 +444,7 @@ textarea.form-control {
     margin: 0 auto;
     width: 100%;
     max-width: 1200px;
-    padding-top: 100px;
+    padding-top: 30px;
 }
 
 .mobilePage {

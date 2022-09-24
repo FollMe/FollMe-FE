@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useMatch, useResolvedPath } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import MuiDrawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
@@ -54,7 +54,6 @@ const Drawer = styled(MuiDrawer, {})(
 
 
 export default function SideDrawer({ setIsOpenSideDrawer, isOpenSideDrawer, isMobile }) {
-    const navigate = useNavigate();
     const toggleDrawer = (event) => {
         if (
             event &&
@@ -75,59 +74,52 @@ export default function SideDrawer({ setIsOpenSideDrawer, isOpenSideDrawer, isMo
             onClose={toggleDrawer}
         >
             <List>
-                <ListItem key='story' disablePadding sx={{ display: 'block', mb: '4px' }}>
-                    <ListItemButton
-                        sx={{
-                            minHeight: 50,
-                            justifyContent: isOpenSideDrawer ? 'initial' : 'center',
-                            px: 2.5,
-                            mt: 1,
-                            borderRadius: '8px'
-                        }}
-                        onClick={() => navigate('stories')}
-                    >
-                        <ListItemIcon
-                            sx={{
-                                minWidth: 0,
-                                mr: isOpenSideDrawer ? 1.5 : 'auto',
-                                justifyContent: 'center',
-                                fontSize: 28,
-                                color: 'rgb(99 102 241)'
-                            }}
-                        >
-                            <IoLibrary />
-                        </ListItemIcon>
-                        <ListItemText className='txtTitleSideBar'
-                            primary='Story' sx={{ opacity: isOpenSideDrawer ? 1 : 0 }} primaryTypographyProps={{ sx: {fontSize: '1.4rem'}}}
-                        />
-                    </ListItemButton>
-                </ListItem>
-                <ListItem key='Blog' disablePadding sx={{ display: 'block', mb: '4px' }}>
-                    <ListItemButton
-                        sx={{
-                            minHeight: 50,
-                            justifyContent: isOpenSideDrawer ? 'initial' : 'center',
-                            px: 2.5,
-                            borderRadius: '8px'
-                        }}
-                    >
-                        <ListItemIcon
-                            sx={{
-                                minWidth: 0,
-                                mr: isOpenSideDrawer ? 1.5 : 'auto',
-                                justifyContent: 'center',
-                                fontSize: 28,
-                                color: '#ec4899'
-                            }}
-                        >
-                            <IoNewspaper />
-                        </ListItemIcon>
-                        <ListItemText className='txtTitleSideBar'
-                            primary='Blog' sx={{ opacity: isOpenSideDrawer ? 1 : 0, fontSize: 20 }} primaryTypographyProps={{ sx: {fontSize: '1.4rem'}}}
-                        />
-                    </ListItemButton>
-                </ListItem>
+                <SideBarItem to='stories' title='Story' isOpenSideDrawer={isOpenSideDrawer}
+                    color='rgb(99 102 241)' children={<IoLibrary />}
+                />
+                <SideBarItem to='stories/tran-trong-tung-giay/chap-2' title='Blog' isOpenSideDrawer={isOpenSideDrawer}
+                    color='#ec4899' children={<IoNewspaper />}
+                />
             </List>
         </Drawer>
     );
+}
+
+
+function SideBarItem({ to, title, isOpenSideDrawer, children, color }) {
+    const navigate = useNavigate();
+    const resolvedPath = useResolvedPath(to);
+
+    const isActive = Boolean(useMatch({ path: resolvedPath.pathname }));
+
+    return (
+        <ListItem key={title} disablePadding sx={{ display: 'block', mb: '4px' }}>
+            <ListItemButton
+                className={isActive ? "active" : ""}
+                sx={{
+                    minHeight: 50,
+                    justifyContent: isOpenSideDrawer ? 'initial' : 'center',
+                    px: 2.5,
+                    mt: 1,
+                    borderRadius: '8px'
+                }}
+                onClick={() => navigate(to)}
+            >
+                <ListItemIcon
+                    sx={{
+                        minWidth: 0,
+                        mr: isOpenSideDrawer ? 1.5 : 'auto',
+                        justifyContent: 'center',
+                        fontSize: 28,
+                        color: color
+                    }}
+                >
+                    {children}
+                </ListItemIcon>
+                <ListItemText className='txtTitleSideBar'
+                    primary={title} sx={{ opacity: isOpenSideDrawer ? 1 : 0 }} primaryTypographyProps={{ sx: { fontSize: '1.4rem' } }}
+                />
+            </ListItemButton>
+        </ListItem>
+    )
 }
