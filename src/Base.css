@@ -8,6 +8,7 @@
     --white-color: #fff;
     --black-color: #000;
     --text-color: #333;
+    --text-color-title: rgb(88 87 87);
     --background-color: #f1f1f1;
 }
 
@@ -466,4 +467,8 @@ textarea.form-control {
 
 svg.MuiSvgIcon-root{
     font-size: 2rem;
+}
+
+.MuiListItemText-root {
+    transition: 0.3s;
 }

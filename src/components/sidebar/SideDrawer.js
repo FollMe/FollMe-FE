@@ -1,14 +1,15 @@
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import MuiDrawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
+import { IoNewspaper } from "react-icons/io5";
+import { IoLibrary } from "react-icons/io5";
+import './SideDrawer.css';
 
 const drawerWidth = 240;
 const animationDuration = 200;
@@ -53,8 +54,7 @@ const Drawer = styled(MuiDrawer, {})(
 
 
 export default function SideDrawer({ setIsOpenSideDrawer, isOpenSideDrawer, isMobile }) {
-    const [open, setOpen] = React.useState(isOpenSideDrawer);
-
+    const navigate = useNavigate();
     const toggleDrawer = (event) => {
         if (
             event &&
@@ -75,53 +75,58 @@ export default function SideDrawer({ setIsOpenSideDrawer, isOpenSideDrawer, isMo
             onClose={toggleDrawer}
         >
             <List>
-                {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-                    <ListItem key={text} disablePadding sx={{ display: 'block' }}>
-                        <ListItemButton
+                <ListItem key='story' disablePadding sx={{ display: 'block', mb: '4px' }}>
+                    <ListItemButton
+                        sx={{
+                            minHeight: 50,
+                            justifyContent: isOpenSideDrawer ? 'initial' : 'center',
+                            px: 2.5,
+                            mt: 1,
+                            borderRadius: '8px'
+                        }}
+                        onClick={() => navigate('stories')}
+                    >
+                        <ListItemIcon
                             sx={{
-                                minHeight: 48,
-                                justifyContent: open ? 'initial' : 'center',
-                                px: 2.5,
+                                minWidth: 0,
+                                mr: isOpenSideDrawer ? 1.5 : 'auto',
+                                justifyContent: 'center',
+                                fontSize: 28,
+                                color: 'rgb(99 102 241)'
                             }}
                         >
-                            <ListItemIcon
-                                sx={{
-                                    minWidth: 0,
-                                    mr: open ? 3 : 'auto',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                            </ListItemIcon>
-                            <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-                        </ListItemButton>
-                    </ListItem>
-                ))}
-            </List>
-            <Divider />
-            <List>
-                {['All mail', 'Trash', 'Spam'].map((text, index) => (
-                    <ListItem key={text} disablePadding sx={{ display: 'block' }}>
-                        <ListItemButton
+                            <IoLibrary />
+                        </ListItemIcon>
+                        <ListItemText className='txtTitleSideBar'
+                            primary='Story' sx={{ opacity: isOpenSideDrawer ? 1 : 0 }} primaryTypographyProps={{ sx: {fontSize: '1.4rem'}}}
+                        />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem key='Blog' disablePadding sx={{ display: 'block', mb: '4px' }}>
+                    <ListItemButton
+                        sx={{
+                            minHeight: 50,
+                            justifyContent: isOpenSideDrawer ? 'initial' : 'center',
+                            px: 2.5,
+                            borderRadius: '8px'
+                        }}
+                    >
+                        <ListItemIcon
                             sx={{
-                                minHeight: 48,
-                                justifyContent: open ? 'initial' : 'center',
-                                px: 2.5,
+                                minWidth: 0,
+                                mr: isOpenSideDrawer ? 1.5 : 'auto',
+                                justifyContent: 'center',
+                                fontSize: 28,
+                                color: '#ec4899'
                             }}
                         >
-                            <ListItemIcon
-                                sx={{
-                                    minWidth: 0,
-                                    mr: open ? 3 : 'auto',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                            </ListItemIcon>
-                            <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-                        </ListItemButton>
-                    </ListItem>
-                ))}
+                            <IoNewspaper />
+                        </ListItemIcon>
+                        <ListItemText className='txtTitleSideBar'
+                            primary='Blog' sx={{ opacity: isOpenSideDrawer ? 1 : 0, fontSize: 20 }} primaryTypographyProps={{ sx: {fontSize: '1.4rem'}}}
+                        />
+                    </ListItemButton>
+                </ListItem>
             </List>
         </Drawer>
     );
