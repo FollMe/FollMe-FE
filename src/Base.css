@@ -106,7 +106,6 @@ button, input {
 }
 
 .container-view {
-    background-color: white;
     position: relative;
     min-height: calc(100vh - 120px);
     padding-top: 50px;

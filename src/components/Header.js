@@ -7,8 +7,6 @@ import { styled } from '@mui/material/styles';
 import Badge from '@mui/material/Badge';
 import Typography from '@mui/material/Typography';
 import normalStyles from './NormalHeader.module.scss';
-import mobileStyles from './MobileHeader.module.scss';
-import { HEADER_TYPE } from "../config/enum";
 import { useUserInfo } from 'customHooks/useUserInfo';
 import UserMenu from './UserMenu';
 
@@ -24,11 +22,7 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 
 export default function Header({ type, setIsOpenSideDrawer }) {
     const [ userInfo ] = useUserInfo();
-
     let styles = normalStyles;
-    if (type === HEADER_TYPE.MOBILE) {
-        styles = mobileStyles;
-    }
     return (
         <header>
             <nav className={styles.navbarMe}>

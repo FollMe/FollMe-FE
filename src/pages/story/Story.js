@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import styles from "./Story.module.scss";
 import { request } from 'util/request';
+import Paper from '@mui/material/Paper';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
@@ -30,6 +31,7 @@ export default function Story() {
                 setPreviousChap(data.previousChap);
                 setNextChap(data.nextChap);
                 setIsLoading(false);
+                window.scrollTo(0, 0)
             } catch (err) {
                 console.log(err);
             }
@@ -41,7 +43,7 @@ export default function Story() {
             <div className="container-view grid">
                 {
                     isLoading ? <OvalLoading /> :
-                        <>
+                        <Paper variant="outlined" sx={{ borderRadius: '8px', paddingBottom: '30px', mb: '30px' }}>
                             <div className={styles.boxContent}>
                                 <div className={styles.chapNumber}>
                                     <b><ArrowForwardIosIcon /> {story.name}</b>
@@ -80,13 +82,9 @@ export default function Story() {
                                 </div>
 
                             </div>
-                        </>
+                        </Paper>
                 }
             </div>
-            <footer className='grid'>
-                <img src="/imgs/follme-logo.png" alt="follme-logo" className="follme-logo" />
-                <h4>FollMe</h4>
-            </footer>
         </>
     )
 }

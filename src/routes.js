@@ -33,7 +33,7 @@ export default function Router() {
         {
             element: <AuthMainLayout />,
             children: [
-                { path: '/', element: <Home /> },
+                { path: '/', element: <Navigate to="/stories" replace />  },
                 { path: '/stories', element: <StoryList /> },
             ]
         },

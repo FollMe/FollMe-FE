@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useParams, Link } from 'react-router-dom';
+import Paper from '@mui/material/Paper';
 import styles from './SelectChap.module.scss';
 import WumpusHiLoading from 'components/WumpusHiLoading';
 import { request } from 'util/request';
@@ -37,8 +38,11 @@ export default function SelectChap() {
                 {
                     isLoading ? <WumpusHiLoading /> : (
                         <div className={styles.body}>
-                            <h4>Truyện: {story.name}</h4>
+                            <h4 className={styles.pageType}>STORY</h4>
+                            <h3>{story.name}</h3>
                             <div>
+                                <Paper variant="outlined" sx={{ borderRadius: '8px', padding: '16px' }}>
+                                <span className={styles.listOfChaps}>List of chaps</span>
                                 <ul className={styles.selectChap}>
                                     {
                                         story.chaps.map(chap =>
@@ -48,15 +52,12 @@ export default function SelectChap() {
                                         )
                                     }
                                 </ul>
+                                </Paper>
                             </div>
                         </div>
                     )
                 }
             </div>
-            <footer className='grid'>
-                <img src="/imgs/follme-logo.png" alt="follme-logo" className="follme-logo" />
-                <h4>FollMe</h4>
-            </footer>
         </>
     )
 }

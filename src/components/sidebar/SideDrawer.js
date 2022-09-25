@@ -90,7 +90,7 @@ function SideBarItem({ to, title, isOpenSideDrawer, children, color }) {
     const navigate = useNavigate();
     const resolvedPath = useResolvedPath(to);
 
-    const isActive = Boolean(useMatch({ path: resolvedPath.pathname }));
+    const isActive = Boolean(useMatch({ path: resolvedPath.pathname, end: false }));
 
     return (
         <ListItem key={title} disablePadding sx={{ display: 'block', mb: '4px' }}>
