@@ -17,6 +17,7 @@ export default function Story() {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        window.scrollTo(0, 0)
         getStory();
 
         async function getStory() {
@@ -31,7 +32,6 @@ export default function Story() {
                 setPreviousChap(data.previousChap);
                 setNextChap(data.nextChap);
                 setIsLoading(false);
-                window.scrollTo(0, 0)
             } catch (err) {
                 console.log(err);
             }

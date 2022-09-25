@@ -54,6 +54,8 @@ const Drawer = styled(MuiDrawer, {})(
 
 
 export default function SideDrawer({ setIsOpenSideDrawer, isOpenSideDrawer, isMobile }) {
+    const navigate = useNavigate();
+
     const toggleDrawer = (event) => {
         if (
             event &&
@@ -66,6 +68,13 @@ export default function SideDrawer({ setIsOpenSideDrawer, isOpenSideDrawer, isMo
         setIsOpenSideDrawer(false);
     };
 
+    const handClickItem = (to) => {
+        if (isMobile) {
+            setIsOpenSideDrawer(false);
+        }
+        navigate(to);
+    } 
+
     return (
         <Drawer
             PaperProps={{ sx: { top: isMobile ? 0 : 61, zIndex: 1 } }}
@@ -75,10 +84,10 @@ export default function SideDrawer({ setIsOpenSideDrawer, isOpenSideDrawer, isMo
         >
             <List>
                 <SideBarItem to='stories' title='Story' isOpenSideDrawer={isOpenSideDrawer}
-                    color='rgb(99 102 241)' children={<IoLibrary />}
+                    handClickItem={handClickItem} color='rgb(99 102 241)' children={<IoLibrary />}
                 />
                 <SideBarItem to='blogs' title='Blog' isOpenSideDrawer={isOpenSideDrawer}
-                    color='#ec4899' children={<IoNewspaper />}
+                    handClickItem={handClickItem} color='#ec4899' children={<IoNewspaper />}
                 />
             </List>
         </Drawer>
@@ -86,8 +95,7 @@ export default function SideDrawer({ setIsOpenSideDrawer, isOpenSideDrawer, isMo
 }
 
 
-function SideBarItem({ to, title, isOpenSideDrawer, children, color }) {
-    const navigate = useNavigate();
+function SideBarItem({ to, title, isOpenSideDrawer, children, color, handClickItem }) {
     const resolvedPath = useResolvedPath(to);
 
     const isActive = Boolean(useMatch({ path: resolvedPath.pathname, end: false }));
@@ -103,7 +111,7 @@ function SideBarItem({ to, title, isOpenSideDrawer, children, color }) {
                     mt: 1,
                     borderRadius: '8px'
                 }}
-                onClick={() => navigate(to)}
+                onClick={() => handClickItem(to)}
             >
                 <ListItemIcon
                     sx={{
