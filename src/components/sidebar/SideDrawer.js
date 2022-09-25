@@ -77,7 +77,7 @@ export default function SideDrawer({ setIsOpenSideDrawer, isOpenSideDrawer, isMo
                 <SideBarItem to='stories' title='Story' isOpenSideDrawer={isOpenSideDrawer}
                     color='rgb(99 102 241)' children={<IoLibrary />}
                 />
-                <SideBarItem to='stories/tran-trong-tung-giay/chap-2' title='Blog' isOpenSideDrawer={isOpenSideDrawer}
+                <SideBarItem to='blogs' title='Blog' isOpenSideDrawer={isOpenSideDrawer}
                     color='#ec4899' children={<IoNewspaper />}
                 />
             </List>

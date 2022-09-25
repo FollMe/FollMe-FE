@@ -11,6 +11,7 @@ import MainLayout from "./layouts/MainLayout";
 import AuthMainLayout from "layouts/AuthMainLayout";
 import { HEADER_TYPE } from "./config/enum";
 import Page404 from "pages/main/Page404";
+import BlogList from "pages/blog/BlogList";
 
 export default function Router() {
     return useRoutes([
@@ -35,6 +36,7 @@ export default function Router() {
             children: [
                 { path: '/', element: <Navigate to="/stories" replace />  },
                 { path: '/stories', element: <StoryList /> },
+                { path: '/blogs', element: <BlogList />}
             ]
         },
         {
