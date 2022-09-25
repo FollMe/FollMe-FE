@@ -24,12 +24,39 @@
     border-radius: 10px;
     float: left;
     position: relative;
-    // top: -20px;
-    // left: -1px;
     transition: 0.3s ease;
 }
 
 .info_Description {
     margin-left: 10px;
     margin-right: 5px;
+}
+
+
+.storyContent_btnFunction {
+    margin-top: 10px;
+    font-size: 16px;
+    color: var(--text-color-title)
+}
+
+.btnFunction_like {
+    display: flex;
+    align-items: center;
+}
+
+.btnFunction_like > span {
+    margin-left: 6px;
+}
+
+.btnFunction_like svg {
+    font-size: 22px;
+}
+
+.storyContent_title {
+    display: inline-block;
+    cursor: pointer;
+}
+
+.storyContent_title:hover {
+    color: #0056b3
 }

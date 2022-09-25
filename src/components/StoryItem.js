@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
-import { CardActionArea } from '@mui/material';
-import Divider from '@mui/material/Divider';
+import Grid from '@mui/material/Grid';
+import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
+import styles from './StoryItem.module.scss';
+
 
 import { formatDate } from 'util/date.js';
 import { STORY_TYPE } from 'instants/story.instant';
@@ -19,7 +19,7 @@ export default function StoryItem({ story }) {
     function handleClickItem() {
         if (story.type === STORY_TYPE.SERIES) {
             navigate(`/stories/${story.slug}`, {
-                state: { chaps: story.chaps, name: story.name } 
+                state: { chaps: story.chaps, name: story.name }
             })
             return;
         }
@@ -31,31 +31,45 @@ export default function StoryItem({ story }) {
     }
 
     return (
-        <Card onClick={handleClickItem}>
-            <CardActionArea>
-                <CardMedia
-                    component="img"
-                    height="170"
-                    image={picture}
-                    alt="Story picture"
-                    sx={{ aspectRatio: 16 / 9 }}
-                    onError={e => {
-                        e.target.src = "/imgs/default-story-background.webp";
-                    }}
-                />
-                <Divider />
-                <CardContent>
-                    <Typography gutterBottom variant="h5" component="div">
-                        {name}
-                    </Typography>
-                    <Typography variant="body" color="text.secondary" component="div" sx={{ paddingBottom: 0.5}}>
-                        Tác giả: {author}
-                    </Typography>
-                    <Typography variant="body" color="text.secondary">
-                        Ngày cập nhật: {updatedAt}
-                    </Typography>
-                </CardContent>
-            </CardActionArea>
-        </Card>
+        <div>
+            <Grid container columnSpacing={2} rowSpacing={2}>
+                <Grid item md={4} sm={12} xs={12}>
+                    <CardMedia
+                        component="img"
+                        height="170"
+                        image={picture}
+                        alt="Story picture"
+                        sx={{ aspectRatio: 16 / 9, borderRadius: '8px', cursor: 'pointer' }}
+                        onError={e => {
+                            e.target.src = "/imgs/default-story-background.webp";
+                        }}
+                        onClick={handleClickItem}
+                    />
+                </Grid>
+                <Grid item md={8} sm={12} xs={12}>
+                    <div className={styles.storyContentContainer}>
+                        <Typography gutterBottom variant="h4" component="div"
+                            className={styles.storyContent_title}
+                            sx={{fontSize: '2rem', fontWeight: 'bold', color: 'var(--text-color-title)', mb: '12px'}}
+                            onClick={handleClickItem}
+                        >
+                            {name}
+                        </Typography>
+                        <Typography variant="body" color="text.secondary" component="div" sx={{ paddingBottom: 0.5 }}>
+                            Author: {author}
+                        </Typography>
+                        <Typography variant="body" color="text.secondary">
+                            Updated date: {updatedAt}
+                        </Typography>
+                        <div className={styles.storyContent_btnFunction}>
+                            <div className={styles.btnFunction_like}>
+                                <IoChatbubbleEllipsesOutline/>
+                                <span>0</span>
+                            </div>
+                        </div>
+                    </div>
+                </Grid>
+            </Grid>
+        </div>
     )
 }

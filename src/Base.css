@@ -9,7 +9,7 @@
     --black-color: #000;
     --text-color: #333;
     --text-color-title: rgb(88 87 87);
-    --background-color: #f1f1f1;
+    --background-color: #f9fafb;
 }
 
 * {
@@ -443,8 +443,8 @@ textarea.form-control {
 .containerStory {
     margin: 0 auto;
     width: 100%;
-    max-width: 1200px;
-    padding-top: 30px;
+    max-width: 900px;
+    padding: 30px 20px;
 }
 
 .mobilePage {

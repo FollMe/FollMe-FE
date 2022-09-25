@@ -1,20 +1,21 @@
 import { useEffect, useState } from 'react';
-import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import StoryItem from 'components/StoryItem';
 import { request } from 'util/request';
 import StorySkeleton from 'components/skeletons/StorySkeleton';
+import Paper from '@mui/material/Paper';
+import Divider from '@mui/material/Divider';
 import styles from "./StoryList.module.scss";
 
 export default function StoryList() {
     const [stories, setStories] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     useEffect(() => {
-        document.title = "Truyện | FollMe";
+        document.title = "Story | FollMe";
         getStory();
 
         async function getStory() {
-            try{
+            try {
                 setIsLoading(true);
                 const res = await request.get('api/stories');
                 setIsLoading(false);
@@ -31,32 +32,30 @@ export default function StoryList() {
     return (
         <div className="containerMain">
             <div className="containerStory">
-                <Typography className={styles.txtPageTitle} gutterBottom variant="h4" component="div" sx={{ paddingLeft: 2 }}>
+                <Typography className={styles.txtPageTitle} gutterBottom variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
                     Stories
                 </Typography>
-        
-                <Grid container columnSpacing={2} rowSpacing={4} sx={{ padding: 2 }} style={{ display: "flex", justifyItems: "center", alignContent: "center", alignItems: "center", direction: "row" }}>
+
+                <Paper variant="outlined" sx={{ borderRadius: '8px', padding: '16px' }}>
                     {
                         isLoading ? (
                             <>
-                                <Grid item xs={12} sm={6} md={4}>
-                                    <StorySkeleton />
-                                </Grid>
-                                <Grid item xs={12} sm={6} md={4}>
-                                    <StorySkeleton />
-                                </Grid>
-                                <Grid item xs={12} sm={6} md={4}>
-                                    <StorySkeleton />
-                                </Grid>
+                                <StorySkeleton />
+                                <Divider light sx={{ margin: '20px 0' }} />
+                                <StorySkeleton />
+                                <Divider light sx={{ margin: '20px 0' }} />
+                                <StorySkeleton />
                             </>
-                        ) : stories.map(story =>
-                            <Grid key={story._id} item xs={12} sm={6} md={4}>
-                                <StoryItem story={story}/>
-                            </Grid>
+                        ) : stories.map((story, index) =>
+                            <>
+                                <StoryItem story={story} />
+                                {
+                                    index < stories.length - 1 ? <Divider light sx={{ margin: '20px 0' }} /> : ""
+                                }
+                            </>
                         )
                     }
-                </Grid>
-
+                </ Paper>
             </div>
         </div>
     )
