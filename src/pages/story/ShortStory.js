@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import styles from "./Story.module.scss";
 import { request } from 'util/request';
+import Paper from '@mui/material/Paper';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import OvalLoading from 'components/OvalLoading';
 
 export default function ShortStory() {
     const { storySlug } = useParams();
-  
+
     const [story, setStory] = useState({});
     const [isLoading, setIsLoading] = useState(true);
 
@@ -35,7 +36,7 @@ export default function ShortStory() {
             <div className="container-view grid">
                 {
                     isLoading ? <OvalLoading /> :
-                        <>
+                        <Paper variant="outlined" sx={{ borderRadius: '8px', paddingBottom: '30px', mb: '30px' }}>
                             <div className={styles.boxContent}>
                                 <div className={styles.chapNumber}>
                                     <b><ArrowForwardIosIcon /> {story.name}</b>
@@ -44,17 +45,12 @@ export default function ShortStory() {
                                     {story.chaps[0].content}
                                 </pre>
                                 <div className={styles.paginateChap}>
-                                    <span> -- Hết -- </span>
+                                    <span>-- Hết --</span>
                                 </div>
-
                             </div>
-                        </>
+                        </Paper>
                 }
             </div>
-            <footer className='grid'>
-                <img src="/imgs/follme-logo.png" alt="follme-logo" className="follme-logo" />
-                <h4>FollMe</h4>
-            </footer>
         </>
     )
 }

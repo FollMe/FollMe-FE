@@ -1,7 +1,6 @@
 import { Navigate, useRoutes } from "react-router-dom";
 import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
-import Home from "./pages/main/Home";
 import SelectChap from "./pages/story/SelectChap";
 import Story from "./pages/story/Story";
 import ShortStory from "pages/story/ShortStory";
@@ -42,9 +41,9 @@ export default function Router() {
         {
             element: <AuthMainLayout type={HEADER_TYPE.MOBILE} />,
             children: [
-                { path: '/stories/:storySlug', element: <SelectChap /> },
-                { path: '/stories/:storySlug/:chapSlug', element: <Story /> },
-                { path: '/short-stories/:storySlug', element: <ShortStory /> },
+                { path: '/stories/long-stories/:storySlug', element: <SelectChap /> },
+                { path: '/stories/long-stories/:storySlug/:chapSlug', element: <Story /> },
+                { path: '/stories/short-stories/:storySlug', element: <ShortStory /> },
             ]
         },
         { path: '*', element: <Navigate to="/404" replace /> }

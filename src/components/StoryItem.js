@@ -18,14 +18,14 @@ export default function StoryItem({ story }) {
 
     function handleClickItem() {
         if (story.type === STORY_TYPE.SERIES) {
-            navigate(`/stories/${story.slug}`, {
+            navigate(`/stories/long-stories/${story.slug}`, {
                 state: { chaps: story.chaps, name: story.name }
             })
             return;
         }
 
         if (story.type === STORY_TYPE.SHORT) {
-            navigate(`/short-stories/${story.slug}`);
+            navigate(`/stories/short-stories/${story.slug}`);
             return;
         }
     }
