@@ -56,7 +56,7 @@ export default function Story() {
                                     <span>Hết: {story.chaps[0].name}</span>
                                     <div className={styles.functionBar}>
                                         <Link
-                                            to={`/stories/${story.slug}/${previousChap?.slug}`}
+                                            to={`/stories/long-stories/${story.slug}/${previousChap?.slug}`}
                                             className={(!previousChap && styles.btnDisabled) || ""}
                                         >
                                             <div className={styles.buttonChap}>
@@ -64,13 +64,13 @@ export default function Story() {
                                                 <span style={{ marginLeft: 5 }}> Trước </span>
                                             </div>
                                         </Link>
-                                        <Link to={`/stories/${story.slug}`}>
+                                        <Link to={`/stories/long-stories/${story.slug}`}>
                                             <div className={styles.buttonChap}>
                                                 <AppsIcon sx={{ fontSize: 24 }} />
                                             </div>
                                         </Link>
                                         <Link
-                                            to={`/stories/${story.slug}/${nextChap?.slug}`}
+                                            to={`/stories/long-stories/${story.slug}/${nextChap?.slug}`}
                                             className={(!nextChap && styles.btnDisabled) || ""}
                                         >
                                             <div className={styles.buttonChap}>
