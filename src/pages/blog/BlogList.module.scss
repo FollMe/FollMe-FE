@@ -1,3 +1,13 @@
 .txtPageTitle {
-    margin-bottom: 18px;
+    margin: 0;
+}
+
+button.btnAddNewBlog {
+    background-color: var(--theme-color);
+    color: white;
+}
+
+button.btnAddNewBlog:hover {
+    background-color: var(--theme-color);
+    color: var(--black-color);
 }
