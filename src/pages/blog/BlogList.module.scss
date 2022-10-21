@@ -3,11 +3,33 @@
 }
 
 button.btnAddNewBlog {
+    flex-direction: column;
+    width: 45px;
+    height: 45px;
     background-color: var(--theme-color);
-    color: white;
+    color: #f9fafb;
+}
+
+button.btnAddNewBlog svg {
+    font-size: 2.5rem;
+    transition: 0.8s;
 }
 
 button.btnAddNewBlog:hover {
     background-color: var(--theme-color);
-    color: var(--black-color);
+
+    .btnAddBlog {
+        visibility: hidden;
+        transform: translateY(40px);
+        transition: 0.8s;
+    }
+    .btnAddBlog2 {
+        transform: translateY(50px);
+        transition: 0.8s;
+    }
+}
+
+.btnAddBlog2 {
+    top: -40px;
+    position: absolute;
 }

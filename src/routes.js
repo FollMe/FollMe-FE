@@ -11,6 +11,7 @@ import AuthMainLayout from "layouts/AuthMainLayout";
 import { HEADER_TYPE } from "./config/enum";
 import Page404 from "pages/main/Page404";
 import BlogList from "pages/blog/BlogList";
+import CreateBlog from "pages/blog/CreateBlog";
 
 export default function Router() {
     return useRoutes([
@@ -35,15 +36,11 @@ export default function Router() {
             children: [
                 { path: '/', element: <Navigate to="/stories" replace />  },
                 { path: '/stories', element: <StoryList /> },
-                { path: '/blogs', element: <BlogList />}
-            ]
-        },
-        {
-            element: <AuthMainLayout type={HEADER_TYPE.MOBILE} />,
-            children: [
+                { path: '/blogs', element: <BlogList />},
                 { path: '/stories/long-stories/:storySlug', element: <SelectChap /> },
                 { path: '/stories/long-stories/:storySlug/:chapSlug', element: <Story /> },
                 { path: '/stories/short-stories/:storySlug', element: <ShortStory /> },
+                { path: '/blogs/create', element: <CreateBlog />}
             ]
         },
         { path: '*', element: <Navigate to="/404" replace /> }
