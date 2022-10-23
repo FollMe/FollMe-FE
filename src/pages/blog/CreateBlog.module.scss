@@ -1,0 +1,38 @@
+.createContainer {
+    margin: 0 auto;
+    margin-top: 12px;
+    width: 80%;
+    border-radius: 10px;
+}
+
+.quote {
+    font-family: cursive;
+    text-align: right;
+    margin-top: 8px;
+    padding-bottom: 10px;
+    padding-right: 5px;
+}
+
+.inpBlogTitle {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.inpBlogTitle > div > div {
+    background-color: var(--white-color);
+    border-radius: 15px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding-right: 48px;
+}
+
+.txtCounter {
+    position: absolute;
+    right: 8px;
+    top: 16.5px;
+    padding: 4px;
+    background-color: var(--theme-color);
+    border-radius: 8px;
+    color: var(--white-color);
+    font-size: 1.1rem
+}

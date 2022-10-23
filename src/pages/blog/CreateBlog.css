@@ -1,0 +1,15 @@
+.ql-container.ql-snow {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    font-size: 1.5rem;
+    background-color: var(--white-color);
+}
+
+.ql-toolbar.ql-snow {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.ql-container {
+    height: 65vh;
+}
