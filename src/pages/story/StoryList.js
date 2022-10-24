@@ -47,12 +47,12 @@ export default function StoryList() {
                                 <StorySkeleton />
                             </>
                         ) : stories.map((story, index) =>
-                            <>
+                            <div key={story._id}>
                                 <StoryItem story={story} />
                                 {
                                     index < stories.length - 1 ? <Divider light sx={{ margin: '20px 0' }} /> : ""
                                 }
-                            </>
+                            </div>
                         )
                     }
                 </ Paper>

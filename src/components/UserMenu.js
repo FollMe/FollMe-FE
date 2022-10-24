@@ -97,7 +97,7 @@ export default function UserMenu({ picture }) {
             >
                 <MenuItem onClick={handleSignOut} disableRipple>
                     <LogoutIcon />
-                    Đăng xuất
+                    Sign out
                 </MenuItem>
             </StyledMenu>
         </div>
