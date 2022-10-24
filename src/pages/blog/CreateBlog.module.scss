@@ -7,10 +7,10 @@
 
 .quote {
     font-family: cursive;
-    text-align: right;
+    text-align: left;
     margin-top: 8px;
     padding-bottom: 10px;
-    padding-right: 5px;
+    padding-left: 5px;
 }
 
 .inpBlogTitle {
@@ -35,4 +35,24 @@
     border-radius: 8px;
     color: var(--white-color);
     font-size: 1.1rem
+}
+
+.createBlogFooter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+}
+
+
+.btnPostBlog span svg {
+    transition: 0.5s;
+}
+
+button.btnPostBlog:hover {
+    background-color: var(--theme-color);
+    span svg {
+        transition: 0.5s;
+        transform: rotate(35deg);
+    }
 }

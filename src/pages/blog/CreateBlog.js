@@ -1,26 +1,40 @@
-import { useEffect, useState } from "react";
-import { useQuill } from 'react-quilljs';
+import { useEffect, useRef, useState } from "react";
+import Quill from "quill";
 import TextField from '@mui/material/TextField';
-import 'quill/dist/quill.snow.css'; // Add css for snow theme
+import Button from '@mui/material/Button';
+import RocketIcon from '@mui/icons-material/Rocket'; import 'quill/dist/quill.snow.css'; // Add css for snow theme
 import styles from './CreateBlog.module.scss';
 import './CreateBlog.css';
 
+const toolbar = [
+    [{ header: [1, 2, 3, 4, false] }],
+    ['bold', 'italic', 'underline', 'strike'],
+    [{ list: 'ordered' }, { list: 'bullet' }, { align: [] }],
+    ['link', 'image'],
+    [{ color: [] }],
+    ['code-block', 'blockquote', 'formula']
+];
+
+const options = {
+    modules: {
+        toolbar
+    },
+    placeholder: 'Compose an epic...',
+    theme: 'snow'
+};
+
+
 export default function CreateBlog() {
-    const { quill, quillRef } = useQuill();
-    const [ txtLabel, setTxtLabel ] = useState("");
+    const quillRef = useRef();
+    const [txtLabel, setTxtLabel] = useState("");
 
     useEffect(() => {
         document.title = "Blog | FollMe";
     }, [])
 
     useEffect(() => {
-        if (quill) {
-            quill.on('text-change', (delta, oldDelta, source) => {
-                console.log('Text change!');
-                console.log(quillRef.current.firstChild.innerHTML); // Get innerHTML using quillRef
-            });
-        }
-    }, [quill]);
+        const editor = new Quill(quillRef.current, options);
+    }, []);
 
     return (
         <div className={styles.createContainer}>
@@ -30,7 +44,6 @@ export default function CreateBlog() {
                     label="Title"
                     name="title"
                     value={txtLabel}
-                    // multiline
                     maxRows={2}
                     InputLabelProps={{
                         sx: {
@@ -46,8 +59,21 @@ export default function CreateBlog() {
             <div className={styles.editorContainer}>
                 <div ref={quillRef} />
             </div>
-            <div className={styles.quote}>
-                Thank you so much for your sharing❤️
+            <div className={styles.createBlogFooter}>
+                <div className={styles.quote}>
+                    Thank you so much for your sharing❤️
+                </div>
+                <div className={styles.createBlogFooter_function}>
+                    <Button className={styles.btnPostBlog} variant="contained" endIcon={<RocketIcon />}
+                        sx={{
+                            backgroundColor: 'var(--theme-color)',
+                            textTransform: 'none',
+                            fontSize: '1.2rem',
+                        }}
+                    >
+                        Post
+                    </Button>
+                </div>
             </div>
         </div>
     )
