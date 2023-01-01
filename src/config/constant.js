@@ -1,0 +1,2 @@
+export const MIN_CONTENT_CHARACTER = 1000;
+export const MIN_TITLE_CHARACTER = 3;

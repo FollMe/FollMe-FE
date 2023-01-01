@@ -12,7 +12,7 @@ button.btnAddNewBlog {
 
 button.btnAddNewBlog svg {
     font-size: 2.5rem;
-    transition: 0.8s;
+    transition: 0.5s;
 }
 
 button.btnAddNewBlog:hover {
@@ -21,11 +21,11 @@ button.btnAddNewBlog:hover {
     .btnAddBlog {
         visibility: hidden;
         transform: translateY(40px);
-        transition: 0.8s;
+        transition: 0.5s;
     }
     .btnAddBlog2 {
         transform: translateY(50px);
-        transition: 0.8s;
+        transition: 0.5s;
     }
 }
 

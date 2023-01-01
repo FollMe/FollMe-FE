@@ -1,0 +1,23 @@
+.inpBlogTitle {
+    margin: 20px 0;
+    position: relative;
+}
+
+.inpBlogTitle > div > div {
+    background-color: var(--white-color);
+    border-radius: 15px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding-right: 48px;
+}
+
+.txtCounter {
+    position: absolute;
+    right: 8px;
+    top: 16.5px;
+    padding: 4px;
+    background-color: var(--theme-color);
+    border-radius: 8px;
+    color: var(--white-color);
+    font-size: 1.1rem
+}
