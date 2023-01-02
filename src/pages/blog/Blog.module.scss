@@ -1,6 +1,8 @@
 .blogContent {
     width: 1000px;
     max-width: 100%;
+    min-height: calc(100vh - 120px);
+    position: relative;
     margin: 20px auto;
 }
 
