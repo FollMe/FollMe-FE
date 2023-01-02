@@ -1,0 +1,62 @@
+.header_Info {
+    text-align: left;
+    width: 100%;
+    top: 0px;
+    left: 0px;
+}
+
+.information {
+    background-color: white;
+    width: 90%;
+    min-height: 80px;
+    margin: 0 auto;
+    margin-top: 60px;
+    display: flex;
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+    transition: 0.3s ease;
+}
+.info_Avatar {
+    width: 80px;
+    height: 80px;
+    border: 2px solid rgb(255, 178, 115);
+    object-fit: cover;
+    border-radius: 10px;
+    float: left;
+    position: relative;
+    transition: 0.3s ease;
+}
+
+.info_Description {
+    margin-left: 10px;
+    margin-right: 5px;
+}
+
+
+.storyContent_btnFunction {
+    margin-top: 10px;
+    font-size: 16px;
+    color: var(--text-color-title)
+}
+
+.btnFunction_like {
+    display: flex;
+    align-items: center;
+}
+
+.btnFunction_like > span {
+    margin-left: 6px;
+}
+
+.btnFunction_like svg {
+    font-size: 22px;
+}
+
+.storyContent_title {
+    display: inline-block;
+    cursor: pointer;
+}
+
+.storyContent_title:hover {
+    color: #0056b3
+}

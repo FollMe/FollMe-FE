@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Typography from '@mui/material/Typography';
-import StoryItem from 'components/StoryItem';
+import StoryItem from 'components/story/StoryItem';
 import { request } from 'util/request';
 import StorySkeleton from 'components/skeletons/StorySkeleton';
 import Paper from '@mui/material/Paper';

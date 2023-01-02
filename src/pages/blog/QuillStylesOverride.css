@@ -13,3 +13,15 @@
 .ql-container {
     height: 75vh;
 }
+
+pre.ql-syntax {
+    margin-bottom: 5px;
+    margin-top: 5px;
+    padding: 5px 10px;
+    font-size: 15px;
+    background-color: #23241f;
+    color: #f8f8f2;
+    overflow: visible;
+    border-radius: 3px;
+    white-space: pre-wrap;
+}

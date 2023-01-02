@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
@@ -7,11 +7,35 @@ import Stack from '@mui/material/Stack';
 import AddIcon from '@mui/icons-material/Add';
 import DesignServicesIcon from '@mui/icons-material/DesignServices';
 import Paper from '@mui/material/Paper';
+import Divider from '@mui/material/Divider';
+import BlogSkeleton from 'components/skeletons/BlogSkeleton';
+import BlogItem from 'components/blog/BlogItem';
+import { request } from 'util/request';
+
 import styles from "./BlogList.module.scss";
 
 export default function BlogList() {
+    const [blogs, setBlogs] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     useEffect(() => {
         document.title = "Blog | FollMe";
+        getBlogs();
+
+        async function getBlogs() {
+            try {
+                setIsLoading(true);
+                const res = await request.get('api/blogs');
+                const blogs = res.blogs;
+                if (!Array.isArray(blogs)) {
+                    return;
+                }
+                setBlogs(blogs);
+            } catch (err) {
+                console.log(err);
+            } finally {
+                setIsLoading(false);
+            }
+        }
     }, [])
 
     return (
@@ -24,14 +48,33 @@ export default function BlogList() {
                     <Tooltip placement='left' title={<Typography fontSize={"1.3rem"}>Viết blog</Typography>}>
                         <Link to="/blogs/create">
                             <IconButton className={styles.btnAddNewBlog} variant="outlined">
-                                <DesignServicesIcon className={styles.btnAddBlog2} sx={{fontSize: '40px'}} />
-                                <AddIcon className={styles.btnAddBlog} sx={{fontSize: '40px'}} />
+                                <DesignServicesIcon className={styles.btnAddBlog2} sx={{ fontSize: '40px' }} />
+                                <AddIcon className={styles.btnAddBlog} sx={{ fontSize: '40px' }} />
                             </IconButton>
                         </Link>
                     </Tooltip>
                 </Stack>
                 <Paper variant="outlined" sx={{ marginTop: '20px', borderRadius: '8px', padding: '16px' }}>
-                        Hiện chưa có blog nào
+                    {
+                        isLoading ? (
+                            <>
+                                <BlogSkeleton />
+                                <Divider light sx={{ margin: '20px 0' }} />
+                                <BlogSkeleton />
+                                <Divider light sx={{ margin: '20px 0' }} />
+                                <BlogSkeleton />
+                            </>
+                        ) : blogs.length <= 0
+                            ? <> Hiện chưa có blog nào </>
+                            : blogs.map((blog, index) =>
+                                <div key={blog._id}>
+                                    <BlogItem blog={blog} />
+                                    {
+                                        index < blogs.length - 1 ? <Divider light sx={{ margin: '20px 0' }} /> : ""
+                                    }
+                                </div>
+                            )
+                    }
                 </ Paper>
             </div>
         </div>

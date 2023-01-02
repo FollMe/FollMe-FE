@@ -66,7 +66,9 @@ export default function CreateBlog() {
         const editor = new Quill(quillRef.current, options);
         editor.clipboard.addMatcher("p", (_, delta) => {
             const op = delta.ops[0];
-            op.insert = op.insert?.replace("\n\n", "\n");
+            if (typeof op.insert.replace == 'function') {
+                op.insert = op.insert?.replace("\n\n", "\n");
+            }
             return delta;
         });
 
