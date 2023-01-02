@@ -21,7 +21,7 @@ export default function BlogList() {
                     <Typography className={styles.txtPageTitle} gutterBottom variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
                         Blogs
                     </Typography>
-                    <Tooltip placement='left' title={<Typography fontSize={"1.3rem"}>Write new blog</Typography>}>
+                    <Tooltip placement='left' title={<Typography fontSize={"1.3rem"}>Viết blog</Typography>}>
                         <Link to="/blogs/create">
                             <IconButton className={styles.btnAddNewBlog} variant="outlined">
                                 <DesignServicesIcon className={styles.btnAddBlog2} sx={{fontSize: '40px'}} />
@@ -31,7 +31,7 @@ export default function BlogList() {
                     </Tooltip>
                 </Stack>
                 <Paper variant="outlined" sx={{ marginTop: '20px', borderRadius: '8px', padding: '16px' }}>
-                    There is no blog
+                        Hiện chưa có blog nào
                 </ Paper>
             </div>
         </div>

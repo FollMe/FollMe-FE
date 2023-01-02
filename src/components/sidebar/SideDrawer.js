@@ -83,7 +83,7 @@ export default function SideDrawer({ setIsOpenSideDrawer, isOpenSideDrawer, isMo
             onClose={toggleDrawer}
         >
             <List>
-                <SideBarItem to='stories' title='Story' isOpenSideDrawer={isOpenSideDrawer}
+                <SideBarItem to='stories' title='Truyện' isOpenSideDrawer={isOpenSideDrawer}
                     handClickItem={handClickItem} color='rgb(99 102 241)' children={<IoLibrary />}
                 />
                 <SideBarItem to='blogs' title='Blog' isOpenSideDrawer={isOpenSideDrawer}

@@ -32,7 +32,7 @@ export default function Header({ type, setIsOpenSideDrawer }) {
                 <Link to="/"><img src="/imgs/follme-logo.png" alt="FollMe Logo" className={styles.navLogo} /></Link>
                 <h1>FollMe</h1>
                 <div className="user-box">
-                    <Tooltip title={<Typography fontSize={"1.3rem"}>Notification</Typography>}>
+                    <Tooltip title={<Typography fontSize={"1.3rem"}>Thông báo</Typography>}>
                         <IconButton className={styles.navbarWidget}>
                             <StyledBadge badgeContent={0} color="primary">
                                 <NotificationsIcon sx={{width: 20, height: 20, color: "black"}} />

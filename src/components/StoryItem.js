@@ -56,10 +56,10 @@ export default function StoryItem({ story }) {
                             {name}
                         </Typography>
                         <Typography variant="body" color="text.secondary" component="div" sx={{ paddingBottom: 0.5 }}>
-                            Author: {author}
+                            Tác giả: {author}
                         </Typography>
                         <Typography variant="body" color="text.secondary">
-                            Updated date: {updatedAt}
+                            Ngày cập nhật: {updatedAt}
                         </Typography>
                         <div className={styles.storyContent_btnFunction}>
                             <div className={styles.btnFunction_like}>

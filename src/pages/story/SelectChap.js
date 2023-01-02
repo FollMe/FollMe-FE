@@ -38,11 +38,11 @@ export default function SelectChap() {
                 {
                     isLoading ? <WumpusHiLoading /> : (
                         <div className={styles.body}>
-                            <h4 className={styles.pageType}>STORY</h4>
+                            <h4 className={styles.pageType}>TRUYỆN</h4>
                             <h3>{story.name}</h3>
                             <div>
                                 <Paper variant="outlined" sx={{ borderRadius: '8px', padding: '16px' }}>
-                                <span className={styles.listOfChaps}>List of chaps</span>
+                                <span className={styles.listOfChaps}>Danh sách chap</span>
                                 <ul className={styles.selectChap}>
                                     {
                                         story.chaps.map(chap =>

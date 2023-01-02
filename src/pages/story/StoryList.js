@@ -33,7 +33,7 @@ export default function StoryList() {
         <div className="containerMain">
             <div className="containerStory">
                 <Typography className={styles.txtPageTitle} gutterBottom variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
-                    Stories
+                    Truyện
                 </Typography>
 
                 <Paper variant="outlined" sx={{ borderRadius: '8px', padding: '16px' }}>
