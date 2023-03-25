@@ -1,11 +1,13 @@
 import { Stack } from "@mui/system";
 import OutlinedInput from '@mui/material/OutlinedInput';
+import { useUserInfo } from 'customHooks/useUserInfo';
 
 
 export function CommentInput() {
+  const [ userInfo ] = useUserInfo();
   return (
     <Stack direction='row' sx={{ width: '100%' }} alignItems="flex-start">
-      <img src={null ?? '#'} alt="User Logo" style={{ width: '40px', borderRadius: '50%' }}
+      <img src={userInfo.avatar?.link ?? '#'} alt="User Logo" style={{ width: '40px', borderRadius: '50%' }}
         onError={({ currentTarget }) => {
           currentTarget.onerror = null;
           currentTarget.src = "/imgs/user.svg";
