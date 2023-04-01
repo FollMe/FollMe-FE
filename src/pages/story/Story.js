@@ -17,6 +17,7 @@ export default function Story() {
   const [nextChap, setNextChap] = useState({});
   const [previousChap, setPreviousChap] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const [isCmtLoading, setIsCmtLoading] = useState(true);
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -74,6 +75,7 @@ export default function Story() {
         })
 
         setComments(data.comments);
+        setIsCmtLoading(false);
       } catch (err) {
         console.log(err);
       }
@@ -125,8 +127,8 @@ export default function Story() {
                   </div>
                 </div>
               </Paper>
-              <Paper variant="outlined" sx={{ borderRadius: '8px', pt: '10px', pb: '30px', mb: '30px' }}>
-                <CommentContainer comments={comments} />
+              <Paper variant="outlined" sx={{ borderRadius: '8px', pt: '10px', pb: '10px', mb: '30px' }}>
+                <CommentContainer comments={comments} isLoading={isCmtLoading} />
               </Paper>
             </>
         }
