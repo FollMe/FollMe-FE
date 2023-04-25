@@ -13,11 +13,9 @@ import styles from "./Story.module.scss";
 export default function Story() {
   const { storySlug, chapSlug } = useParams();
   const [story, setStory] = useState({});
-  const [comments, setComments] = useState([]);
   const [nextChap, setNextChap] = useState({});
   const [previousChap, setPreviousChap] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  const [isCmtLoading, setIsCmtLoading] = useState(true);
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -40,47 +38,6 @@ export default function Story() {
       }
     }
   }, [storySlug, chapSlug])
-
-  useEffect(() => {
-    getComments()
-    async function getComments() {
-      try {
-        const data = await request.get(`comment-svc/api/comments/${storySlug}`);
-
-        if (!Array.isArray(data.comments) || data.comments.length <= 0) {
-          return;
-        }
-
-        const authorIds = {};
-        data.comments.forEach(cmt => {
-          authorIds[cmt.author] = true
-          cmt.replies?.forEach(reply => {
-            authorIds[reply.author] = true
-          })
-        })
-
-        const res = await request.post("api/profiles/get", {
-          ids: Object.keys(authorIds)
-        })
-        const profiles = res?.profiles ?? {};
-        data.comments.forEach(cmt => {
-          if (profiles[cmt.author]) {
-            cmt.author = profiles[cmt.author]
-          }
-          cmt.replies?.forEach(reply => {
-            if (profiles[reply.author]) {
-              reply.author = profiles[reply.author]
-            }
-          })
-        })
-
-        setComments(data.comments);
-        setIsCmtLoading(false);
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  }, [storySlug])
 
   return (
     <>
@@ -128,7 +85,7 @@ export default function Story() {
                 </div>
               </Paper>
               <Paper variant="outlined" sx={{ borderRadius: '8px', pt: '10px', pb: '10px', mb: '30px' }}>
-                <CommentContainer comments={comments} isLoading={isCmtLoading} />
+                <CommentContainer storySlug={storySlug} />
               </Paper>
             </>
         }

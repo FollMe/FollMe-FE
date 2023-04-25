@@ -1,10 +1,14 @@
+import { useState } from "react"
 import { Stack } from "@mui/system";
 import OutlinedInput from '@mui/material/OutlinedInput';
+import InputAdornment from '@mui/material/InputAdornment';
+import { Oval } from 'react-loading-icons'
 import { useUserInfo } from 'customHooks/useUserInfo';
 
 
-export function CommentInput() {
+export function CommentInput({ parentCmt, onPost, isPosting }) {
   const [ userInfo ] = useUserInfo();
+  const [insight, setInsight] = useState("");
   return (
     <Stack direction='row' sx={{ width: '100%' }} alignItems="flex-start">
       <img src={userInfo.avatar?.link ?? '#'} alt="User Logo" style={{ width: '40px', borderRadius: '50%' }}
@@ -14,6 +18,11 @@ export function CommentInput() {
         }}
       />
       <OutlinedInput
+        endAdornment = {
+          <InputAdornment position="end">
+            <Oval stroke="#ff6541" style={{ width: isPosting ? '25px' : '0' }} />
+          </InputAdornment>
+        }
         sx={{
           width: '100%',
           padding: '10px 12px',
@@ -23,7 +32,24 @@ export function CommentInput() {
         maxRows={10}
         multiline={true}
         color='follme'
-        placeholder="Cảm nhận của bạn" />
+        placeholder="Cảm nhận của bạn"
+        onKeyPress={e => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            (async () => {
+              const ok = await onPost(insight, parentCmt)
+              if (ok) {
+                setInsight("")
+              }
+            })()
+          }
+        }}
+        onChange={e => {
+          setInsight(e.target.value)
+        }}
+        value={insight}
+        disabled={isPosting}
+      />
     </Stack>
   )
 }
