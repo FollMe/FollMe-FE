@@ -92,9 +92,10 @@ export function CommentContainer({ storySlug }) {
         })
 
         setComments(data.comments);
-        setIsCmtLoading(false);
       } catch (err) {
         console.log(err);
+      } finally {
+        setIsCmtLoading(false);
       }
     }
   }, [storySlug])
@@ -107,15 +108,17 @@ export function CommentContainer({ storySlug }) {
         {
           isCmtLoading
             ? <OvalLoading />
-            : comments.map(cmt =>
-              <CommentItem
-                key={cmt.id}
-                handlePosting={handlePosting}
-                isPosting={isPosting}
-                comment={cmt}
-                type={CommentType.PARENT}
-              />
-            )
+            : comments.length <= 0
+              ? <div style={{ textAlign: 'center', opacity: '0.7' }}> Hãy là người đầu tiên chia sẻ cảm xúc của mình </div>
+              : comments.map(cmt =>
+                <CommentItem
+                  key={cmt.id}
+                  handlePosting={handlePosting}
+                  isPosting={isPosting}
+                  comment={cmt}
+                  type={CommentType.PARENT}
+                />
+              )
         }
       </Stack>
       <Divider sx={{
