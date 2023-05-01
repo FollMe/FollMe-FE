@@ -4,7 +4,7 @@ const WebSocketContext = createContext();
 
 
 const WebSocketProvider = ({ children }) => {
-  const socket = new WebSocket(`ws://${process.env.REACT_APP_WS_BASE_HOST}/comment-svc/api/ws`);
+  const socket = new WebSocket(`${process.env.REACT_APP_WS_BASE_HOST}/comment-svc/api/ws`);
   const [ws, setWs] = useState(socket);
 
   return (
