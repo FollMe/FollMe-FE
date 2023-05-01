@@ -6,10 +6,12 @@ import { CommentItem } from "./CommentItem";
 import OvalLoading from "components/OvalLoading";
 import { CommentType } from "instants/comment.instant";
 import { useUserInfo } from 'customHooks/useUserInfo';
+import { useWebSocket } from 'customHooks/useWebSocket';
 import { request } from 'util/request';
 
 export function CommentContainer({ storySlug }) {
   const [userInfo] = useUserInfo();
+  const [ws] = useWebSocket();
   const [comments, setComments] = useState([]);
   const [isCmtLoading, setIsCmtLoading] = useState(true);
   const [isPosting, setIsPosting] = useState(false);
@@ -17,38 +19,16 @@ export function CommentContainer({ storySlug }) {
   const handlePosting = async (content, parentId) => {
     setIsPosting(true);
     try {
-      await request.post("comment-svc/api/comments", {
+      const res = await request.post("comment-svc/api/comments", {
         postSlug: storySlug,
         content,
         parentId
       });
-
-      const newCmt = {
-        content: content,
-        createdAt: Date.now(),
-        author: {
-          avatar: userInfo.avatar,
-          name: userInfo.name
-        }
+      const author = {
+        avatar: userInfo.avatar,
+        name: userInfo.name
       }
-      const updatedComments = JSON.parse(JSON.stringify(comments))
-      if (parentId) {
-        const parentIndex = updatedComments.findIndex((cmt) => cmt.id === parentId)
-        if (!updatedComments[parentIndex].replies) {
-          updatedComments[parentIndex].replies = []
-        }
-        updatedComments[parentIndex].replies?.push(newCmt)
-      } else {
-        updatedComments.push({
-          content: content,
-          createdAt: Date.now(),
-          author: {
-            avatar: userInfo.avatar,
-            name: userInfo.name
-          }
-        })
-      }
-      setComments(updatedComments)
+      handlePosted({ id: res.id, parentId, content, author })
       return true
     } catch (err) {
       console.log(err)
@@ -57,6 +37,48 @@ export function CommentContainer({ storySlug }) {
       setIsPosting(false);
     }
   }
+
+  const handlePosted = (params) => {
+    const newCmt = {
+      id: params.id,
+      content: params.content,
+      createdAt: Date.now(),
+      author: params.author || { name: "..." },
+      new: true,
+    }
+    const updatedComments = JSON.parse(JSON.stringify(comments))
+    if (params.parentId) {
+      const parentIndex = updatedComments.findIndex((cmt) => cmt.id === params.parentId)
+      if (!updatedComments[parentIndex].replies) {
+        updatedComments[parentIndex].replies = []
+      }
+      updatedComments[parentIndex].replies?.push(newCmt)
+    } else {
+      updatedComments.push(newCmt)
+    }
+    setComments(updatedComments)
+  }
+
+  useEffect(() => {
+    ws.onmessage = (e) => {
+      const data = JSON.parse(e.data)
+      if (data.action === "commented") {
+        (async () => {
+          const newCmt = JSON.parse(data.message)
+          const res = await request.post("api/profiles/get", {
+            ids: [newCmt.author]
+          })
+          const profiles = res?.profiles ?? {};
+          handlePosted({
+            id: newCmt.id,
+            content: newCmt.content,
+            parentId: newCmt.parentId,
+            author: profiles[newCmt.author]
+          })
+        })()
+      }
+    }
+  }, [comments])
 
   useEffect(() => {
     getComments()
@@ -99,6 +121,7 @@ export function CommentContainer({ storySlug }) {
       }
     }
   }, [storySlug])
+
   return (
     <Stack spacing={2} alignItems="flex-start" sx={{
       padding: '12px',

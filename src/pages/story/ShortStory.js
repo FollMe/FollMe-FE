@@ -5,9 +5,12 @@ import { request } from 'util/request';
 import Paper from '@mui/material/Paper';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { CommentContainer } from 'components/comment/CommentContainer';
+import { useWebSocket } from "customHooks/useWebSocket";
+import { waitConnectWS } from 'util/handleWebSocket';
 import OvalLoading from 'components/OvalLoading';
 
 export default function ShortStory() {
+  const [ws] = useWebSocket();
   const { storySlug } = useParams();
 
   const [story, setStory] = useState({});
@@ -15,6 +18,19 @@ export default function ShortStory() {
 
   useEffect(() => {
     getStory();
+    subscribePost()
+
+    async function subscribePost() {
+      try {
+        await waitConnectWS(ws);
+        ws.send(JSON.stringify({
+          action: 'join_post',
+          message: storySlug
+        }))
+      } catch (err) {
+        console.log(err);
+      }
+    }
 
     async function getStory() {
       try {
@@ -29,6 +45,13 @@ export default function ShortStory() {
       } catch (err) {
         console.log(err);
       }
+    }
+
+    return () => {
+      ws.send(JSON.stringify({
+        action: 'join_post',
+        message: ""
+      }))
     }
   }, [storySlug])
 

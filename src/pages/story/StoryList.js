@@ -13,7 +13,7 @@ export default function StoryList() {
   useEffect(() => {
     document.title = "Story | FollMe";
     getStory();
-
+    
     async function getStory() {
       try {
         setIsLoading(true);

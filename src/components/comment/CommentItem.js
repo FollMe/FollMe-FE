@@ -25,7 +25,8 @@ export function CommentItem({ comment, type, isPosting, handlePosting }) {
           <div>
             <Box
               sx={{
-                backgroundColor: '#f1f1f1', p: '8px 16px',
+                backgroundColor: comment.new ? '#ebeeff' : '#f1f1f1',
+                p: '8px 16px',
                 borderRadius: '20px'
               }}
             >
@@ -56,7 +57,7 @@ export function CommentItem({ comment, type, isPosting, handlePosting }) {
 
         {
           comment.replies?.map(reply => (
-            <CommentItem comment={reply} type={CommentType.CHILD} />
+            <CommentItem key={reply.id} comment={reply} type={CommentType.CHILD} />
           ))
         }
         {

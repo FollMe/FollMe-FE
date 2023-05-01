@@ -8,9 +8,13 @@ import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import OvalLoading from 'components/OvalLoading';
 import { CommentContainer } from 'components/comment/CommentContainer';
+import { useWebSocket } from "customHooks/useWebSocket";
+import { waitConnectWS } from 'util/handleWebSocket';
+
 import styles from "./Story.module.scss";
 
 export default function Story() {
+  const [ws] = useWebSocket();
   const { storySlug, chapSlug } = useParams();
   const [story, setStory] = useState({});
   const [nextChap, setNextChap] = useState({});
@@ -20,7 +24,19 @@ export default function Story() {
   useEffect(() => {
     window.scrollTo(0, 0)
     getStory();
+    subscribePost();
 
+    async function subscribePost() {
+      try {
+        await waitConnectWS(ws);
+        ws.send(JSON.stringify({
+          action: 'join_post',
+          message: storySlug
+        }))
+      } catch (err) {
+        console.log(err);
+      }
+    }
     async function getStory() {
       setIsLoading(true);
       try {
@@ -36,6 +52,13 @@ export default function Story() {
       } catch (err) {
         console.log(err);
       }
+    }
+
+    return () => {
+      ws.send(JSON.stringify({
+        action: 'join_post',
+        message: ""
+      }))
     }
   }, [storySlug, chapSlug])
 

@@ -5,14 +5,16 @@ import './index.css';
 import './Base.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { UserInfoProvider } from './contexts';
+import { UserInfoProvider, WebSocketProvider } from './contexts';
 import { theme } from 'theme';
 
 ReactDOM.render(
     <React.StrictMode>
         <ThemeProvider theme={theme}>
             <UserInfoProvider>
+              <WebSocketProvider>
                 <App />
+              </WebSocketProvider>
             </UserInfoProvider>
         </ThemeProvider>
     </React.StrictMode>,
