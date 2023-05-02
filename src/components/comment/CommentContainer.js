@@ -8,6 +8,9 @@ import { CommentType } from "instants/comment.instant";
 import { useUserInfo } from 'customHooks/useUserInfo';
 import { useWebSocket } from 'customHooks/useWebSocket';
 import { request } from 'util/request';
+import notificationSound from 'assets/audios/notification_sound.wav'
+
+const audio = new Audio(notificationSound)
 
 export function CommentContainer({ storySlug }) {
   const [userInfo] = useUserInfo();
@@ -25,6 +28,7 @@ export function CommentContainer({ storySlug }) {
         parentId
       });
       const author = {
+        id: userInfo._id,
         avatar: userInfo.avatar,
         name: userInfo.name
       }
@@ -75,6 +79,9 @@ export function CommentContainer({ storySlug }) {
             parentId: newCmt.parentId,
             author: profiles[newCmt.author]
           })
+          if (profiles[newCmt.author]._id !== userInfo._id) {
+            audio.play();
+          }
         })()
       }
     }
