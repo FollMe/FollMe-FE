@@ -178,7 +178,7 @@ export function CommentContainer({ storySlug }) {
       </Stack>
       {
         isOtherTyping ?
-          <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+          <div className='typingBox' style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
             <Typing />
             <span style={{ opacity: "0.7" }}>
               Ai đó đang gõ😍

@@ -471,3 +471,18 @@ svg.MuiSvgIcon-root{
 .MuiListItemText-root {
     transition: 0.3s;
 }
+
+@keyframes append-animate {
+	from {
+		transform: scaleY(0);
+		opacity: 0;
+	}
+	to {
+		transform: scaleY(1);
+		opacity: 1;
+	}
+}
+
+.typingBox {
+  animation: append-animate .3s ease forwards;
+}
