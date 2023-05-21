@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Stack } from "@mui/system";
 import Divider from '@mui/material/Divider';
 import { CommentInput } from "./CommentInput";
 import { CommentItem } from "./CommentItem";
 import OvalLoading from "components/OvalLoading";
+import Typing from 'components/animations/Typing';
+
 import { CommentType } from "instants/comment.instant";
 import { useUserInfo } from 'customHooks/useUserInfo';
 import { useWebSocket } from 'customHooks/useWebSocket';
@@ -18,6 +20,9 @@ export function CommentContainer({ storySlug }) {
   const [comments, setComments] = useState([]);
   const [isCmtLoading, setIsCmtLoading] = useState(true);
   const [isPosting, setIsPosting] = useState(false);
+  const [isOtherTyping, setIsOtherTyping] = useState(false);
+  const timeOutTyping = useRef("");
+
 
   const handlePosting = async (content, parentId) => {
     setIsPosting(true);
@@ -61,28 +66,48 @@ export function CommentContainer({ storySlug }) {
       updatedComments.push(newCmt)
     }
     setComments(updatedComments)
+    setIsOtherTyping(false)
+  }
+
+  const handleTyping = () => {
+    ws.send(JSON.stringify({
+      userId: userInfo._id,
+      action: "typing_cmt_post"
+    }))
   }
 
   useEffect(() => {
     ws.onmessage = (e) => {
       const data = JSON.parse(e.data)
-      if (data.action === "commented") {
-        (async () => {
-          const newCmt = JSON.parse(data.message)
-          const res = await request.post("api/profiles/get", {
-            ids: [newCmt.author]
-          })
-          const profiles = res?.profiles ?? {};
-          handlePosted({
-            id: newCmt.id,
-            content: newCmt.content,
-            parentId: newCmt.parentId,
-            author: profiles[newCmt.author]
-          })
-          if (profiles[newCmt.author]._id !== userInfo._id) {
-            audio.play();
+      switch (data.action) {
+        case "commented":
+          (async () => {
+            const newCmt = JSON.parse(data.message)
+            const res = await request.post("api/profiles/get", {
+              ids: [newCmt.author]
+            })
+            const profiles = res?.profiles ?? {};
+            handlePosted({
+              id: newCmt.id,
+              content: newCmt.content,
+              parentId: newCmt.parentId,
+              author: profiles[newCmt.author]
+            })
+            if (profiles[newCmt.author]._id !== userInfo._id) {
+              audio.play();
+            }
+          })()
+          break;
+        case "typing_cmt_post":
+          setIsOtherTyping(true);
+          if (timeOutTyping.current) {
+            clearTimeout(timeOutTyping.current);
           }
-        })()
+          timeOutTyping.current = setTimeout(() => {
+            setIsOtherTyping(false);
+          }, 4000)
+          break;
+        default:
       }
     }
   }, [comments])
@@ -151,10 +176,19 @@ export function CommentContainer({ storySlug }) {
               )
         }
       </Stack>
+      {
+        isOtherTyping ?
+          <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+            <Typing />
+            <span style={{ opacity: "0.7" }}>
+              Ai đó đang gõ😍
+            </span>
+          </div> : ""
+      }
       <Divider sx={{
         width: '100%'
       }} />
-      <CommentInput onPost={handlePosting} isPosting={isPosting} />
+      <CommentInput onPost={handlePosting} onTyping={handleTyping} isPosting={isPosting} />
     </Stack>
   )
 } 

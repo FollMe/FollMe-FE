@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Stack } from "@mui/system";
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -6,9 +6,10 @@ import { Oval } from 'react-loading-icons'
 import { useUserInfo } from 'customHooks/useUserInfo';
 
 
-export function CommentInput({ parentCmt, onPost, isPosting }) {
-  const [ userInfo ] = useUserInfo();
+export function CommentInput({ parentCmt, onPost, onTyping, isPosting }) {
+  const [userInfo] = useUserInfo();
   const [insight, setInsight] = useState("");
+  const lastedPostTyping = useRef(null);
   return (
     <Stack direction='row' sx={{ width: '100%' }} alignItems="flex-start">
       <img src={userInfo.avatar?.link ?? '#'} alt="User Logo" style={{ width: '40px', borderRadius: '50%' }}
@@ -18,7 +19,7 @@ export function CommentInput({ parentCmt, onPost, isPosting }) {
         }}
       />
       <OutlinedInput
-        endAdornment = {
+        endAdornment={
           <InputAdornment position="end">
             <Oval stroke="#ff6541" style={{ width: isPosting ? '25px' : '0' }} />
           </InputAdornment>
@@ -45,7 +46,16 @@ export function CommentInput({ parentCmt, onPost, isPosting }) {
           }
         }}
         onChange={e => {
-          setInsight(e.target.value)
+          const content = e.target.value;
+          setInsight(content)
+          const needPost = lastedPostTyping.current
+            ? Date.now() - lastedPostTyping.current > 3000
+              ? true : false
+            : true;
+          if (content && needPost) {
+            onTyping()
+            lastedPostTyping.current = Date.now()
+          }
         }}
         value={insight}
         disabled={isPosting}
