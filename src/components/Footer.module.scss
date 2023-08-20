@@ -1,0 +1,20 @@
+.footer {
+  box-shadow: 0 -1px 1px rgb(230, 230, 230);
+  width: 100%;
+  text-align: center;
+  padding: 10px;
+  padding-bottom: 20px;
+  z-index: 99999999999;
+  margin-top: 10px;
+  background-color: white;
+  position: relative;
+}
+
+.footer > p {
+  font-weight: bold;
+  line-height: 1rem;
+}
+
+.footer > a {
+  text-decoration: none;
+}

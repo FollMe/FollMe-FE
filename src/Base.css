@@ -62,6 +62,7 @@ button, input {
 .root-content {
     display: flex;
     margin-top: 61.68px;
+    min-height: calc(100vh - 150px);
 }
 
 .side-drawer {

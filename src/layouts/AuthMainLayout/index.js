@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import SideDrawer from "components/sidebar/SideDrawer";
 import { useWebSocket } from "customHooks/useWebSocket";
 import { waitConnectWS } from "util/handleWebSocket";
+import Footer from "components/Footer";
 
 
 const MOBILE_MAX_WIDTH = 760;
@@ -75,6 +76,7 @@ export default function AuthMainLayout({ type }) {
         />
         <Outlet />
       </div>
+      <Footer />
     </>
   )
 }

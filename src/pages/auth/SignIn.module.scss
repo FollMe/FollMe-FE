@@ -1,167 +1,171 @@
-
 .introTitle {
-    font-size: 2.5rem;
+  font-size: 2.5rem;
 }
 
 .titleMethod {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0.9;
-    margin-top: 35px;
-    margin-bottom: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.9;
+  margin-top: 35px;
+  margin-bottom: 25px;
 }
 
-.titleMethod > hr {
-    margin: 10px;
-    display: inline-block;
-    width: 50px;
-} 
+.titleMethod>hr {
+  margin: 10px;
+  display: inline-block;
+  width: 50px;
+}
 
 .login {
-    margin: 0 auto;
-    width: 80%;
-    max-width: 340px;
+  margin: 0 auto;
+  width: 80%;
+  max-width: 340px;
 }
 
 .loginForm_Text {
-    margin-bottom: 20px;
-    position: relative;
+  margin-bottom: 20px;
+  position: relative;
 }
 
 .fontIcon {
-    position: absolute;
-    left: 6px;
-    top: 7px;
+  position: absolute;
+  left: 6px;
+  top: 7px;
 }
 
 .inputField {
-    border-radius: 2px;
-    border: 1px solid #d4dfee;
-    color: #4c4c53;
-    width: 100%;
-    height: 40px;
-    text-indent: 35px;
-    line-height: 36px;
+  border-radius: 2px;
+  border: 1px solid #d4dfee;
+  color: #4c4c53;
+  width: 100%;
+  height: 40px;
+  text-indent: 35px;
+  line-height: 36px;
 }
 
 .inputField::placeholder {
-    padding: 2px;
+  padding: 2px;
 }
 
 .loginFormRMB {
-    font-size: 1.3rem;
-    display: flex;
-    justify-content: space-between;
+  font-size: 1.3rem;
+  display: flex;
+  justify-content: space-between;
 }
 
 .titleForgetPassword {
-    cursor: pointer;
-    color: var(--theme-color);
+  cursor: pointer;
+  color: var(--theme-color);
 }
 
 .loginForm_Submit {
-    margin-top: 30px;
+  margin-top: 30px;
 }
 
-.loginForm_Submit > button {
-    cursor: pointer;
-    width: 100%;
-    height: 40px;
-    border: none;
-    border-radius: 4px;
-    color: white;
-    background-color: var(--theme-color);
+.loginForm_Submit>button {
+  cursor: pointer;
+  width: 100%;
+  height: 40px;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  background-color: var(--theme-color);
 }
 
-.loginForm_Submit > button:disabled {
-    opacity: 0.8;
+.loginForm_Submit>button:disabled {
+  opacity: 0.8;
 }
 
 .svg {
-    color: white;
-    position: relative;
-    border-radius: 4px;
-    width: 40px;
-    height: 40px;
-    line-height: 40px;
-    display: inline-block;
+  color: white;
+  position: relative;
+  border-radius: 4px;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  display: inline-block;
 }
 
 .fbLogin {
-    background-color: #4267b2;
-    cursor: pointer;
+  background-color: #4267b2;
+  cursor: pointer;
 }
 
 .googleLogin {
-    cursor: pointer;
+  cursor: pointer;
 }
 
-.svg > svg {
-    position: absolute;
-    left: 5px;
-    top: 5px;
-    width: 30px;
+.svg>svg {
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  width: 30px;
 }
 
 .notifyInput {
-    color: var(--error-color);
+  color: var(--error-color);
 }
 
 .divButton {
-    text-decoration: none;
+  text-decoration: none;
 }
 
 .loginFoot {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 
 .containerCarousel {
-    width: 90%;
-    background-color: white;
-    border-radius: 4px;
-    margin: auto;
-    min-height: 520px;
-    max-width: 523px;
-    padding-top: 50px;
-    position: relative;
+  width: 90%;
+  background-color: white;
+  border-radius: 4px;
+  margin: auto;
+  min-height: 520px;
+  max-width: 523px;
+  padding-top: 50px;
+  position: relative;
 }
 
 .btnSendCode {
-    position: absolute;
-    right: 8px;
-    line-height: 40px;
-    cursor: pointer;
-    color: var(--theme-color);
+  position: absolute;
+  right: 8px;
+  line-height: 40px;
+  cursor: pointer;
+  color: var(--theme-color);
 }
 
 .ctnFunction {
-    color: var(--theme-color);
-    width: 60px;
-    text-align: right;
-    background-color: white;
-    position: absolute;
-    right: 8px;
-    line-height: 23px;
-    top: 8px;
+  color: var(--theme-color);
+  width: 60px;
+  text-align: right;
+  background-color: white;
+  position: absolute;
+  right: 8px;
+  line-height: 23px;
+  top: 8px;
 }
 
 .txtTimeDown {
-    color: rgb(194, 194, 194);
-    cursor: default;
-    pointer-events: none;
+  color: rgb(194, 194, 194);
+  cursor: default;
+  pointer-events: none;
 }
 
 .my-facebook-button-class {
-    background: none;
-    border: none;
+  background: none;
+  border: none;
 }
 
 .loginFacebookButton {
-    background: none;
-    border: none;
+  background: none;
+  border: none;
 }
 
 .oauthButton {
-    margin: auto 8px;
+  margin: auto 8px;
+}
+
+.documents {
+  margin-top: 30px;
+  text-decoration: none;
 }

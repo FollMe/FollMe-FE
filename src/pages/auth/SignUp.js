@@ -19,268 +19,284 @@ import styles from './SignIn.module.scss';
 const REQUEST_CODE_INTERVAL = 30;
 
 const validate = (values) => {
-    const errors = {};
- 
-    if (!values.code) {
-        errors.code = 'Yêu cầu mã xác thực';
-    }
+  const errors = {};
 
-    if (!values.password) {
-        errors.password = 'Yêu cầu mật khẩu';
-    } else if (values.password.length < 6) {
-        errors.password = 'Mật khẩu phải có ít nhất 6 kí tự';
-    }
-  
-    return errors;
+  if (!values.code) {
+    errors.code = 'Yêu cầu mã xác thực';
+  }
+
+  if (!values.password) {
+    errors.password = 'Yêu cầu mật khẩu';
+  } else if (values.password.length < 6) {
+    errors.password = 'Mật khẩu phải có ít nhất 6 kí tự';
+  }
+
+  return errors;
 };
 
 
 export default function SignUp() {
-    const navigate = useNavigate();
-    const [showScrollImg, setShowScrollImg] = useState(true);
-    const [userInfo, setUserInfo] = useUserInfo();
-    const [isOauthFacebookLoading, setIsOauthFacebookLoading] = useState(false);
-    const [isOauthGoogleLoading, setIsOauthGoogleLoading] = useState(false);
-    const [isRequestCodeLoading, setIsRequestCodeLoading] = useState(false);
-    const [isRequestSignUpLoading, setIsRequestSignUpLoading] = useState(false);
-    const [email, setEmail] = useState('');
-    const [waitTime, setWaitTime] = useState(0);
-    const isValidEmail = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email);
+  const navigate = useNavigate();
+  const [showScrollImg, setShowScrollImg] = useState(true);
+  const [userInfo, setUserInfo] = useUserInfo();
+  const [isOauthFacebookLoading, setIsOauthFacebookLoading] = useState(false);
+  const [isOauthGoogleLoading, setIsOauthGoogleLoading] = useState(false);
+  const [isRequestCodeLoading, setIsRequestCodeLoading] = useState(false);
+  const [isRequestSignUpLoading, setIsRequestSignUpLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [waitTime, setWaitTime] = useState(0);
+  const isValidEmail = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email);
 
-    useEffect(() => {
-        document.title = "Đăng kí | FollMe";
+  useEffect(() => {
+    document.title = "Đăng kí | FollMe";
 
-        if (Object.keys(userInfo).length !== 0) {
-            return navigate('/');
-        }
-        window.addEventListener("scroll", () => {
-            if (window.scrollY > 50) {
-                setShowScrollImg(false);
-            } else {
-                setShowScrollImg(true);
-            }
-        })
-
-        // Init Google Oauth
-        if (window.google?.accounts?.id) {
-            window.google.accounts.id.initialize({
-                client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
-                callback: oauthGoogleCallback,
-            })
-            window.google.accounts.id.prompt();
-            window.google.accounts.id.renderButton(
-                document.getElementById("login-google-button"), {
-                type: "icon"
-            }
-            )
-        }
-    }, [])
-
-    async function oauthFacebookCallback(res) {
-        try {
-            if (!res || !res.accessToken) {
-                toast.error("Đăng nhập thất bại!");
-                return;
-            }
-            setIsOauthFacebookLoading(true);
-            const userInfo = await request.authenticate(authRouteList.facebook, { accessToken: res.accessToken });
-            setIsOauthFacebookLoading(false);
-            if (userInfo) {
-                setUserInfo(userInfo);
-                navigate(window.sessionStorage.getItem('redirect') ?? '/');
-                window.sessionStorage.removeItem('redirect');
-            }
-        } catch (err) {
-            console.log(err);
-            setIsOauthFacebookLoading(false);
-        }
+    if (Object.keys(userInfo).length !== 0) {
+      return navigate('/');
     }
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 50) {
+        setShowScrollImg(false);
+      } else {
+        setShowScrollImg(true);
+      }
+    })
 
-    async function oauthGoogleCallback(res) {
-        try {
-            if (!res || !res.credential) {
-                toast.error("Xảy ra lỗi, vui lòng thử lại!");
-                return;
-            }
-            setIsOauthGoogleLoading(true);
-            const userInfo = await request.authenticate(authRouteList.google, { idToken: res.credential });
-            setIsOauthGoogleLoading(false);
-            if (userInfo) {
-                setUserInfo(userInfo);
-                navigate(window.sessionStorage.getItem('redirect') ?? '/');
-                window.sessionStorage.removeItem('redirect');
-            }
-        } catch (err) {
-            console.log(err);
-            setIsOauthGoogleLoading(false);
+    // Init Google Oauth
+    if (window.google?.accounts?.id) {
+      window.google.accounts.id.initialize({
+        client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+        callback: oauthGoogleCallback,
+      })
+      window.google.accounts.id.prompt();
+      window.google.accounts.id.renderButton(
+        document.getElementById("login-google-button"), {
+        type: "icon"
+      }
+      )
+    }
+  }, [])
+
+  async function oauthFacebookCallback(res) {
+    try {
+      if (!res || !res.accessToken) {
+        toast.error("Đăng nhập thất bại!");
+        return;
+      }
+      setIsOauthFacebookLoading(true);
+      const userInfo = await request.authenticate(authRouteList.facebook, { accessToken: res.accessToken });
+      setIsOauthFacebookLoading(false);
+      if (userInfo) {
+        setUserInfo(userInfo);
+        navigate(window.sessionStorage.getItem('redirect') ?? '/');
+        window.sessionStorage.removeItem('redirect');
+      }
+    } catch (err) {
+      console.log(err);
+      setIsOauthFacebookLoading(false);
+    }
+  }
+
+  async function oauthGoogleCallback(res) {
+    try {
+      if (!res || !res.credential) {
+        toast.error("Xảy ra lỗi, vui lòng thử lại!");
+        return;
+      }
+      setIsOauthGoogleLoading(true);
+      const userInfo = await request.authenticate(authRouteList.google, { idToken: res.credential });
+      setIsOauthGoogleLoading(false);
+      if (userInfo) {
+        setUserInfo(userInfo);
+        navigate(window.sessionStorage.getItem('redirect') ?? '/');
+        window.sessionStorage.removeItem('redirect');
+      }
+    } catch (err) {
+      console.log(err);
+      setIsOauthGoogleLoading(false);
+    }
+  }
+
+  async function signUpLocalCallback(data) {
+    try {
+      setIsRequestSignUpLoading(true);
+      data.email = email;
+      await request.post('api/auth/sign-up', data);
+      setIsRequestSignUpLoading(false);
+      toast.success("Đăng kí tài khoản thành công, vui lòng đăng nhập");
+
+      setTimeout(() => {
+        navigate('/sign-in');
+      }, 4000);
+    } catch (err) {
+      console.log(err);
+      setIsRequestSignUpLoading(false);
+    }
+  }
+
+  async function handRequestGetCode() {
+    try {
+      setIsRequestCodeLoading(true);
+      await request.post('api/auth/code', { email });
+      setIsRequestCodeLoading(false);
+      countDownRequestTime();
+      toast.success("Đã gửi mã đến email của bạn");
+    } catch (err) {
+      console.log(err);
+      setIsRequestCodeLoading(false);
+    }
+  }
+
+  function countDownRequestTime() {
+    setWaitTime(REQUEST_CODE_INTERVAL);
+    const threadId = setInterval(() => {
+      setWaitTime(waitTime => {
+        if (waitTime <= 0) {
+          clearInterval(threadId);
+          return 0;
         }
-    }
+        return waitTime - 1
+      });
+    }, 1000)
+  }
 
-    async function signUpLocalCallback(data) {
-        try {
-            setIsRequestSignUpLoading(true);
-            data.email = email;
-            await request.post('api/auth/sign-up', data);
-            setIsRequestSignUpLoading(false);
-            toast.success("Đăng kí tài khoản thành công, vui lòng đăng nhập");
-
-            setTimeout(() => {
-                navigate('/sign-in');
-            }, 4000);
-        } catch (err) {
-            console.log(err);
-            setIsRequestSignUpLoading(false);
-        }
-    }
-
-    async function handRequestGetCode() {
-        try {
-            setIsRequestCodeLoading(true);
-            await request.post('api/auth/code', { email });
-            setIsRequestCodeLoading(false);
-            countDownRequestTime();
-            toast.success("Đã gửi mã đến email của bạn");
-        } catch (err) {
-            console.log(err);
-            setIsRequestCodeLoading(false);
-        }
-    }
-
-    function countDownRequestTime() {
-        setWaitTime(REQUEST_CODE_INTERVAL);
-        const threadId = setInterval(() => {
-            setWaitTime(waitTime => {
-                if (waitTime <= 0) {
-                    clearInterval(threadId);
-                    return 0;
-                }
-                return waitTime - 1
-            });
-        }, 1000) 
-    }
-
-    return (
-        <div className="containerMain">
-            <div className="sideFeature mainSide">
-                <div className={styles.introTitle}>Tạo tài khoản dễ dàng</div>
-                <div className={styles.titleMethod}><hr />Đăng kí bằng email<hr /></div>
-                <div className={styles.login}>
-                    <Formik
-                        initialValues={{
-                            email: '',
-                            code: '',
-                            password: '',
-                        }}
-                        onSubmit={signUpLocalCallback}
-                        validate={validate}
-                    >
-                        {() => (
-                            <Form id="form-login" action="sign-up" method="POST" className={styles.loginForm}>
-                                <div className={styles.loginForm_Text}>
-                                    <EmailIcon className={styles.fontIcon} style={{ fontSize: '2.2rem' }} />
-                                    <Field
-                                        className={styles.inputField}
-                                        name="email"
-                                        type="text"
-                                        placeholder="Tài khoản email"
-                                        required
-                                        value={email}
-                                        onChange={(event) => setEmail(event.target.value.trim())}
-                                    />
-                                    <ErrorMessage name="email" render={msg => <div className="txtErrorInput">{msg}</div>} />
-                                </div>
-                                <div className={styles.loginForm_Text}>
-                                    <div className={styles.notifyInput}></div>
-                                    <AddModeratorIcon className={styles.fontIcon} style={{ fontSize: '2.2rem' }} />
-                                    <i className="fas fa-shield-alt font-icon"></i>
-                                    <span className={styles.btnSendCode} style={{ display: isValidEmail ? "inline" : "none" }}
-                                        onClick={handRequestGetCode}
-                                    >
-                                        Nhận mã
-                                    </span>
-                                    <div className={styles.ctnFunction}>
-                                        {waitTime > 0 ? waitTime : (isRequestCodeLoading ? <LoadingIcons.TailSpin stroke="#ff6541" style={{ width: 23, height: 23 }} /> : null)}
-                                    </div>
-                                    <Field className={styles.inputField} name="code" type="number" step="1" placeholder="Mã xác thực" />
-                                    <ErrorMessage name="code" render={msg => <div className="txtErrorInput">{msg}</div>} />
-                                </div>
-                                <div className={styles.loginForm_Text}>
-                                    <div className={styles.notifyInput}></div>
-                                    <LockIcon className={styles.fontIcon} style={{ fontSize: '2.2rem' }} />
-                                    <Field className={styles.inputField} name="password" type="password" placeholder="Mật khẩu" />
-                                    <ErrorMessage name="password" render={msg => <div className="txtErrorInput">{msg}</div>} />
-                                </div>
-
-                                <div className={styles.loginForm_Submit}>
-                                    <button type="submit" disabled={isRequestSignUpLoading}>
-                                        {isRequestSignUpLoading ? <LoadingIcons.TailSpin style={{ width: 30 }} /> : "Đăng kí"} 
-                                    </button>
-                                </div>
-                            </Form>
-                        )}
-                    </Formik>
-
+  return (
+    <div className="containerMain">
+      <div className="sideFeature mainSide">
+        <div className={styles.introTitle}>Tạo tài khoản dễ dàng</div>
+        <div className={styles.titleMethod}><hr />Đăng kí bằng email<hr /></div>
+        <div className={styles.login}>
+          <Formik
+            initialValues={{
+              email: '',
+              code: '',
+              password: '',
+            }}
+            onSubmit={signUpLocalCallback}
+            validate={validate}
+          >
+            {() => (
+              <Form id="form-login" action="sign-up" method="POST" className={styles.loginForm}>
+                <div className={styles.loginForm_Text}>
+                  <EmailIcon className={styles.fontIcon} style={{ fontSize: '2.2rem' }} />
+                  <Field
+                    className={styles.inputField}
+                    name="email"
+                    type="text"
+                    placeholder="Tài khoản email"
+                    required
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value.trim())}
+                  />
+                  <ErrorMessage name="email" render={msg => <div className="txtErrorInput">{msg}</div>} />
                 </div>
-                <div className={styles.loginFoot}>
-                    Đã có tài khoản, vui lòng <Link to="/sign-in">đăng nhập</Link>
+                <div className={styles.loginForm_Text}>
+                  <div className={styles.notifyInput}></div>
+                  <AddModeratorIcon className={styles.fontIcon} style={{ fontSize: '2.2rem' }} />
+                  <i className="fas fa-shield-alt font-icon"></i>
+                  <span className={styles.btnSendCode} style={{ display: isValidEmail ? "inline" : "none" }}
+                    onClick={handRequestGetCode}
+                  >
+                    Nhận mã
+                  </span>
+                  <div className={styles.ctnFunction}>
+                    {waitTime > 0 ? waitTime : (isRequestCodeLoading ? <LoadingIcons.TailSpin stroke="#ff6541" style={{ width: 23, height: 23 }} /> : null)}
+                  </div>
+                  <Field className={styles.inputField} name="code" type="number" step="1" placeholder="Mã xác thực" />
+                  <ErrorMessage name="code" render={msg => <div className="txtErrorInput">{msg}</div>} />
                 </div>
-                <div className={styles.titleMethod}><hr />Hoặc đăng nhập bằng<hr /></div>
-                <div className={styles.login}>
-                    <FacebookLogin
-                        appId={process.env.REACT_APP_FACEBOOK_APP_ID}
-                        scope="public_profile"
-                        fields="name, picture"
-                        callback={oauthFacebookCallback}
-                        cssClass={clsx(styles.loginFacebookButton, styles.oauthButton)}
-                        redirectUri={window.location.origin + window.location.pathname}
-                        icon={
-                            <div className={clsx(styles.svg, styles.fbLogin)}>
-                                {
-                                    isOauthFacebookLoading ? <LoadingIcons.TailSpin style={{ top: 1 }} /> : (
-                                        <svg xmlns="http://www.w3.org/20svg" viewBox="0 0 216 216" className="_5h0m" color="#FFFFFF">
-                                            <path fill="#FFFFFF" d="M204.1 0H11.9C5.3 0 0 5.3 0 11.9v192.2c0 6.6 5.3 11.9 11.9
+                <div className={styles.loginForm_Text}>
+                  <div className={styles.notifyInput}></div>
+                  <LockIcon className={styles.fontIcon} style={{ fontSize: '2.2rem' }} />
+                  <Field className={styles.inputField} name="password" type="password" placeholder="Mật khẩu" />
+                  <ErrorMessage name="password" render={msg => <div className="txtErrorInput">{msg}</div>} />
+                </div>
+
+                <div className={styles.loginForm_Submit}>
+                  <button type="submit" disabled={isRequestSignUpLoading}>
+                    {isRequestSignUpLoading ? <LoadingIcons.TailSpin style={{ width: 30 }} /> : "Đăng kí"}
+                  </button>
+                </div>
+              </Form>
+            )}
+          </Formik>
+
+        </div>
+        <div className={styles.loginFoot}>
+          Đã có tài khoản, vui lòng <Link to="/sign-in">đăng nhập</Link>
+        </div>
+        <div className={styles.titleMethod}><hr />Hoặc đăng nhập bằng<hr /></div>
+        <div className={styles.login}>
+          <FacebookLogin
+            appId={process.env.REACT_APP_FACEBOOK_APP_ID}
+            scope="public_profile"
+            fields="name, picture"
+            callback={oauthFacebookCallback}
+            cssClass={clsx(styles.loginFacebookButton, styles.oauthButton)}
+            redirectUri={window.location.origin + window.location.pathname}
+            icon={
+              <div className={clsx(styles.svg, styles.fbLogin)}>
+                {
+                  isOauthFacebookLoading ? <LoadingIcons.TailSpin style={{ top: 1 }} /> : (
+                    <svg xmlns="http://www.w3.org/20svg" viewBox="0 0 216 216" className="_5h0m" color="#FFFFFF">
+                      <path fill="#FFFFFF" d="M204.1 0H11.9C5.3 0 0 5.3 0 11.9v192.2c0 6.6 5.3 11.9 11.9
                                             11.9h103.5v-83.6H87.2V99.8h28.1v-24c0-27.9 17-43.1 41.9-43.1
                                             11.9 0 22.2.9 25.2 1.3v29.2h-17.3c-13.5 0-16.2 6.4-16.2
                                             15.9v20.8h32.3l-4.2 32.6h-28V216h55c6.6 0 11.9-5.3
                                             11.9-11.9V11.9C216 5.3 210.7 0 204.1 0z">
-                                            </path>
-                                        </svg>
-                                    )
-                                }
-                            </div>
-                        }
-                        textButton=""
-                        isDisabled={isOauthFacebookLoading}
-                    />
-                    <div
-                        id="login-google-button"
-                        className={clsx(styles.svg, styles.googleLogin, styles.oauthButton)}
-                        style={{ display: isOauthGoogleLoading ? "none" : "inline-block" }}
-                    >
-                    </div>
-                    {
-                        isOauthGoogleLoading ? (
-                            <div className={clsx(styles.svg, styles.googleLogin, styles.oauthButton)} style={{ border: "solid 0.4px #9d9d9d" }}>
-                                <LoadingIcons.TailSpin stroke="red" style={{ top: 1 }} />
-                            </div>
-                        ) : null
-                    }
-                </div>
-
-                <img
-                    className={clsx("arrowDownIcon", {
-                        "arrowDownIconHide": !showScrollImg
-                    })}
-                    src="imgs/scroll-down.gif"
-                    alt="arrow down"
-                />
-
-            </div>
-            <div className="sideIntro mainSide">
-                <div className={styles.containerCarousel}>
-                    <ImageCarousel />
-                </div>
-            </div>
+                      </path>
+                    </svg>
+                  )
+                }
+              </div>
+            }
+            textButton=""
+            isDisabled={isOauthFacebookLoading}
+          />
+          <div
+            id="login-google-button"
+            className={clsx(styles.svg, styles.googleLogin, styles.oauthButton)}
+            style={{ display: isOauthGoogleLoading ? "none" : "inline-block" }}
+          >
+          </div>
+          {
+            isOauthGoogleLoading ? (
+              <div className={clsx(styles.svg, styles.googleLogin, styles.oauthButton)} style={{ border: "solid 0.4px #9d9d9d" }}>
+                <LoadingIcons.TailSpin stroke="red" style={{ top: 1 }} />
+              </div>
+            ) : null
+          }
         </div>
-    )
+        <div className={styles.documents}>
+          <a
+            href="https://www.freeprivacypolicy.com/live/b2e00735-5907-4d28-9a1a-875d2f56053c"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Privacy Policy
+          </a>
+          <a
+            href="https://www.freeprivacypolicy.com/live/882e116b-73b8-4713-85a2-bbc173c68be0"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Terms & Conditions
+          </a>
+        </div>
+
+        <img
+          className={clsx("arrowDownIcon", {
+            "arrowDownIconHide": !showScrollImg
+          })}
+          src="imgs/scroll-down.gif"
+          alt="arrow down"
+        />
+
+      </div>
+      <div className="sideIntro mainSide">
+        <div className={styles.containerCarousel}>
+          <ImageCarousel />
+        </div>
+      </div>
+    </div>
+  )
 }
