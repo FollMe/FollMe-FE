@@ -75,7 +75,7 @@ export default function ShortStory() {
                 </div>
               </Paper>
               <Paper variant="outlined" sx={{ borderRadius: '8px', pt: '10px', pb: '10px', mb: '30px' }}>
-                <CommentContainer storySlug={storySlug} />
+                <CommentContainer storySlug={storySlug} writerId={story.author._id} />
               </Paper>
             </>
         }
