@@ -14,7 +14,7 @@ import notificationSound from 'assets/audios/notification_sound.wav'
 
 const audio = new Audio(notificationSound)
 
-export function CommentContainer({ storySlug }) {
+export function CommentContainer({ storySlug, writerId }) {
   const [userInfo] = useUserInfo();
   const [ws] = useWebSocket();
   const [comments, setComments] = useState([]);
@@ -22,7 +22,6 @@ export function CommentContainer({ storySlug }) {
   const [isPosting, setIsPosting] = useState(false);
   const [isOtherTyping, setIsOtherTyping] = useState(false);
   const timeOutTyping = useRef("");
-
 
   const handlePosting = async (content, parentId) => {
     setIsPosting(true);
@@ -134,6 +133,11 @@ export function CommentContainer({ storySlug }) {
           ids: Object.keys(authorIds)
         })
         const profiles = res?.profiles ?? {};
+        for (const authorId in profiles) {
+          if (authorId === writerId) {
+            profiles[authorId].writer = true
+          }
+        }
         data.comments.forEach(cmt => {
           if (profiles[cmt.author]) {
             cmt.author = profiles[cmt.author]

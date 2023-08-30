@@ -4,6 +4,7 @@ import { useState } from "react";
 import { formatDate } from 'util/date.js';
 import { CommentInput } from "./CommentInput";
 import { CommentType } from "instants/comment.instant";
+import styles from './CommentItem.module.scss';
 
 export function CommentItem({ comment, type, isPosting, handlePosting }) {
   const [isShowReply, setIsShowReply] = useState(false)
@@ -32,6 +33,12 @@ export function CommentItem({ comment, type, isPosting, handlePosting }) {
             >
               <Typography variant="body1" component="div" sx={{ fontWeight: 'bold' }}>
                 {comment.author.name ?? comment.author.slEmail}
+                {
+                  comment.author.writer &&
+                  <div className={styles.writerLabel}>
+                    Tác giả
+                  </div>
+                }
               </Typography>
               <Typography variant="body2" component="span">
                 {comment.content}
@@ -61,7 +68,7 @@ export function CommentItem({ comment, type, isPosting, handlePosting }) {
           ))
         }
         {
-          isShowReply ? <CommentInput parentCmt={comment.id} onPost={handlePosting} isPosting={isPosting}/> : ""
+          isShowReply ? <CommentInput parentCmt={comment.id} onPost={handlePosting} isPosting={isPosting} /> : ""
         }
       </Stack>
     </Stack>
