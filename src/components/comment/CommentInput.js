@@ -38,6 +38,9 @@ export function CommentInput({ parentCmt, onPost, onTyping, isPosting }) {
           if (e.key === 'Enter') {
             e.preventDefault();
             (async () => {
+              if (!insight) {
+                return;
+              }
               const ok = await onPost(insight, parentCmt)
               if (ok) {
                 setInsight("")
