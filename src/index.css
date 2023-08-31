@@ -81,3 +81,9 @@ input[type=number] {
         display: none;
     }
 }
+
+@media only screen and (min-width: 760px) {
+  .footer {
+    z-index: 99999999;
+  }
+}
