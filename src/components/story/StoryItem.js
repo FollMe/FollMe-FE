@@ -64,7 +64,7 @@ export default function StoryItem({ story }) {
                         <div className={styles.storyContent_btnFunction}>
                             <div className={styles.btnFunction_like}>
                                 <IoChatbubbleEllipsesOutline/>
-                                <span>0</span>
+                                <span>{ story.numsOfCmt ?? "..." }</span>
                             </div>
                         </div>
                     </div>

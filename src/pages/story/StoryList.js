@@ -24,11 +24,28 @@ export default function StoryList() {
           return;
         }
         setStories(stories);
+        populateNumsOfCmt(stories);
       } catch (err) {
         console.log(err);
       }
     }
   }, [])
+
+  async function populateNumsOfCmt(stories) {
+    const payload = {
+      postSlugs: stories.map(story => story.slug)
+    }
+    const res = await request.post('comment-svc/api/comments/count', payload);
+    const numsOfCmt = res?.numsOfCmt ?? {};
+
+    setStories(current => {
+      return current.map(story => {
+        story.numsOfCmt = numsOfCmt[story.slug]
+        return story
+      })      
+    })
+  }
+
   return (
     <div className="containerMain">
       <div className="containerStory">
