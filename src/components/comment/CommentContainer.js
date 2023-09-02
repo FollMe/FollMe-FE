@@ -1,16 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
-import { Stack } from "@mui/system";
-import Divider from '@mui/material/Divider';
-import { CommentInput } from "./CommentInput";
-import { CommentItem } from "./CommentItem";
-import OvalLoading from "components/OvalLoading";
-import Typing from 'components/animations/Typing';
-
-import { CommentType } from "instants/comment.instant";
 import { useUserInfo } from 'customHooks/useUserInfo';
 import { useWebSocket } from 'customHooks/useWebSocket';
 import { request } from 'util/request';
 import notificationSound from 'assets/audios/notification_sound.wav'
+import { CommentInterface } from './CommentInterface';
+import { CommentDesktop } from './CommentDesktop';
+import CommentMobile from './CommentMobile';
+
+const MOBILE_MAX_WIDTH = 760;
 
 const audio = new Audio(notificationSound)
 
@@ -21,6 +18,8 @@ export function CommentContainer({ storySlug, writerId }) {
   const [isCmtLoading, setIsCmtLoading] = useState(true);
   const [isPosting, setIsPosting] = useState(false);
   const [isOtherTyping, setIsOtherTyping] = useState(false);
+  const [openCmtDialog, setOpenCmtDialog] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= MOBILE_MAX_WIDTH);
   const timeOutTyping = useRef("");
 
   const handlePosting = async (content, parentId) => {
@@ -47,6 +46,9 @@ export function CommentContainer({ storySlug, writerId }) {
   }
 
   const handlePosted = (params) => {
+    if (params.author.id === writerId) {
+      params.author.writer = true;
+    }
     const newCmt = {
       id: params.id,
       content: params.content,
@@ -73,6 +75,10 @@ export function CommentContainer({ storySlug, writerId }) {
       userId: userInfo._id,
       action: "typing_cmt_post"
     }))
+  }
+
+  function resize() {
+    setIsMobile(window.innerWidth <= MOBILE_MAX_WIDTH);
   }
 
   useEffect(() => {
@@ -156,43 +162,43 @@ export function CommentContainer({ storySlug, writerId }) {
         setIsCmtLoading(false);
       }
     }
+
+    window.addEventListener("resize", resize);
+    return () => {
+      window.removeEventListener("resize", resize);
+    }
   }, [storySlug])
 
   return (
-    <Stack spacing={2} alignItems="flex-start" sx={{
-      padding: '12px',
-      mb: isCmtLoading ? '0' : '20px'
-    }}>
-      <Stack spacing={1} style={{ position: 'relative', width: '100%', minHeight: '30px' }}>
-        {
-          isCmtLoading
-            ? <OvalLoading />
-            : comments.length <= 0
-              ? <div style={{ textAlign: 'center', opacity: '0.7' }}> Hãy là người đầu tiên chia sẻ cảm xúc của mình </div>
-              : comments.map(cmt =>
-                <CommentItem
-                  key={cmt.id}
-                  handlePosting={handlePosting}
-                  isPosting={isPosting}
-                  comment={cmt}
-                  type={CommentType.PARENT}
-                />
-              )
-        }
-      </Stack>
-      {
-        isOtherTyping ?
-          <div className='typingBox' style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-            <Typing />
-            <span style={{ opacity: "0.7" }}>
-              Ai đó đang gõ😍
-            </span>
-          </div> : ""
+    <>
+      {isMobile
+        ? <CommentMobile
+          open={openCmtDialog}
+          setOpen={setOpenCmtDialog}
+          comments={comments}
+          handlePosting={handlePosting}
+          handleTyping={handleTyping}
+          isPosting={isPosting}
+          isCmtLoading={isCmtLoading}
+          isOtherTyping={isOtherTyping}
+        />
+        : <CommentDesktop
+          open={openCmtDialog}
+          setOpen={setOpenCmtDialog}
+          comments={comments}
+          handlePosting={handlePosting}
+          handleTyping={handleTyping}
+          isPosting={isPosting}
+          isCmtLoading={isCmtLoading}
+          isOtherTyping={isOtherTyping}
+        />
       }
-      <Divider sx={{
-        width: '100%'
-      }} />
-      <CommentInput onPost={handlePosting} onTyping={handleTyping} isPosting={isPosting} />
-    </Stack>
+
+      <CommentInterface
+        numsOfCmt={comments.reduce((acc, curr) => acc + 1 + (curr.replies?.length ?? 0), 0)}
+        setOpenCmtDialog={setOpenCmtDialog}
+        isCmtLoading={isCmtLoading}
+      />
+    </>
   )
 } 

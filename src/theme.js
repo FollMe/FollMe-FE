@@ -67,6 +67,13 @@ export const theme = createTheme({
           fontSize: '1.5rem',
         }
       }
+    },
+    MuiDialogContentText: {
+      styleOverrides: {
+        root: {
+          color: 'rgba(0, 0, 0, 0.87)',
+        }
+      }
     }
   },
 });
