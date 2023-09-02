@@ -46,7 +46,7 @@ export function CommentContainer({ storySlug, writerId }) {
   }
 
   const handlePosted = (params) => {
-    if (params.author.id === writerId) {
+    if (params.author.id === writerId || params.author._id === writerId) {
       params.author.writer = true;
     }
     const newCmt = {

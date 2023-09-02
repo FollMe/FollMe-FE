@@ -32,7 +32,7 @@ function CommentMobile({ open, setOpen, comments, handlePosting, handleTyping, i
       return;
     }
     const lastedCmt = comments[comments.length - 1];
-    if (lastedCmt.new && (lastedCmt.author.id === userInfo._id || lastedCmt.author._id === userInfo._id)) {
+    if (lastedCmt.new && lastedCmt.author.id === userInfo._id) {
       bottomCommentListRef.current?.scrollIntoView({ behavior: "smooth",  })
     }
   }, [comments])
