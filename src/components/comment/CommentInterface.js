@@ -2,7 +2,6 @@ import { Paper, Typography, IconButton } from '@mui/material';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 export function CommentInterface({ numsOfCmt, setOpenCmtDialog, isCmtLoading }) {
-  numsOfCmt = 0
   return (
     <Paper variant="outlined" sx={{ borderRadius: '8px', p: '20px', mb: '30px' }}>
       <Typography gutterBottom variant="h4" component="div"
