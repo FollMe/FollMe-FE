@@ -38,9 +38,9 @@ function CommentMobile({ open, setOpen, comments, handlePosting, handleTyping, i
     }
   }, [comments])
 
-  const measuredInputCtnRef  = React.useCallback(node => {
+  const measuredInputCtnRef = React.useCallback(node => {
     if (!node) return;
-    const resizeObserver = new ResizeObserver(() => { 
+    const resizeObserver = new ResizeObserver(() => {
       setInputCtnHeight(node?.clientHeight ?? 75)
     });
     resizeObserver.observe(node);
@@ -99,14 +99,13 @@ function CommentMobile({ open, setOpen, comments, handlePosting, handleTyping, i
           <div style={{ height: '60px' }} />
           <CommentList
             comments={comments}
-            isOtherTyping={isOtherTyping}
             isCmtLoading={isCmtLoading}
             handlePosting={handlePosting}
             isPosting={isPosting}
           />
           <div ref={bottomCommentListRef} style={{ height: `${inputCtnHeight}px` }} />
           <Stack
-            ref={measuredInputCtnRef }
+            ref={measuredInputCtnRef}
             sx={{
               position: 'absolute',
               bottom: '0',
@@ -117,7 +116,12 @@ function CommentMobile({ open, setOpen, comments, handlePosting, handleTyping, i
               borderTop: 'solid 1px rgb(230, 230, 230)'
             }}
           >
-            <CommentInput onPost={handlePosting} onTyping={handleTyping} isPosting={isPosting} />
+            <CommentInput
+              onPost={handlePosting}
+              onTyping={handleTyping}
+              isPosting={isPosting}
+              isOtherTyping={isOtherTyping}
+            />
           </Stack>
         </StyledBox>
       </SwipeableDrawer>

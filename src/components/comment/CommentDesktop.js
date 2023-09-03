@@ -23,7 +23,7 @@ export function CommentDesktop({ open, setOpen, comments, handlePosting, handleT
     }
     const lastedCmt = comments[comments.length - 1];
     if (lastedCmt.new && lastedCmt.author.id === userInfo._id) {
-      bottomCommentListRef.current?.scrollIntoView({ behavior: "smooth",  })
+      bottomCommentListRef.current?.scrollIntoView({ behavior: "smooth" })
     }
   }, [comments])
 
@@ -66,7 +66,6 @@ export function CommentDesktop({ open, setOpen, comments, handlePosting, handleT
           >
             <CommentList
               comments={comments}
-              isOtherTyping={isOtherTyping}
               isCmtLoading={isCmtLoading}
               handlePosting={handlePosting}
               isPosting={isPosting}
@@ -75,7 +74,12 @@ export function CommentDesktop({ open, setOpen, comments, handlePosting, handleT
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ p: '20px' }}>
-          <CommentInput onPost={handlePosting} onTyping={handleTyping} isPosting={isPosting} />
+          <CommentInput
+            onPost={handlePosting}
+            onTyping={handleTyping}
+            isPosting={isPosting}
+            isOtherTyping={isOtherTyping}
+          />
         </DialogActions>
       </Dialog>
     </div>
