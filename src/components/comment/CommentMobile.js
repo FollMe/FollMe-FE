@@ -28,6 +28,13 @@ function CommentMobile({ open, setOpen, comments, handlePosting, handleTyping, i
     setOpen(newOpen);
   };
 
+
+  React.useEffect(() => {
+    if (window.location.search.includes("show_comments=true") && !open) {
+      window.history.replaceState({}, document.title, window.location.href.split("?")[0]);
+    }
+  }, [])
+
   React.useEffect(() => {
     if (!open) {
       return;
@@ -37,6 +44,25 @@ function CommentMobile({ open, setOpen, comments, handlePosting, handleTyping, i
       bottomCommentListRef.current?.scrollIntoView({ behavior: "smooth" })
     }
   }, [comments])
+
+  React.useEffect(() => {
+    if (open && !window.location.search.includes("show_comments=true")) {
+      window.history.pushState({}, "", "?show_comments=true");
+    }
+
+    if (!open && window.location.search.includes("show_comments=true")) {
+      window.history.back();
+    }
+  
+    function handleBackEvent() {
+      if (open) {
+        setOpen(false)
+      }
+    }
+  
+    window.addEventListener("popstate", handleBackEvent);
+    return () => window.removeEventListener("popstate", handleBackEvent);
+  }, [open, setOpen]);
 
   const measuredInputCtnRef = React.useCallback(node => {
     if (!node) return;
