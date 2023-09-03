@@ -23,6 +23,7 @@ const StyledBox = styled(Box)(({ theme }) => ({
 function CommentMobile({ open, setOpen, comments, handlePosting, handleTyping, isPosting, isOtherTyping, isCmtLoading }) {
   const [userInfo] = useUserInfo();
   const bottomCommentListRef = React.useRef(null)
+  const [inputCtnHeight, setInputCtnHeight] = React.useState(75);
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
@@ -33,9 +34,17 @@ function CommentMobile({ open, setOpen, comments, handlePosting, handleTyping, i
     }
     const lastedCmt = comments[comments.length - 1];
     if (lastedCmt.new && lastedCmt.author.id === userInfo._id) {
-      bottomCommentListRef.current?.scrollIntoView({ behavior: "smooth",  })
+      bottomCommentListRef.current?.scrollIntoView({ behavior: "smooth" })
     }
   }, [comments])
+
+  const measuredInputCtnRef  = React.useCallback(node => {
+    if (!node) return;
+    const resizeObserver = new ResizeObserver(() => { 
+      setInputCtnHeight(node?.clientHeight ?? 75)
+    });
+    resizeObserver.observe(node);
+  }, []);
 
   return (
     <Root>
@@ -95,8 +104,9 @@ function CommentMobile({ open, setOpen, comments, handlePosting, handleTyping, i
             handlePosting={handlePosting}
             isPosting={isPosting}
           />
-          <div ref={bottomCommentListRef} style={{ height: '75px' }} />
+          <div ref={bottomCommentListRef} style={{ height: `${inputCtnHeight}px` }} />
           <Stack
+            ref={measuredInputCtnRef }
             sx={{
               position: 'absolute',
               bottom: '0',
