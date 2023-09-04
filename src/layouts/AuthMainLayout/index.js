@@ -7,11 +7,12 @@ import SideDrawer from "components/sidebar/SideDrawer";
 import { useWebSocket } from "customHooks/useWebSocket";
 import { waitConnectWS } from "util/handleWebSocket";
 import Footer from "components/Footer";
+import { forceLogin } from "util/authHelper";
 
 
 const MOBILE_MAX_WIDTH = 760;
 
-export default function AuthMainLayout({ type }) {
+export default function AuthMainLayout({ type, isProtected }) {
   const [userInfo, setUserInfo] = useUserInfo();
   const [ws] = useWebSocket();
   const [isOpenSideDrawer, setIsOpenSideDrawer] = useState(window.innerWidth > MOBILE_MAX_WIDTH);
@@ -58,10 +59,8 @@ export default function AuthMainLayout({ type }) {
     }
   }
 
-  if (!isLoggedIn) {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userInfo');
-    window.sessionStorage.setItem('redirect', window.location.pathname);
+  if (!isLoggedIn && isProtected) {
+    forceLogin();
     return <Navigate to='/sign-in' />
   }
 
