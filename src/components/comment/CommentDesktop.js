@@ -13,7 +13,10 @@ import { CommentList } from './CommentList';
 export function CommentDesktop({ open, setOpen, comments, handlePosting, handleTyping, isPosting, isCmtLoading, isOtherTyping }) {
   const [userInfo] = useUserInfo();
   const bottomCommentListRef = React.useRef(null)
-  const isLoggedIn = React.useRef(userInfo.sessionExp && new Date().getTime() <= userInfo.sessionExp * 1000).current;
+  const isLoggedIn = React.useMemo(() =>
+    userInfo.sessionExp && new Date().getTime() <= userInfo.sessionExp * 1000
+    , [userInfo]
+  )
 
   const handleClose = () => {
     setOpen(false);

@@ -23,7 +23,10 @@ const StyledBox = styled(Box)(({ theme }) => ({
 function CommentMobile({ open, setOpen, comments, handlePosting, handleTyping, isPosting, isOtherTyping, isCmtLoading }) {
   const [userInfo] = useUserInfo();
   const bottomCommentListRef = React.useRef(null)
-  const isLoggedIn = React.useRef(userInfo.sessionExp && new Date().getTime() <= userInfo.sessionExp * 1000).current;
+  const isLoggedIn = React.useMemo(() =>
+    userInfo.sessionExp && new Date().getTime() <= userInfo.sessionExp * 1000
+    , [userInfo]
+  )
   const [inputCtnHeight, setInputCtnHeight] = React.useState(75);
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
@@ -54,13 +57,13 @@ function CommentMobile({ open, setOpen, comments, handlePosting, handleTyping, i
     if (!open && window.location.search.includes("show_comments=true")) {
       window.history.back();
     }
-  
+
     function handleBackEvent() {
       if (open) {
         setOpen(false)
       }
     }
-  
+
     window.addEventListener("popstate", handleBackEvent);
     return () => window.removeEventListener("popstate", handleBackEvent);
   }, [open, setOpen]);
