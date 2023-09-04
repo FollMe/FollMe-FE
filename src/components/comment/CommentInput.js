@@ -1,5 +1,6 @@
 import { useState, useRef } from "react"
 import { useNavigate } from "react-router-dom";
+import { useWebSocket } from 'customHooks/useWebSocket';
 import { Stack } from "@mui/system";
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -11,8 +12,9 @@ import { Typography, Button } from "@mui/material";
 import { forceLogin } from "util/authHelper";
 
 
-export function CommentInput({ parentCmt, onPost, onTyping, isPosting, isOtherTyping, isLoggedIn }) {
+export function CommentInput({ parentCmt, onPost, isPosting, isOtherTyping, isLoggedIn }) {
   const [userInfo] = useUserInfo();
+  const [ws] = useWebSocket();
   const navigate = useNavigate();
   const [insight, setInsight] = useState("");
   const lastedPostTyping = useRef(null);
@@ -20,6 +22,13 @@ export function CommentInput({ parentCmt, onPost, onTyping, isPosting, isOtherTy
   function handleSignIn() {
     forceLogin();
     navigate('/sign-in');
+  }
+
+  const handleTyping = () => {
+    ws.send(JSON.stringify({
+      userId: userInfo._id,
+      action: "typing_cmt_post"
+    }))
   }
 
   return (
@@ -80,7 +89,7 @@ export function CommentInput({ parentCmt, onPost, onTyping, isPosting, isOtherTy
                     ? true : false
                   : true;
                 if (content && needPost) {
-                  onTyping()
+                  handleTyping()
                   lastedPostTyping.current = Date.now()
                 }
               }}

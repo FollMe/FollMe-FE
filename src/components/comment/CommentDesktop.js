@@ -2,7 +2,6 @@ import * as React from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
@@ -10,7 +9,7 @@ import { useUserInfo } from 'customHooks/useUserInfo';
 import { CommentInput } from './CommentInput';
 import { CommentList } from './CommentList';
 
-export function CommentDesktop({ open, setOpen, comments, handlePosting, handleTyping, isPosting, isCmtLoading, isOtherTyping }) {
+export function CommentDesktop({ open, setOpen, comments, handlePosting, isPosting, isCmtLoading, isOtherTyping }) {
   const [userInfo] = useUserInfo();
   const bottomCommentListRef = React.useRef(null)
   const isLoggedIn = React.useMemo(() =>
@@ -65,24 +64,18 @@ export function CommentDesktop({ open, setOpen, comments, handlePosting, handleT
           <CloseIcon />
         </IconButton>
         <DialogContent dividers>
-          <DialogContentText
-            id="scroll-dialog-description"
-            tabIndex={-1}
-          >
-            <CommentList
-              comments={comments}
-              isCmtLoading={isCmtLoading}
-              handlePosting={handlePosting}
-              isPosting={isPosting}
-              isLoggedIn={isLoggedIn}
-            />
-            <div ref={bottomCommentListRef} />
-          </DialogContentText>
+          <CommentList
+            comments={comments}
+            isCmtLoading={isCmtLoading}
+            handlePosting={handlePosting}
+            isPosting={isPosting}
+            isLoggedIn={isLoggedIn}
+          />
+          <div ref={bottomCommentListRef} />
         </DialogContent>
         <DialogActions sx={{ p: '20px' }}>
           <CommentInput
             onPost={handlePosting}
-            onTyping={handleTyping}
             isPosting={isPosting}
             isOtherTyping={isOtherTyping}
             isLoggedIn={isLoggedIn}

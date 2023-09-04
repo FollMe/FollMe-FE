@@ -53,10 +53,10 @@ export function CommentItem({ comment, type, isPosting, handlePosting, isLoggedI
             >
               {type === CommentType.PARENT ?
                 <div
-                  onClick={isLoggedIn ? toggleShowReply : () => {}}
+                  onClick={isLoggedIn ? toggleShowReply : () => { }}
                   style={{
                     cursor: isLoggedIn ? 'pointer' : 'not-allowed',
-                    opacity: isLoggedIn ? '1': '0.7'
+                    opacity: isLoggedIn ? '1' : '0.7'
                   }}
                 >
                   Phản hồi
@@ -74,7 +74,13 @@ export function CommentItem({ comment, type, isPosting, handlePosting, isLoggedI
           ))
         }
         {
-          isShowReply ? <CommentInput parentCmt={comment.id} onPost={handlePosting} isPosting={isPosting} /> : ""
+          isShowReply
+            ? <CommentInput
+              parentCmt={comment.id}
+              onPost={handlePosting}
+              isPosting={isPosting}
+              isLoggedIn={isLoggedIn}
+            /> : ""
         }
       </Stack>
     </Stack>

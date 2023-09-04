@@ -46,6 +46,24 @@ export function CommentContainer({ storySlug, writerId }) {
   }
 
   const handlePosted = (params) => {
+    // Check the new comment is already add to comments
+    if (params.parentId) {
+      const replies = comments.find((cmt) => cmt.id === params.parentId)?.replies;
+      if (replies) {
+        for (let i = replies.length - 1; i >= 0; i--) {
+          if (replies[i].id === params.id) {
+            return;
+          }
+        }
+      }
+    } else {
+      for (let i = comments.length - 1; i >= 0; i--) {
+        if (comments[i].id === params.id) {
+          return;
+        }
+      } 
+    }
+
     if (params.author.id === writerId || params.author._id === writerId) {
       params.author.writer = true;
     }
@@ -62,19 +80,13 @@ export function CommentContainer({ storySlug, writerId }) {
       if (!updatedComments[parentIndex].replies) {
         updatedComments[parentIndex].replies = []
       }
+
       updatedComments[parentIndex].replies?.push(newCmt)
     } else {
       updatedComments.push(newCmt)
     }
     setComments(updatedComments)
     setIsOtherTyping(false)
-  }
-
-  const handleTyping = () => {
-    ws.send(JSON.stringify({
-      userId: userInfo._id,
-      action: "typing_cmt_post"
-    }))
   }
 
   function resize() {
@@ -177,7 +189,6 @@ export function CommentContainer({ storySlug, writerId }) {
           setOpen={setOpenCmtDialog}
           comments={comments}
           handlePosting={handlePosting}
-          handleTyping={handleTyping}
           isPosting={isPosting}
           isCmtLoading={isCmtLoading}
           isOtherTyping={isOtherTyping}
@@ -187,7 +198,6 @@ export function CommentContainer({ storySlug, writerId }) {
           setOpen={setOpenCmtDialog}
           comments={comments}
           handlePosting={handlePosting}
-          handleTyping={handleTyping}
           isPosting={isPosting}
           isCmtLoading={isCmtLoading}
           isOtherTyping={isOtherTyping}

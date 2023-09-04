@@ -20,7 +20,7 @@ const StyledBox = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'light' ? '#fff' : grey[800],
 }));
 
-function CommentMobile({ open, setOpen, comments, handlePosting, handleTyping, isPosting, isOtherTyping, isCmtLoading }) {
+function CommentMobile({ open, setOpen, comments, handlePosting, isPosting, isOtherTyping, isCmtLoading }) {
   const [userInfo] = useUserInfo();
   const bottomCommentListRef = React.useRef(null)
   const isLoggedIn = React.useMemo(() =>
@@ -149,7 +149,6 @@ function CommentMobile({ open, setOpen, comments, handlePosting, handleTyping, i
           >
             <CommentInput
               onPost={handlePosting}
-              onTyping={handleTyping}
               isPosting={isPosting}
               isOtherTyping={isOtherTyping}
               isLoggedIn={isLoggedIn}
