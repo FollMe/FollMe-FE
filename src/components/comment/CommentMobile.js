@@ -23,6 +23,7 @@ const StyledBox = styled(Box)(({ theme }) => ({
 function CommentMobile({ open, setOpen, comments, handlePosting, handleTyping, isPosting, isOtherTyping, isCmtLoading }) {
   const [userInfo] = useUserInfo();
   const bottomCommentListRef = React.useRef(null)
+  const isLoggedIn = React.useRef(userInfo.sessionExp && new Date().getTime() <= userInfo.sessionExp * 1000).current;
   const [inputCtnHeight, setInputCtnHeight] = React.useState(75);
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
@@ -128,6 +129,7 @@ function CommentMobile({ open, setOpen, comments, handlePosting, handleTyping, i
             isCmtLoading={isCmtLoading}
             handlePosting={handlePosting}
             isPosting={isPosting}
+            isLoggedIn={isLoggedIn}
           />
           <div ref={bottomCommentListRef} style={{ height: `${inputCtnHeight}px` }} />
           <Stack
@@ -147,6 +149,7 @@ function CommentMobile({ open, setOpen, comments, handlePosting, handleTyping, i
               onTyping={handleTyping}
               isPosting={isPosting}
               isOtherTyping={isOtherTyping}
+              isLoggedIn={isLoggedIn}
             />
           </Stack>
         </StyledBox>

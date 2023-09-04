@@ -13,6 +13,8 @@ import { CommentList } from './CommentList';
 export function CommentDesktop({ open, setOpen, comments, handlePosting, handleTyping, isPosting, isCmtLoading, isOtherTyping }) {
   const [userInfo] = useUserInfo();
   const bottomCommentListRef = React.useRef(null)
+  const isLoggedIn = React.useRef(userInfo.sessionExp && new Date().getTime() <= userInfo.sessionExp * 1000).current;
+
   const handleClose = () => {
     setOpen(false);
   };
@@ -69,6 +71,7 @@ export function CommentDesktop({ open, setOpen, comments, handlePosting, handleT
               isCmtLoading={isCmtLoading}
               handlePosting={handlePosting}
               isPosting={isPosting}
+              isLoggedIn={isLoggedIn}
             />
             <div ref={bottomCommentListRef} />
           </DialogContentText>
@@ -79,6 +82,7 @@ export function CommentDesktop({ open, setOpen, comments, handlePosting, handleT
             onTyping={handleTyping}
             isPosting={isPosting}
             isOtherTyping={isOtherTyping}
+            isLoggedIn={isLoggedIn}
           />
         </DialogActions>
       </Dialog>

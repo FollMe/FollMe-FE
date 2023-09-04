@@ -11,11 +11,10 @@ import { Typography, Button } from "@mui/material";
 import { forceLogin } from "util/authHelper";
 
 
-export function CommentInput({ parentCmt, onPost, onTyping, isPosting, isOtherTyping }) {
+export function CommentInput({ parentCmt, onPost, onTyping, isPosting, isOtherTyping, isLoggedIn }) {
   const [userInfo] = useUserInfo();
   const navigate = useNavigate();
   const [insight, setInsight] = useState("");
-  const isLoggedIn = useRef(userInfo.sessionExp && new Date().getTime() <= userInfo.sessionExp * 1000);
   const lastedPostTyping = useRef(null);
 
   function handleSignIn() {
@@ -35,7 +34,7 @@ export function CommentInput({ parentCmt, onPost, onTyping, isPosting, isOtherTy
           </div> : ""
       }
       {
-        isLoggedIn.current
+        isLoggedIn
           ? <Stack direction='row' sx={{ width: '100%' }} alignItems="flex-start">
             <img src={userInfo.avatar?.link ?? '#'} alt="User Logo" style={{ width: '40px', borderRadius: '50%' }}
               onError={({ currentTarget }) => {

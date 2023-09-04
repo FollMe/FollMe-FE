@@ -4,7 +4,7 @@ import OvalLoading from "components/OvalLoading";
 import { CommentItem } from "./CommentItem";
 import { CommentType } from "instants/comment.instant";
 
-export function CommentList({ comments, isCmtLoading, handlePosting, isPosting }) {
+export function CommentList({ comments, isCmtLoading, handlePosting, isPosting, isLoggedIn }) {
   return (
     <>
       <Stack spacing={1} style={{ position: 'relative', width: '100%', minHeight: '80px' }}>
@@ -20,6 +20,7 @@ export function CommentList({ comments, isCmtLoading, handlePosting, isPosting }
                   isPosting={isPosting}
                   comment={cmt}
                   type={CommentType.PARENT}
+                  isLoggedIn={isLoggedIn}
                 />
               )
         }

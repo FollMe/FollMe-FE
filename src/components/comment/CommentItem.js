@@ -6,7 +6,7 @@ import { CommentInput } from "./CommentInput";
 import { CommentType } from "instants/comment.instant";
 import styles from './CommentItem.module.scss';
 
-export function CommentItem({ comment, type, isPosting, handlePosting }) {
+export function CommentItem({ comment, type, isPosting, handlePosting, isLoggedIn }) {
   const [isShowReply, setIsShowReply] = useState(false)
 
   const toggleShowReply = () => {
@@ -52,7 +52,13 @@ export function CommentItem({ comment, type, isPosting, handlePosting }) {
               }}
             >
               {type === CommentType.PARENT ?
-                <div onClick={toggleShowReply} style={{ cursor: 'pointer' }}>
+                <div
+                  onClick={isLoggedIn ? toggleShowReply : () => {}}
+                  style={{
+                    cursor: isLoggedIn ? 'pointer' : 'not-allowed',
+                    opacity: isLoggedIn ? '1': '0.7'
+                  }}
+                >
                   Phản hồi
                 </div>
                 : ""
