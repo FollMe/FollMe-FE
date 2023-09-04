@@ -31,7 +31,7 @@ export default function Router() {
             ]
         },
 
-        // Protected routes
+        // Public routes
         {
             element: <AuthMainLayout />,
             children: [
@@ -41,10 +41,18 @@ export default function Router() {
                 { path: '/stories/long-stories/:storySlug/:chapSlug', element: <Story /> },
                 { path: '/stories/short-stories/:storySlug', element: <ShortStory /> },
                 { path: '/blogs', element: <BlogList />},
-                { path: '/blogs/create', element: <CreateBlog />},
                 { path: '/blogs/:blogSlug', element: <Blog /> },
             ]
         },
+
+        // Protected routes
+        {
+          element: <AuthMainLayout isProtected={true} />,
+          children: [
+            { path: '/blogs/create', element: <CreateBlog />},
+          ]
+        },
+
         { path: '*', element: <Navigate to="/404" replace /> }
     ])
 }

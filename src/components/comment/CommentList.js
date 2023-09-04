@@ -7,7 +7,7 @@ import { CommentType } from "instants/comment.instant";
 export function CommentList({ comments, isCmtLoading, handlePosting, isPosting, isLoggedIn }) {
   return (
     <>
-      <Stack spacing={1} style={{ position: 'relative', width: '100%', minHeight: '80px' }}>
+      <Stack spacing={1} style={{ position: 'relative', width: '100%', minHeight: '300px' }}>
         {
           isCmtLoading
             ? <OvalLoading />
