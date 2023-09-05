@@ -47,6 +47,10 @@
     justify-content: center;
 }
 
+.functionBar > a + a {
+  margin-left: 20px;
+}
+
 .btnDisabled {
     pointer-events: none;
     opacity: 0.5;
