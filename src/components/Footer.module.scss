@@ -17,3 +17,7 @@
 .footer > a {
   text-decoration: none;
 }
+
+.footer > a + a {
+  margin-left: 20px;
+}
