@@ -168,4 +168,8 @@
 .documents {
   margin-top: 30px;
   text-decoration: none;
+
+  a + a {
+    margin-left: 20px;
+  }
 }
