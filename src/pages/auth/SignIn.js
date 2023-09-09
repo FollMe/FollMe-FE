@@ -12,6 +12,7 @@ import ImageCarousel from "components/ImageCarousel";
 
 import { useUserInfo } from "customHooks/useUserInfo";
 import { request, authRouteList } from "util/request";
+import { handleCheckLoggedIn } from "util/authHelper";
 
 const validate = (values) => {
   const errors = {};
@@ -42,8 +43,9 @@ export default function SignIn() {
 
   useEffect(() => {
     document.title = "Đăng nhập | FollMe";
+    const isLoggedIn = handleCheckLoggedIn(userInfo.sessionExp)
 
-    if (Object.keys(userInfo).length !== 0) {
+    if (isLoggedIn) {
       return navigate('/');
     }
     window.addEventListener("scroll", () => {

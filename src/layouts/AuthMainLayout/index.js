@@ -7,7 +7,7 @@ import SideDrawer from "components/sidebar/SideDrawer";
 import { useWebSocket } from "customHooks/useWebSocket";
 import { waitConnectWS } from "util/handleWebSocket";
 import Footer from "components/Footer";
-import { forceLogin } from "util/authHelper";
+import { forceLogin, handleCheckLoggedIn } from "util/authHelper";
 
 
 const MOBILE_MAX_WIDTH = 760;
@@ -17,9 +17,7 @@ export default function AuthMainLayout({ type, isProtected }) {
   const [ws] = useWebSocket();
   const [isOpenSideDrawer, setIsOpenSideDrawer] = useState(window.innerWidth > MOBILE_MAX_WIDTH);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= MOBILE_MAX_WIDTH);
-
-  const now = new Date().getTime();
-  const isLoggedIn = userInfo.sessionExp && now <= userInfo.sessionExp * 1000;
+  const isLoggedIn = handleCheckLoggedIn(userInfo.sessionExp)
 
   useEffect(() => {
     if (!isLoggedIn) {

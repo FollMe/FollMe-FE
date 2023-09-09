@@ -12,6 +12,7 @@ import BlogSkeleton from 'components/skeletons/BlogSkeleton';
 import BlogItem from 'components/blog/BlogItem';
 import { useUserInfo } from 'customHooks/useUserInfo';
 import { request } from 'util/request';
+import { handleCheckLoggedIn } from "util/authHelper";
 
 import styles from "./BlogList.module.scss";
 import RequestSignInDialog from 'components/dialog/RequestSignInDialog';
@@ -22,8 +23,8 @@ export default function BlogList() {
   const [blogs, setBlogs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showRequestLoginDialog, setShowRequestLoginDialog] = useState(false);
-  const isLoggedIn = useMemo(() =>
-    userInfo.sessionExp && new Date().getTime() <= userInfo.sessionExp * 1000
+  const isLoggedIn = useMemo(
+    () => handleCheckLoggedIn(userInfo.sessionExp)
     , [userInfo]
   )
 

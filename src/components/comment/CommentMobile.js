@@ -8,6 +8,7 @@ import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import { useUserInfo } from 'customHooks/useUserInfo';
 import { CommentList } from './CommentList';
 import { CommentInput } from './CommentInput';
+import { handleCheckLoggedIn } from "util/authHelper";
 
 const drawerBleeding = 0;
 
@@ -23,8 +24,8 @@ const StyledBox = styled(Box)(({ theme }) => ({
 function CommentMobile({ open, setOpen, comments, handlePosting, isPosting, isOtherTyping, isCmtLoading }) {
   const [userInfo] = useUserInfo();
   const bottomCommentListRef = React.useRef(null)
-  const isLoggedIn = React.useMemo(() =>
-    userInfo.sessionExp && new Date().getTime() <= userInfo.sessionExp * 1000
+  const isLoggedIn = React.useMemo(
+    () => handleCheckLoggedIn(userInfo.sessionExp)
     , [userInfo]
   )
   const [inputCtnHeight, setInputCtnHeight] = React.useState(75);

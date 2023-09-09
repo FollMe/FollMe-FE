@@ -8,12 +8,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useUserInfo } from 'customHooks/useUserInfo';
 import { CommentInput } from './CommentInput';
 import { CommentList } from './CommentList';
+import { handleCheckLoggedIn } from "util/authHelper";
 
 export function CommentDesktop({ open, setOpen, comments, handlePosting, isPosting, isCmtLoading, isOtherTyping }) {
   const [userInfo] = useUserInfo();
   const bottomCommentListRef = React.useRef(null)
-  const isLoggedIn = React.useMemo(() =>
-    userInfo.sessionExp && new Date().getTime() <= userInfo.sessionExp * 1000
+  const isLoggedIn = React.useMemo(
+    () => handleCheckLoggedIn(userInfo.sessionExp)
     , [userInfo]
   )
 
