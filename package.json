@@ -18,6 +18,7 @@
         "@uppy/progress-bar": "^3.0.1",
         "@uppy/react": "^3.0.2",
         "@uppy/status-bar": "^3.0.1",
+        "add-to-calendar-button-react": "^2.4.1",
         "clsx": "^1.2.1",
         "formik": "^2.2.9",
         "jwt-decode": "^3.1.2",

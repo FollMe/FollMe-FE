@@ -1,0 +1,116 @@
+.invitationPage {
+  width: 90%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+div.youAreInvitedLabel {
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+div.eventName {
+  font-family: 'Pacifico';
+  color: white;
+  text-align: center;
+  padding: 16px 0px;
+  font-size: 2.5rem;
+}
+
+div.eventDate {
+  margin: 20px auto;
+  text-align: center;
+  border-radius: 50px;
+  background-color: rgba(255, 255, 255);
+  padding: 8px;
+}
+
+.dateLabel {
+  opacity: 0.85;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.dateValue {
+  font-weight: bold;
+  color: var(--theme-color);
+}
+
+div.dateItem {
+  padding: 0;
+}
+
+.dateItem + .dateItem {
+  border-left: solid 2px rgba(0, 0, 0, 0.4);
+}
+
+.eventTime {
+  text-align: center;
+}
+
+.timeItem {
+  font-weight: 600;
+  font-size: 4rem;
+  color: var(--theme-color);
+}
+
+div.eventLocationContainer {
+  padding: 8px;
+  margin: 10px auto;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+a.eventLocation {
+  color: white;
+  
+  svg {
+    margin-left: 8px;
+    color: var(--theme-color);
+    position: relative;
+    top: 8px;
+    font-size: 2.5rem;
+  }
+}
+
+div.eventCountDown {
+  margin: 10px auto;
+  max-width: 320px;
+  font-size: 1.1rem;
+  color: white;
+
+  .countDownLabel {
+    opacity: 0.8;
+    font-size: 1rem;
+  };
+
+  .countDownValue {
+    font-weight: 900;
+    margin-bottom: 5px;
+  };
+}
+
+.countDownItem {
+  border: 2px solid var(--theme-color);
+  padding: 10px;
+  text-align: center;
+  background-color: var(--theme-color);
+  border-radius: 10px;
+}
+
+.functionBox {
+  width: 100%;
+  margin-top: 50px;
+}
+
+button.showQr {
+  width: 100%;
+  padding: 10.4px 16px;
+  text-align: center;
+  background-color: white;
+  border-radius: 6px;
+  line-height: 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: black;
+}

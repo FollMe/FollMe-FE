@@ -13,46 +13,48 @@ import Page404 from "pages/main/Page404";
 import BlogList from "pages/blog/BlogList";
 import CreateBlog from "pages/blog/CreateBlog";
 import Blog from "pages/blog/Blog";
+import InvitationCard from "pages/invitation/InvitationCard";
 
 export default function Router() {
-    return useRoutes([
-        {
-            element: <MainLayout />,
-            children: [
-                { path: 'sign-in', element: <SignIn /> },
-                { path: 'sign-up', element: <SignUp /> },
-                { path: '/404', element: <Page404 /> }
-            ]
-        },
-        {
-            element: <MainLayout type={HEADER_TYPE.MOBILE} />,
-            children: [
-                { path: '/documents/facebook-data-deletion-instructions-url', element: <FacebookDataDeletionInstructions /> }
-            ]
-        },
+  return useRoutes([
+    {
+      element: <MainLayout />,
+      children: [
+        { path: 'sign-in', element: <SignIn /> },
+        { path: 'sign-up', element: <SignUp /> },
+        { path: '/404', element: <Page404 /> }
+      ]
+    },
+    {
+      element: <MainLayout type={HEADER_TYPE.MOBILE} />,
+      children: [
+        { path: '/documents/facebook-data-deletion-instructions-url', element: <FacebookDataDeletionInstructions /> },
+        { path: '/invitation/:id', element: <InvitationCard /> }
+      ]
+    },
 
-        // Public routes
-        {
-            element: <AuthMainLayout />,
-            children: [
-                { path: '/', element: <Navigate to="/stories" replace />  },
-                { path: '/stories', element: <StoryList /> },
-                { path: '/stories/long-stories/:storySlug', element: <SelectChap /> },
-                { path: '/stories/long-stories/:storySlug/:chapSlug', element: <Story /> },
-                { path: '/stories/short-stories/:storySlug', element: <ShortStory /> },
-                { path: '/blogs', element: <BlogList />},
-                { path: '/blogs/:blogSlug', element: <Blog /> },
-            ]
-        },
+    // Public routes
+    {
+      element: <AuthMainLayout />,
+      children: [
+        { path: '/', element: <Navigate to="/stories" replace /> },
+        { path: '/stories', element: <StoryList /> },
+        { path: '/stories/long-stories/:storySlug', element: <SelectChap /> },
+        { path: '/stories/long-stories/:storySlug/:chapSlug', element: <Story /> },
+        { path: '/stories/short-stories/:storySlug', element: <ShortStory /> },
+        { path: '/blogs', element: <BlogList /> },
+        { path: '/blogs/:blogSlug', element: <Blog /> },
+      ]
+    },
 
-        // Protected routes
-        {
-          element: <AuthMainLayout isProtected={true} />,
-          children: [
-            { path: '/blogs/create', element: <CreateBlog />},
-          ]
-        },
+    // Protected routes
+    {
+      element: <AuthMainLayout isProtected={true} />,
+      children: [
+        { path: '/blogs/create', element: <CreateBlog /> },
+      ]
+    },
 
-        { path: '*', element: <Navigate to="/404" replace /> }
-    ])
+    { path: '*', element: <Navigate to="/404" replace /> }
+  ])
 }
