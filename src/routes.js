@@ -14,6 +14,8 @@ import BlogList from "pages/blog/BlogList";
 import CreateBlog from "pages/blog/CreateBlog";
 import Blog from "pages/blog/Blog";
 import InvitationCard from "pages/invitation/InvitationCard";
+import InvitationList from "pages/invitation/InvitationList";
+import Event from "pages/invitation/Event";
 
 export default function Router() {
   return useRoutes([
@@ -52,6 +54,8 @@ export default function Router() {
       element: <AuthMainLayout isProtected={true} />,
       children: [
         { path: '/blogs/create', element: <CreateBlog /> },
+        { path: '/invitations', element: <InvitationList /> },
+        { path: '/invitations/:eventId', element: <Event /> },
       ]
     },
 

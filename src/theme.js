@@ -74,6 +74,20 @@ export const theme = createTheme({
           color: 'rgba(0, 0, 0, 0.87)',
         }
       }
+    },
+    MuiDataGrid: {
+      styleOverrides: {
+        root: {
+          fontSize: '1.5rem',
+        }
+      }
+    },
+    MuiTablePagination: {
+      styleOverrides: {
+        displayedRows: {
+          fontSize: '1.2rem',
+        }
+      }
     }
   },
 });
