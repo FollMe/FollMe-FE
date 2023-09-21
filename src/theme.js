@@ -88,6 +88,20 @@ export const theme = createTheme({
           fontSize: '1.2rem',
         }
       }
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          fontSize: '1.5rem',
+        }
+      }
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          fontSize: '1.2rem',
+        }
+      }
     }
   },
 });

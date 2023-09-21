@@ -16,6 +16,7 @@ import Blog from "pages/blog/Blog";
 import InvitationCard from "pages/invitation/InvitationCard";
 import InvitationList from "pages/invitation/InvitationList";
 import Event from "pages/invitation/Event";
+import CreateEvent from "pages/invitation/CreateEvent";
 
 export default function Router() {
   return useRoutes([
@@ -55,6 +56,7 @@ export default function Router() {
       children: [
         { path: '/blogs/create', element: <CreateBlog /> },
         { path: '/invitations', element: <InvitationList /> },
+        { path: '/events/create', element: <CreateEvent /> },
         { path: '/invitations/:eventId', element: <Event /> },
       ]
     },

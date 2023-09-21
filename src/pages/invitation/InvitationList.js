@@ -1,19 +1,22 @@
 import { useEffect, useState } from 'react';
-import Typography from '@mui/material/Typography';
+import { useNavigate } from 'react-router-dom';
+import { Typography, Stack, Tooltip, IconButton } from '@mui/material';
 import { request } from 'util/request';
 import StorySkeleton from 'components/skeletons/StorySkeleton';
 import Paper from '@mui/material/Paper';
 import Divider from '@mui/material/Divider';
+import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 import styles from "./InvitationList.module.scss";
 import InvitationItem from 'components/invitation/InvitationItem';
 
 export default function InvitationList() {
+  const navigate = useNavigate();
   const [invitations, setInvitations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     document.title = "Invitation | FollMe";
     getInvitation();
-    
+
     async function getInvitation() {
       try {
         setIsLoading(true);
@@ -33,9 +36,17 @@ export default function InvitationList() {
   return (
     <div className="containerMain">
       <div className="containerStory">
-        <Typography className={styles.txtPageTitle} gutterBottom variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
-          Thư mời điện tử
-        </Typography>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Typography className={styles.txtPageTitle} gutterBottom variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
+            Thư mời điện tử
+          </Typography>
+          <Tooltip placement='left' title={<Typography fontSize={"1.3rem"}>Tạo sự kiện</Typography>}>
+            <IconButton className={styles.btnAddNewEvent} variant="outlined" onClick={() => navigate("/events/create")}>
+              <EditCalendarIcon sx={{ fontSize: '40px' }} />
+              Thêm
+            </IconButton>
+          </Tooltip>
+        </Stack>
 
         <Paper variant="outlined" sx={{ marginTop: '20px', borderRadius: '8px', padding: '16px' }}>
           {

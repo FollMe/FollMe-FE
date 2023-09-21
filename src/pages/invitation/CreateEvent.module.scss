@@ -1,0 +1,90 @@
+.blogContent {
+  width: 1000px;
+  max-width: 100%;
+  min-height: calc(100vh - 120px);
+  position: relative;
+  margin: 20px auto;
+  padding-top: 30px;
+  background-color: white;
+  border-radius: 10px;
+}
+
+.blogContent img {
+  max-width: 100%;
+}
+
+.blogContent a+a {
+  margin: 0;
+}
+
+.boxContent {
+  margin: 0 auto;
+  padding-right: 20px;
+  padding-left: 20px;
+  width: 100%;
+}
+
+.chapNumber {
+  font-size: 2rem;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.content {
+  line-height: 2.9rem;
+  font-family: 'Roboto';
+  font-size: 1.7rem;
+  text-align: justify;
+  white-space: pre-line;
+}
+
+.content p {
+  font-family: 'Roboto';
+  font-size: 1.7rem;
+}
+
+.buttonChap {
+  min-width: 40px;
+  text-align: center;
+  color: white;
+  border-radius: 5px;
+  padding-left: 10px;
+  padding-right: 8px;
+  background-color: var(--theme-color);
+  height: 38px;
+  display: flex;
+  align-items: center;
+
+}
+
+.thumbnail {
+  width: 100%;
+  max-height: 300px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.eventField {
+  line-height: 2.2rem;
+}
+
+.eventField svg {
+  position: relative;
+  top: 4px;
+  font-size: 2.2rem;
+  margin-right: 5px;
+}
+
+.createEventForm {
+  margin-top: 30px;
+}
+
+div.inputFiled {
+  margin-top: 24px;
+}
+
+.funcBox {
+  display: flex;
+  justify-content: end;
+  margin-top: 40px;
+}

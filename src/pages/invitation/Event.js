@@ -13,8 +13,8 @@ import styles from "./Event.module.scss";
 import { formatDateTime } from 'util/date';
 
 const columns = [
-  { field: 'mail', headerName: 'Mail khách mời', flex: 1, headerClassName: styles.tableHeader },
-  { field: 'viewed', headerName: 'Số lượt xem', align: 'center', headerClassName: styles.tableHeader },
+  { field: 'mail', headerName: 'Mail', flex: 1, headerClassName: styles.tableHeader },
+  { field: 'viewed', headerName: 'Lượt xem', align: 'center', headerClassName: styles.tableHeader, width: 126 },
 ]
 
 export default function Event() {
@@ -36,12 +36,11 @@ export default function Event() {
           return;
         }
         document.title = `Invitation | FollMe`;
+        setIsLoading(false);
         setEvent(data.invitation);
       } catch (err) {
         console.log(err);
         navigate(`/invitations`);
-      } finally {
-        setIsLoading(false);
       }
     }
   }, [eventId, navigate])
