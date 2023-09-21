@@ -88,7 +88,7 @@ export default function SideDrawer({ setIsOpenSideDrawer, isOpenSideDrawer, isMo
         <SideBarItem to='blogs' title='Blog' isOpenSideDrawer={isOpenSideDrawer}
           handClickItem={handClickItem} color='#ec4899' children={<IoNewspaper />}
         />
-        <SideBarItem to='invitations' title='Thư mời' isOpenSideDrawer={isOpenSideDrawer}
+        <SideBarItem to='events' title='Thư mời' isOpenSideDrawer={isOpenSideDrawer}
           handClickItem={handClickItem} color='#f59e0b' children={<IoTicket />}
         />
       </List>

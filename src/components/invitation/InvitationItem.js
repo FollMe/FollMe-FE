@@ -12,7 +12,7 @@ export default function InvitationItem({ invitation }) {
   const formattedStartAt = formatDateTime(startAt);
 
   function handleClickItem() {
-    navigate(`/invitations/${invitation._id}`)
+    navigate(`/events/${invitation._id}`)
   }
 
   return (

@@ -59,7 +59,7 @@ export default function CreateEvent() {
         setIsPosting(true);
         const event = await request.post('api/invitations', { ...values, guests });
         console.log(event);
-        navigate(`/invitations/${event._id}`)
+        navigate(`/events/${event._id}`)
       } catch (err) {
         setIsPosting(false);
         console.log(err);

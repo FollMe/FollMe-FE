@@ -55,9 +55,9 @@ export default function Router() {
       element: <AuthMainLayout isProtected={true} />,
       children: [
         { path: '/blogs/create', element: <CreateBlog /> },
-        { path: '/invitations', element: <InvitationList /> },
+        { path: '/events', element: <InvitationList /> },
         { path: '/events/create', element: <CreateEvent /> },
-        { path: '/invitations/:eventId', element: <Event /> },
+        { path: '/events/:eventId', element: <Event /> },
       ]
     },
 

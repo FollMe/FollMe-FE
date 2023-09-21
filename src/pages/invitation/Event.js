@@ -32,15 +32,15 @@ export default function Event() {
       try {
         const data = await request.get(`api/invitations/${eventId}`);
         if (!data.invitation) {
-          navigate(`/invitations`);
+          navigate(`/events`);
           return;
         }
         document.title = `Invitation | FollMe`;
-        setIsLoading(false);
         setEvent(data.invitation);
+        setIsLoading(false);
       } catch (err) {
         console.log(err);
-        navigate(`/invitations`);
+        navigate(`/events`);
       }
     }
   }, [eventId, navigate])
