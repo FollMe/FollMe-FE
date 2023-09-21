@@ -178,7 +178,7 @@ export default function InvitationCard() {
                     </Grid>
                   </Grid> :
                   <div className={styles.alreadyHappenedLabel}>
-                    SỰ KIÊN ĐÃ DIỄN RA!
+                    SỰ KIỆN ĐÃ DIỄN RA!
                   </div>
               }
               <div className={styles.eventLocationContainer}>
