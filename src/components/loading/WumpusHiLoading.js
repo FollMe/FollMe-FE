@@ -1,4 +1,4 @@
-import WumpusHi from './animations/WumpusHi';
+import WumpusHi from '../animations/WumpusHi';
 
 function WumpusHiLoading() {
   return (

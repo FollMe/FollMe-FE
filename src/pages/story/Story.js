@@ -6,7 +6,7 @@ import { Paper } from '@mui/material';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import OvalLoading from 'components/OvalLoading';
+import OvalLoading from 'components/loading/OvalLoading';
 import { CommentContainer } from 'components/comment/CommentContainer';
 import { useWebSocket } from "customHooks/useWebSocket";
 import { waitConnectWS } from 'util/handleWebSocket';

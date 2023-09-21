@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../auth/SignIn.module.scss';
 import styles from './Home.module.scss';
-import WumpusHiLoading from 'components/WumpusHiLoading';
+import WumpusHiLoading from 'components/loading/WumpusHiLoading';
 import { request } from 'util/request';
 
 export default function Home() {

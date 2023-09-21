@@ -1,6 +1,6 @@
 import { Stack } from "@mui/system";
 
-import OvalLoading from "components/OvalLoading";
+import OvalLoading from "components/loading/OvalLoading";
 import { CommentItem } from "./CommentItem";
 import { CommentType } from "instants/comment.instant";
 

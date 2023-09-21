@@ -7,7 +7,7 @@ import Box from '@mui/material/Box';
 import { DataGrid } from '@mui/x-data-grid';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import OvalLoading from 'components/OvalLoading';
+import OvalLoading from 'components/loading/OvalLoading';
 
 import styles from "./Event.module.scss";
 import { formatDateTime } from 'util/date';

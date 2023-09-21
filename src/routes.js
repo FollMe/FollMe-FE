@@ -32,7 +32,7 @@ export default function Router() {
       element: <MainLayout type={HEADER_TYPE.MOBILE} />,
       children: [
         { path: '/documents/facebook-data-deletion-instructions-url', element: <FacebookDataDeletionInstructions /> },
-        { path: '/invitation/:id', element: <InvitationCard /> }
+        { path: '/invitations/:id', element: <InvitationCard /> }
       ]
     },
 

@@ -7,7 +7,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { CommentContainer } from 'components/comment/CommentContainer';
 import { useWebSocket } from "customHooks/useWebSocket";
 import { waitConnectWS } from 'util/handleWebSocket';
-import OvalLoading from 'components/OvalLoading';
+import OvalLoading from 'components/loading/OvalLoading';
 
 export default function ShortStory() {
   const [ws] = useWebSocket();

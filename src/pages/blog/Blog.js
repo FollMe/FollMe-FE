@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { request } from 'util/request';
-import OvalLoading from 'components/OvalLoading';
+import OvalLoading from 'components/loading/OvalLoading';
 
 import styles from "./Blog.module.scss";
 

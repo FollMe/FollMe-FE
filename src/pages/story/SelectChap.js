@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useParams, Link } from 'react-router-dom';
 import Paper from '@mui/material/Paper';
 import styles from './SelectChap.module.scss';
-import WumpusHiLoading from 'components/WumpusHiLoading';
+import WumpusHiLoading from 'components/loading/WumpusHiLoading';
 import { request } from 'util/request';
 
 export default function SelectChap() {
