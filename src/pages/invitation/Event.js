@@ -8,9 +8,9 @@ import { DataGrid } from '@mui/x-data-grid';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import OvalLoading from 'components/loading/OvalLoading';
+import dayjs from 'dayjs';
 
 import styles from "./Event.module.scss";
-import { formatDateTime } from 'util/date';
 
 const columns = [
   { field: 'mail', headerName: 'Mail', flex: 1, headerClassName: styles.tableHeader },
@@ -56,7 +56,7 @@ export default function Event() {
               </div>
               <hr />
               <Typography className={styles.eventField} variant="body" color="text.primary" component="div" sx={{ paddingBottom: 0.5 }}>
-                <AccessTimeIcon /> {formatDateTime(event.startAt)}
+                <AccessTimeIcon /> { dayjs(event.startAt).format('HH:mm, DD-MM-YYYY')}
               </Typography>
               <Typography className={styles.eventField} variant="body" color="text.primary" component="div" sx={{ paddingBottom: 0.5 }}>
                 <LocationOnIcon /> {event.location}

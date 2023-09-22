@@ -3,13 +3,12 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import { IoPeopleSharp } from "react-icons/io5";
 import styles from './InvitationItem.module.scss';
-
-import { formatDateTime } from 'util/date.js';
+import dayjs from 'dayjs';
 
 export default function InvitationItem({ invitation }) {
   const navigate = useNavigate();
   const { title, location, startAt, numGuests } = invitation;
-  const formattedStartAt = formatDateTime(startAt);
+  const formattedStartAt = dayjs(startAt).format('HH:mm, DD-MM-YYYY');
 
   function handleClickItem() {
     navigate(`/events/${invitation._id}`)

@@ -100,10 +100,10 @@ export default function InvitationCard() {
 
               <div className={styles.eventTime}>
                 <div className={styles.timeItem}>
-                  {event.startAt?.getHours()}
+                  {('0' + event.startAt?.getHours()).slice(-2)}
                 </div>
                 <div className={styles.timeItem}>
-                  {event.startAt?.getMinutes()}
+                  {('0' + event.startAt?.getMinutes()).slice(-2)}
                 </div>
               </div>
 
