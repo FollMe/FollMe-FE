@@ -57,7 +57,7 @@ export default function CreateEvent() {
     onSubmit: async (values) => {
       try {
         setIsPosting(true);
-        const event = await request.post('api/invitations', { ...values, guests });
+        const event = await request.post('api/events', { ...values, guests });
         console.log(event);
         navigate(`/events/${event._id}`)
       } catch (err) {

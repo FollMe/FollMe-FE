@@ -13,10 +13,10 @@ import { request } from 'util/request';
 import { toast } from 'react-toastify';
 
 export default function InvitationCard() {
-  const { id: eventId } = useParams();
+  const { id: invitationId } = useParams();
   const [isLoading, setIsLoading] = useState(true);
   const [isCompletedSplash, setIsCompetedSplash] = useState(false);
-  const [invitation, setInvitation] = useState({});
+  const [event, setEvent] = useState({});
   const [duration, setDuration] = useState(null);
 
   useEffect(() => {
@@ -27,15 +27,15 @@ export default function InvitationCard() {
     var intervalId = '';
     async function getInvitation() {
       setIsLoading(true);
-      const res = await request.get(`api/invitations/${eventId}`);
-      const startAt = new Date(res.invitation.startAt)
+      const res = await request.get(`api/invitations/${invitationId}`);
+      const startAt = new Date(res.invitation.event?.startAt)
       const endAt = new Date(startAt.getTime() + 60 * 60 * 1000)
-      const invitation = {
-        ...res.invitation,
+      const event = {
+        ...res.invitation.event,
         startAt,
         endAt
       }
-      setInvitation(invitation);
+      setEvent(event);
       intervalId = setInterval(() => {
         const distance = startAt.getTime() - new Date().getTime();
         if (distance < 0) {
@@ -95,15 +95,15 @@ export default function InvitationCard() {
                 variant="h4"
                 component="div"
               >
-                {invitation.title}
+                {event.title}
               </Typography>
 
               <div className={styles.eventTime}>
                 <div className={styles.timeItem}>
-                  {invitation.startAt?.getHours()}
+                  {event.startAt?.getHours()}
                 </div>
                 <div className={styles.timeItem}>
-                  {invitation.startAt?.getMinutes()}
+                  {event.startAt?.getMinutes()}
                 </div>
               </div>
 
@@ -113,7 +113,7 @@ export default function InvitationCard() {
                     Ngày
                   </div>
                   <div className={styles.dateValue}>
-                    {invitation.startAt?.getDate()}
+                    {event.startAt?.getDate()}
                   </div>
                 </Grid>
                 <Grid className={styles.dateItem} xs={4}>
@@ -121,7 +121,7 @@ export default function InvitationCard() {
                     Tháng
                   </div>
                   <div className={styles.dateValue}>
-                    {invitation.startAt?.getMonth() + 1}
+                    {event.startAt?.getMonth() + 1}
                   </div>
                 </Grid>
                 <Grid className={styles.dateItem} xs={4}>
@@ -129,7 +129,7 @@ export default function InvitationCard() {
                     Năm
                   </div>
                   <div className={styles.dateValue}>
-                    {invitation.startAt?.getFullYear()}
+                    {event.startAt?.getFullYear()}
                   </div>
                 </Grid>
               </Grid>
@@ -182,10 +182,10 @@ export default function InvitationCard() {
                   </div>
               }
               <div className={styles.eventLocationContainer}>
-                {invitation.location}
+                {event.location}
                 {
-                  invitation.mapLocation &&
-                  <a href={invitation.mapLocation} target='_blank' rel="noreferrer">
+                  event.mapLocation &&
+                  <a href={event.mapLocation} target='_blank' rel="noreferrer">
                     <ArrowCircleRightIcon />
                   </a>
                 }
@@ -197,13 +197,13 @@ export default function InvitationCard() {
                     <AddToCalendarButton
                       styleLight="--font: Roboto"
                       label='Lưu'
-                      name={invitation.title}
+                      name={event.title}
                       options={['Google', 'Apple', 'Outlook.com']}
-                      location={`${invitation.location} [${invitation.mapLocation}]`}
-                      startDate={dayjs(invitation.startAt).format('YYYY-MM-DD')}
-                      endDate={dayjs(invitation.endAt).format('YYYY-MM-DD')}
-                      startTime={dayjs(invitation.startAt).format('HH:mm')}
-                      endTime={dayjs(invitation.endAt).format('HH:mm')}
+                      location={`${event.location} [${event.mapLocation}]`}
+                      startDate={dayjs(event.startAt).format('YYYY-MM-DD')}
+                      endDate={dayjs(event.endAt).format('YYYY-MM-DD')}
+                      startTime={dayjs(event.startAt).format('HH:mm')}
+                      endTime={dayjs(event.endAt).format('HH:mm')}
                       timeZone="Asia/Bangkok"
                       language="vi"
                     ></AddToCalendarButton>

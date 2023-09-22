@@ -20,7 +20,7 @@ export default function InvitationList() {
     async function getInvitation() {
       try {
         setIsLoading(true);
-        const res = await request.get('api/invitations');
+        const res = await request.get('api/events');
         setIsLoading(false);
         const invitations = res.invitations;
         if (!Array.isArray(invitations)) {

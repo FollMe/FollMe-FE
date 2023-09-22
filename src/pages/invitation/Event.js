@@ -30,7 +30,7 @@ export default function Event() {
     async function getEvent() {
       setIsLoading(true);
       try {
-        const data = await request.get(`api/invitations/${eventId}`);
+        const data = await request.get(`api/events/${eventId}`);
         if (!data.invitation) {
           navigate(`/events`);
           return;
