@@ -35,28 +35,42 @@ export default function InvitationCard() {
         startAt,
         endAt
       }
+
       setEvent(event);
-      intervalId = setInterval(() => {
+
+      if (calculateDuration()) {
+        intervalId = setInterval(() => {
+          if (!calculateDuration()) {
+            clearInterval(intervalId);
+          }
+        }, 1000)
+      }
+
+      function calculateDuration() {
         const distance = startAt.getTime() - new Date().getTime();
         if (distance < 0) {
           toast.warning("Sự kiện đã diễn ra", {
             autoClose: false
           })
-          clearInterval(intervalId);
-          return;
+          return false;
         }
+
         setDuration({
           days: Math.floor(distance / (1000 * 60 * 60 * 24)),
           hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
           minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
           seconds: Math.floor((distance % (1000 * 60)) / 1000),
         })
-      }, 1000)
+        return true;
+      }
 
       setIsLoading(false);
     }
+
     return () => {
-      clearInterval(intervalId);
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
     }
   }, [])
 
