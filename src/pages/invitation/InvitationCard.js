@@ -11,6 +11,7 @@ import { ECardLoading } from 'components/loading/ECardLoading';
 import styles from "./InvitationCard.module.scss";
 import { request } from 'util/request';
 import { toast } from 'react-toastify';
+import QRModel from './QRModel';
 
 export default function InvitationCard() {
   const { id: invitationId } = useParams();
@@ -18,6 +19,7 @@ export default function InvitationCard() {
   const [isCompletedSplash, setIsCompetedSplash] = useState(false);
   const [event, setEvent] = useState({});
   const [duration, setDuration] = useState(null);
+  const [isShowQR, setIsShowQR] = useState(false);
 
   useEffect(() => {
     setTimeout(() => {
@@ -231,6 +233,7 @@ export default function InvitationCard() {
                         textTransform: 'none',
                         fontSize: '1.2rem',
                       }}
+                      onClick={() => setIsShowQR(true)}
                     >
                       Mã
                     </Button>
@@ -238,6 +241,10 @@ export default function InvitationCard() {
                 </Grid>
               </div>
             </div>
+            {isShowQR && <QRModel
+              value={invitationId}
+              handleClose={() => setIsShowQR(false)}
+            />}
           </Paper>
       }
     </>
