@@ -8,7 +8,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import Slide from '@mui/material/Slide';
 import { forceLogin } from 'util/authHelper';
-import Writing from 'components/animations/Writing';
+import Locked from 'components/animations/Locked';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
@@ -33,13 +33,13 @@ export default function RequestSignInDialog({ open, setOpen, action }) {
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
         maxWidth='sm'
-        fullWidth='true'
+        fullWidth
       >
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
             Vui lòng đăng nhập để <b> {action} </b>
           </DialogContentText>
-          <Writing styles={{
+          <Locked styles={{
             margin: '5px auto',
             marginBottom: '0px',
             width: 200,

@@ -70,6 +70,7 @@ export default function AuthMainLayout({ type, isProtected }) {
           setIsOpenSideDrawer={setIsOpenSideDrawer}
           isOpenSideDrawer={isOpenSideDrawer}
           isMobile={isMobile}
+          isLoggedIn={isLoggedIn}
         />
         <Outlet />
       </div>

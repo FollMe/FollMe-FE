@@ -8,6 +8,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { IoNewspaper, IoTicket, IoLibrary } from "react-icons/io5";
+import RequestSignInDialog from 'components/dialog/RequestSignInDialog';
 import './SideDrawer.css';
 
 const drawerWidth = 240;
@@ -52,8 +53,14 @@ const Drawer = styled(MuiDrawer, {})(
 );
 
 
-export default function SideDrawer({ setIsOpenSideDrawer, isOpenSideDrawer, isMobile }) {
+export default function SideDrawer({
+  setIsOpenSideDrawer,
+  isOpenSideDrawer,
+  isMobile,
+  isLoggedIn 
+}) {
   const navigate = useNavigate();
+  const [showRequestLoginDialog, setShowRequestLoginDialog] = React.useState(false);
 
   const toggleDrawer = (event) => {
     if (
@@ -67,7 +74,12 @@ export default function SideDrawer({ setIsOpenSideDrawer, isOpenSideDrawer, isMo
     setIsOpenSideDrawer(false);
   };
 
-  const handClickItem = (to) => {
+  const handClickItem = (to, isProtected) => {
+    if (isProtected && !isLoggedIn) {
+      setShowRequestLoginDialog(true);
+      return;
+    }
+
     if (isMobile) {
       setIsOpenSideDrawer(false);
     }
@@ -89,15 +101,28 @@ export default function SideDrawer({ setIsOpenSideDrawer, isOpenSideDrawer, isMo
           handClickItem={handClickItem} color='#ec4899' children={<IoNewspaper />}
         />
         <SideBarItem to='events' title='Thư mời' isOpenSideDrawer={isOpenSideDrawer}
+          isProtected
           handClickItem={handClickItem} color='#f59e0b' children={<IoTicket />}
         />
       </List>
+      {
+        showRequestLoginDialog
+        && <RequestSignInDialog open={true} setOpen={setShowRequestLoginDialog} action="truy cập" />
+      }
     </Drawer>
   );
 }
 
 
-function SideBarItem({ to, title, isOpenSideDrawer, children, color, handClickItem }) {
+function SideBarItem({
+  to,
+  title,
+  isOpenSideDrawer,
+  children,
+  color,
+  handClickItem,
+  isProtected
+}) {
   const resolvedPath = useResolvedPath(to);
 
   const isActive = Boolean(useMatch({ path: resolvedPath.pathname, end: false }));
@@ -113,7 +138,7 @@ function SideBarItem({ to, title, isOpenSideDrawer, children, color, handClickIt
           mt: 1,
           borderRadius: '8px'
         }}
-        onClick={() => handClickItem(to)}
+        onClick={() => handClickItem(to, isProtected)}
       >
         <ListItemIcon
           sx={{

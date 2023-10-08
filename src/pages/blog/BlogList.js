@@ -94,7 +94,10 @@ export default function BlogList() {
           }
         </ Paper>
       </div>
-      <RequestSignInDialog open={showRequestLoginDialog} setOpen={setShowRequestLoginDialog} action="viết blog" />
+      {
+        showRequestLoginDialog
+        && <RequestSignInDialog open={true} setOpen={setShowRequestLoginDialog} action="truy cập" />
+      }
     </div>
   )
 }
