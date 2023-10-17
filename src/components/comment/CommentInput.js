@@ -14,7 +14,7 @@ import { forceLogin } from "util/authHelper";
 
 export function CommentInput({ parentCmt, onPost, isPosting, isOtherTyping, isLoggedIn }) {
   const [userInfo] = useUserInfo();
-  const [ws] = useWebSocket();
+  const [wsSend] = useWebSocket();
   const navigate = useNavigate();
   const [insight, setInsight] = useState("");
   const lastedPostTyping = useRef(null);
@@ -25,10 +25,10 @@ export function CommentInput({ parentCmt, onPost, isPosting, isOtherTyping, isLo
   }
 
   const handleTyping = () => {
-    ws.send(JSON.stringify({
+    wsSend({
       userId: userInfo._id,
       action: "typing_cmt_post"
-    }))
+    })
   }
 
   return (

@@ -6,11 +6,10 @@ import Paper from '@mui/material/Paper';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { CommentContainer } from 'components/comment/CommentContainer';
 import { useWebSocket } from "customHooks/useWebSocket";
-import { waitConnectWS } from 'util/handleWebSocket';
 import OvalLoading from 'components/loading/OvalLoading';
 
 export default function ShortStory() {
-  const [ws] = useWebSocket();
+  const [wsSend] = useWebSocket();
   const { storySlug } = useParams();
 
   const [story, setStory] = useState({});
@@ -22,11 +21,10 @@ export default function ShortStory() {
 
     async function subscribePost() {
       try {
-        await waitConnectWS(ws);
-        ws.send(JSON.stringify({
+        wsSend({
           action: 'join_post',
           message: storySlug
-        }))
+        })
       } catch (err) {
         console.log(err);
       }
@@ -48,10 +46,10 @@ export default function ShortStory() {
     }
 
     return () => {
-      ws.send(JSON.stringify({
+      wsSend({
         action: 'join_post',
         message: ""
-      }))
+      })
     }
   }, [storySlug])
 

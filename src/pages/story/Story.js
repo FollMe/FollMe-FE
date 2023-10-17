@@ -9,12 +9,11 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import OvalLoading from 'components/loading/OvalLoading';
 import { CommentContainer } from 'components/comment/CommentContainer';
 import { useWebSocket } from "customHooks/useWebSocket";
-import { waitConnectWS } from 'util/handleWebSocket';
 
 import styles from "./Story.module.scss";
 
 export default function Story() {
-  const [ws] = useWebSocket();
+  const [wsSend] = useWebSocket();
   const { storySlug, chapSlug } = useParams();
   const [story, setStory] = useState({});
   const [nextChap, setNextChap] = useState({});
@@ -28,11 +27,10 @@ export default function Story() {
 
     async function subscribePost() {
       try {
-        await waitConnectWS(ws);
-        ws.send(JSON.stringify({
+        wsSend({
           action: 'join_post',
           message: storySlug
-        }))
+        })
       } catch (err) {
         console.log(err);
       }
@@ -55,10 +53,10 @@ export default function Story() {
     }
 
     return () => {
-      ws.send(JSON.stringify({
+      wsSend({
         action: 'join_post',
         message: ""
-      }))
+      })
     }
   }, [storySlug, chapSlug])
 

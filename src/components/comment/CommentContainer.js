@@ -13,7 +13,7 @@ const audio = new Audio(notificationSound)
 
 export function CommentContainer({ storySlug, writerId }) {
   const [userInfo] = useUserInfo();
-  const [ws] = useWebSocket();
+  const [, ws] = useWebSocket();
   const [comments, setComments] = useState([]);
   const [isCmtLoading, setIsCmtLoading] = useState(true);
   const [isPosting, setIsPosting] = useState(false);
@@ -127,7 +127,7 @@ export function CommentContainer({ storySlug, writerId }) {
         default:
       }
     }
-  }, [comments])
+  }, [comments, ws])
 
   useEffect(() => {
     getComments()
