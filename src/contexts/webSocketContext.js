@@ -1,4 +1,5 @@
 import { useState, useRef, createContext, useEffect } from "react";
+import { toast } from "react-toastify";
 
 const WebSocketContext = createContext();
 
@@ -21,12 +22,14 @@ const WebSocketProvider = ({ children }) => {
 
   useEffect(() => {
     const onClose = ws.onclose;
-    let timeoutId;
+    let timeoutId, pingInterval;
     ws.onclose = function () {
       needRecoverState.current = true;
       timeoutId = setTimeout(function () {
         setWs(new WebSocket(`${process.env.REACT_APP_WS_BASE_HOST}/comment-svc/ws`))
       }, durationGenerator.current.next().value);
+      clearInterval(pingInterval);
+
       if (onClose) {
         onClose()
       }
@@ -40,17 +43,32 @@ const WebSocketProvider = ({ children }) => {
 
       // Reset exponential backoff
       durationGenerator.current = exponentialBackoff();
-      
+
       // Recover current state to server
       if (needRecoverState.current && Object.keys(wsState.current).length > 0) {
         ws.send(JSON.stringify({
           action: "recover_state",
           message: JSON.stringify(wsState.current)
         }))
+        toast.warning(<ToastRefreshPageRequest />, {
+          autoClose: 10000
+        })
       }
+      ws.send(JSON.stringify({
+        action: "ping"
+      }))
+      pingInterval = setInterval(() => {
+        console.log("Send ping", new Date().getSeconds())
+        ws.send(JSON.stringify({
+          action: "ping"
+        }))
+      }, 12000)
     }
 
-    return () => clearTimeout(timeoutId);
+    return () => {
+      clearTimeout(timeoutId)
+      clearInterval(pingInterval);
+    };
   }, [ws])
 
   const waitConnectWS = () => {
@@ -93,3 +111,17 @@ const WebSocketProvider = ({ children }) => {
 }
 
 export { WebSocketContext, WebSocketProvider };
+
+const ToastRefreshPageRequest = () => {
+  return (
+    <p>Lỗi kết nối máy chủ. Vui lòng&nbsp;
+      <a href="." onClick={(e) => {
+        e.preventDefault();
+        window.location.reload()
+      }}
+      >
+        tải lại
+      </a>!
+    </p>
+  )
+}
