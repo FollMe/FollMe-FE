@@ -23,13 +23,12 @@ const WebSocketProvider = ({ children }) => {
 
   useEffect(() => {
     const onClose = ws.onclose;
-    let timeoutId, pingInterval;
+    let timeoutId;
     ws.onclose = function () {
       needRecoverState.current = true;
       timeoutId = setTimeout(function () {
         setWs(new WebSocket(`${process.env.REACT_APP_WS_BASE_HOST}/comment-svc/ws`))
       }, durationGenerator.current.next().value);
-      clearInterval(pingInterval);
 
       if (onClose) {
         onClose()
@@ -58,11 +57,6 @@ const WebSocketProvider = ({ children }) => {
       ws.send(JSON.stringify({
         action: "ping"
       }))
-      pingInterval = setInterval(() => {
-        ws.send(JSON.stringify({
-          action: "ping"
-        }))
-      }, 12000)
     }
 
     ws.onmessage = (e) => {
@@ -77,8 +71,7 @@ const WebSocketProvider = ({ children }) => {
     }
   
     return () => {
-      clearTimeout(timeoutId)
-      clearInterval(pingInterval);
+      clearTimeout(timeoutId);
     };
   }, [ws])
 
