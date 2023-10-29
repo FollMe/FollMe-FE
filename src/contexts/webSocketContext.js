@@ -19,6 +19,7 @@ const WebSocketProvider = ({ children }) => {
   const wsState = useRef({});
   const durationGenerator = useRef(exponentialBackoff());
   const needRecoverState = useRef(false);
+  const handlersPool = useRef({});
 
   useEffect(() => {
     const onClose = ws.onclose;
@@ -58,13 +59,23 @@ const WebSocketProvider = ({ children }) => {
         action: "ping"
       }))
       pingInterval = setInterval(() => {
-        console.log("Send ping", new Date().getSeconds())
         ws.send(JSON.stringify({
           action: "ping"
         }))
       }, 12000)
     }
 
+    ws.onmessage = (e) => {
+      const data = JSON.parse(e.data)
+      const isMatchedCommonAction = processCommonAction(ws, data);
+      if (isMatchedCommonAction) {
+        return;
+      }
+      if (handlersPool.current[data.action]) {
+        handlersPool.current[data.action](data.message)
+      }
+    }
+  
     return () => {
       clearTimeout(timeoutId)
       clearInterval(pingInterval);
@@ -103,11 +114,56 @@ const WebSocketProvider = ({ children }) => {
     ws.send(JSON.stringify(body))
   }
 
+  const addActions = (handlers) => {
+    handlers.forEach(handler => {
+      handlersPool.current[handler.action] = handler.do;
+    })
+    ws.onmessage = (e) => {
+      const data = JSON.parse(e.data)
+      const isMatchedCommonAction = processCommonAction(ws, data);
+      if (isMatchedCommonAction) {
+        return;
+      }
+      if (handlersPool.current[data.action]) {
+        handlersPool.current[data.action](data.message)
+      }
+    }
+  }
+
+  const removeActions = (actions) => {
+    actions.forEach(action => {
+      delete handlersPool.current[action];
+    })
+    ws.onmessage = (e) => {
+      const data = JSON.parse(e.data)
+      const isMatchedCommonAction = processCommonAction(ws, data);
+      if (isMatchedCommonAction) {
+        return;
+      }
+      if (handlersPool.current[data.action]) {
+        handlersPool.current[data.action](data.message)
+      }
+    }
+  }
+
   return (
-    <WebSocketContext.Provider value={{ wsSend, ws }} >
+    <WebSocketContext.Provider value={{ wsSend, addActions, removeActions }} >
       {children}
     </WebSocketContext.Provider>
   )
+}
+
+const processCommonAction = (ws, data) => {
+  switch (data.action) {
+    case "ping":
+      ws.send(JSON.stringify({
+        action: "pong"
+      }))
+      break;
+    default:
+      return false
+  }
+  return true;
 }
 
 export { WebSocketContext, WebSocketProvider };

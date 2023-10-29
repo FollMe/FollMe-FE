@@ -13,7 +13,7 @@ import { useWebSocket } from "customHooks/useWebSocket";
 import styles from "./Story.module.scss";
 
 export default function Story() {
-  const [wsSend] = useWebSocket();
+  const {wsSend} = useWebSocket();
   const { storySlug, chapSlug } = useParams();
   const [story, setStory] = useState({});
   const [nextChap, setNextChap] = useState({});
@@ -23,18 +23,7 @@ export default function Story() {
   useEffect(() => {
     window.scrollTo(0, 0)
     getStory();
-    subscribePost();
 
-    async function subscribePost() {
-      try {
-        wsSend({
-          action: 'join_post',
-          message: storySlug
-        })
-      } catch (err) {
-        console.log(err);
-      }
-    }
     async function getStory() {
       setIsLoading(true);
       try {
@@ -51,14 +40,29 @@ export default function Story() {
         console.log(err);
       }
     }
+  
+  }, [storySlug, chapSlug])
 
+  useEffect(() => {
+    subscribePost();
+
+    async function subscribePost() {
+      try {
+        wsSend({
+          action: 'join_post',
+          message: storySlug
+        })
+      } catch (err) {
+        console.log(err);
+      }
+    }
     return () => {
       wsSend({
         action: 'join_post',
         message: ""
       })
     }
-  }, [storySlug, chapSlug])
+  }, [wsSend, storySlug])
 
   return (
     <>

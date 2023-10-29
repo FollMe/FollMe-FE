@@ -9,7 +9,7 @@ import { useWebSocket } from "customHooks/useWebSocket";
 import OvalLoading from 'components/loading/OvalLoading';
 
 export default function ShortStory() {
-  const [wsSend] = useWebSocket();
+  const {wsSend} = useWebSocket();
   const { storySlug } = useParams();
 
   const [story, setStory] = useState({});
@@ -17,18 +17,6 @@ export default function ShortStory() {
 
   useEffect(() => {
     getStory();
-    subscribePost()
-
-    async function subscribePost() {
-      try {
-        wsSend({
-          action: 'join_post',
-          message: storySlug
-        })
-      } catch (err) {
-        console.log(err);
-      }
-    }
 
     async function getStory() {
       try {
@@ -44,6 +32,21 @@ export default function ShortStory() {
         console.log(err);
       }
     }
+  }, [storySlug])
+
+  useEffect(() => {
+    subscribePost()
+
+    async function subscribePost() {
+      try {
+        wsSend({
+          action: 'join_post',
+          message: storySlug
+        })
+      } catch (err) {
+        console.log(err);
+      }
+    }
 
     return () => {
       wsSend({
@@ -51,7 +54,7 @@ export default function ShortStory() {
         message: ""
       })
     }
-  }, [storySlug])
+  }, [storySlug, wsSend])
 
   return (
     <>

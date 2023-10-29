@@ -13,7 +13,7 @@ const MOBILE_MAX_WIDTH = 760;
 
 export default function AuthMainLayout({ type, isProtected }) {
   const [userInfo, setUserInfo] = useUserInfo();
-  const [wsSend] = useWebSocket();
+  const {wsSend} = useWebSocket();
   const [isOpenSideDrawer, setIsOpenSideDrawer] = useState(window.innerWidth > MOBILE_MAX_WIDTH);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= MOBILE_MAX_WIDTH);
   const isLoggedIn = handleCheckLoggedIn(userInfo.sessionExp)
@@ -23,16 +23,17 @@ export default function AuthMainLayout({ type, isProtected }) {
       setUserInfo({});
     }
 
-    if (isLoggedIn) {
-      regisToServer()
-    }
-
     window.addEventListener("resize", resize);
     return () => {
       window.removeEventListener("resize", resize);
     }
   }, [isLoggedIn])
 
+  useEffect(() => {
+    if (isLoggedIn) {
+      regisToServer()
+    }
+  }, [isLoggedIn, wsSend])
 
   function resize() {
     setIsMobile(isMobile => {

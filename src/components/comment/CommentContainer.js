@@ -13,7 +13,7 @@ const audio = new Audio(notificationSound)
 
 export function CommentContainer({ storySlug, writerId }) {
   const [userInfo] = useUserInfo();
-  const [, ws] = useWebSocket();
+  const { addActions, removeActions } = useWebSocket();
   const [comments, setComments] = useState([]);
   const [isCmtLoading, setIsCmtLoading] = useState(true);
   const [isPosting, setIsPosting] = useState(false);
@@ -61,7 +61,7 @@ export function CommentContainer({ storySlug, writerId }) {
         if (comments[i].id === params.id) {
           return;
         }
-      } 
+      }
     }
 
     if (params.author.id === writerId || params.author._id === writerId) {
@@ -94,28 +94,29 @@ export function CommentContainer({ storySlug, writerId }) {
   }
 
   useEffect(() => {
-    ws.onmessage = (e) => {
-      const data = JSON.parse(e.data)
-      switch (data.action) {
-        case "commented":
-          (async () => {
-            const newCmt = JSON.parse(data.message)
-            const res = await request.post("api/profiles/get", {
-              ids: [newCmt.author]
-            })
-            const profiles = res?.profiles ?? {};
-            handlePosted({
-              id: newCmt.id,
-              content: newCmt.content,
-              parentId: newCmt.parentId,
-              author: profiles[newCmt.author]
-            })
-            if (profiles[newCmt.author]._id !== userInfo._id) {
-              audio.play();
-            }
-          })()
-          break;
-        case "typing_cmt_post":
+    addActions([
+      {
+        action: "commented",
+        do: async (message) => {
+          const newCmt = JSON.parse(message)
+          const res = await request.post("api/profiles/get", {
+            ids: [newCmt.author]
+          })
+          const profiles = res?.profiles ?? {};
+          handlePosted({
+            id: newCmt.id,
+            content: newCmt.content,
+            parentId: newCmt.parentId,
+            author: profiles[newCmt.author]
+          })
+          if (profiles[newCmt.author]._id !== userInfo._id) {
+            audio.play();
+          }
+        }
+      },
+      {
+        action: "typing_cmt_post",
+        do: () => {
           setIsOtherTyping(true);
           if (timeOutTyping.current) {
             clearTimeout(timeOutTyping.current);
@@ -123,11 +124,10 @@ export function CommentContainer({ storySlug, writerId }) {
           timeOutTyping.current = setTimeout(() => {
             setIsOtherTyping(false);
           }, 4000)
-          break;
-        default:
+        }
       }
-    }
-  }, [comments, ws])
+    ])
+  }, [comments])
 
   useEffect(() => {
     getComments()
@@ -178,6 +178,7 @@ export function CommentContainer({ storySlug, writerId }) {
     window.addEventListener("resize", resize);
     return () => {
       window.removeEventListener("resize", resize);
+      removeActions(["commented", "typing_cmt_post"]);
     }
   }, [storySlug])
 

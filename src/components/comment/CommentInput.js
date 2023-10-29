@@ -14,7 +14,7 @@ import { forceLogin } from "util/authHelper";
 
 export function CommentInput({ parentCmt, onPost, isPosting, isOtherTyping, isLoggedIn }) {
   const [userInfo] = useUserInfo();
-  const [wsSend] = useWebSocket();
+  const {wsSend} = useWebSocket();
   const navigate = useNavigate();
   const [insight, setInsight] = useState("");
   const lastedPostTyping = useRef(null);
