@@ -76,6 +76,11 @@ input[type=number] {
     bottom: -200px;
 }
 
+.cmt-tag {
+  background-color: #0866FF33;
+  font-weight: 500;
+}
+
 @media only screen and (min-width: 700px) {
     .arrowDownIcon {
         display: none;

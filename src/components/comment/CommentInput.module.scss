@@ -1,0 +1,22 @@
+.inputContainer {
+  position: relative;
+  width: 100%;
+  padding: 10px 12px;
+  margin-left: 16px;
+  border-radius: 18px;
+  border: 1px solid #e0e0e0;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.inputLoading {
+  position: absolute;
+  right: 6px;
+}
+
+.inputHint {
+  position: absolute;
+  left: 69px;
+  top: 11px;
+  opacity: 0.5;
+}

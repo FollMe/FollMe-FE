@@ -40,9 +40,7 @@ export function CommentItem({ comment, type, isPosting, handlePosting, isLoggedI
                   </div>
                 }
               </Typography>
-              <Typography variant="body2" component="span">
-                {comment.content}
-              </Typography>
+              <Typography variant="body2" component="div" dangerouslySetInnerHTML={{ __html: comment.content}} />
             </Box>
             <Stack
               direction="row"
