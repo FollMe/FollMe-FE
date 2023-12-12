@@ -20,10 +20,12 @@ export function CommentInput({ parentCmt, onPost, isPosting, isOtherTyping, isLo
   const navigate = useNavigate();
   const [tagMatchedUsers, setTagMatchedUsers] = useState([]);
   const [showHint, setShowHint] = useState(true);
+  const [focusedProfileIndex, setFocusedProfile] = useState(0);
   const lastedPostTyping = useRef(null);
   const getProfilesTimeoutId = useRef(null);
   const cmtInputElement = useRef(null);
-  const [focusedProfileIndex, setFocusedProfile] = useState(0);
+  const previousContent = useRef("");
+  const timePressed = useRef({});
 
   function handleSignIn() {
     forceLogin();
@@ -38,18 +40,20 @@ export function CommentInput({ parentCmt, onPost, isPosting, isOtherTyping, isLo
   }
 
   const handleClickProfile = (name) => {
-    cmtInputElement.current.innerHTML = cmtInputElement.current.innerHTML.replace(
-      tagRegex,
-      `<span class="cmt-tag" contenteditable="false">${name}&#x200B;</span>`
-    );
-    cmtInputElement.current.focus();
-    const range = document.createRange();
-    const selection = window.getSelection();
-    range.setStart(cmtInputElement.current, cmtInputElement.current.childNodes.length);
-    range.collapse(true);
-    selection.removeAllRanges();
-    selection.addRange(range);
-    setTagMatchedUsers([]);
+    setTimeout(() => {
+      cmtInputElement.current.innerHTML = cmtInputElement.current.innerHTML.replace(
+        tagRegex,
+        `<span class="cmt-tag" contenteditable="false">${name}&#x200B;</span>`
+      );
+      cmtInputElement.current.focus();
+      const range = document.createRange();
+      const selection = window.getSelection();
+      range.setStart(cmtInputElement.current, cmtInputElement.current.childNodes.length);
+      range.collapse(true);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      setTagMatchedUsers([]);
+    }, 100)
   }
 
   return (
@@ -81,11 +85,17 @@ export function CommentInput({ parentCmt, onPost, isPosting, isOtherTyping, isLo
               }}
               onInput={e => {
                 const html = e.target.innerHTML;
+                if (getProfilesTimeoutId.current) {
+                  clearTimeout(getProfilesTimeoutId.current);
+                }
                 const text = e.target.innerText;
                 if (text === "") {
                   setShowHint(true);
                 } else {
                   setShowHint(false);
+                }
+                if (html === previousContent.current) {
+                  return;
                 }
                 const needPost = lastedPostTyping.current
                   ? Date.now() - lastedPostTyping.current > 3000
@@ -95,23 +105,28 @@ export function CommentInput({ parentCmt, onPost, isPosting, isOtherTyping, isLo
                   handleTyping()
                   lastedPostTyping.current = Date.now()
                 }
-
                 const matches = html?.match(tagRegex);
-                if (getProfilesTimeoutId.current) {
-                  clearTimeout(getProfilesTimeoutId.current);
-                }
-                if (matches?.length === 1) {
-                  getProfilesTimeoutId.current = setTimeout(async () => {
-                    getProfilesTimeoutId.current = null;
+                getProfilesTimeoutId.current = setTimeout(async () => {
+                  previousContent.current = html;
+                  getProfilesTimeoutId.current = null;
+                  if (matches?.length === 1) {
                     const data = await request.get(`api/profiles?q=${matches[0].substring(1)}`);
                     setTagMatchedUsers(data.profiles);
                     setFocusedProfile(0);
-                  }, 500);
-                } else {
-                  setTagMatchedUsers([]);
-                }
+                  } else {
+                    setTagMatchedUsers([]);
+                  }
+                }, 300);
               }}
               onKeyDown={e => {
+                if (["ArrowDown", "ArrowUp", "Enter"].includes(e.code)) {
+                  const now = new Date().getTime();
+                  if (timePressed.current[e.code] && now - timePressed.current[e.code] < 50) {
+                    return
+                  }
+                  timePressed.current[e.code] = now
+                }
+
                 switch (true) {
                   case e.code === "ArrowDown":
                     if (tagMatchedUsers.length) {
