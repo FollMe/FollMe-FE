@@ -82,6 +82,7 @@ export function CommentInput({ parentCmt, onPost, isPosting, isOtherTyping, isLo
               ref={cmtInputElement}
               style={{
                 paddingRight: isPosting ? "37px" : "12px",
+                minHeight: "40px",
               }}
               onInput={e => {
                 const html = e.target.innerHTML;
@@ -119,7 +120,7 @@ export function CommentInput({ parentCmt, onPost, isPosting, isOtherTyping, isLo
                 }, 300);
               }}
               onKeyDown={e => {
-                if (["ArrowDown", "ArrowUp", "Enter"].includes(e.code)) {
+                if (["ArrowDown", "ArrowUp"].includes(e.code)) {
                   const now = new Date().getTime();
                   if (timePressed.current[e.code] && now - timePressed.current[e.code] < 50) {
                     return
@@ -140,28 +141,6 @@ export function CommentInput({ parentCmt, onPost, isPosting, isOtherTyping, isLo
                       setFocusedProfile(i => i <= 0 ? tagMatchedUsers.length - 1 : i - 1);
                     }
                     break;
-                  case e.code === "Enter":
-                    e.preventDefault();
-                    if (tagMatchedUsers.length) {
-                      const profile = tagMatchedUsers[focusedProfileIndex];
-                      handleClickProfile(profile.name ?? profile.slEmail);
-                      return;
-                    }
-                    if (e.shiftKey) {
-                      return;
-                    }
-                    (async () => {
-                      const text = e.currentTarget.innerText.trim();
-                      if (!text) {
-                        return;
-                      }
-                      const insight = cmtInputElement.current.innerHTML;
-                      const ok = await onPost(insight, parentCmt)
-                      if (ok) {
-                        cmtInputElement.current.innerHTML = "";
-                      }
-                    })()
-                    break;
                   case e.code === "KeyB" || e.code === "KeyI" || e.code === "KeyU":
                     if (!e.ctrlKey) {
                       return;
@@ -169,6 +148,35 @@ export function CommentInput({ parentCmt, onPost, isPosting, isOtherTyping, isLo
                     e.preventDefault();
                     break;
                   default:
+                }
+              }}
+              onKeyPress={e => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  const now = new Date().getTime();
+                  if (timePressed.current[e.code] && now - timePressed.current[e.code] < 50) {
+                    return
+                  }
+                  timePressed.current[e.code] = now
+                  if (tagMatchedUsers.length) {
+                    const profile = tagMatchedUsers[focusedProfileIndex];
+                    handleClickProfile(profile.name ?? profile.slEmail);
+                    return;
+                  }
+                  if (e.shiftKey) {
+                    return;
+                  }
+                  (async () => {
+                    const text = e.currentTarget.innerText.trim();
+                    if (!text) {
+                      return;
+                    }
+                    const insight = cmtInputElement.current.innerHTML;
+                    const ok = await onPost(insight, parentCmt)
+                    if (ok) {
+                      cmtInputElement.current.innerHTML = "";
+                    }
+                  })()
                 }
               }}
               onPaste={e => {
