@@ -68,7 +68,7 @@ export function CommentInput({ parentCmt, onPost, isPosting, isOtherTyping, isLo
       }
       {
         isLoggedIn
-          ? <Stack direction='row' sx={{ width: '100%' }} alignItems="flex-start">
+          ? <Stack className={styles.inputContainer} direction='row' sx={{ width: '100%' }} alignItems="flex-start">
             <img src={userInfo.avatar?.link ?? '#'} alt="User Logo" style={{ width: '40px', borderRadius: '50%' }}
               onError={({ currentTarget }) => {
                 currentTarget.onerror = null;
@@ -76,7 +76,7 @@ export function CommentInput({ parentCmt, onPost, isPosting, isOtherTyping, isLo
               }}
             />
             <div
-              className={styles.inputContainer}
+              className={styles.input}
               contentEditable={!isPosting}
               ref={cmtInputElement}
               style={{
