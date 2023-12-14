@@ -44,9 +44,10 @@ export default function TagPopup({ inputElement, users, onClickProfile, focusInd
         users.map((user, index) => (
           <ListItem
             key={user._id}
-            onClick={() =>
+            onClick={e => {
+              e.preventDefault();
               onClickProfile(user.name ?? user.slEmail)
-            }
+            }}
             sx={{
               cursor: 'pointer',
               "&:hover": {

@@ -45,7 +45,6 @@ export function CommentInput({ parentCmt, onPost, isPosting, isOtherTyping, isLo
         tagRegex,
         `<span class="cmt-tag" contenteditable="false">${name}&#x200B;</span>`
       );
-      cmtInputElement.current.focus();
       const range = document.createRange();
       const selection = window.getSelection();
       range.setStart(cmtInputElement.current, cmtInputElement.current.childNodes.length);
