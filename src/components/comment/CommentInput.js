@@ -122,6 +122,7 @@ export function CommentInput({ parentCmt, onPost, isPosting, isOtherTyping, isLo
                 if (["ArrowDown", "ArrowUp"].includes(e.code)) {
                   const now = new Date().getTime();
                   if (timePressed.current[e.code] && now - timePressed.current[e.code] < 50) {
+                    e.preventDefault();
                     return
                   }
                   timePressed.current[e.code] = now
