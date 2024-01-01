@@ -7,6 +7,7 @@ import { Oval } from 'react-loading-icons'
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import { useUserInfo } from 'customHooks/useUserInfo';
 import { Typography, Button } from "@mui/material";
+import textCursorHelper from 'text-cursor-helper';
 import { forceLogin } from "util/authHelper";
 import { request } from 'util/request';
 import styles from './CommentInput.module.scss'
@@ -45,12 +46,7 @@ export function CommentInput({ parentCmt, onPost, isPosting, isOtherTyping, isLo
         tagRegex,
         `<span class="cmt-tag" contenteditable="false">${name}&#x200B;</span>`
       );
-      const range = document.createRange();
-      const selection = window.getSelection();
-      range.setStart(cmtInputElement.current, cmtInputElement.current.childNodes.length);
-      range.collapse(true);
-      selection.removeAllRanges();
-      selection.addRange(range);
+      textCursorHelper.goToEnd(cmtInputElement.current)
       setTagMatchedUsers([]);
     }, 100)
   }

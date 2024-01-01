@@ -3,12 +3,12 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
-import { getCursorXY } from "util/cursorHelper";
+import textCursorHelper from 'text-cursor-helper';
 
 export default function TagPopup({ inputElement, users, onClickProfile, focusIndex }) {
   const [selfHeight, setSelfHeight] = useState(0);
   const resizeObserver = useRef(null);
-  const position = inputElement ? getCursorXY(inputElement) : { x: 0, y: 0 };
+  const position = inputElement ? textCursorHelper.getCursorXY(inputElement) : { x: 0, y: 0 };
 
 
   const measuredSelfHeightRef = useCallback(node => {
