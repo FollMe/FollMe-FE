@@ -1,4 +1,4 @@
-import { useState, useRef } from "react"
+import { useState, useRef, useMemo } from "react"
 import { useNavigate } from "react-router-dom";
 import { useWebSocket } from 'customHooks/useWebSocket';
 import { Stack } from "@mui/system";
@@ -10,6 +10,7 @@ import { Typography, Button } from "@mui/material";
 import textCursorHelper from 'text-cursor-helper';
 import { forceLogin } from "util/authHelper";
 import { request } from 'util/request';
+import { throttle, debounce } from 'util/limitCallFunction';
 import styles from './CommentInput.module.scss'
 import TagPopup from "./TagPopup";
 
@@ -22,8 +23,6 @@ export function CommentInput({ parentCmt, onPost, isPosting, isOtherTyping, isLo
   const [tagMatchedUsers, setTagMatchedUsers] = useState([]);
   const [showHint, setShowHint] = useState(true);
   const [focusedProfileIndex, setFocusedProfile] = useState(0);
-  const lastedPostTyping = useRef(null);
-  const getProfilesTimeoutId = useRef(null);
   const cmtInputElement = useRef(null);
   const previousContent = useRef("");
   const timePressed = useRef({});
@@ -33,12 +32,30 @@ export function CommentInput({ parentCmt, onPost, isPosting, isOtherTyping, isLo
     navigate('/sign-in');
   }
 
-  const handleTyping = () => {
-    wsSend({
-      userId: userInfo._id,
-      action: "typing_cmt_post"
-    })
-  }
+  const throttledHandleTyping = useMemo(
+    () => throttle(() => {
+      wsSend({
+        userId: userInfo._id,
+        action: "typing_cmt_post"
+      })
+    }, 3000),
+    [wsSend, userInfo._id]
+  )
+
+  const debouncedFetchProfiles = useMemo(
+    () => debounce(async (html) => {
+      const matches = html?.match(tagRegex);
+
+      if (matches?.length === 1) {
+        const data = await request.get(`api/profiles?q=${matches[0].substring(1)}`);
+        setTagMatchedUsers(data.profiles);
+        setFocusedProfile(0);
+      } else {
+        setTagMatchedUsers([]);
+      }
+    }, 400),
+    []
+  )
 
   const handleClickProfile = (name) => {
     setTimeout(() => {
@@ -81,38 +98,19 @@ export function CommentInput({ parentCmt, onPost, isPosting, isOtherTyping, isLo
               }}
               onInput={e => {
                 const html = e.target.innerHTML;
-                if (getProfilesTimeoutId.current) {
-                  clearTimeout(getProfilesTimeoutId.current);
-                }
                 const text = e.target.innerText;
+
                 if (text === "") {
                   setShowHint(true);
                 } else {
                   setShowHint(false);
                 }
-                if (html === previousContent.current) {
-                  return;
+                if (html !== previousContent.current) {
+                  throttledHandleTyping()
+                  debouncedFetchProfiles(html)
+
+                  previousContent.current = html
                 }
-                const needPost = lastedPostTyping.current
-                  ? Date.now() - lastedPostTyping.current > 3000
-                    ? true : false
-                  : true;
-                if (text.trim() && needPost) {
-                  handleTyping()
-                  lastedPostTyping.current = Date.now()
-                }
-                const matches = html?.match(tagRegex);
-                getProfilesTimeoutId.current = setTimeout(async () => {
-                  previousContent.current = html;
-                  getProfilesTimeoutId.current = null;
-                  if (matches?.length === 1) {
-                    const data = await request.get(`api/profiles?q=${matches[0].substring(1)}`);
-                    setTagMatchedUsers(data.profiles);
-                    setFocusedProfile(0);
-                  } else {
-                    setTagMatchedUsers([]);
-                  }
-                }, 300);
               }}
               onKeyDown={e => {
                 if (["ArrowDown", "ArrowUp"].includes(e.code)) {
