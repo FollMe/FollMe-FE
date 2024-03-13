@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import lottie from "lottie-web";
 import TypingAnimation from "animationData/Typing.json";
 

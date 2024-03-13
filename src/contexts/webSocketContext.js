@@ -103,8 +103,13 @@ const WebSocketProvider = ({ children }) => {
 
   const wsSend = async (body) => {
     wsState.current[body.action] = body.message;
-    await waitConnectWS();
-    ws.send(JSON.stringify(body))
+    try {
+      await waitConnectWS();
+      ws.send(JSON.stringify(body));
+    } catch (err) {
+      console.log(err);
+    }
+
   }
 
   const addActions = (handlers) => {

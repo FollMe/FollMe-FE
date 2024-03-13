@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { loadAnimation, destroy } from "lottie-web";
 import page404Animation from "animationData/Page404.json";
 
