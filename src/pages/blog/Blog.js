@@ -49,7 +49,7 @@ export default function Blog() {
                             <div className={styles.chapNumber}>
                                 <b>{blog.title}</b>
                             </div>
-                            <p> Tác giả: {blog.author.name ?? blog.author.slEmail}</p>
+                            <p> Author: {blog.author.name ?? blog.author.slEmail}</p>
                             <hr />
                             <div className={styles.content}
                                 dangerouslySetInnerHTML={{ __html: blog.content }}
