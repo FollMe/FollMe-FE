@@ -47,7 +47,7 @@ export default function Blog() {
                                 }}
                             />
                             <div className={styles.chapNumber}>
-                                <b>{blog.title}</b>
+                                <h2>{blog.title}</h2>
                             </div>
                             <p> Author: {blog.author.name ?? blog.author.slEmail}</p>
                             <hr />
