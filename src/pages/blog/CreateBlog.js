@@ -63,6 +63,9 @@ export default function CreateBlog() {
 
     useEffect(() => {
         document.title = "Blog | FollMe";
+        if (quillRef.current.childNodes.length) {
+            return;
+        }
         const editor = new Quill(quillRef.current, options);
         editor.clipboard.addMatcher("p", (_, delta) => {
             const op = delta.ops[0];
