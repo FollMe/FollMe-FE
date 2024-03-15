@@ -1,7 +1,6 @@
 .ql-container.ql-snow {
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
-    font-size: 1.5rem;
     background-color: var(--white-color);
 }
 
@@ -12,6 +11,8 @@
 
 .ql-container {
     height: 75vh;
+    font-family: unset;
+    font-size: unset;
 }
 
 pre.ql-syntax {
@@ -24,4 +25,22 @@ pre.ql-syntax {
     overflow: visible;
     border-radius: 3px;
     white-space: pre-wrap;
+}
+
+.ql-editor p,
+.ql-editor ol,
+.ql-editor ul,
+.ql-editor pre,
+.ql-editor blockquote,
+.ql-editor h1,
+.ql-editor h2,
+.ql-editor h3,
+.ql-editor h4,
+.ql-editor h5,
+.ql-editor h6 {
+    margin: revert;
+}
+
+.ql-snow pre.ql-syntax, pre.ql-syntax {
+    margin-bottom: 17px;
 }

@@ -11,6 +11,7 @@ import { toast } from 'react-toastify';
 import 'quill/dist/quill.snow.css';
 import './QuillStylesOverride.css';
 import styles from './CreateBlog.module.scss';
+import blogStyles from "./Blog.module.scss";
 
 
 Quill.register('modules/blotFormatter', BlotFormatter);
@@ -97,7 +98,7 @@ export default function CreateBlog() {
                     </Button>
                 </div>
             </div>
-            <div className={styles.editorContainer}>
+            <div className={blogStyles.content}>
                 <div ref={quillRef} />
             </div>
             <CreateBlogModel
