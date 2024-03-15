@@ -44,10 +44,10 @@ export default function BlogItem({ blog }) {
                             {title}
                         </Typography>
                         <Typography variant="body" color="text.secondary" component="div" sx={{ paddingBottom: 0.5 }}>
-                            Tác giả: {author}
+                            Author: {author}
                         </Typography>
                         <Typography variant="body" color="text.secondary">
-                            Ngày cập nhật: {updatedAt}
+                            Updated at: {updatedAt}
                         </Typography>
                         <div className={styles.storyContent_btnFunction}>
                             <div className={styles.btnFunction_like}>

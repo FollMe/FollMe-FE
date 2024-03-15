@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { request } from 'util/request';
 import OvalLoading from 'components/loading/OvalLoading';
+import { formatDate } from 'util/date.js';
 
 import styles from "./Blog.module.scss";
 
@@ -50,6 +51,7 @@ export default function Blog() {
                                 <h2>{blog.title}</h2>
                             </div>
                             <p> Author: {blog.author.name ?? blog.author.slEmail}</p>
+                            <p> Updated at: {formatDate(blog.updatedAt)}</p>
                             <hr />
                             <div className={styles.content}
                                 dangerouslySetInnerHTML={{ __html: blog.content }}
