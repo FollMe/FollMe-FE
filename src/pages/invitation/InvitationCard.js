@@ -209,7 +209,7 @@ export default function InvitationCard() {
 
               <div className={styles.functionBox}>
                 <Grid container spacing={2}>
-                  <Grid className={styles.dateItem} xs={6}>
+                  <Grid xs={6}>
                     <AddToCalendarButton
                       styleLight="--font: Roboto"
                       label='Lưu'
