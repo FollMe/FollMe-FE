@@ -8,13 +8,45 @@ import { DataGrid } from '@mui/x-data-grid';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import OvalLoading from 'components/loading/OvalLoading';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import Tooltip from '@mui/material/Tooltip';
 import dayjs from 'dayjs';
 
 import styles from "./Event.module.scss";
+import { getHostURL } from 'util/stringUtil';
 
 const columns = [
   { field: 'mail', headerName: 'Mail', flex: 1, headerClassName: styles.tableHeader },
   { field: 'viewed', headerName: 'Lượt xem', align: 'center', headerClassName: styles.tableHeader, width: 126 },
+  {
+    field: "action",
+    headerName: "Action",
+    sortable: false,
+    headerClassName: styles.tableHeader,
+    headerAlign: "center",
+    align:"center",
+    renderCell: (params) => {
+      const handleClick = async (e) => {
+        e.stopPropagation(); // don't select this row after clicking
+        const invitationLink = `${getHostURL()}/invitations/${params.row._id}`;
+        await navigator.clipboard.writeText(invitationLink);
+
+        const tooltipElement = document.querySelector("[role='tooltip'] p");
+        if (tooltipElement) {
+          tooltipElement.innerText = "✓ Đã copy";
+        }
+      };
+
+      return (
+        <Tooltip placement="top" title={<Typography fontSize={"1.3rem"}>Copy link</Typography>}>
+          <ContentCopyIcon
+            sx={{width: 20, height: 20, color: "black", cursor: "pointer"}}
+            onClick={handleClick}
+          />
+        </Tooltip>
+      )
+    }
+  }
 ]
 
 export default function Event() {
