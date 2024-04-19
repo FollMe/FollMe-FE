@@ -44,6 +44,12 @@ const WebSocketProvider = ({ children }) => {
       // Reset exponential backoff
       durationGenerator.current = exponentialBackoff();
 
+      // Authenticate
+      ws.send(JSON.stringify({
+        action: "authenticate",
+        message: process.env.REACT_APP_WS_TOKEN
+      }))
+
       // Recover current state to server
       if (needRecoverState.current && Object.keys(wsState.current).length > 0) {
         ws.send(JSON.stringify({
