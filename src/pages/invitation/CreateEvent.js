@@ -34,11 +34,23 @@ export default function CreateEvent() {
       setGuests(value);
       return;
     }
-    if (!emailRegex.test(value[value.length - 1])) {
-      setEmailInput(value[value.length - 1]);
+
+    const inputValue = value.pop();
+    const detailValues = inputValue.split('|');
+    const name = detailValues[0].trim().replace(/\s+/g, ' ');
+    const email = detailValues?.[1]?.trim()?.toLowerCase();
+    const newValue = `${name}${email ? ` | ${email}` : ''}`;
+  
+    if (detailValues.length > 2 || (detailValues.length === 2 && !emailRegex.test(email))) {
+      setEmailInput(inputValue);
       return;
     }
-    setGuests(value)
+
+    if (value.includes(newValue)) {
+      return;
+    }
+
+    setGuests([...value, newValue])
   }
 
   useEffect(() => {
@@ -57,8 +69,14 @@ export default function CreateEvent() {
     onSubmit: async (values) => {
       try {
         setIsPosting(true);
-        const event = await request.post('api/events', { ...values, guests });
-        console.log(event);
+        const parsedGuests = guests.map(guest => {
+          const values = guest.split(' | ');
+          return {
+            name: values[0],
+            email: values?.[1]
+          }
+        })
+        const event = await request.post('api/events', { ...values, guests: parsedGuests });
         navigate(`/events/${event._id}`)
       } catch (err) {
         setIsPosting(false);
@@ -119,7 +137,7 @@ export default function CreateEvent() {
               value={guests}
               onChange={onChangeGuests}
               inputValue={emailInput}
-              onInputChange={(_, value) => setEmailInput(value.toLowerCase())}
+              onInputChange={(_, value) => setEmailInput(value)}
               freeSolo
               multiple
               renderTags={(value, props) =>
@@ -128,10 +146,12 @@ export default function CreateEvent() {
                 ))
               }
               renderInput={(params) =>
-                <TextField label="Mail khách mời" {...params}
+                <TextField label="Khách mời" {...params}
+                  helperText="Cú pháp: <Tên> hoặc <Tên> | <Mail>, hệ thống sẽ gửi thư mời đến mail của khách mời (nếu có)"
                 />
               }
             />
+
             <div className={styles.funcBox}>
               <LoadingButton variant="contained"
                 loading={isPosting}
