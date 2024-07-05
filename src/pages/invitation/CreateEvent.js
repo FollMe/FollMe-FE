@@ -37,7 +37,10 @@ export default function CreateEvent() {
 
     const inputValue = value.pop();
     const detailValues = inputValue.split('|');
-    const name = detailValues[0].trim().replace(/\s+/g, ' ');
+    const name = detailValues[0]
+      .trim()
+      .replace(/\s+/g, ' ')
+      .replace(/(^\w{1})|(\s\w{1})/g, letter => letter.toUpperCase());
     const email = detailValues?.[1]?.trim()?.toLowerCase();
     const newValue = `${name}${email ? ` | ${email}` : ''}`;
   
@@ -148,6 +151,11 @@ export default function CreateEvent() {
               renderInput={(params) =>
                 <TextField label="Khách mời" {...params}
                   helperText="Cú pháp: <Tên> hoặc <Tên> | <Mail>, hệ thống sẽ gửi thư mời đến mail của khách mời (nếu có)"
+                  onKeyDown={(event) => {
+                    if (event.key === 'Backspace') {
+                        event.stopPropagation();
+                    }
+                }}
                 />
               }
             />
