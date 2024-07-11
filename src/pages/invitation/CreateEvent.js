@@ -100,7 +100,7 @@ export default function CreateEvent() {
             <TextField style={{ fontSize: '1.5rem' }} fullWidth label="Tên sự kiện*"
               name='title'
               value={formik.values.title}
-              onChange={(...params) => {console.log(params); formik.handleChange(...params)}}
+              onChange={(...params) => formik.handleChange(...params)}
               onBlur={formik.handleBlur}
               error={formik.touched.title && Boolean(formik.errors.title)}
               helperText={formik.touched.title && formik.errors.title}
