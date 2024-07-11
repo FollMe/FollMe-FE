@@ -149,7 +149,9 @@ export default function CreateEvent() {
                 ))
               }
               renderInput={(params) =>
-                <TextField label="Khách mời" {...params}
+                <TextField
+                  label={`Khách mời${guests.length ? ` (${guests.length})` : ''}`}
+                  {...params}
                   helperText="Cú pháp: <Tên> hoặc <Tên> | <Mail>, hệ thống sẽ gửi thư mời đến mail của khách mời (nếu có)"
                   onKeyDown={(event) => {
                     if (event.key === 'Backspace') {
