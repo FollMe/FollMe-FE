@@ -16,6 +16,7 @@ import styles from "./Event.module.scss";
 import { getHostURL } from 'util/stringUtil';
 
 const columns = [
+  { field: 'name', headerName: 'Name', flex: 1, headerClassName: styles.tableHeader },
   { field: 'mail', headerName: 'Mail', flex: 1, headerClassName: styles.tableHeader },
   { field: 'viewed', headerName: 'Lượt xem', align: 'center', headerClassName: styles.tableHeader, width: 126 },
   {
