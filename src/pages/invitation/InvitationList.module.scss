@@ -17,3 +17,18 @@ button.btnAddNewEvent:hover {
   background-color: var(--theme-color);
   color: white;
 }
+
+@keyframes append-animate {
+	from {
+		transform: scale(0);
+		opacity: 0;
+	}
+	to {
+		transform: scale(1);
+		opacity: 1;	
+	}
+}
+
+.fetchLoading {
+  animation: append-animate .2s linear;
+}
