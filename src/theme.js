@@ -15,6 +15,13 @@ export const theme = createTheme({
         disableRipple: true, // No more ripple, on the whole application 💣!
       },
     },
+    MuiMenuItem: {
+      styleOverrides: {
+        root: {
+          fontSize: '1.5rem',
+        },
+      }
+    },
     MuiTypography: {
       styleOverrides: {
         // Name of the slot
