@@ -1,0 +1,146 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: var(--header-h);
+  background: var(--bg);
+  background: color-mix(in srgb, var(--bg) 78%, transparent);
+  backdrop-filter: saturate(180%) blur(14px);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.25s ease, background-color 0.25s ease;
+}
+
+.scrolled {
+  border-bottom-color: var(--border);
+}
+
+.inner {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.navLink {
+  position: relative;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--text-2);
+  text-decoration: none;
+  transition: color 0.2s ease, background-color 0.2s ease;
+
+  &:hover {
+    color: var(--text);
+    background: var(--surface-2);
+  }
+
+  &.active {
+    color: var(--text);
+    font-weight: 600;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: 1px;
+      width: 4px;
+      height: 4px;
+      margin-left: -2px;
+      border-radius: 50%;
+      background: var(--brand);
+    }
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.menuButton {
+  display: none !important;
+}
+
+@media (max-width: 760px) {
+  .nav,
+  .desktopOnly {
+    display: none !important;
+  }
+
+  .menuButton {
+    display: inline-flex !important;
+  }
+
+  .inner {
+    gap: 12px;
+  }
+}
+
+/* Mobile drawer */
+.drawer {
+  width: min(320px, 86vw);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg) !important;
+}
+
+.drawerHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-h);
+  padding: 0 12px 0 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.drawerNav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 12px;
+}
+
+.drawerLink {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  color: var(--text-2);
+  font-size: 1.6rem;
+  font-weight: 500;
+  text-decoration: none;
+
+  svg {
+    font-size: 2rem;
+  }
+
+  &:hover {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+
+  &.active {
+    background: var(--brand-soft);
+    color: var(--brand-text);
+    font-weight: 600;
+  }
+}
+
+.drawerFoot {
+  margin-top: auto;
+  padding: 20px;
+  border-top: 1px solid var(--border);
+}

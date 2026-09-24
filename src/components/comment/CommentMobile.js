@@ -18,7 +18,7 @@ const Root = styled('div')(({ theme }) => ({
 }));
 
 const StyledBox = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'light' ? '#fff' : grey[800],
+  backgroundColor: 'var(--surface)',
 }));
 
 function CommentMobile({ open, setOpen, comments, handlePosting, isPosting, isOtherTyping, isCmtLoading }) {
@@ -120,7 +120,7 @@ function CommentMobile({ open, setOpen, comments, handlePosting, isPosting, isOt
               left: 0,
               width: '100%',
               zIndex: 9,
-              backgroundColor: 'white',
+              backgroundColor: 'var(--surface)',
               borderTopLeftRadius: 10,
               borderTopRightRadius: 10
             }}
@@ -143,9 +143,9 @@ function CommentMobile({ open, setOpen, comments, handlePosting, isPosting, isOt
               bottom: '0',
               right: '0',
               width: '100%',
-              backgroundColor: 'white',
+              backgroundColor: 'var(--surface)',
               padding: 2,
-              borderTop: 'solid 1px rgb(230, 230, 230)'
+              borderTop: 'solid 1px var(--border)'
             }}
           >
             <CommentInput

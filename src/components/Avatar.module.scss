@@ -1,0 +1,17 @@
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--surface-2);
+}
+
+.fallback {
+  background: linear-gradient(135deg, var(--brand-soft-2), var(--brand-soft));
+  color: var(--brand-text);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  user-select: none;
+}

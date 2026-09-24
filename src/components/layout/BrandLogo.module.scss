@@ -1,0 +1,39 @@
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.mark {
+  width: 34px;
+  height: 34px;
+  transition: transform 0.4s var(--ease);
+}
+
+.brand:hover .mark {
+  transform: rotate(-12deg) scale(1.05);
+}
+
+.word {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+
+  span {
+    color: var(--brand);
+  }
+}
+
+.lg {
+  .mark {
+    width: 42px;
+    height: 42px;
+  }
+
+  .word {
+    font-size: 2.4rem;
+  }
+}

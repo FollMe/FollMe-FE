@@ -22,6 +22,7 @@ import '@uppy/progress-bar/dist/style.css';
 import '@uppy/status-bar/dist/style.css';
 import styles from './CreateBlogModel.module.scss';
 import { MIN_TITLE_CHARACTER } from 'config/constant';
+import { useColorMode } from 'customHooks/useColorMode';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="down" ref={ref} {...props} />;
@@ -33,6 +34,7 @@ export default function CreateBlogModel({
     onPostBlog
 }) {
     const navigate = useNavigate();
+    const [mode] = useColorMode();
     const [txtLabel, setTxtLabel] = useState("");
     const [errorLabel, setErrorLabel] = useState(false);
     const [isPosting, setIsPosting] = useState(false);
@@ -98,7 +100,7 @@ export default function CreateBlogModel({
                     <DialogContentText>
                         Mẹo: Thêm ảnh bìa giúp blog của bạn trở nên hấp dẫn hơn!
                     </DialogContentText>
-                    <Dashboard uppy={uppy.current} plugins={['FileInput']} hideUploadButton={true} height={400} />
+                    <Dashboard uppy={uppy.current} plugins={['FileInput']} hideUploadButton={true} height={400} theme={mode} />
                 </DialogContent>
                 <DialogActions>
                     <Button variant="outlined" onClick={onCloseCreateModel} disabled={isPosting}>

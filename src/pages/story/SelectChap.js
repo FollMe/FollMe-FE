@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useParams, Link } from 'react-router-dom';
-import Paper from '@mui/material/Paper';
-import styles from './SelectChap.module.scss';
-import WumpusHiLoading from 'components/loading/WumpusHiLoading';
+import { useLocation, useParams, Link, useNavigate } from 'react-router-dom';
+import Button from '@mui/material/Button';
+import { IoArrowForward, IoListOutline } from 'react-icons/io5';
+import OvalLoading from 'components/loading/OvalLoading';
+import ArticleHeader from 'components/article/ArticleHeader';
 import { request } from 'util/request';
+import styles from './SelectChap.module.scss';
 
 export default function SelectChap() {
+    const navigate = useNavigate();
     const location = useLocation();
     const { storySlug } = useParams();
     const [story, setStory] = useState(location.state);
@@ -29,35 +32,47 @@ export default function SelectChap() {
                 setIsLoading(false);
             } catch (err) {
                 console.log(err.message);
-            }    
+            }
         }
     }, [storySlug])
+
+    if (isLoading) {
+        return <OvalLoading />
+    }
+
+    const chaps = story.chaps ?? [];
+
     return (
-        <>
-            <div className="container-view grid mobilePage">
-                {
-                    isLoading ? <WumpusHiLoading /> : (
-                        <div className={styles.body}>
-                            <h4 className={styles.pageType}>TRUYỆN</h4>
-                            <h3>{story.name}</h3>
-                            <div>
-                                <Paper variant="outlined" sx={{ borderRadius: '8px', padding: '16px' }}>
-                                <span className={styles.listOfChaps}>Danh sách chap</span>
-                                <ul className={styles.selectChap}>
-                                    {
-                                        story.chaps.map(chap =>
-                                            <Link to={chap.slug} key={chap._id} >
-                                                <li className={styles.chapNumber}> {chap.name} </li>
-                                            </Link>
-                                        )
-                                    }
-                                </ul>
-                                </Paper>
-                            </div>
-                        </div>
-                    )
-                }
-            </div>
-        </>
+        <div className="container container--narrow">
+            <ArticleHeader
+                back={{ to: '/stories', label: 'Tất cả truyện' }}
+                eyebrow="Truyện dài"
+                title={story.name}
+                author={story.author?.name}
+                meta={[<><IoListOutline /> {chaps.length} chương</>]}
+                actions={chaps.length > 0 && (
+                    <Button variant="contained" endIcon={<IoArrowForward />} onClick={() => navigate(chaps[0].slug)}>
+                        Bắt đầu đọc
+                    </Button>
+                )}
+            />
+
+            <section className={styles.panel}>
+                <h2 className={styles.panelTitle}>Danh sách chương</h2>
+                <ol className={styles.list}>
+                    {
+                        chaps.map((chap, index) =>
+                            <li key={chap._id}>
+                                <Link to={chap.slug} className={styles.item}>
+                                    <span className={styles.index}>{String(index + 1).padStart(2, '0')}</span>
+                                    <span className={styles.name}>{chap.name}</span>
+                                    <IoArrowForward className={styles.arrow} />
+                                </Link>
+                            </li>
+                        )
+                    }
+                </ol>
+            </section>
+        </div>
     )
 }

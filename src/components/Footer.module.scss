@@ -1,23 +1,88 @@
 .footer {
-  box-shadow: 0 -1px 1px rgb(230, 230, 230);
-  width: 100%;
-  text-align: center;
-  padding: 10px;
-  padding-bottom: 20px;
-  margin-top: 10px;
-  background-color: white;
-  position: relative;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 1.45rem;
 }
 
-.footer > p {
-  font-weight: bold;
-  line-height: 1rem;
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 40px;
+  padding-top: 56px;
+  padding-bottom: 40px;
 }
 
-.footer > a {
+.about {
+  max-width: 360px;
+}
+
+.tagline {
+  margin: 16px 0 0;
+  line-height: 1.7;
+}
+
+.columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 56px;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 120px;
+}
+
+.column h3 {
+  margin: 0 0 4px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.column a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-2);
   text-decoration: none;
+  transition: color 0.2s ease;
 }
 
-.footer > a + a {
-  margin-left: 20px;
+.column a:hover {
+  color: var(--brand-text);
+}
+
+.bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 20px;
+  padding-bottom: 28px;
+  border-top: 1px solid var(--border);
+  font-size: 1.3rem;
+  color: var(--text-3);
+}
+
+.toTop {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-3);
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+.toTop:hover {
+  color: var(--text);
 }

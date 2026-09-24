@@ -5,12 +5,21 @@
 .input {
   position: relative;
   width: 100%;
-  padding: 10px 12px;
+  padding: 10px 14px;
   margin-left: 16px;
   border-radius: 18px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
   max-height: 220px;
   overflow-y: auto;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:focus {
+    border-color: var(--brand);
+    box-shadow: var(--ring);
+  }
 }
 
 .inputLoading {
@@ -20,7 +29,7 @@
 
 .inputHint {
   position: absolute;
-  left: 69px;
+  left: 72px;
   top: 11px;
-  opacity: 0.5;
+  color: var(--text-3);
 }

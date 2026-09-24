@@ -11,12 +11,14 @@ import OvalLoading from 'components/loading/OvalLoading';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import Tooltip from '@mui/material/Tooltip';
 import dayjs from 'dayjs';
+import ArticleHeader from 'components/article/ArticleHeader';
+import InvitationStatusTag from 'components/invitation/InvitationStatusTag';
 
 import styles from "./Event.module.scss";
 import { getHostURL } from 'util/stringUtil';
 
 const columns = [
-  { field: 'name', headerName: 'Name', flex: 1, headerClassName: styles.tableHeader },
+  { field: 'name', headerName: 'Tên', flex: 1, headerClassName: styles.tableHeader },
   { field: 'mail', headerName: 'Mail', flex: 1, headerClassName: styles.tableHeader },
   { field: 'viewed', headerName: 'Lượt xem', align: 'center', headerClassName: styles.tableHeader, width: 126 },
   {
@@ -41,7 +43,7 @@ const columns = [
       return (
         <Tooltip placement="top" title={<Typography fontSize={"1.3rem"}>Copy link</Typography>}>
           <ContentCopyIcon
-            sx={{width: 20, height: 20, color: "black", cursor: "pointer"}}
+            sx={{width: 20, height: 20, color: "var(--text-2)", cursor: "pointer"}}
             onClick={handleClick}
           />
         </Tooltip>
@@ -68,7 +70,7 @@ export default function Event() {
           navigate(`/events`);
           return;
         }
-        document.title = `Invitation | FollMe`;
+        document.title = `${data.invitation.title} | FollMe`;
         setEvent(data.invitation);
         setIsLoading(false);
       } catch (err) {
@@ -78,54 +80,59 @@ export default function Event() {
     }
   }, [eventId, navigate])
 
-  return (
-    <>
-      <div className={styles.blogContent}>
-        {
-          isLoading ? <OvalLoading /> :
-            <div className={styles.boxContent}>
-              <div className={styles.chapNumber}>
-                <b>Sự kiện: {event.title}</b>
-              </div>
-              <hr />
-              <Typography className={styles.eventField} variant="body" color="text.primary" component="div" sx={{ paddingBottom: 0.5 }}>
-                <AccessTimeIcon /> { dayjs(event.startAt).format('HH:mm, DD-MM-YYYY')}
-              </Typography>
-              <Typography className={styles.eventField} variant="body" color="text.primary" component="div" sx={{ paddingBottom: 0.5 }}>
-                <LocationOnIcon /> {event.location}
-              </Typography>
+  if (isLoading) {
+    return <OvalLoading />
+  }
 
-              <Box sx={{ height: 400, width: '100%', mt: '50px' }}>
-                <DataGrid
-                  rows={event.guests}
-                  columns={columns}
-                  initialState={{
-                    pagination: {
-                      paginationModel: {
-                        pageSize: 5,
-                      },
-                    },
-                  }}
-                  pageSizeOptions={[5]}
-                  disableRowSelectionOnClick
-                  getRowId={(row) => row._id}
-                  slots={{
-                    noRowsOverlay: () => (
-                      <Stack height="100%" alignItems="center" justifyContent="center">
-                        Chưa có khách mời nào
-                      </Stack>
-                    ),
-                    noResultsOverlay: () => (
-                      <Stack height="100%" alignItems="center" justifyContent="center">
-                        Không tìm thấy khách mời
-                      </Stack>
-                    )
-                  }}
-                />
-              </Box>
-            </div>
-        }
-      </div>
-    </>
+  const status = new Date(event.startAt) > new Date() ? 'upcoming' : 'happened';
+
+  return (
+    <div className={`container ${styles.page}`}>
+      <ArticleHeader
+        back={{ to: '/events', label: 'Tất cả sự kiện' }}
+        eyebrow="Sự kiện"
+        title={event.title}
+        meta={[
+          <><AccessTimeIcon /> {dayjs(event.startAt).format('HH:mm · DD/MM/YYYY')}</>,
+          <><LocationOnIcon /> {event.location}</>,
+        ]}
+        actions={<InvitationStatusTag status={status} />}
+      />
+
+      <section className={styles.panel}>
+        <div className={styles.panelHead}>
+          <h2>Khách mời</h2>
+          <span>{event.guests?.length ?? 0} người</span>
+        </div>
+        <Box sx={{ height: 420, width: '100%' }}>
+          <DataGrid
+            rows={event.guests}
+            columns={columns}
+            initialState={{
+              pagination: {
+                paginationModel: {
+                  pageSize: 5,
+                },
+              },
+            }}
+            pageSizeOptions={[5]}
+            disableRowSelectionOnClick
+            getRowId={(row) => row._id}
+            slots={{
+              noRowsOverlay: () => (
+                <Stack height="100%" alignItems="center" justifyContent="center">
+                  Chưa có khách mời nào
+                </Stack>
+              ),
+              noResultsOverlay: () => (
+                <Stack height="100%" alignItems="center" justifyContent="center">
+                  Không tìm thấy khách mời
+                </Stack>
+              )
+            }}
+          />
+        </Box>
+      </section>
+    </div>
   )
 }

@@ -1,19 +1,16 @@
 import { useEffect, useState } from 'react';
-import Typography from '@mui/material/Typography';
+import PageHeader from 'components/PageHeader';
 import StoryItem from 'components/story/StoryItem';
+import { PostCardSkeleton } from 'components/cards/PostCard';
 import { request } from 'util/request';
-import StorySkeleton from 'components/skeletons/StorySkeleton';
-import Paper from '@mui/material/Paper';
-import Divider from '@mui/material/Divider';
-import styles from "./StoryList.module.scss";
 
 export default function StoryList() {
   const [stories, setStories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
-    document.title = "Story | FollMe";
+    document.title = "Truyện | FollMe";
     getStory();
-    
+
     async function getStory() {
       try {
         setIsLoading(true);
@@ -42,38 +39,33 @@ export default function StoryList() {
       return current.map(story => {
         story.numsOfCmt = numsOfCmt[story.slug]
         return story
-      })      
+      })
     })
   }
 
   return (
-    <div className="containerMain">
-      <div className="containerStory">
-        <Typography className={styles.txtPageTitle} gutterBottom variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
-          Truyện
-        </Typography>
+    <div className="container page">
+      <PageHeader
+        eyebrow="Truyện"
+        title="Những câu chuyện"
+        description="Truyện dài theo từng chương và những truyện ngắn — để đọc chậm, và cảm nhận nhiều hơn."
+      />
 
-        <Paper variant="outlined" sx={{ borderRadius: '8px', padding: '16px' }}>
-          {
-            isLoading ? (
-              <>
-                <StorySkeleton />
-                <Divider light sx={{ margin: '20px 0' }} />
-                <StorySkeleton />
-                <Divider light sx={{ margin: '20px 0' }} />
-                <StorySkeleton />
-              </>
-            ) : stories.map((story, index) =>
-              <div key={story._id}>
-                <StoryItem story={story} />
-                {
-                  index < stories.length - 1 ? <Divider light sx={{ margin: '20px 0' }} /> : ""
-                }
-              </div>
-            )
-          }
-        </ Paper>
-      </div>
+      {
+        isLoading ? (
+          <div className="card-grid">
+            <PostCardSkeleton />
+            <PostCardSkeleton />
+            <PostCardSkeleton />
+          </div>
+        ) : stories.length <= 0 ? (
+          <div className="empty-state">Hiện chưa có truyện nào.</div>
+        ) : (
+          <div className="card-grid stagger">
+            {stories.map(story => <StoryItem key={story._id} story={story} />)}
+          </div>
+        )
+      }
     </div>
   )
 }

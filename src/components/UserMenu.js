@@ -1,66 +1,32 @@
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { styled, alpha } from '@mui/material/styles';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import LogoutIcon from '@mui/icons-material/Logout';
+import Divider from '@mui/material/Divider';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import { IoCreateOutline, IoTicketOutline, IoLogOutOutline } from 'react-icons/io5';
 import { useUserInfo } from 'customHooks/useUserInfo';
+import Avatar from 'components/Avatar';
+import styles from './UserMenu.module.scss';
 
-const StyledMenu = styled((props) => (
-    <Menu
-        elevation={0}
-        anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right',
-        }}
-        transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-        }}
-        {...props}
-    />
-))(({ theme }) => ({
-    '& .MuiPaper-root': {
-        borderRadius: 6,
-        marginTop: theme.spacing(1),
-        minWidth: 180,
-        color:
-            theme.palette.mode === 'light' ? 'rgb(55, 65, 81)' : theme.palette.grey[300],
-        boxShadow:
-            'rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px',
-        '& .MuiMenu-list': {
-            padding: '4px 0',
-        },
-        '& .MuiMenuItem-root': {
-            '& .MuiSvgIcon-root': {
-                fontSize: 20,
-                color: theme.palette.text.secondary,
-                marginRight: theme.spacing(1.5),
-            },
-            '&:active': {
-                backgroundColor: alpha(
-                    theme.palette.primary.main,
-                    theme.palette.action.selectedOpacity,
-                ),
-            },
-            fontSize: 12,
-        },
-    },
-}));
-
-export default function UserMenu({ picture }) {
+export default function UserMenu({ userInfo = {} }) {
     const navigate = useNavigate();
     const [, setUserInfo] = useUserInfo();
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
+    const displayName = userInfo.name ?? userInfo.slEmail ?? 'Tài khoản';
+
     const handleClose = () => {
         setAnchorEl(null);
     };
 
+    const goTo = (path) => {
+        handleClose();
+        navigate(path);
+    };
+
     const handleSignOut = () => {
+        handleClose();
         localStorage.removeItem('token');
         localStorage.removeItem('userInfo');
         if (window.location.pathname !== '/sign-in') {
@@ -70,36 +36,51 @@ export default function UserMenu({ picture }) {
     }
 
     return (
-        <div>
-            <div
-                id="demo-customized-button"
-                aria-controls={open ? 'demo-customized-menu' : undefined}
+        <>
+            <button
+                type="button"
+                className={styles.trigger}
+                id="user-menu-button"
+                aria-label="Tài khoản"
+                aria-controls={open ? 'user-menu' : undefined}
                 aria-haspopup="true"
                 aria-expanded={open ? 'true' : undefined}
-                variant="contained"
-                onClick={handleClick}
+                onClick={event => setAnchorEl(event.currentTarget)}
             >
-                <img src={picture ?? '#'} alt="User Logo" className="nav-avt"
-                    onError={({ currentTarget }) => {
-                        currentTarget.onerror = null;
-                        currentTarget.src = "/imgs/user.svg";
-                    }}
-                />
-            </div>
-            <StyledMenu
-                id="demo-customized-menu"
-                MenuListProps={{
-                    'aria-labelledby': 'demo-customized-button',
-                }}
+                <Avatar src={userInfo.avatar?.link} name={displayName} size={36} />
+            </button>
+            <Menu
+                id="user-menu"
                 anchorEl={anchorEl}
                 open={open}
                 onClose={handleClose}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                MenuListProps={{ 'aria-labelledby': 'user-menu-button' }}
+                PaperProps={{ sx: { mt: 1, minWidth: 220, borderRadius: '14px' } }}
             >
-                <MenuItem onClick={handleSignOut} disableRipple>
-                    <LogoutIcon />
+                <div className={styles.head}>
+                    <Avatar src={userInfo.avatar?.link} name={displayName} size={40} />
+                    <div className={styles.headText}>
+                        <div className={styles.name}>{displayName}</div>
+                        <div className={styles.sub}>Thành viên FollMe</div>
+                    </div>
+                </div>
+                <Divider sx={{ my: 0.5 }} />
+                <MenuItem onClick={() => goTo('/blogs/create')}>
+                    <ListItemIcon className={styles.icon}><IoCreateOutline /></ListItemIcon>
+                    Viết blog
+                </MenuItem>
+                <MenuItem onClick={() => goTo('/events')}>
+                    <ListItemIcon className={styles.icon}><IoTicketOutline /></ListItemIcon>
+                    Thư mời của tôi
+                </MenuItem>
+                <Divider sx={{ my: 0.5 }} />
+                <MenuItem onClick={handleSignOut}>
+                    <ListItemIcon className={styles.icon}><IoLogOutOutline /></ListItemIcon>
                     Đăng xuất
                 </MenuItem>
-            </StyledMenu>
-        </div>
+            </Menu>
+        </>
     );
 }

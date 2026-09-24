@@ -1,14 +1,12 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Typography, Stack, Tooltip, IconButton } from '@mui/material';
-import { request } from 'util/request';
-import StorySkeleton from 'components/skeletons/StorySkeleton';
-import Paper from '@mui/material/Paper';
-import Divider from '@mui/material/Divider';
-import EditCalendarIcon from '@mui/icons-material/EditCalendar';
-import { Oval } from 'react-loading-icons'
-import styles from "./InvitationList.module.scss";
+import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
+import { IoAdd } from 'react-icons/io5';
+import PageHeader from 'components/PageHeader';
+import { PostCardSkeleton } from 'components/cards/PostCard';
 import InvitationItem from 'components/invitation/InvitationItem';
+import { request } from 'util/request';
 import { debounce, sleep } from 'util/limitCallFunction';
 
 export default function InvitationList() {
@@ -57,7 +55,7 @@ export default function InvitationList() {
   const fetchEventListener = useCallback(debounce(handleFetchEvent, 200), []);
 
   useEffect(() => {
-    document.title = "Invitation | FollMe";
+    document.title = "Thư mời | FollMe";
     getInvitation();
 
     async function getInvitation() {
@@ -91,53 +89,46 @@ export default function InvitationList() {
   }, [])
 
   return (
-    <div className="containerMain">
-      <div className="containerStory">
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Typography className={styles.txtPageTitle} gutterBottom variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
-            Thư mời điện tử
-          </Typography>
-          <Tooltip placement='left' title={<Typography fontSize={"1.3rem"}>Tạo sự kiện</Typography>}>
-            <IconButton className={styles.btnAddNewEvent} variant="outlined" onClick={() => navigate("/events/create")}>
-              <EditCalendarIcon sx={{ fontSize: '40px' }} />
-              Thêm
-            </IconButton>
-          </Tooltip>
-        </Stack>
+    <div className="container page">
+      <PageHeader
+        eyebrow="Thư mời điện tử"
+        title="Sự kiện của bạn"
+        description="Tạo sự kiện, gửi thư mời đến từng khách mời qua email và theo dõi ai đã xem thư mời."
+        actions={
+          <Button variant="contained" size="large" startIcon={<IoAdd />} onClick={() => navigate("/events/create")}>
+            Tạo sự kiện
+          </Button>
+        }
+      />
 
-        <Paper
-          ref={eventListElement}
-          variant="outlined"
-          sx={{ marginTop: '20px', borderRadius: '8px', padding: '16px' }}
-        >
-          {
-            isLoading ? (
-              <>
-                <StorySkeleton />
-                <Divider light sx={{ margin: '20px 0' }} />
-                <StorySkeleton />
-                <Divider light sx={{ margin: '20px 0' }} />
-                <StorySkeleton />
-              </>
-            ) : invitations.length <= 0
-              ? <> Bạn chưa tạo sự kiện nào </>
-              : invitations.map((invitation, index) =>
-                <div key={invitation._id}>
-                  <InvitationItem invitation={invitation} />
-                  {
-                    index < invitations.length - 1 ? <Divider light sx={{ margin: '20px 0' }} /> : ""
-                  }
-                </div>
-              )
-          }
-          {
-            isFetching && <Oval
-              className={styles.fetchLoading}
-              stroke="#ff6541"
-              style={{ display: 'block', width: '25px', margin: '5px auto 0' }}
-            />
-          }
-        </ Paper>
+      <div ref={eventListElement}>
+        {
+          isLoading ? (
+            <div className="card-grid">
+              <PostCardSkeleton />
+              <PostCardSkeleton />
+              <PostCardSkeleton />
+            </div>
+          ) : invitations.length <= 0 ? (
+            <div className="empty-state">
+              Bạn chưa tạo sự kiện nào.{' '}
+              <Button variant="text" onClick={() => navigate("/events/create")}>Tạo sự kiện đầu tiên →</Button>
+            </div>
+          ) : (
+            <div className="card-grid stagger">
+              {invitations.map(invitation =>
+                <InvitationItem key={invitation._id} invitation={invitation} />
+              )}
+            </div>
+          )
+        }
+        {
+          isFetching && (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '24px 0' }}>
+              <CircularProgress size={26} />
+            </div>
+          )
+        }
       </div>
     </div>
   )

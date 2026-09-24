@@ -3,13 +3,13 @@ import { useState, useEffect } from "react"
 import { Link, useNavigate } from 'react-router-dom';
 import { Formik, Field, ErrorMessage, Form } from 'formik';
 import { toast } from 'react-toastify';
-import EmailIcon from '@mui/icons-material/Email';
-import LockIcon from '@mui/icons-material/Lock';
-import LoadingIcons from 'react-loading-icons'
+import CircularProgress from '@mui/material/CircularProgress';
+import { IoMailOutline, IoLockClosedOutline } from 'react-icons/io5';
+import AuthShell from "components/auth/AuthShell";
 import styles from './SignIn.module.scss';
-import ImageCarousel from "components/ImageCarousel";
 
 import { useUserInfo } from "customHooks/useUserInfo";
+import { useColorMode } from "customHooks/useColorMode";
 import { request, authRouteList } from "util/request";
 import { handleCheckLoggedIn } from "util/authHelper";
 
@@ -31,13 +31,28 @@ const validate = (values) => {
   return errors;
 };
 
+export function renderGoogleButton(mode) {
+  const element = document.getElementById("login-google-button");
+  if (!element || !window.google?.accounts?.id) {
+    return;
+  }
+  element.innerHTML = '';
+  window.google.accounts.id.renderButton(element, {
+    type: "standard",
+    theme: mode === 'dark' ? "filled_black" : "outline",
+    size: "large",
+    shape: "pill",
+    text: "continue_with",
+    width: Math.min(element.offsetWidth || 400, 400),
+  });
+}
+
 export default function SignIn() {
   const navigate = useNavigate();
-  const [showScrollImg, setShowScrollImg] = useState(true);
+  const [mode] = useColorMode();
   const [userInfo, setUserInfo] = useUserInfo();
   const [isOauthGoogleLoading, setIsOauthGoogleLoading] = useState(false);
   const [isAuthLocalLoading, setIsAuthLocalLoading] = useState(false);
-  const [message] = useState('');
 
   useEffect(() => {
     document.title = "Đăng nhập | FollMe";
@@ -46,13 +61,6 @@ export default function SignIn() {
     if (isLoggedIn) {
       return navigate('/');
     }
-    window.addEventListener("scroll", () => {
-      if (window.scrollY > 50) {
-        setShowScrollImg(false);
-      } else {
-        setShowScrollImg(true);
-      }
-    })
 
     if (window.google?.accounts?.id) {
       window.google.accounts.id.initialize({
@@ -60,13 +68,12 @@ export default function SignIn() {
         callback: oauthGoogleCallback,
       })
       window.google.accounts.id.prompt();
-      window.google.accounts.id.renderButton(
-        document.getElementById("login-google-button"), {
-        type: "icon"
-      }
-      )
     }
   }, [])
+
+  useEffect(() => {
+    renderGoogleButton(mode);
+  }, [mode])
 
   async function oauthGoogleCallback(res) {
     try {
@@ -105,98 +112,61 @@ export default function SignIn() {
   }
 
   return (
-    <div className="containerMain">
-      <div className="sideFeature mainSide">
-        <div className={styles.introTitle}> Chào mừng bạn </div>
-        <div className={styles.titleMethod}><hr /> Đăng nhập bằng email <hr /></div>
-        <div className={styles.login}>
-          <Formik
-            initialValues={{
-              email: '',
-              password: '',
-            }}
-            onSubmit={authLocalCallback}
-            validate={validate}
-          >
-            {() => (
-              <Form id="login-form" method="post" className={styles.loginForm}>
-                <div className={styles.loginForm_Text}>
-                  <div className={styles.notifyInput}> {message} </div>
-                  <EmailIcon className={styles.fontIcon} style={{ fontSize: '2.2rem' }} />
-                  <Field name="email" className={clsx(styles.inputField)} type="text" placeholder="Tài khoản email" />
-                  <ErrorMessage name="email" render={msg => <div className="txtErrorInput">{msg}</div>} />
-                </div>
-                <div className={styles.loginForm_Text}>
-                  <div className={styles.notifyInput}> {message} </div>
-                  <LockIcon className={styles.fontIcon} style={{ fontSize: '2.2rem' }} />
-                  <Field className={styles.inputField} name="password" type="password" placeholder="Mật khẩu" />
-                  <ErrorMessage name="password" render={msg => <div className="txtErrorInput">{msg}</div>} />
-                </div>
-                <div className={styles.loginFormRMB}>
-                  <div className={styles.formGroup}>
-                    <Field type="checkbox" name="isRemember" />
-                    <label htmlFor="isRemember">Lưu trạng thái</label>
-                  </div>
-                  <div className={styles.titleForgetPassword}>Quên mật khẩu</div>
-                </div>
-                <div className={styles.loginForm_Submit}>
-                  <button type="submit" disabled={isAuthLocalLoading}>
-                    {isAuthLocalLoading ? <LoadingIcons.TailSpin style={{ width: 30 }} /> : "Đăng nhập"}
-                  </button>
-                </div>
-              </Form>
-            )}
-          </Formik>
-
-        </div>
-        <div className={styles.loginFoot}>
-          Nếu chưa có tài khoản, vui lòng <Link to="/sign-up"> đăng kí </Link>
-        </div>
-        <div className={styles.titleMethod}><hr />Hoặc đăng nhập bằng<hr /></div>
-        <div className={styles.login}>
-          <div
-            id="login-google-button"
-            className={clsx(styles.svg, styles.googleLogin, styles.oauthButton)}
-            style={{ display: isOauthGoogleLoading ? "none" : "inline-block" }}
-          >
-          </div>
-          {
-            isOauthGoogleLoading ? (
-              <div className={clsx(styles.svg, styles.googleLogin, styles.oauthButton)} style={{ border: "solid 0.4px #9d9d9d" }}>
-                <LoadingIcons.TailSpin stroke="red" style={{ top: 1 }} />
-              </div>
-            ) : null
-          }
-        </div>
-        <div className={styles.documents}>
-          <a
-            href="https://www.freeprivacypolicy.com/live/b2e00735-5907-4d28-9a1a-875d2f56053c"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Privacy Policy
-          </a>
-          <a
-            href="https://www.freeprivacypolicy.com/live/882e116b-73b8-4713-85a2-bbc173c68be0"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Terms & Conditions
-          </a>
-        </div>
-        <img
-          className={clsx("arrowDownIcon", {
-            "arrowDownIconHide": !showScrollImg
-          })}
-          src="imgs/scroll-down.gif"
-          alt="arrow down"
+    <AuthShell
+      title="Chào mừng trở lại"
+      subtitle="Đăng nhập để bình luận, viết blog và quản lý thư mời của bạn."
+      footer={<>Chưa có tài khoản? <Link to="/sign-up">Đăng kí ngay</Link></>}
+    >
+      <div className={styles.oauth}>
+        <div id="login-google-button" className={styles.googleButton}
+          style={{ display: isOauthGoogleLoading ? "none" : "flex" }}
         />
+        {isOauthGoogleLoading && (
+          <div className={styles.oauthLoading}><CircularProgress size={22} /> Đang đăng nhập với Google…</div>
+        )}
       </div>
-      <div className="sideIntro mainSide">
-        <div className={styles.containerCarousel}>
-          <ImageCarousel />
-        </div>
-      </div>
-    </div>
+
+      <div className={styles.divider}><span>hoặc dùng email</span></div>
+
+      <Formik
+        initialValues={{
+          email: '',
+          password: '',
+        }}
+        onSubmit={authLocalCallback}
+        validate={validate}
+      >
+        {({ errors, touched }) => (
+          <Form id="login-form" method="post" className={styles.form} noValidate>
+            <div className={styles.field}>
+              <label htmlFor="email" className={styles.label}>Email</label>
+              <div className={clsx(styles.inputWrap, touched.email && errors.email && styles.invalid)}>
+                <IoMailOutline className={styles.inputIcon} />
+                <Field id="email" name="email" className={styles.input} type="email" autoComplete="email" placeholder="ban@example.com" />
+              </div>
+              <ErrorMessage name="email" render={msg => <div className="txtErrorInput">{msg}</div>} />
+            </div>
+            <div className={styles.field}>
+              <div className={styles.labelRow}>
+                <label htmlFor="password" className={styles.label}>Mật khẩu</label>
+                <span className={styles.forgot}>Quên mật khẩu?</span>
+              </div>
+              <div className={clsx(styles.inputWrap, touched.password && errors.password && styles.invalid)}>
+                <IoLockClosedOutline className={styles.inputIcon} />
+                <Field id="password" className={styles.input} name="password" type="password" autoComplete="current-password" placeholder="Nhập mật khẩu" />
+              </div>
+              <ErrorMessage name="password" render={msg => <div className="txtErrorInput">{msg}</div>} />
+            </div>
+            <label className={styles.checkbox}>
+              <Field type="checkbox" name="isRemember" />
+              <span>Ghi nhớ đăng nhập</span>
+            </label>
+            <button type="submit" className={styles.submit} disabled={isAuthLocalLoading}>
+              {isAuthLocalLoading ? <CircularProgress size={20} sx={{ color: 'inherit' }} /> : "Đăng nhập"}
+            </button>
+          </Form>
+        )}
+      </Formik>
+    </AuthShell>
   )
 }

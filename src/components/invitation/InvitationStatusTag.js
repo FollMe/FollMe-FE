@@ -1,27 +1,19 @@
-import styles from './InvitationItem.module.scss';
+import clsx from 'clsx';
+import styles from './InvitationStatusTag.module.scss';
+
+const STATUS = {
+  upcoming: 'Sắp diễn ra',
+  happened: 'Đã diễn ra',
+};
 
 export default function InvitationStatusTag({ status }) {
-  let message, backgroundColor;
-  switch (status) {
-    case 'upcoming':
-      message = 'Sắp diễn ra';
-      backgroundColor = '#f59e0c'
-      break;
-      case 'happened':  
-      backgroundColor = '#737373'
-      message = 'Đã diễn ra';
-      break;
-    default:
-  }
+  const message = STATUS[status];
 
   if (!message) {
     return <></>
   }
   return (
-    <span
-      className={styles.storyContentHeader_tag}
-      style={{ backgroundColor }}
-    >
+    <span className={clsx(styles.tag, styles[status])}>
       {message}
     </span>
   )

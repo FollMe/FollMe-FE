@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import clsx from 'clsx';
+import { IoTimeOutline, IoCalendarOutline } from 'react-icons/io5';
 import styles from "./Story.module.scss";
 import { request } from 'util/request';
-import Paper from '@mui/material/Paper';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { formatLongDate, getReadingMinutes } from 'util/date.js';
 import { CommentContainer } from 'components/comment/CommentContainer';
 import { useWebSocket } from "customHooks/useWebSocket";
 import OvalLoading from 'components/loading/OvalLoading';
+import ArticleHeader from 'components/article/ArticleHeader';
+import ReadingProgress from 'components/ReadingProgress';
 
 export default function ShortStory() {
   const {wsSend} = useWebSocket();
@@ -56,29 +59,35 @@ export default function ShortStory() {
     }
   }, [storySlug, wsSend])
 
+  if (isLoading) {
+    return <OvalLoading />
+  }
+
   return (
-    <>
-      <div className="container-view grid">
-        {
-          isLoading ? <OvalLoading /> :
-            <>
-              <Paper variant="outlined" sx={{ borderRadius: '8px', paddingBottom: '30px', mb: '30px' }}>
-                <div className={styles.boxContent}>
-                  <div className={styles.chapNumber}>
-                    <b><ArrowForwardIosIcon /> {story.name}</b>
-                  </div>
-                  <pre className={styles.content}>
-                    {story.chaps[0].content}
-                  </pre>
-                  <div className={styles.paginateChap}>
-                    <span>-- Hết --</span>
-                  </div>
-                </div>
-              </Paper>
-              <CommentContainer storySlug={storySlug} writerId={story.author._id} />
-            </>
-        }
+    <article>
+      <ReadingProgress />
+      <div className="container container--narrow">
+        <ArticleHeader
+          back={{ to: '/stories', label: 'Tất cả truyện' }}
+          eyebrow="Truyện ngắn"
+          title={story.name}
+          author={story.author?.name}
+          meta={[
+            story.updatedAt && <><IoCalendarOutline /> {formatLongDate(story.updatedAt)}</>,
+            <><IoTimeOutline /> {getReadingMinutes(story.chaps[0].content)} phút đọc</>,
+          ]}
+        />
+
+        <div className={clsx('prose', styles.content)}>
+          {story.chaps[0].content}
+        </div>
+
+        <div className={styles.end}>
+          <span>Hết</span>
+        </div>
+
+        <CommentContainer storySlug={storySlug} writerId={story.author._id} />
       </div>
-    </>
+    </article>
   )
 }

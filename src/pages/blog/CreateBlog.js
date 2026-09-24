@@ -11,7 +11,6 @@ import { toast } from 'react-toastify';
 import 'quill/dist/quill.snow.css';
 import './QuillStylesOverride.css';
 import styles from './CreateBlog.module.scss';
-import blogStyles from "./Blog.module.scss";
 
 
 Quill.register('modules/blotFormatter', BlotFormatter);
@@ -63,7 +62,7 @@ export default function CreateBlog() {
     }
 
     useEffect(() => {
-        document.title = "Blog | FollMe";
+        document.title = "Viết blog | FollMe";
         if (quillRef.current.childNodes.length) {
             return;
         }
@@ -83,22 +82,20 @@ export default function CreateBlog() {
     }, [])
 
     return (
-        <div className={styles.createContainer}>
-            <div className={styles.createBlogFooter}>
-                <div className={styles.nextBlogFooter_function}>
-                    <Button className={styles.btnReviewBlog} variant="contained" endIcon={<StartIcon />}
-                        sx={{
-                            backgroundColor: 'var(--theme-color)',
-                            textTransform: 'none',
-                            fontSize: '1.2rem',
-                        }}
-                        onClick={handleOpenCreateModel}
-                    >
-                        Tiếp tục
-                    </Button>
+        <div className={`container ${styles.createContainer}`}>
+            <div className={styles.toolbar}>
+                <div>
+                    <div className="eyebrow">Blog</div>
+                    <h1 className={styles.title}>Soạn bài viết mới</h1>
+                    <p className={styles.hint}>Nội dung cần tối thiểu {MIN_CONTENT_CHARACTER} kí tự. Bạn sẽ đặt tiêu đề và ảnh bìa ở bước tiếp theo.</p>
                 </div>
+                <Button variant="contained" size="large" endIcon={<StartIcon />}
+                    onClick={handleOpenCreateModel}
+                >
+                    Tiếp tục
+                </Button>
             </div>
-            <div className={blogStyles.content}>
+            <div className={`prose ${styles.editor}`}>
                 <div ref={quillRef} />
             </div>
             <CreateBlogModel

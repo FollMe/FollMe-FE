@@ -1,13 +1,14 @@
-import { Link } from 'react-router-dom';
-import styles from './NormalHeader.module.scss';
+import BrandLogo from 'components/layout/BrandLogo';
+import ThemeToggle from 'components/layout/ThemeToggle';
+import styles from './LogoHeader.module.scss';
 
 export default function LogoHeader() {
     return (
-        <header className={styles.headerOnlyLogo}>
-            <nav className={styles.navbarOnlyLogo}>
-                <Link to="/"><img src="/imgs/follme-logo.png" alt="FollMe Logo" className={styles.navOnlyLogo} /></Link>
-                <h1>FollMe</h1>
-            </nav>
+        <header className={styles.header}>
+            <div className={`container ${styles.inner}`}>
+                <BrandLogo />
+                <ThemeToggle />
+            </div>
         </header>
     )
 }

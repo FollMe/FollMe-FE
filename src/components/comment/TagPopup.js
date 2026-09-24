@@ -51,9 +51,9 @@ export default function TagPopup({ inputElement, users, onClickProfile, focusInd
             sx={{
               cursor: 'pointer',
               "&:hover": {
-                backgroundColor: '#f0f2f5'
+                backgroundColor: 'var(--surface-2)'
               },
-              backgroundColor: index === focusIndex ? '#f0f2f5' : 'unset',
+              backgroundColor: index === focusIndex ? 'var(--surface-2)' : 'unset',
               borderRadius: '8px'
             }}
           >

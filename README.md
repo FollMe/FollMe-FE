@@ -23,6 +23,14 @@ The project is organized into the following main directories:
   - **util/**: Utility functions for common operations (e.g., date formatting, API requests).
   - **config/**: Configuration files for constants and enums.
 
+## Design System
+
+- **Tokens** live in [src/index.css](src/index.css) as CSS variables (`--brand`, `--bg`, `--surface`, `--text`, `--border`, …) with a `[data-theme='dark']` override. Use them instead of hard-coded colors so components work in both themes.
+- **MUI theme** is generated per color mode in [src/theme.js](src/theme.js); keep its hex values in sync with the CSS tokens.
+- **Dark mode** is resolved before first paint in `public/index.html` (saved choice, else system preference) and toggled via `useColorMode()`.
+- **Typography**: Be Vietnam Pro for UI, Lora for headings and long-form reading (`.prose`).
+- **Shared building blocks**: `PageHeader`, `PostCard`, `ArticleHeader`, `Avatar`, `Reveal`, `ReadingProgress`.
+
 ## Installation
 
 1. Clone the repository:

@@ -3,10 +3,14 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { ToastContainer } from 'react-toastify';
 import Router from "./routes";
+import ScrollToTop from "components/layout/ScrollToTop";
+import { useColorMode } from "customHooks/useColorMode";
 import 'react-toastify/dist/ReactToastify.css';
 
 
 export default function App() {
+  const [mode] = useColorMode();
+
   return (
     <BrowserRouter>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -20,7 +24,9 @@ export default function App() {
           pauseOnFocusLoss
           draggable
           pauseOnHover
+          theme={mode}
         />
+        <ScrollToTop />
         <Router />
       </LocalizationProvider>
     </BrowserRouter>

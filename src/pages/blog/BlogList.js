@@ -1,25 +1,17 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
-import Stack from '@mui/material/Stack';
-import AddIcon from '@mui/icons-material/Add';
-import DesignServicesIcon from '@mui/icons-material/DesignServices';
-import Paper from '@mui/material/Paper';
-import Divider from '@mui/material/Divider';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import BlogSkeleton from 'components/skeletons/BlogSkeleton';
+import Button from '@mui/material/Button';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import { IoCreateOutline } from 'react-icons/io5';
+import PageHeader from 'components/PageHeader';
 import BlogItem from 'components/blog/BlogItem';
+import { PostCardSkeleton } from 'components/cards/PostCard';
 import RequestSignInDialog from 'components/dialog/RequestSignInDialog';
 import { useUserInfo } from 'customHooks/useUserInfo';
 import { request } from 'util/request';
 import { handleCheckLoggedIn } from "util/authHelper";
 import { getSortingValue } from 'util/stringUtil';
-
-import styles from "./BlogList.module.scss";
 
 export default function BlogList() {
   const navigate = useNavigate();
@@ -28,6 +20,7 @@ export default function BlogList() {
   const [blogs, setBlogs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showRequestLoginDialog, setShowRequestLoginDialog] = useState(false);
+  const sort = getSortingValue(searchParams.get('sort'));
   const isLoggedIn = useMemo(
     () => handleCheckLoggedIn(userInfo.sessionExp)
     , [userInfo]
@@ -42,8 +35,10 @@ export default function BlogList() {
   }
 
   const onSorting = useCallback(
-    (event) => {
-      getBlogs(event.target.value);
+    (_, value) => {
+      if (value) {
+        getBlogs(value);
+      }
     }, []);
 
   const getBlogs = useCallback(async (sort) => {
@@ -79,58 +74,58 @@ export default function BlogList() {
     getBlogs(sort);
   }, [])
 
+  const showFeatured = sort === '-updatedAt' && blogs.length > 2;
+  const [featured, ...rest] = blogs;
+
   return (
-    <div className="containerMain">
-      <div className="containerStory">
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Typography className={styles.txtPageTitle} gutterBottom variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
-            Blogs
-          </Typography>
-          <Tooltip placement='left' title={<Typography fontSize={"1.3rem"}>Viết blog</Typography>}>
-            <IconButton className={styles.btnAddNewBlog} variant="outlined" onClick={handleClickWriteBlog}>
-              <DesignServicesIcon className={styles.btnAddBlog2} sx={{ fontSize: '40px' }} />
-              <AddIcon className={styles.btnAddBlog} sx={{ fontSize: '40px' }} />
-            </IconButton>
-          </Tooltip>
-        </Stack>
-        <FormControl>
-          <Select
-            labelId="demo-simple-select-label"
-            className={styles.selectSort}
-            defaultValue='-updatedAt'
-            value={getSortingValue(searchParams.get('sort'))}
-            onChange={onSorting}
-          >
-            <MenuItem value='-updatedAt'>Newest</MenuItem>
-            <MenuItem value='updatedAt'>Oldest</MenuItem>
-          </Select>
-        </FormControl>
-        <Paper variant="outlined" sx={{ marginTop: '10px', borderRadius: '8px', padding: '16px' }}>
-          {
-            isLoading ? (
-              <>
-                <BlogSkeleton />
-                <Divider sx={{ margin: '20px 0' }} />
-                <BlogSkeleton />
-                <Divider sx={{ margin: '20px 0' }} />
-                <BlogSkeleton />
-              </>
-            ) : blogs.length <= 0
-              ? <> Hiện chưa có blog nào </>
-              : blogs.map((blog, index) =>
-                <div key={blog._id}>
-                  <BlogItem blog={blog} />
-                  {
-                    index < blogs.length - 1 ? <Divider sx={{ margin: '20px 0' }} /> : ""
-                  }
-                </div>
-              )
-          }
-        </ Paper>
+    <div className="container page">
+      <PageHeader
+        eyebrow="Blog"
+        title="Ghi chép kỹ thuật"
+        description="Những điều mình học được khi xây dựng phần mềm — từ thiết kế cơ sở dữ liệu, giao thức web cho tới Git và hơn thế nữa."
+        actions={
+          <Button variant="contained" size="large" startIcon={<IoCreateOutline />} onClick={handleClickWriteBlog}>
+            Viết blog
+          </Button>
+        }
+      />
+
+      <div className="toolbar">
+        <ToggleButtonGroup value={sort} exclusive onChange={onSorting} aria-label="Sắp xếp" size="small">
+          <ToggleButton value="-updatedAt">Mới nhất</ToggleButton>
+          <ToggleButton value="updatedAt">Cũ nhất</ToggleButton>
+        </ToggleButtonGroup>
+        {!isLoading && <span className="toolbar__count">{blogs.length} bài viết</span>}
       </div>
+
+      {
+        isLoading ? (
+          <div className="card-grid">
+            <PostCardSkeleton />
+            <PostCardSkeleton />
+            <PostCardSkeleton />
+          </div>
+        ) : blogs.length <= 0 ? (
+          <div className="empty-state">Hiện chưa có blog nào.</div>
+        ) : (
+          <>
+            {showFeatured && (
+              <div className="fade-up" style={{ marginBottom: 24 }}>
+                <BlogItem blog={featured} variant="featured" />
+              </div>
+            )}
+            <div className="card-grid stagger">
+              {(showFeatured ? rest : blogs).map(blog =>
+                <BlogItem key={blog._id} blog={blog} />
+              )}
+            </div>
+          </>
+        )
+      }
+
       {
         showRequestLoginDialog
-        && <RequestSignInDialog open={true} setOpen={setShowRequestLoginDialog} action="truy cập" />
+        && <RequestSignInDialog open={true} setOpen={setShowRequestLoginDialog} action="viết blog" />
       }
     </div>
   )

@@ -1,34 +1,24 @@
-import { Paper, Typography, IconButton } from '@mui/material';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import Button from '@mui/material/Button';
+import { IoChatbubblesOutline, IoArrowForward } from 'react-icons/io5';
+import styles from './CommentInterface.module.scss';
 
 export function CommentInterface({ numsOfCmt, setOpenCmtDialog, isCmtLoading }) {
   return (
-    <Paper variant="outlined" sx={{ borderRadius: '8px', p: '20px', mb: '30px' }}>
-      <Typography gutterBottom variant="h4" component="div"
-        sx={{
-          fontSize: '1.5rem',
-          fontWeight: 'bold',
-          color: 'var(--text-color-title)',
-        }}
-      >
-        Bình luận ({isCmtLoading ? "..." : numsOfCmt})
-        <IconButton
-          sx={{
-            marginLeft: '14px',
-            backgroundColor: '#e8e7e7',
-            p: '10px',
-            color: 'black'
-          }}
-          onClick={() => setOpenCmtDialog(true)}
-        >
-          <KeyboardArrowRightIcon />
-        </IconButton>
-      </Typography>
-      {
-        !isCmtLoading
-        && numsOfCmt === 0
-        && <div style={{ textAlign: 'center', opacity: '0.7', marginTop: '10px' }}> Hãy là người đầu tiên chia sẻ cảm xúc của mình </div>
-      }
-    </Paper>
+    <section className={styles.card}>
+      <span className={styles.icon}><IoChatbubblesOutline /></span>
+      <div className={styles.text}>
+        <h2 className={styles.title}>
+          Bình luận <span className={styles.count}>{isCmtLoading ? "…" : numsOfCmt}</span>
+        </h2>
+        <p className={styles.sub}>
+          {!isCmtLoading && numsOfCmt === 0
+            ? 'Hãy là người đầu tiên chia sẻ cảm xúc của mình.'
+            : 'Cùng thảo luận với tác giả và những người đọc khác.'}
+        </p>
+      </div>
+      <Button variant="contained" endIcon={<IoArrowForward />} onClick={() => setOpenCmtDialog(true)}>
+        Xem bình luận
+      </Button>
+    </section>
   )
 }

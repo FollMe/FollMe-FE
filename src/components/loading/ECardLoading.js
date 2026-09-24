@@ -21,7 +21,7 @@ export function ECardLoading() {
           width: '50%',
           height: '4rem',
           zIndex: '1',
-          backgroundColor: '#f9fafb',
+          backgroundColor: 'var(--bg)',
           left: '-110px'
         }}
       ></div>

@@ -9,6 +9,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import RocketIcon from '@mui/icons-material/Rocket';
 import dayjs from 'dayjs';
 
+import ArticleHeader from 'components/article/ArticleHeader';
 import styles from "./CreateEvent.module.scss";
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
 
@@ -57,13 +58,13 @@ export default function CreateEvent() {
   }
 
   useEffect(() => {
-    window.scrollTo(0, 0)
+    document.title = "Tạo sự kiện | FollMe";
   }, [])
 
   const formik = useFormik({
     initialValues: {
       title: '',
-      startAt: dayjs('2023-06-21 14:52:00.691Z'),
+      startAt: dayjs().add(7, 'day').hour(19).minute(0).second(0),
       location: '',
       mapLocation: '',
       guests: [],
@@ -89,15 +90,16 @@ export default function CreateEvent() {
   });
 
   return (
-    <>
-      <div className={styles.blogContent}>
-        <div className={styles.boxContent}>
-          <div className={styles.chapNumber}>
-            <b>Tạo sự kiện</b>
-          </div>
-          <hr />
+    <div className="container container--narrow">
+      <ArticleHeader
+        back={{ to: '/events', label: 'Tất cả sự kiện' }}
+        eyebrow="Thư mời điện tử"
+        title="Tạo sự kiện mới"
+        subtitle="Điền thông tin sự kiện và danh sách khách mời. Khách có email sẽ nhận thư mời tự động."
+      />
+      <div className={styles.panel}>
           <form className={styles.createEventForm} onSubmit={formik.handleSubmit}>
-            <TextField style={{ fontSize: '1.5rem' }} fullWidth label="Tên sự kiện*"
+            <TextField fullWidth label="Tên sự kiện*"
               name='title'
               value={formik.values.title}
               onChange={(...params) => formik.handleChange(...params)}
@@ -108,7 +110,7 @@ export default function CreateEvent() {
             <DateTimeField
               className={styles.inputFiled}
               name='startAt'
-              sx={{ mr: '16px' }}
+              fullWidth
               label="Thời gian*"
               format='DD-MM-YYYY hh:mm A'
               value={formik.values.startAt}
@@ -164,17 +166,17 @@ export default function CreateEvent() {
 
             <div className={styles.funcBox}>
               <LoadingButton variant="contained"
+                size="large"
                 loading={isPosting}
                 loadingPosition="end"
                 endIcon={<RocketIcon />}
                 type='submit'
               >
-                Tạo
+                Tạo sự kiện
               </LoadingButton>
             </div>
           </form>
-        </div>
       </div>
-    </>
+    </div>
   )
 }

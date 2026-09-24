@@ -1,23 +1,31 @@
 .createContainer {
-    margin: 0 auto;
-    margin-top: 10px;
-    width: 90%;
-    max-width: 1120px;
-    border-radius: 10px;
+    max-width: 1000px;
+    padding-top: 40px;
 }
 
-.createBlogFooter {
+.toolbar {
     display: flex;
-    justify-content: right;
-    align-items: center;
-    padding: 8px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
 }
 
-
-.btnReviewBlog span svg {
-    transition: 0.5s;
+.title {
+    margin: 8px 0 0;
+    font-family: var(--font-serif);
+    font-size: clamp(2.8rem, 3.6vw, 3.6rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
 }
 
-button.btnReviewBlog:hover {
-    background-color: var(--theme-color);
+.hint {
+    margin: 6px 0 0;
+    font-size: 1.4rem;
+    color: var(--text-3);
+}
+
+.editor {
+    font-size: 1.7rem;
 }

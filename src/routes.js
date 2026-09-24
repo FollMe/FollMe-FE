@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Navigate, useRoutes } from "react-router-dom";
 import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
@@ -8,31 +9,39 @@ import StoryList from "./pages/story/StoryList";
 import FacebookDataDeletionInstructions from "pages/document/FacebookDataDeletionInstructions";
 import MainLayout from "./layouts/MainLayout";
 import AuthMainLayout from "layouts/AuthMainLayout";
-import { HEADER_TYPE } from "./config/enum";
+import Home from "pages/main/Home";
 import Page404 from "pages/main/Page404";
 import BlogList from "pages/blog/BlogList";
-import CreateBlog from "pages/blog/CreateBlog";
 import Blog from "pages/blog/Blog";
-import InvitationCard from "pages/invitation/InvitationCard";
-import InvitationList from "pages/invitation/InvitationList";
-import Event from "pages/invitation/Event";
-import CreateEvent from "pages/invitation/CreateEvent";
+import OvalLoading from "components/loading/OvalLoading";
+
+// Heavy pages (rich-text editor, data grid, uploader) are split into their own chunks
+const CreateBlog = lazy(() => import("pages/blog/CreateBlog"));
+const InvitationCard = lazy(() => import("pages/invitation/InvitationCard"));
+const InvitationList = lazy(() => import("pages/invitation/InvitationList"));
+const Event = lazy(() => import("pages/invitation/Event"));
+const CreateEvent = lazy(() => import("pages/invitation/CreateEvent"));
+
+const withSuspense = (element) => (
+  <Suspense fallback={<OvalLoading />}>{element}</Suspense>
+);
 
 export default function Router() {
   return useRoutes([
     {
-      element: <MainLayout />,
+      element: <MainLayout hideHeader />,
       children: [
         { path: 'sign-in', element: <SignIn /> },
         { path: 'sign-up', element: <SignUp /> },
-        { path: '/404', element: <Page404 /> }
+        // The e-card has its own full-screen design
+        { path: '/invitations/:id', element: withSuspense(<InvitationCard />) },
       ]
     },
     {
-      element: <MainLayout type={HEADER_TYPE.MOBILE} />,
+      element: <MainLayout />,
       children: [
+        { path: '/404', element: <Page404 /> },
         { path: '/documents/facebook-data-deletion-instructions-url', element: <FacebookDataDeletionInstructions /> },
-        { path: '/invitations/:id', element: <InvitationCard /> }
       ]
     },
 
@@ -40,7 +49,7 @@ export default function Router() {
     {
       element: <AuthMainLayout />,
       children: [
-        { path: '/', element: <Navigate to="/stories" replace /> },
+        { path: '/', element: <Home /> },
         { path: '/stories', element: <StoryList /> },
         { path: '/stories/long-stories/:storySlug', element: <SelectChap /> },
         { path: '/stories/long-stories/:storySlug/:chapSlug', element: <Story /> },
@@ -54,10 +63,10 @@ export default function Router() {
     {
       element: <AuthMainLayout isProtected={true} />,
       children: [
-        { path: '/blogs/create', element: <CreateBlog /> },
-        { path: '/events', element: <InvitationList /> },
-        { path: '/events/create', element: <CreateEvent /> },
-        { path: '/events/:eventId', element: <Event /> },
+        { path: '/blogs/create', element: withSuspense(<CreateBlog />) },
+        { path: '/events', element: withSuspense(<InvitationList />) },
+        { path: '/events/create', element: withSuspense(<CreateEvent />) },
+        { path: '/events/:eventId', element: withSuspense(<Event />) },
       ]
     },
 

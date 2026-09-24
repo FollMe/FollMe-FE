@@ -2,15 +2,15 @@ import clsx from "clsx";
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Formik, Field, ErrorMessage, Form } from 'formik';
-import EmailIcon from '@mui/icons-material/Email';
-import LockIcon from '@mui/icons-material/Lock';
-import AddModeratorIcon from '@mui/icons-material/AddModerator';
-import LoadingIcons from 'react-loading-icons'
+import CircularProgress from '@mui/material/CircularProgress';
+import { IoMailOutline, IoLockClosedOutline, IoShieldCheckmarkOutline } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 import { request, authRouteList } from "util/request";
-import ImageCarousel from "components/ImageCarousel";
+import AuthShell from "components/auth/AuthShell";
 import { useUserInfo } from "customHooks/useUserInfo";
+import { useColorMode } from "customHooks/useColorMode";
 import { handleCheckLoggedIn } from "util/authHelper";
+import { renderGoogleButton } from "./SignIn";
 
 import styles from './SignIn.module.scss';
 
@@ -35,7 +35,7 @@ const validate = (values) => {
 
 export default function SignUp() {
   const navigate = useNavigate();
-  const [showScrollImg, setShowScrollImg] = useState(true);
+  const [mode] = useColorMode();
   const [userInfo, setUserInfo] = useUserInfo();
   const [isOauthGoogleLoading, setIsOauthGoogleLoading] = useState(false);
   const [isRequestCodeLoading, setIsRequestCodeLoading] = useState(false);
@@ -51,13 +51,6 @@ export default function SignUp() {
     if (isLoggedIn) {
       return navigate('/');
     }
-    window.addEventListener("scroll", () => {
-      if (window.scrollY > 50) {
-        setShowScrollImg(false);
-      } else {
-        setShowScrollImg(true);
-      }
-    })
 
     // Init Google Oauth
     if (window.google?.accounts?.id) {
@@ -66,13 +59,12 @@ export default function SignUp() {
         callback: oauthGoogleCallback,
       })
       window.google.accounts.id.prompt();
-      window.google.accounts.id.renderButton(
-        document.getElementById("login-google-button"), {
-        type: "icon"
-      }
-      )
     }
   }, [])
+
+  useEffect(() => {
+    renderGoogleButton(mode);
+  }, [mode])
 
   async function oauthGoogleCallback(res) {
     try {
@@ -138,117 +130,84 @@ export default function SignUp() {
   }
 
   return (
-    <div className="containerMain">
-      <div className="sideFeature mainSide">
-        <div className={styles.introTitle}>Tạo tài khoản dễ dàng</div>
-        <div className={styles.titleMethod}><hr />Đăng kí bằng email<hr /></div>
-        <div className={styles.login}>
-          <Formik
-            initialValues={{
-              email: '',
-              code: '',
-              password: '',
-            }}
-            onSubmit={signUpLocalCallback}
-            validate={validate}
-          >
-            {() => (
-              <Form id="form-login" action="sign-up" method="POST" className={styles.loginForm}>
-                <div className={styles.loginForm_Text}>
-                  <EmailIcon className={styles.fontIcon} style={{ fontSize: '2.2rem' }} />
-                  <Field
-                    className={styles.inputField}
-                    name="email"
-                    type="text"
-                    placeholder="Tài khoản email"
-                    required
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value.trim())}
-                  />
-                  <ErrorMessage name="email" render={msg => <div className="txtErrorInput">{msg}</div>} />
-                </div>
-                <div className={styles.loginForm_Text}>
-                  <div className={styles.notifyInput}></div>
-                  <AddModeratorIcon className={styles.fontIcon} style={{ fontSize: '2.2rem' }} />
-                  <i className="fas fa-shield-alt font-icon"></i>
-                  <span className={styles.btnSendCode} style={{ display: isValidEmail ? "inline" : "none" }}
-                    onClick={handRequestGetCode}
-                  >
-                    Nhận mã
-                  </span>
-                  <div className={styles.ctnFunction}>
-                    {waitTime > 0 ? waitTime : (isRequestCodeLoading ? <LoadingIcons.TailSpin stroke="#ff6541" style={{ width: 23, height: 23 }} /> : null)}
-                  </div>
-                  <Field className={styles.inputField} name="code" type="number" step="1" placeholder="Mã xác thực" />
-                  <ErrorMessage name="code" render={msg => <div className="txtErrorInput">{msg}</div>} />
-                </div>
-                <div className={styles.loginForm_Text}>
-                  <div className={styles.notifyInput}></div>
-                  <LockIcon className={styles.fontIcon} style={{ fontSize: '2.2rem' }} />
-                  <Field className={styles.inputField} name="password" type="password" placeholder="Mật khẩu" />
-                  <ErrorMessage name="password" render={msg => <div className="txtErrorInput">{msg}</div>} />
-                </div>
-
-                <div className={styles.loginForm_Submit}>
-                  <button type="submit" disabled={isRequestSignUpLoading}>
-                    {isRequestSignUpLoading ? <LoadingIcons.TailSpin style={{ width: 30 }} /> : "Đăng kí"}
-                  </button>
-                </div>
-              </Form>
-            )}
-          </Formik>
-
-        </div>
-        <div className={styles.loginFoot}>
-          Đã có tài khoản, vui lòng <Link to="/sign-in">đăng nhập</Link>
-        </div>
-        <div className={styles.titleMethod}><hr />Hoặc đăng nhập bằng<hr /></div>
-        <div className={styles.login}>
-          <div
-            id="login-google-button"
-            className={clsx(styles.svg, styles.googleLogin, styles.oauthButton)}
-            style={{ display: isOauthGoogleLoading ? "none" : "inline-block" }}
-          >
-          </div>
-          {
-            isOauthGoogleLoading ? (
-              <div className={clsx(styles.svg, styles.googleLogin, styles.oauthButton)} style={{ border: "solid 0.4px #9d9d9d" }}>
-                <LoadingIcons.TailSpin stroke="red" style={{ top: 1 }} />
-              </div>
-            ) : null
-          }
-        </div>
-        <div className={styles.documents}>
-          <a
-            href="https://www.freeprivacypolicy.com/live/b2e00735-5907-4d28-9a1a-875d2f56053c"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Privacy Policy
-          </a>
-          <a
-            href="https://www.freeprivacypolicy.com/live/882e116b-73b8-4713-85a2-bbc173c68be0"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Terms & Conditions
-          </a>
-        </div>
-
-        <img
-          className={clsx("arrowDownIcon", {
-            "arrowDownIconHide": !showScrollImg
-          })}
-          src="imgs/scroll-down.gif"
-          alt="arrow down"
+    <AuthShell
+      title="Tạo tài khoản"
+      subtitle="Chỉ mất một phút — nhập email, nhận mã xác thực và đặt mật khẩu."
+      footer={<>Đã có tài khoản? <Link to="/sign-in">Đăng nhập</Link></>}
+    >
+      <div className={styles.oauth}>
+        <div id="login-google-button" className={styles.googleButton}
+          style={{ display: isOauthGoogleLoading ? "none" : "flex" }}
         />
+        {isOauthGoogleLoading && (
+          <div className={styles.oauthLoading}><CircularProgress size={22} /> Đang đăng nhập với Google…</div>
+        )}
+      </div>
 
-      </div>
-      <div className="sideIntro mainSide">
-        <div className={styles.containerCarousel}>
-          <ImageCarousel />
-        </div>
-      </div>
-    </div>
+      <div className={styles.divider}><span>hoặc đăng kí bằng email</span></div>
+
+      <Formik
+        initialValues={{
+          email: '',
+          code: '',
+          password: '',
+        }}
+        onSubmit={signUpLocalCallback}
+        validate={validate}
+      >
+        {({ errors, touched }) => (
+          <Form id="form-login" action="sign-up" method="POST" className={styles.form} noValidate>
+            <div className={styles.field}>
+              <label htmlFor="email" className={styles.label}>Email</label>
+              <div className={styles.inputWrap}>
+                <IoMailOutline className={styles.inputIcon} />
+                <Field
+                  id="email"
+                  className={styles.input}
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="ban@example.com"
+                  required
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value.trim())}
+                />
+              </div>
+              <ErrorMessage name="email" render={msg => <div className="txtErrorInput">{msg}</div>} />
+            </div>
+            <div className={styles.field}>
+              <label htmlFor="code" className={styles.label}>Mã xác thực</label>
+              <div className={clsx(styles.inputWrap, touched.code && errors.code && styles.invalid)}>
+                <IoShieldCheckmarkOutline className={styles.inputIcon} />
+                <Field id="code" className={styles.input} style={{ paddingRight: 130 }} name="code" type="number" step="1" placeholder="Nhập mã gửi tới email" />
+                <button
+                  type="button"
+                  className={styles.inputAction}
+                  onClick={handRequestGetCode}
+                  disabled={!isValidEmail || waitTime > 0 || isRequestCodeLoading}
+                >
+                  {isRequestCodeLoading
+                    ? <CircularProgress size={14} sx={{ color: 'inherit' }} />
+                    : waitTime > 0 ? `Gửi lại (${waitTime}s)` : 'Nhận mã'}
+                </button>
+              </div>
+              <ErrorMessage name="code" render={msg => <div className="txtErrorInput">{msg}</div>} />
+            </div>
+            <div className={styles.field}>
+              <label htmlFor="password" className={styles.label}>Mật khẩu</label>
+              <div className={clsx(styles.inputWrap, touched.password && errors.password && styles.invalid)}>
+                <IoLockClosedOutline className={styles.inputIcon} />
+                <Field id="password" className={styles.input} name="password" type="password" autoComplete="new-password" placeholder="Ít nhất 6 kí tự" />
+              </div>
+              <ErrorMessage name="password" render={msg => <div className="txtErrorInput">{msg}</div>} />
+            </div>
+
+            <button type="submit" className={styles.submit} disabled={isRequestSignUpLoading}>
+              {isRequestSignUpLoading ? <CircularProgress size={20} sx={{ color: 'inherit' }} /> : "Đăng kí"}
+            </button>
+          </Form>
+        )}
+      </Formik>
+    </AuthShell>
   )
 }

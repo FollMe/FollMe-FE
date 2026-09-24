@@ -26,9 +26,9 @@ export function CommentItem({ comment, type, isPosting, handlePosting, isLoggedI
           <div>
             <Box
               sx={{
-                backgroundColor: comment.new ? '#ebeeff' : '#f1f1f1',
+                backgroundColor: comment.new ? 'var(--info-soft)' : 'var(--surface-2)',
                 p: '8px 16px',
-                borderRadius: '20px'
+                borderRadius: '18px'
               }}
             >
               <Typography variant="body1" component="div" sx={{ fontWeight: 'bold' }}>

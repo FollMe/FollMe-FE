@@ -190,7 +190,7 @@ export function CommentInput({ parentCmt, onPost, isPosting, isOtherTyping, isLo
             }
             <Oval
               className={styles.inputLoading}
-              stroke="#ff6541"
+              stroke="#ea580c"
               style={{ width: isPosting ? '25px' : '0px' }}
             />
             {

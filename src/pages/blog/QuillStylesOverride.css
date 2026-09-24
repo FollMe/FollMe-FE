@@ -1,29 +1,112 @@
-.ql-container.ql-snow {
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
-    background-color: var(--white-color);
+.ql-toolbar.ql-snow {
+    position: sticky;
+    top: var(--header-h);
+    z-index: 5;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    background-color: var(--surface-2);
+    font-family: var(--font-sans);
 }
 
-.ql-toolbar.ql-snow {
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+.ql-container.ql-snow {
+    border: 1px solid var(--border);
+    border-top: 0;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    background-color: var(--surface);
 }
 
 .ql-container {
-    height: 75vh;
+    min-height: 70vh;
     font-family: unset;
     font-size: unset;
 }
 
+.ql-editor {
+    min-height: 70vh;
+    padding: 28px 32px;
+    line-height: 1.8;
+}
+
+.ql-editor.ql-blank::before {
+    left: 32px;
+    color: var(--text-3);
+    font-style: italic;
+}
+
+/* Toolbar icons follow the color scheme */
+.ql-snow .ql-stroke {
+    stroke: var(--text-2);
+}
+
+.ql-snow .ql-fill,
+.ql-snow .ql-stroke.ql-fill {
+    fill: var(--text-2);
+}
+
+.ql-snow .ql-picker {
+    color: var(--text-2);
+}
+
+.ql-snow.ql-toolbar button:hover .ql-stroke,
+.ql-snow.ql-toolbar button.ql-active .ql-stroke,
+.ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke,
+.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke {
+    stroke: var(--brand);
+}
+
+.ql-snow.ql-toolbar button:hover .ql-fill,
+.ql-snow.ql-toolbar button.ql-active .ql-fill {
+    fill: var(--brand);
+}
+
+.ql-snow.ql-toolbar button:hover,
+.ql-snow.ql-toolbar button.ql-active,
+.ql-snow.ql-toolbar .ql-picker-label:hover,
+.ql-snow.ql-toolbar .ql-picker-label.ql-active,
+.ql-snow.ql-toolbar .ql-picker-item:hover,
+.ql-snow.ql-toolbar .ql-picker-item.ql-selected {
+    color: var(--brand);
+}
+
+.ql-snow .ql-picker-options {
+    background-color: var(--surface);
+    border-radius: 10px;
+    box-shadow: var(--shadow-lg);
+}
+
+.ql-snow.ql-toolbar .ql-picker.ql-expanded .ql-picker-options,
+.ql-snow .ql-picker.ql-expanded .ql-picker-label {
+    border-color: var(--border);
+}
+
+.ql-snow .ql-tooltip {
+    background-color: var(--surface);
+    border-color: var(--border);
+    color: var(--text);
+    box-shadow: var(--shadow-lg);
+    border-radius: 10px;
+}
+
+.ql-snow .ql-tooltip input[type=text] {
+    background: var(--surface-2);
+    border-color: var(--border);
+    color: var(--text);
+    border-radius: 6px;
+}
+
+.ql-snow .ql-editor pre.ql-syntax,
 pre.ql-syntax {
-    margin-bottom: 5px;
-    margin-top: 5px;
-    padding: 5px 10px;
-    font-size: 15px;
-    background-color: #23241f;
-    color: #f8f8f2;
+    margin: 12px 0;
+    padding: 14px 18px;
+    font-family: var(--font-mono);
+    font-size: 1.45rem;
+    background-color: #1c1917;
+    color: #f5f1ea;
     overflow: visible;
-    border-radius: 3px;
+    border-radius: 8px;
     white-space: pre-wrap;
 }
 
@@ -41,6 +124,7 @@ pre.ql-syntax {
     margin: revert;
 }
 
-.ql-snow pre.ql-syntax, pre.ql-syntax {
-    margin-bottom: 17px;
+.ql-snow .ql-editor blockquote {
+    border-left-color: var(--brand);
+    color: var(--text-2);
 }

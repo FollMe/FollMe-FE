@@ -1,0 +1,200 @@
+.shell {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+}
+
+/* ---------- Form side ---------- */
+.formSide {
+  display: flex;
+  flex-direction: column;
+  padding: 0 40px;
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-h);
+  margin-top: 8px;
+}
+
+.formWrap {
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+  padding: 48px 0;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 3.6rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.subtitle {
+  margin: 10px 0 32px;
+  color: var(--text-2);
+  font-size: 1.6rem;
+}
+
+.footer {
+  margin-top: 28px;
+  text-align: center;
+  font-size: 1.45rem;
+  color: var(--text-2);
+
+  a {
+    font-weight: 600;
+    text-decoration: none;
+  }
+}
+
+.legal {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 24px 0;
+  font-size: 1.3rem;
+
+  a {
+    color: var(--text-3);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--text);
+    }
+  }
+}
+
+/* ---------- Brand side ---------- */
+.brandSide {
+  position: relative;
+  overflow: hidden;
+  margin: 12px;
+  border-radius: 28px;
+  color: #f5f1ea;
+  background:
+    radial-gradient(70% 60% at 100% 0%, rgba(255, 170, 110, 0.55), transparent 70%),
+    radial-gradient(60% 60% at 0% 100%, rgba(120, 30, 0, 0.55), transparent 70%),
+    linear-gradient(160deg, #f26b2c, #c2410c 60%, #7c2d12);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.14) 1px, transparent 1px);
+    background-size: 22px 22px;
+    mask-image: linear-gradient(to bottom, #000, transparent 70%);
+    -webkit-mask-image: linear-gradient(to bottom, #000, transparent 70%);
+    pointer-events: none;
+  }
+}
+
+.brandInner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 64px 40px;
+}
+
+.brandMark {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.18);
+}
+
+.quote {
+  margin: 40px 0 0;
+
+  blockquote {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: clamp(2.4rem, 2.4vw, 3.2rem);
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+  }
+
+  figcaption {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 28px;
+
+    img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: 40% 30%;
+      border: 2px solid rgba(255, 255, 255, 0.6);
+    }
+
+    span {
+      display: flex;
+      flex-direction: column;
+      font-size: 1.35rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    strong {
+      font-size: 1.6rem;
+      color: #fff;
+    }
+  }
+}
+
+.points {
+  margin: 48px 0 0;
+  padding: 24px 0 0;
+  list-style: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+
+  li {
+    position: relative;
+    padding-left: 28px;
+    margin: 12px 0;
+    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.92);
+
+    &::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      top: 1px;
+      display: grid;
+      place-items: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.22);
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .brandSide {
+    display: none;
+  }
+
+  .formSide {
+    padding: 0 20px;
+  }
+}

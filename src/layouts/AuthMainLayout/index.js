@@ -1,31 +1,19 @@
-import { useState } from "react";
 import { Outlet, Navigate } from "react-router-dom";
-import Header from "../../components/Header";
-import { useUserInfo } from "customHooks/useUserInfo";
 import { useEffect } from "react";
-import SideDrawer from "components/sidebar/SideDrawer";
+import { useUserInfo } from "customHooks/useUserInfo";
 import { useWebSocket } from "customHooks/useWebSocket";
+import SiteHeader from "components/layout/SiteHeader";
 import Footer from "components/Footer";
 import { forceLogin, handleCheckLoggedIn } from "util/authHelper";
 
-
-const MOBILE_MAX_WIDTH = 760;
-
-export default function AuthMainLayout({ type, isProtected }) {
+export default function AuthMainLayout({ isProtected }) {
   const [userInfo, setUserInfo] = useUserInfo();
-  const {wsSend} = useWebSocket();
-  const [isOpenSideDrawer, setIsOpenSideDrawer] = useState(window.innerWidth > MOBILE_MAX_WIDTH);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= MOBILE_MAX_WIDTH);
+  const { wsSend } = useWebSocket();
   const isLoggedIn = handleCheckLoggedIn(userInfo.sessionExp)
 
   useEffect(() => {
     if (!isLoggedIn) {
       setUserInfo({});
-    }
-
-    window.addEventListener("resize", resize);
-    return () => {
-      window.removeEventListener("resize", resize);
     }
   }, [isLoggedIn])
 
@@ -34,16 +22,6 @@ export default function AuthMainLayout({ type, isProtected }) {
       regisToServer()
     }
   }, [isLoggedIn, wsSend])
-
-  function resize() {
-    setIsMobile(isMobile => {
-      const newIsMobile = window.innerWidth <= MOBILE_MAX_WIDTH;
-      if (isOpenSideDrawer && !isMobile && newIsMobile) {
-        setIsOpenSideDrawer(false);
-      }
-      return newIsMobile;
-    });
-  }
 
   async function regisToServer() {
     try {
@@ -63,16 +41,10 @@ export default function AuthMainLayout({ type, isProtected }) {
 
   return (
     <>
-      <Header type={type} setIsOpenSideDrawer={setIsOpenSideDrawer} />
-      <div className="root-content">
-        <SideDrawer
-          setIsOpenSideDrawer={setIsOpenSideDrawer}
-          isOpenSideDrawer={isOpenSideDrawer}
-          isMobile={isMobile}
-          isLoggedIn={isLoggedIn}
-        />
+      <SiteHeader isLoggedIn={isLoggedIn} userInfo={userInfo} />
+      <main className="site-main">
         <Outlet />
-      </div>
+      </main>
       <Footer />
     </>
   )

@@ -1,0 +1,47 @@
+.trigger {
+  display: inline-flex;
+  padding: 2px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px var(--border);
+  transition: box-shadow 0.2s ease;
+
+  &:hover,
+  &[aria-expanded='true'] {
+    box-shadow: 0 0 0 2px var(--brand);
+  }
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px 12px;
+}
+
+.headText {
+  min-width: 0;
+}
+
+.name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+
+.sub {
+  font-size: 1.25rem;
+  color: var(--text-3);
+}
+
+div.icon {
+  min-width: 30px;
+  font-size: 1.9rem;
+  color: var(--text-2);
+}

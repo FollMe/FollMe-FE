@@ -1,12 +1,12 @@
-import AppsIcon from '@mui/icons-material/Apps';
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import clsx from 'clsx';
+import { IoArrowBack, IoArrowForward, IoGridOutline, IoTimeOutline, IoBookOutline } from 'react-icons/io5';
 import { request } from 'util/request';
-import { Paper } from '@mui/material';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { getReadingMinutes } from 'util/date.js';
 import OvalLoading from 'components/loading/OvalLoading';
+import ArticleHeader from 'components/article/ArticleHeader';
+import ReadingProgress from 'components/ReadingProgress';
 import { CommentContainer } from 'components/comment/CommentContainer';
 import { useWebSocket } from "customHooks/useWebSocket";
 
@@ -21,7 +21,6 @@ export default function Story() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    window.scrollTo(0, 0)
     getStory();
 
     async function getStory() {
@@ -40,7 +39,7 @@ export default function Story() {
         console.log(err);
       }
     }
-  
+
   }, [storySlug, chapSlug])
 
   useEffect(() => {
@@ -64,55 +63,59 @@ export default function Story() {
     }
   }, [wsSend, storySlug])
 
+  if (isLoading) {
+    return <OvalLoading />
+  }
+
+  const chap = story.chaps[0];
+
   return (
-    <>
-      <div className="container-view grid">
-        {
-          isLoading ? <OvalLoading /> :
-            <>
-              <Paper variant="outlined" sx={{ borderRadius: '8px', paddingBottom: '10px', mb: '30px' }}>
-                <div className={styles.boxContent}>
-                  <div className={styles.chapNumber}>
-                    <b><ArrowForwardIosIcon /> {story.name}</b>
-                  </div>
-                  <span>{story.chaps[0].name}</span>
-                  <pre className={styles.content}>
-                    {story.chaps[0].content}
-                  </pre>
-                  <div className={styles.paginateChap}>
-                    <span>Hết: {story.chaps[0].name}</span>
-                    <div className={styles.functionBar}>
-                      <Link
-                        to={`/stories/long-stories/${story.slug}/${previousChap?.slug}`}
-                        className={(!previousChap && styles.btnDisabled) || ""}
-                      >
-                        <div className={styles.buttonChap}>
-                          <KeyboardArrowLeftIcon sx={{ fontSize: 24 }} />
-                          <span style={{ marginLeft: 5 }}> Trước </span>
-                        </div>
-                      </Link>
-                      <Link to={`/stories/long-stories/${story.slug}`}>
-                        <div className={styles.buttonChap}>
-                          <AppsIcon sx={{ fontSize: 24 }} />
-                        </div>
-                      </Link>
-                      <Link
-                        to={`/stories/long-stories/${story.slug}/${nextChap?.slug}`}
-                        className={(!nextChap && styles.btnDisabled) || ""}
-                      >
-                        <div className={styles.buttonChap}>
-                          <span style={{ marginRight: 5 }}> Tiếp &ensp; </span>
-                          <KeyboardArrowRightIcon sx={{ fontSize: 24 }} />
-                        </div>
-                      </Link>
-                    </ div>
-                  </div>
-                </div>
-              </Paper>
-              <CommentContainer storySlug={storySlug} writerId={story.author._id} />
-            </>
-        }
+    <article>
+      <ReadingProgress />
+      <div className="container container--narrow">
+        <ArticleHeader
+          back={{ to: `/stories/long-stories/${story.slug}`, label: story.name }}
+          eyebrow="Truyện dài"
+          title={chap.name}
+          author={story.author?.name}
+          meta={[
+            <><IoBookOutline /> {story.name}</>,
+            <><IoTimeOutline /> {getReadingMinutes(chap.content)} phút đọc</>,
+          ]}
+        />
+
+        <div className={clsx('prose', styles.content)}>
+          {chap.content}
+        </div>
+
+        <div className={styles.end}>
+          <span>Hết {chap.name}</span>
+        </div>
+
+        <nav className={styles.chapNav} aria-label="Điều hướng chương">
+          <Link
+            to={`/stories/long-stories/${story.slug}/${previousChap?.slug}`}
+            className={clsx(styles.chapLink, !previousChap && styles.disabled)}
+            aria-disabled={!previousChap}
+          >
+            <span className={styles.chapLabel}><IoArrowBack /> Chương trước</span>
+            <span className={styles.chapName}>{previousChap?.name ?? 'Không có'}</span>
+          </Link>
+          <Link to={`/stories/long-stories/${story.slug}`} className={styles.chapList} aria-label="Danh sách chương">
+            <IoGridOutline />
+          </Link>
+          <Link
+            to={`/stories/long-stories/${story.slug}/${nextChap?.slug}`}
+            className={clsx(styles.chapLink, styles.next, !nextChap && styles.disabled)}
+            aria-disabled={!nextChap}
+          >
+            <span className={styles.chapLabel}>Chương tiếp <IoArrowForward /></span>
+            <span className={styles.chapName}>{nextChap?.name ?? 'Không có'}</span>
+          </Link>
+        </nav>
+
+        <CommentContainer storySlug={storySlug} writerId={story.author._id} />
       </div>
-    </>
+    </article>
   )
 }
