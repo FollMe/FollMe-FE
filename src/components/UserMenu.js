@@ -4,7 +4,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Divider from '@mui/material/Divider';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import { IoCreateOutline, IoTicketOutline, IoLogOutOutline } from 'react-icons/io5';
+import { IoCreateOutline, IoTicketOutline, IoLogOutOutline, IoBookmarksOutline } from 'react-icons/io5';
 import { useUserInfo } from 'customHooks/useUserInfo';
 import Avatar from 'components/Avatar';
 import styles from './UserMenu.module.scss';
@@ -74,6 +74,10 @@ export default function UserMenu({ userInfo = {} }) {
                 <MenuItem onClick={() => goTo('/events')}>
                     <ListItemIcon className={styles.icon}><IoTicketOutline /></ListItemIcon>
                     Thư mời của tôi
+                </MenuItem>
+                <MenuItem onClick={() => goTo('/fortune/profiles')}>
+                    <ListItemIcon className={styles.icon}><IoBookmarksOutline /></ListItemIcon>
+                    Hồ sơ lá số
                 </MenuItem>
                 <Divider sx={{ my: 0.5 }} />
                 <MenuItem onClick={handleSignOut}>

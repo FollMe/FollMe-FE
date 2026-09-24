@@ -21,6 +21,10 @@ const InvitationCard = lazy(() => import("pages/invitation/InvitationCard"));
 const InvitationList = lazy(() => import("pages/invitation/InvitationList"));
 const Event = lazy(() => import("pages/invitation/Event"));
 const CreateEvent = lazy(() => import("pages/invitation/CreateEvent"));
+const FortuneHome = lazy(() => import("pages/fortune/FortuneHome"));
+const Numerology = lazy(() => import("pages/fortune/Numerology"));
+const TuVi = lazy(() => import("pages/fortune/TuVi"));
+const FortuneProfiles = lazy(() => import("pages/fortune/Profiles"));
 
 const withSuspense = (element) => (
   <Suspense fallback={<OvalLoading />}>{element}</Suspense>
@@ -56,6 +60,9 @@ export default function Router() {
         { path: '/stories/short-stories/:storySlug', element: <ShortStory /> },
         { path: '/blogs', element: <BlogList /> },
         { path: '/blogs/:blogSlug', element: <Blog /> },
+        { path: '/fortune', element: withSuspense(<FortuneHome />) },
+        { path: '/fortune/numerology', element: withSuspense(<Numerology />) },
+        { path: '/fortune/tu-vi', element: withSuspense(<TuVi />) },
       ]
     },
 
@@ -67,6 +74,7 @@ export default function Router() {
         { path: '/events', element: withSuspense(<InvitationList />) },
         { path: '/events/create', element: withSuspense(<CreateEvent />) },
         { path: '/events/:eventId', element: withSuspense(<Event />) },
+        { path: '/fortune/profiles', element: withSuspense(<FortuneProfiles />) },
       ]
     },
 

@@ -6,6 +6,7 @@ import IconButton from '@mui/material/IconButton';
 import Drawer from '@mui/material/Drawer';
 import {
   IoMenu, IoClose, IoHomeOutline, IoNewspaperOutline, IoLibraryOutline, IoTicketOutline, IoCreateOutline,
+  IoSparklesOutline,
 } from 'react-icons/io5';
 import RequestSignInDialog from 'components/dialog/RequestSignInDialog';
 import UserMenu from 'components/UserMenu';
@@ -16,6 +17,7 @@ import styles from './SiteHeader.module.scss';
 export const NAV_ITEMS = [
   { to: '/blogs', label: 'Blog', icon: <IoNewspaperOutline /> },
   { to: '/stories', label: 'Truyện', icon: <IoLibraryOutline /> },
+  { to: '/fortune', label: 'Tử vi', icon: <IoSparklesOutline /> },
   { to: '/events', label: 'Thư mời', icon: <IoTicketOutline />, isProtected: true },
 ];
 

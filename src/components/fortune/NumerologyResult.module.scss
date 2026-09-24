@@ -1,0 +1,198 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 32px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.hero {
+  text-align: center;
+}
+
+.lifePath {
+  margin-top: 4px;
+  font-family: var(--font-serif);
+  font-size: clamp(6rem, 12vw, 8.8rem);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--brand-text);
+}
+
+.lifePathTitle {
+  margin-top: 10px;
+  font-family: var(--font-serif);
+  font-size: 2.2rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.tile {
+  padding: 14px 8px;
+  text-align: center;
+  background: var(--surface-2);
+  border-radius: var(--radius);
+}
+
+.tileValue {
+  font-family: var(--font-serif);
+  font-size: 2.8rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text);
+}
+
+.tileLabel {
+  font-size: 1.3rem;
+  color: var(--text-2);
+}
+
+.subTitle {
+  margin-bottom: 10px;
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.chartRow {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 64px);
+  grid-auto-rows: 64px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-serif);
+  font-size: 1.9rem;
+  font-weight: 600;
+  color: var(--text);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  word-break: break-all;
+  text-align: center;
+
+  &:nth-child(3n) {
+    border-right: none;
+  }
+
+  &:nth-last-child(-n + 3) {
+    border-bottom: none;
+  }
+}
+
+.cellEmpty {
+  font-weight: 400;
+  color: var(--text-3);
+  opacity: 0.45;
+}
+
+.arrows {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 8px;
+
+  .subTitle {
+    flex-basis: 100%;
+    margin-bottom: 2px;
+  }
+}
+
+.chip {
+  padding: 4px 12px;
+  font-size: 1.4rem;
+  font-weight: 600;
+  border-radius: 999px;
+}
+
+.chipStrong {
+  color: var(--brand-text);
+  background: var(--brand-soft);
+}
+
+.chipEmpty {
+  color: var(--text-2);
+  background: var(--surface-2);
+  border: 1px dashed var(--border-strong);
+}
+
+.peaks {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: -14px;
+}
+
+.peak {
+  padding: 12px 8px;
+  text-align: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.peakAge {
+  font-size: 1.3rem;
+  color: var(--text-2);
+}
+
+.peakValue {
+  font-family: var(--font-serif);
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.brand {
+  font-size: 1.2rem;
+  letter-spacing: 0.08em;
+  text-align: right;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+@media (max-width: 600px) {
+  .card {
+    padding: 20px;
+  }
+
+  .chartRow {
+    grid-template-columns: 1fr;
+  }
+
+  .grid {
+    justify-self: center;
+  }
+
+  .peaks {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 380px) {
+  .tiles {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

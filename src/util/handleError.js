@@ -18,6 +18,9 @@ export default async function handleError(response, message) {
         case 404:
             toast.error('Không tìm thấy tài nguyên!');
             break;
+        case 429:
+            toast.error(message ?? 'Bạn thao tác quá nhanh, vui lòng thử lại sau giây lát.');
+            break;
         default:
             break;
     }

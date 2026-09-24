@@ -67,6 +67,39 @@ async function get(url = '') {
     }
 }
 
+async function send(method, url = '', data) {
+    try {
+        const token = localStorage.getItem('token');
+        const requestConfigs = {
+            method,
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+        };
+        if (data !== undefined) {
+            requestConfigs.body = JSON.stringify(data);
+        }
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/${url}`, requestConfigs);
+        const dataRes = await response.json();
+
+        if (!dataRes.meta.ok) {
+            handleError(response, dataRes.meta.message);
+            throw ServerError(dataRes.meta.message);
+        }
+
+        return dataRes.data;
+    } catch (err) {
+        if (err.name !== 'SERVER_ERROR') {
+            toast.error("Xảy ra lỗi, vui lòng thử lại!");
+        }
+        throw err;
+    }
+}
+
+const put = (url, data = {}) => send('PUT', url, data);
+const del = (url) => send('DELETE', url);
+
 async function authenticate(route, data) {
     const response = await post(route, data);
     const token = response.token;
@@ -93,4 +126,4 @@ export const authRouteList = {
     'default': 'api/auth/local'
 }
 
-export const request = { get, post, authenticate };
+export const request = { get, post, put, del, authenticate };
