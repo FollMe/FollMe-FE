@@ -34,6 +34,7 @@ export default function SelectChap() {
                 console.log(err.message);
             }
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [storySlug])
 
     if (isLoading) {

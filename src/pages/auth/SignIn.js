@@ -69,6 +69,7 @@ export default function SignIn() {
       })
       window.google.accounts.id.prompt();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {

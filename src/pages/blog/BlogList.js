@@ -39,6 +39,7 @@ export default function BlogList() {
       if (value) {
         getBlogs(value);
       }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
   const getBlogs = useCallback(async (sort) => {
@@ -66,12 +67,14 @@ export default function BlogList() {
     } finally {
       setIsLoading(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     document.title = "Blog | FollMe";
     const sort = searchParams.get('sort')
     getBlogs(sort);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const showFeatured = sort === '-updatedAt' && blogs.length > 2;

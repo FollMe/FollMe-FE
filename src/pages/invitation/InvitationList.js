@@ -52,6 +52,7 @@ export default function InvitationList() {
     }
   }, []);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchEventListener = useCallback(debounce(handleFetchEvent, 200), []);
 
   useEffect(() => {
@@ -86,6 +87,7 @@ export default function InvitationList() {
     return () => {
       window.removeEventListener('scroll', fetchEventListener);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

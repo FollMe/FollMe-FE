@@ -127,6 +127,7 @@ export function CommentContainer({ storySlug, writerId }) {
         }
       }
     ])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [comments])
 
   useEffect(() => {
@@ -180,6 +181,7 @@ export function CommentContainer({ storySlug, writerId }) {
       window.removeEventListener("resize", resize);
       removeActions(["commented", "typing_cmt_post"]);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storySlug])
 
   return (

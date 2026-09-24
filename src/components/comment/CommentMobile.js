@@ -38,6 +38,7 @@ function CommentMobile({ open, setOpen, comments, handlePosting, isPosting, isOt
     if (window.location.search.includes("show_comments=true") && !open) {
       window.history.replaceState({}, document.title, window.location.href.split("?")[0]);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   React.useEffect(() => {
@@ -48,6 +49,7 @@ function CommentMobile({ open, setOpen, comments, handlePosting, isPosting, isOt
     if (lastedCmt.new && lastedCmt.author.id === userInfo._id) {
       bottomCommentListRef.current?.scrollIntoView({ behavior: "smooth" })
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [comments])
 
   React.useEffect(() => {

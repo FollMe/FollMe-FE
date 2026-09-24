@@ -15,12 +15,14 @@ export default function AuthMainLayout({ isProtected }) {
     if (!isLoggedIn) {
       setUserInfo({});
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoggedIn])
 
   useEffect(() => {
     if (isLoggedIn) {
       regisToServer()
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoggedIn, wsSend])
 
   async function regisToServer() {

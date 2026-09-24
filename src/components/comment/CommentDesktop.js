@@ -30,6 +30,7 @@ export function CommentDesktop({ open, setOpen, comments, handlePosting, isPosti
     if (lastedCmt.new && lastedCmt.author.id === userInfo._id) {
       bottomCommentListRef.current?.scrollIntoView({ behavior: "smooth" })
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [comments])
 
   return (
