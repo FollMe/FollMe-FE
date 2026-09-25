@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import Tooltip from '@mui/material/Tooltip';
 import { IoHelpCircleOutline } from 'react-icons/io5';
 import { RULE_LABELS } from 'util/fortune';
@@ -35,6 +36,44 @@ function WhyTooltip({ ruleIds }) {
   );
 }
 
+function ReadingDetail({ detail }) {
+  return (
+    <div className={styles.detail}>
+      <div className={styles.detailLabel}>{detail.label}</div>
+      {detail.items?.length > 0 ? (
+        <ul className={styles.detailList}>
+          {detail.items.map(line => <li key={line}>{line}</li>)}
+        </ul>
+      ) : (
+        <p className={styles.detailText}>{detail.text}</p>
+      )}
+    </div>
+  );
+}
+
+function ReadingItem({ item }) {
+  const isFeatured = Boolean(item.details?.length);
+  return (
+    <article className={clsx(styles.item, isFeatured && styles.featured)}>
+      <div className={styles.itemHead}>
+        <div>
+          <h3 className={styles.itemTitle}>{item.title}</h3>
+          {item.tagline && <div className={styles.tagline}>{item.tagline}</div>}
+          {item.hint && <div className={styles.hint}>{item.hint}</div>}
+        </div>
+        <WhyTooltip ruleIds={item.sourceRuleIds} />
+      </div>
+      <p className={styles.itemText}>{item.text}</p>
+      {isFeatured && (
+        <div className={styles.details}>
+          {item.details.map(detail => <ReadingDetail key={detail.label} detail={detail} />)}
+        </div>
+      )}
+      {item.shareLine && <blockquote className={styles.shareLine}>{item.shareLine}</blockquote>}
+    </article>
+  );
+}
+
 /** Readings grouped by section, each with a "why?" tooltip naming its rules. */
 export default function ReadingList({ readings = [] }) {
   const sections = [];
@@ -52,15 +91,7 @@ export default function ReadingList({ readings = [] }) {
       {sections.map(section => (
         <section key={section.id} className={styles.section}>
           <h2 className={styles.sectionTitle}>{SECTION_TITLES[section.id] ?? section.id}</h2>
-          {section.items.map(item => (
-            <article key={item.id} className={styles.item}>
-              <div className={styles.itemHead}>
-                <h3 className={styles.itemTitle}>{item.title}</h3>
-                <WhyTooltip ruleIds={item.sourceRuleIds} />
-              </div>
-              <p className={styles.itemText}>{item.text}</p>
-            </article>
-          ))}
+          {section.items.map(item => <ReadingItem key={item.id} item={item} />)}
         </section>
       ))}
     </div>

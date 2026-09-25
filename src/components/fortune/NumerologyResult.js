@@ -25,7 +25,7 @@ function NumberTile({ label, number }) {
  * The shareable numerology card. It deliberately shows no name or birth date,
  * so exporting it as an image does not leak personal data.
  */
-const NumerologyResult = forwardRef(function NumerologyResult({ result, lifePathTitle }, ref) {
+const NumerologyResult = forwardRef(function NumerologyResult({ result, lifePathTitle, shareLine }, ref) {
   const presentArrows = result.birthChart.arrows?.filter(a => a.present) ?? [];
   const emptyArrows = result.birthChart.arrows?.filter(a => !a.present) ?? [];
 
@@ -35,6 +35,7 @@ const NumerologyResult = forwardRef(function NumerologyResult({ result, lifePath
         <div className="eyebrow">Số chủ đạo</div>
         <div className={styles.lifePath}>{result.lifePath.display}</div>
         {lifePathTitle && <div className={styles.lifePathTitle}>{lifePathTitle}</div>}
+        {shareLine && <p className={styles.shareLine}>“{shareLine}”</p>}
       </div>
 
       <div className={styles.tiles}>

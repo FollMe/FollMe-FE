@@ -17,7 +17,6 @@ export default function Numerology() {
   }, []);
 
   const lifePathReading = data?.readings.find(r => r.id.startsWith('num.life_path.'));
-  const lifePathTitle = lifePathReading?.title.split(': ').slice(1).join(': ');
 
   return (
     <div className="container page">
@@ -54,7 +53,12 @@ export default function Numerology() {
             />
           </div>
           <div className={styles.narrow}>
-            <NumerologyResult ref={cardRef} result={data.result} lifePathTitle={lifePathTitle} />
+            <NumerologyResult
+              ref={cardRef}
+              result={data.result}
+              lifePathTitle={lifePathReading?.tagline}
+              shareLine={lifePathReading?.shareLine}
+            />
           </div>
           <div className={styles.narrow}>
             <ReadingList readings={data.readings} />

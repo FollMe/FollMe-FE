@@ -30,6 +30,16 @@
   color: var(--text);
 }
 
+.shareLine {
+  max-width: 440px;
+  margin: 10px auto 0;
+  font-family: var(--font-serif);
+  font-size: 1.7rem;
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+
 .tiles {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
