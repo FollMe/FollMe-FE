@@ -19,12 +19,14 @@ import MonthCalendar from './MonthCalendar';
 import MusicToggle from './MusicToggle';
 import GiftBox from './GiftBox';
 import ScratchReveal from './ScratchReveal';
+import PhotoAlbum from './PhotoAlbum';
 import { getAlmanac, lunarMonthLabel } from 'util/fortune';
 import { RSVP_LABELS, eventHeadline, invitationApi, isCoupleEvent, savePublicGuest } from 'util/invitation';
 import { track } from 'util/analytics';
 import { vnWallClock } from 'util/date';
 import { burst } from 'util/confetti';
 import { MusicBox, canPlayMusic } from 'util/musicBox';
+import { cldUrl } from 'util/photos';
 import styles from './InvitationView.module.scss';
 
 const WEEKDAYS = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
@@ -126,6 +128,11 @@ function prefersReducedMotion() {
   return typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 }
 
+/** Guests scanning the QR on the venue screen land on the wishes, not the envelope. */
+function opensOnWishes() {
+  return typeof window !== 'undefined' && window.location.hash === '#loi-chuc';
+}
+
 function Ornament({ glyph = '✦' }) {
   return (
     <div className={styles.ornament} aria-hidden>
@@ -153,7 +160,7 @@ export default function InvitationView({
   const [lunar, setLunar] = useState(null);
   const [wishes, setWishes] = useState(initialWishes);
   const [showQR, setShowQR] = useState(false);
-  const [isOpen, setIsOpen] = useState(() => embedded || prefersReducedMotion());
+  const [isOpen, setIsOpen] = useState(() => embedded || prefersReducedMotion() || opensOnWishes());
   const theme = event.theme || 'minimal';
   const couple = isCoupleEvent(event.type) && event.groomName && event.brideName;
   const shownEndAt = vnWallClock(startAt.getTime() + 3 * 60 * 60 * 1000);
@@ -164,10 +171,19 @@ export default function InvitationView({
   const withScratch = !embedded && (event.scratchDate ?? isCoupleEvent(event.type));
   const music = useMusic(withMusic);
   const dateKey = dayjs(shownAt).format('YYYY-MM-DD');
+  const photos = event.photos ?? [];
+  const cover = photos[0];
 
   useEffect(() => {
     setWishes(initialWishes);
   }, [initialWishes]);
+
+  // The browser jumped to #loi-chuc before the invitation was rendered
+  useEffect(() => {
+    if (!embedded && opensOnWishes()) {
+      document.getElementById('loi-chuc')?.scrollIntoView();
+    }
+  }, [embedded]);
 
   useEffect(() => {
     // The lunar date is a nicety: never bother a guest with its errors
@@ -186,7 +202,7 @@ export default function InvitationView({
   }, [theme, demo]);
 
   return (
-    <div className={clsx(styles.page, styles[theme], embedded && styles.embedded)}>
+    <div className={clsx(styles.page, styles[theme], embedded && styles.embedded, isOpen && styles.opened)}>
       {!isOpen && (
         <Envelope
           theme={theme}
@@ -202,6 +218,15 @@ export default function InvitationView({
       {/* ---------- Cover ---------- */}
       <section className={styles.cover}>
         <div className={styles.coverFrame}>
+          {cover && (
+            <figure className={styles.coverPhoto}>
+              <img
+                src={cldUrl(cover.url, 'w_600,h_750,c_fill,g_faces')}
+                alt={couple ? `${event.groomName} và ${event.brideName}` : ''}
+                fetchpriority="high"
+              />
+            </figure>
+          )}
           <p className={styles.kicker}>{couple ? 'Save the date' : 'Thư mời'}</p>
           <p className={styles.invite}>
             Trân trọng kính mời <strong>{recipient === 'Bạn' ? 'bạn' : recipient}</strong>
@@ -217,7 +242,7 @@ export default function InvitationView({
           ) : (
             <h1 className={clsx(styles.title, styles.shimmer)}>{event.title}</h1>
           )}
-          <div className={styles.seal} aria-hidden>{couple ? '囍' : '✦'}</div>
+          {!cover && <div className={styles.seal} aria-hidden>{couple ? '囍' : '✦'}</div>}
           {withScratch ? (
             <ScratchReveal
               className={styles.coverScratch}
@@ -242,6 +267,15 @@ export default function InvitationView({
           <p className={styles.message}>{event.message}</p>
           <Ornament />
         </Reveal>
+      )}
+
+      {/* ---------- Album ---------- */}
+      {photos.length > 1 && (
+        <section id="album" className={styles.section}>
+          <Reveal>
+            <PhotoAlbum photos={photos} title={couple ? 'Khoảnh khắc' : 'Hình ảnh'} demo={demo} />
+          </Reveal>
+        </section>
       )}
 
       {/* ---------- When ---------- */}

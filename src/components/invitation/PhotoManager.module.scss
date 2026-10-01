@@ -1,0 +1,106 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tile {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface-2);
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.busy img {
+  opacity: 0.45;
+}
+
+.spinner {
+  position: absolute;
+  top: calc(50% - 14px);
+  left: calc(50% - 14px);
+}
+
+.badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.62);
+  color: #ffffff;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.actions {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: 6px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+
+  button {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #1c1917;
+    font-size: 1.6rem;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background: #ffffff;
+    }
+  }
+
+  .danger {
+    color: #b42318;
+  }
+}
+
+.add {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  aspect-ratio: 1;
+  border: 1.5px dashed var(--border-strong, var(--border));
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-2);
+  font: inherit;
+  font-size: 1.35rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  svg {
+    font-size: 2.6rem;
+  }
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--brand, currentColor);
+    color: var(--text);
+  }
+}

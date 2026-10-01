@@ -64,7 +64,21 @@ export const invitationApi = {
   hostGet: (eventId) => request.get(`api/events/${eventId}`),
   hideWish: (eventId, wishId) => request.put(`api/events/${eventId}/wishes/${wishId}/hide`),
   unhideWish: (eventId, wishId) => request.del(`api/events/${eventId}/wishes/${wishId}/hide`),
+  addPhoto: (eventId, blob) => {
+    const form = new FormData();
+    form.append('photo', blob, 'photo.jpg');
+    return request.post(`api/events/${eventId}/photos`, form, true);
+  },
+  removePhoto: (eventId, photoId) => request.del(`api/events/${eventId}/photos/${photoId}`),
+  orderPhotos: (eventId, order) => request.put(`api/events/${eventId}/photos/order`, { order }),
+  screenKey: (eventId, rotate = false) => request.post(`api/events/${eventId}/screen-key`, { rotate }),
+  screen: (eventId, key, since) => request.get(
+    `api/events/${eventId}/screen/${key}${since ? `?since=${encodeURIComponent(since)}` : ''}`,
+    { quiet: Boolean(since) },
+  ),
 };
+
+export const MAX_PHOTOS = 12;
 
 // Someone who answered on a public link gets a guest id; remember it so
 // they can change their answer from the same browser.
@@ -88,6 +102,15 @@ export function savePublicGuest(eventId, guest) {
 
 export function publicInvitationUrl(eventId) {
   return `${window.location.origin}/e/${eventId}`;
+}
+
+/** Where guests at the party land from the QR on the venue screen. */
+export function wishesUrl(eventId) {
+  return `${window.location.origin}/e/${eventId}#loi-chuc`;
+}
+
+export function screenUrl(eventId, key) {
+  return `${window.location.origin}/man-hinh/${eventId}/${key}`;
 }
 
 export function personalInvitationUrl(guestId) {

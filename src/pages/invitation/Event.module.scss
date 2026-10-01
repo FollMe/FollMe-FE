@@ -78,7 +78,8 @@
     font-weight: 700;
   }
 
-  span {
+  > span,
+  .panelTools > span {
     font-size: 1.35rem;
     color: var(--text-3);
   }
@@ -214,4 +215,46 @@
 
 .hidden {
   opacity: 0.55;
+}
+
+.panelTools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panelHint {
+  margin: -8px 0 14px;
+  font-size: 1.35rem;
+  color: var(--text-3);
+}
+
+.screenPanel {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.screenIcon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--brand-soft);
+  color: var(--brand-text);
+  font-size: 2.8rem;
+}
+
+.warn {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--info-soft);
+}
+
+@media (max-width: 560px) {
+  .screenIcon {
+    display: none;
+  }
 }

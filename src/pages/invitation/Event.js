@@ -10,14 +10,18 @@ import QRCode from 'react-qr-code';
 import dayjs from 'dayjs';
 import {
   IoTimeOutline, IoLocationOutline, IoCopyOutline, IoCheckmark, IoEyeOutline, IoCreateOutline, IoShareSocialOutline,
-  IoEyeOffOutline, IoSparkles,
+  IoEyeOffOutline, IoSparkles, IoDownloadOutline, IoTvOutline, IoRefresh,
 } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
 import ArticleHeader from 'components/article/ArticleHeader';
 import InvitationStatusTag from 'components/invitation/InvitationStatusTag';
+import PhotoManager from 'components/invitation/PhotoManager';
 import {
-  RSVP_LABELS, eventHeadline, invitationApi, personalInvitationUrl, publicInvitationUrl,
+  MAX_PHOTOS, RSVP_LABELS, eventHeadline, invitationApi, isCoupleEvent, personalInvitationUrl, publicInvitationUrl,
+  screenUrl,
 } from 'util/invitation';
+import { downloadCsv } from 'util/csv';
+import { track } from 'util/analytics';
 import styles from "./Event.module.scss";
 
 function CopyButton({ text, label = 'Copy link', variant = 'icon' }) {
@@ -45,6 +49,86 @@ function CopyButton({ text, label = 'Copy link', variant = 'icon' }) {
         {copied ? <IoCheckmark /> : <IoCopyOutline />}
       </button>
     </Tooltip>
+  );
+}
+
+/** The guest list as spreadsheet rows, for seating plans and thank-you notes. */
+export function guestRows(guests) {
+  return [
+    ['Tên', 'Trả lời', 'Số người', 'Lời nhắn', 'Nguồn', 'Lượt mở', 'Email', 'Link riêng'],
+    ...guests.map(g => [
+      g.name,
+      g.rsvp ? RSVP_LABELS[g.rsvp.status] : 'Chưa trả lời',
+      g.rsvp?.status === 'attending' || g.rsvp?.status === 'maybe' ? g.rsvp.count || 1 : '',
+      g.rsvp?.note ?? '',
+      g.source === 'public' ? 'Link chung' : 'Mời riêng',
+      g.viewed ?? 0,
+      g.mail ?? '',
+      g.source === 'public' ? '' : personalInvitationUrl(g._id),
+    ]),
+  ];
+}
+
+/** Link of the wishes wall for the TV at the party, for whoever runs it. */
+function ScreenPanel({ event, onEnablePublicLink }) {
+  const [key, setKey] = useState(null);
+
+  useEffect(() => {
+    invitationApi.screenKey(event._id).then(res => setKey(res.key)).catch(() => setKey(null));
+  }, [event._id]);
+
+  async function rotate() {
+    if (!window.confirm('Tạo link mới? Link cũ (và màn hình đang mở bằng link cũ) sẽ ngừng hoạt động.')) {
+      return;
+    }
+    try {
+      const res = await invitationApi.screenKey(event._id, true);
+      setKey(res.key);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const url = key && screenUrl(event._id, key);
+  return (
+    <section className={clsx(styles.panel, styles.screenPanel)}>
+      <div className={styles.screenIcon} aria-hidden><IoTvOutline /></div>
+      <div className={styles.shareText}>
+        <h2>Màn hình lời chúc tại tiệc</h2>
+        <p>
+          Chiếu lên TV hoặc máy chiếu ở tiệc: khách quét mã QR trên màn hình, viết lời chúc trên điện thoại và lời chúc
+          hiện lên sau vài giây. Gửi link cho bên âm thanh ánh sáng, họ không cần tài khoản.
+        </p>
+        {!event.allowPublicLink && (
+          <p className={styles.warn}>
+            Mã QR trên màn hình dẫn tới link chung, đang tắt.{' '}
+            <Button size="small" onClick={onEnablePublicLink}>Bật link chung</Button>
+          </p>
+        )}
+        {url && <code className={styles.url}>{url}</code>}
+        <div className={styles.shareActions}>
+          {url && (
+            <Button
+              component="a"
+              href={url}
+              target="_blank"
+              rel="noreferrer"
+              variant="contained"
+              size="small"
+              startIcon={<IoTvOutline />}
+              onClick={() => track('screen_opened')}
+            >
+              Mở màn hình
+            </Button>
+          )}
+          {url && <CopyButton text={url} variant="button" label="Copy link" />}
+          {url && <Button size="small" startIcon={<IoRefresh />} onClick={rotate}>Đổi link</Button>}
+          <Button component={Link} to={`/man-hinh/mau?theme=${event.theme || 'night'}`} target="_blank" size="small">
+            Xem mẫu
+          </Button>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -181,7 +265,10 @@ export default function Event() {
           <IoSparkles />
           <div>
             <strong>Thiệp đã sẵn sàng!</strong>
-            <p>Gửi link chung vào nhóm Zalo, Messenger, hoặc copy link riêng của từng khách ở bảng bên dưới.</p>
+            <p>
+              Thêm vài tấm ảnh cưới để thiệp có ảnh bìa và album, rồi gửi link chung vào nhóm Zalo, Messenger, hoặc copy
+              link riêng của từng khách ở bảng bên dưới.
+            </p>
           </div>
         </div>
       )}
@@ -229,8 +316,40 @@ export default function Event() {
 
       <section className={styles.panel}>
         <div className={styles.panelHead}>
+          <h2>{isCoupleEvent(event.type) ? 'Ảnh cưới' : 'Hình ảnh'}</h2>
+          <span>{(event.photos ?? []).length}/{MAX_PHOTOS}</span>
+        </div>
+        <p className={styles.panelHint}>
+          Ảnh đầu tiên là ảnh bìa của thiệp, cũng là ảnh hiện ra khi gửi link qua Zalo, Messenger. Từ 2 ảnh trở lên, thiệp
+          có thêm album.
+        </p>
+        <PhotoManager
+          eventId={eventId}
+          photos={event.photos ?? []}
+          onChange={update => setEvent(e => ({ ...e, photos: update(e.photos ?? []) }))}
+        />
+      </section>
+
+      <ScreenPanel event={event} onEnablePublicLink={enablePublicLink} />
+
+      <section className={styles.panel}>
+        <div className={styles.panelHead}>
           <h2>Khách & xác nhận</h2>
-          <span>{guests.length} người</span>
+          <div className={styles.panelTools}>
+            <span>{guests.length} người</span>
+            {guests.length > 0 && (
+              <Button
+                size="small"
+                startIcon={<IoDownloadOutline />}
+                onClick={() => {
+                  downloadCsv(`khach-moi-${dayjs(event.startAt).format('YYYY-MM-DD')}.csv`, guestRows(guests));
+                  track('guests_exported');
+                }}
+              >
+                Tải danh sách
+              </Button>
+            )}
+          </div>
         </div>
         <Box sx={{ height: 440, width: '100%' }}>
           <DataGrid
