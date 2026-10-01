@@ -59,6 +59,8 @@ export default function CreateEvent() {
       gifts: [],
     };
   });
+  // Managed on the event page; shown here in the preview only
+  const [photos, setPhotos] = useState([]);
   const [effectsTouched, setEffectsTouched] = useState(false);
   const [titleTouched, setTitleTouched] = useState(false);
   const [guests, setGuests] = useState([]);
@@ -95,6 +97,7 @@ export default function CreateEvent() {
           scratchDate: invitation.scratchDate ?? isCoupleEvent(invitation.type),
           gifts: invitation.gifts ?? [],
         });
+        setPhotos(invitation.photos ?? []);
         setEffectsTouched(true);
         setTitleTouched(true);
         setIsLoading(false);
@@ -209,6 +212,7 @@ export default function CreateEvent() {
     location: form.location || 'Địa điểm tổ chức',
     message: form.message,
     gifts: normalizeGifts(form.gifts, couple).filter(isGiftComplete),
+    photos,
   };
 
   return (

@@ -78,6 +78,11 @@ async function getJson(url) {
 }
 
 const ID_RE = /^[a-f0-9]{24}$/i;
+
+/** Only https images from our photo host make it into the page. */
+function safeImage(url) {
+  return typeof url === 'string' && /^https:\/\/res\.cloudinary\.com\//.test(url) ? url : '';
+}
 const SLUG_RE = /^[a-z0-9-]{1,200}$/i;
 
 /** Works out the preview for a path, or null for the site default. */
@@ -91,7 +96,9 @@ async function resolveMeta(pathname, apiBase) {
     const data = await getJson(`${apiBase}/${path}`);
     if (data) {
       const wedding = data.type === 'wedding' || data.type === 'engagement';
-      return { title: data.title, description: data.description, image: wedding ? WEDDING_IMAGE : DEFAULT_IMAGE };
+      // The couple's cover photo when there is one
+      const fallback = wedding ? WEDDING_IMAGE : DEFAULT_IMAGE;
+      return { title: data.title, description: data.description, image: safeImage(data.image) || fallback };
     }
     return null;
   }
