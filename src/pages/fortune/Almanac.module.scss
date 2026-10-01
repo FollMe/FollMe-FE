@@ -90,7 +90,7 @@
   font-weight: 700;
   line-height: 1;
   color: var(--brand-text);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 .lunar {
@@ -224,7 +224,7 @@
 
 .hourRange {
   font-size: 1.25rem;
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 .hourSpirit {

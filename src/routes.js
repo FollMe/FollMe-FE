@@ -31,6 +31,7 @@ const ReadingListPage = lazy(() => import("pages/reading/ReadingListPage"));
 const WeddingHub = lazy(() => import("pages/wedding/WeddingHub"));
 const ChooseDate = lazy(() => import("pages/wedding/ChooseDate"));
 const PublicInvitation = lazy(() => import("pages/invitation/PublicInvitation"));
+const DemoInvitation = lazy(() => import("pages/invitation/DemoInvitation"));
 
 const withSuspense = (element) => (
   <Suspense fallback={<OvalLoading />}>{element}</Suspense>
@@ -46,6 +47,8 @@ export default function Router() {
         // The e-card has its own full-screen design
         { path: '/invitations/:id', element: withSuspense(<InvitationCard />) },
         { path: '/e/:eventId', element: withSuspense(<PublicInvitation />) },
+        { path: '/thiep-mau', element: withSuspense(<DemoInvitation />) },
+        { path: '/thiep-mau/:theme', element: withSuspense(<DemoInvitation />) },
       ]
     },
     {

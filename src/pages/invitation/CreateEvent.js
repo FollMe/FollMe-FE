@@ -11,7 +11,7 @@ import { IoSparklesOutline } from 'react-icons/io5';
 import dayjs from 'dayjs';
 
 import ArticleHeader from 'components/article/ArticleHeader';
-import ThemePreview from 'components/invitation/ThemePreview';
+import InvitationView from 'components/invitation/InvitationView';
 import OvalLoading from 'components/loading/OvalLoading';
 import {
   DEFAULT_MESSAGES, EVENT_TYPES, THEMES, invitationApi, isCoupleEvent, suggestTitle,
@@ -181,6 +181,18 @@ export default function CreateEvent() {
     return <OvalLoading />;
   }
 
+  const previewEvent = {
+    _id: 'preview',
+    type: form.type,
+    theme: form.theme,
+    title: form.title || 'Tên sự kiện',
+    groomName: form.groomName.trim(),
+    brideName: form.brideName.trim(),
+    startAt: (form.startAt?.isValid() ? form.startAt : dayjs()).toISOString(),
+    location: form.location || 'Địa điểm tổ chức',
+    message: form.message,
+  };
+
   return (
     <div className="container page">
       <ArticleHeader
@@ -307,8 +319,14 @@ export default function CreateEvent() {
         </div>
 
         <aside className={styles.previewWrap}>
-          <div className={styles.previewLabel}>Xem trước</div>
-          <ThemePreview {...form} />
+          <div className={styles.previewLabel}>Xem trước · khách sẽ thấy thế này</div>
+          <div className={styles.phone}>
+            <div className={styles.phoneScreen}>
+              <div className={styles.phoneContent}>
+                <InvitationView event={previewEvent} demo embedded />
+              </div>
+            </div>
+          </div>
         </aside>
       </form>
     </div>

@@ -4,7 +4,7 @@
   z-index: 100;
   height: var(--header-h);
   background: var(--bg);
-  background: color-mix(in srgb, var(--bg) 78%, transparent);
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
   backdrop-filter: saturate(180%) blur(14px);
   -webkit-backdrop-filter: saturate(180%) blur(14px);
   border-bottom: 1px solid transparent;
@@ -12,7 +12,7 @@
 }
 
 .scrolled {
-  border-bottom-color: var(--border);
+  border-bottom-color: color-mix(in srgb, var(--gold) 45%, transparent);
 }
 
 .inner {
@@ -31,32 +31,41 @@
 
 .navLink {
   position: relative;
-  padding: 8px 14px;
-  border-radius: 999px;
-  font-size: 1.5rem;
-  font-weight: 500;
+  padding: 8px 12px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--text-2);
   text-decoration: none;
-  transition: color 0.2s ease, background-color 0.2s ease;
+  transition: color 0.2s ease;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 2px;
+    height: 1px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s var(--ease);
+  }
 
   &:hover {
     color: var(--text);
-    background: var(--surface-2);
+
+    &::after {
+      transform: scaleX(1);
+    }
   }
 
   &.active {
-    color: var(--text);
-    font-weight: 600;
+    color: var(--brand-text);
 
     &::after {
-      content: '';
-      position: absolute;
-      left: 50%;
-      bottom: 1px;
-      width: 4px;
-      height: 4px;
-      margin-left: -2px;
-      border-radius: 50%;
+      transform: scaleX(1);
       background: var(--brand);
     }
   }
@@ -223,4 +232,33 @@
 .drawerMinor {
   font-size: 1.45rem !important;
   color: var(--text-2);
+}
+
+/* Over the home page's dark hero */
+.onDark {
+  background: transparent !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+
+  :global(a),
+  .navLink,
+  .searchTrigger,
+  :global(.MuiIconButton-root) {
+    color: #f6ead6 !important;
+  }
+
+  .navLink:hover,
+  .navLink.active {
+    color: #e6c57d !important;
+  }
+
+  .searchTrigger {
+    border-color: rgba(246, 234, 214, 0.3);
+    background: rgba(246, 234, 214, 0.06);
+  }
+
+  :global(.MuiButton-outlined) {
+    border-color: rgba(246, 234, 214, 0.4);
+    color: #f6ead6;
+  }
 }

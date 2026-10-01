@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { ECardLoading } from 'components/loading/ECardLoading';
+import InvitationLoading from 'components/invitation/InvitationLoading';
 import InvitationView from 'components/invitation/InvitationView';
 import { eventHeadline, getPublicGuest, invitationApi, savePublicGuest } from 'util/invitation';
 import { setPageMeta } from 'util/meta';
@@ -32,7 +32,7 @@ export default function PublicInvitation() {
     return <div className="container page empty-state">Thiệp mời này không tồn tại hoặc gia chủ đã tắt link chung.</div>;
   }
   if (!data) {
-    return <ECardLoading />;
+    return <InvitationLoading />;
   }
   return (
     <InvitationView

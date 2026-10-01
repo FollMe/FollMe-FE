@@ -38,9 +38,12 @@ export default function WeddingHub() {
         title="Mọi thứ cho ngày vui của hai bạn"
         description="Xem tuổi, chọn ngày và gửi thiệp cưới online ở cùng một nơi. Miễn phí, không cần cài ứng dụng."
         actions={
-          <Button component={Link} to="/events/create?type=wedding" variant="contained" size="large" endIcon={<IoArrowForward />}>
-            Tạo thiệp cưới
-          </Button>
+          <>
+            <Button component={Link} to="/thiep-mau" variant="outlined" size="large">Mở thử thiệp mẫu</Button>
+            <Button component={Link} to="/events/create?type=wedding" variant="contained" size="large" endIcon={<IoArrowForward />}>
+              Tạo thiệp cưới
+            </Button>
+          </>
         }
       />
 

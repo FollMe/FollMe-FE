@@ -15,7 +15,7 @@ export default function ThemeShowcase() {
   return (
     <div className={styles.showcase}>
       {THEMES.map(t => (
-        <Link key={t.value} to={`/events/create?type=wedding`} className={styles.showcaseItem}>
+        <Link key={t.value} to={`/thiep-mau/${t.value}`} className={styles.showcaseItem}>
           <ThemePreview theme={t.value} type="wedding" {...SAMPLES[t.value]} />
           <strong>{t.label}</strong>
           <span>{t.hint}</span>

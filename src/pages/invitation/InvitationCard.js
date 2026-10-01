@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { ECardLoading } from 'components/loading/ECardLoading';
+import InvitationLoading from 'components/invitation/InvitationLoading';
 import InvitationView from 'components/invitation/InvitationView';
 import { eventHeadline, invitationApi } from 'util/invitation';
 import { setPageMeta } from 'util/meta';
@@ -35,7 +35,7 @@ export default function InvitationCard() {
     return <div className="container page empty-state">Không tìm thấy thiệp mời này.</div>;
   }
   if (!data) {
-    return <ECardLoading />;
+    return <InvitationLoading />;
   }
 
   const { event, wishes, ...guest } = data;

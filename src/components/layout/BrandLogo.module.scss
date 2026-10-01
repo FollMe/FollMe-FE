@@ -8,32 +8,51 @@
 }
 
 .mark {
+  display: grid;
+  place-items: center;
   width: 34px;
   height: 34px;
+  border-radius: 9px;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.22), transparent 55%),
+    var(--brand);
+  box-shadow: inset 0 0 0 2px var(--brand), inset 0 0 0 3px var(--gold);
+  color: var(--on-brand);
+  font-family: var(--font-serif);
+  font-size: 2.4rem;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 1;
+  transform: rotate(-4deg);
   transition: transform 0.4s var(--ease);
 }
 
 .brand:hover .mark {
-  transform: rotate(-12deg) scale(1.05);
+  transform: rotate(4deg) scale(1.06);
 }
 
 .word {
-  font-size: 2rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-family: var(--font-serif);
+  font-size: 2.6rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1;
 
-  span {
+  em {
     color: var(--brand);
+    font-style: italic;
+    font-weight: 600;
   }
 }
 
 .lg {
   .mark {
-    width: 42px;
-    height: 42px;
+    width: 44px;
+    height: 44px;
+    font-size: 3rem;
   }
 
   .word {
-    font-size: 2.4rem;
+    font-size: 3.2rem;
   }
 }

@@ -1,40 +1,49 @@
 /* ==========================================================================
    Design tokens
    ========================================================================== */
+/* "Sơn mài & Giấy dó": red lacquer and gold leaf on warm rice paper. */
 :root {
   --font-sans: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-serif: 'Lora', Georgia, 'Times New Roman', serif;
+  /* Display serif for titles; long-form reading keeps a sturdier serif. */
+  --font-serif: 'Cormorant Garamond', 'Lora', Georgia, 'Times New Roman', serif;
+  --font-reading: 'Lora', Georgia, 'Times New Roman', serif;
+  --font-hand: 'Dancing Script', 'Cormorant Garamond', cursive;
   --font-mono: ui-monospace, SFMono-Regular, 'Cascadia Code', Menlo, Consolas, monospace;
 
-  --brand: #ea580c;
-  --brand-hover: #c2410c;
-  --brand-text: #c2410c;
-  --brand-soft: #fff1e7;
-  --brand-soft-2: #ffe2cf;
-  --on-brand: #ffffff;
+  --brand: #a3201e;
+  --brand-hover: #821614;
+  --brand-text: #9a1c1a;
+  --brand-soft: #f5e2d8;
+  --brand-soft-2: #ecc9bb;
+  --on-brand: #fff8ef;
+  --gold: #b0843a;
+  --gold-soft: #ecdcb8;
 
-  --bg: #faf8f5;
-  --surface: #ffffff;
-  --surface-2: #f4f1ec;
-  --surface-3: #ebe6df;
-  --border: #e8e2d9;
-  --border-strong: #d6cec2;
-  --text: #1c1917;
-  --text-2: #57534e;
-  --text-3: #8a837a;
-  --danger: #dc2626;
-  --success: #15803d;
+  --bg: #f4ecdd;
+  --surface: #fbf7ef;
+  --surface-2: #efe5d3;
+  --surface-3: #e6d8c0;
+  --border: #e2d3ba;
+  --border-strong: #cdb896;
+  --text: #241612;
+  --text-2: #5e4b42;
+  --text-3: #8c776a;
+  --danger: #b42318;
+  --success: #3f7d3a;
   --info-soft: #e8eeff;
 
-  --shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.06);
-  --shadow-md: 0 1px 2px rgba(28, 25, 23, 0.04), 0 6px 16px -4px rgba(28, 25, 23, 0.10);
-  --shadow-lg: 0 2px 6px rgba(28, 25, 23, 0.04), 0 24px 48px -16px rgba(28, 25, 23, 0.22);
-  --ring: 0 0 0 3px rgba(234, 88, 12, 0.25);
+  --shadow-sm: 0 1px 2px rgba(60, 30, 15, 0.08);
+  --shadow-md: 0 1px 2px rgba(60, 30, 15, 0.06), 0 10px 24px -8px rgba(60, 30, 15, 0.18);
+  --shadow-lg: 0 2px 6px rgba(60, 30, 15, 0.06), 0 30px 60px -20px rgba(60, 30, 15, 0.35);
+  --ring: 0 0 0 3px rgba(163, 32, 30, 0.25);
+
+  /* Rice-paper grain, layered under every page */
+  --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .22 0 0 0 0 .1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 
   --radius-sm: 8px;
   --radius: 14px;
   --radius-lg: 22px;
-  --header-h: 64px;
+  --header-h: 68px;
   --container: 1180px;
   --reading: 720px;
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
@@ -52,30 +61,34 @@
   color-scheme: light;
 }
 
+/* Black lacquer */
 [data-theme='dark'] {
-  --brand: #f26b2c;
-  --brand-hover: #ff8446;
-  --brand-text: #ff9a63;
-  --brand-soft: rgba(242, 107, 44, 0.14);
-  --brand-soft-2: rgba(242, 107, 44, 0.24);
+  --brand: #d9463c;
+  --brand-hover: #ee5d52;
+  --brand-text: #f08a7e;
+  --brand-soft: rgba(217, 70, 60, 0.14);
+  --brand-soft-2: rgba(217, 70, 60, 0.26);
+  --on-brand: #fff8ef;
+  --gold: #d8b46a;
+  --gold-soft: rgba(216, 180, 106, 0.18);
 
-  --bg: #111010;
-  --surface: #1a1817;
-  --surface-2: #232120;
-  --surface-3: #2d2a28;
-  --border: #2e2b29;
-  --border-strong: #423d39;
-  --text: #eeeae4;
-  --text-2: #b8b0a6;
-  --text-3: #877f76;
+  --bg: #120c0a;
+  --surface: #1b1310;
+  --surface-2: #251a16;
+  --surface-3: #30231d;
+  --border: #33251f;
+  --border-strong: #4a3830;
+  --text: #f3e9da;
+  --text-2: #c8b8a4;
+  --text-3: #8f7e6e;
   --danger: #f87171;
-  --success: #4ade80;
+  --success: #86c17c;
   --info-soft: rgba(99, 122, 255, 0.18);
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 20px -6px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 2px 6px rgba(0, 0, 0, 0.3), 0 24px 48px -16px rgba(0, 0, 0, 0.7);
-  --ring: 0 0 0 3px rgba(242, 107, 44, 0.35);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 24px -8px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 2px 6px rgba(0, 0, 0, 0.4), 0 30px 60px -20px rgba(0, 0, 0, 0.8);
+  --ring: 0 0 0 3px rgba(217, 70, 60, 0.35);
 
   color-scheme: dark;
 }
@@ -103,10 +116,12 @@ body {
   min-width: 300px;
   margin: 0;
   overflow-x: hidden;
-  background: var(--bg);
+  background: var(--paper-grain), var(--bg);
   color: var(--text);
   font-size: 1.6rem;
   line-height: 1.6;
+  /* Cormorant defaults to old-style figures, where 1 looks like I */
+  font-variant-numeric: lining-nums;
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
@@ -308,7 +323,7 @@ svg.MuiSvgIcon-root {
 
 /* Long-form content rendered from HTML / plain text */
 .prose {
-  font-family: var(--font-serif);
+  font-family: var(--font-reading);
   font-size: 1.85rem;
   line-height: 1.8;
   color: var(--text);

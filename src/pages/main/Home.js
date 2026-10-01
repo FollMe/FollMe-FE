@@ -1,19 +1,13 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import Button from '@mui/material/Button';
-import {
-  IoArrowForward, IoHeartOutline, IoGridOutline, IoCalculatorOutline, IoNewspaperOutline, IoLibraryOutline,
-  IoLogoGithub, IoCheckmarkCircle,
-} from 'react-icons/io5';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { IoArrowForward, IoNewspaperOutline, IoLibraryOutline, IoLogoGithub, IoSparklesOutline } from 'react-icons/io5';
 import Reveal from 'components/Reveal';
+import Petals from 'components/invitation/Petals';
 import TodayAlmanacCard from 'components/almanac/TodayAlmanacCard';
 import ContinueReading from 'components/reading/ContinueReading';
-import ThemePreview from 'components/invitation/ThemePreview';
-import WeddingJourney from 'components/wedding/WeddingJourney';
-import ThemeShowcase from 'components/wedding/ThemeShowcase';
 import { getStoryLink } from 'components/story/StoryItem';
-import { useUserInfo } from 'customHooks/useUserInfo';
-import { handleCheckLoggedIn } from 'util/authHelper';
+import { THEMES } from 'util/invitation';
+import { DEMO_WISHES } from 'util/demoInvitation';
 import { formatLongDate } from 'util/date';
 import { setPageMeta } from 'util/meta';
 import { track } from 'util/analytics';
@@ -22,24 +16,106 @@ import styles from './Home.module.scss';
 
 const GITHUB_URL = 'https://github.com/sumsv50';
 
-const INVITE_FEATURES = [
-  'Thiệp đẹp trên điện thoại, 4 mẫu để chọn',
-  'Khách xác nhận tham dự, bạn biết trước số người',
-  'Sổ lưu bút: khách gửi lời chúc ngay trên thiệp',
-  'Link chung cho nhóm Zalo và mã QR để in lên thiệp giấy',
-  'Ghi kèm ngày âm lịch, chỉ đường, lưu vào lịch',
+const MARQUEE = ['Xem tuổi hợp nhau', 'Chọn ngày hoàng đạo', 'Thiệp cưới online', 'Xác nhận tham dự', 'Sổ lưu bút', 'Lịch vạn niên', 'Miễn phí'];
+
+const MORE_WISHES = [
+  { _id: 'm1', name: 'Bé Na', message: 'Chúc chú dì cưới vui, nhớ để phần bánh kem cho con nha!' },
+  { _id: 'm2', name: 'Team Marketing', message: 'Happy wedding! Cả team sẽ đến đông đủ, chuẩn bị tinh thần nha 🥂' },
+  { _id: 'm3', name: 'Ngoại', message: 'Ngoại chúc hai đứa thương nhau, bảo ban nhau mà sống.' },
+  { _id: 'm4', name: 'Long', message: 'Bạn thân lấy vợ rồi, vui mà cũng buồn. Chúc mừng mày!' },
+];
+
+/** A tiny phone that runs the real sample invitation. */
+function PhoneDemo({ theme, className }) {
+  return (
+    <div className={`${styles.phone} ${className ?? ''}`}>
+      <div className={styles.notch} aria-hidden />
+      <iframe
+        key={theme}
+        title="Thiệp cưới mẫu"
+        src={`/thiep-mau/${theme}?embed=1`}
+        loading="lazy"
+      />
+    </div>
+  );
+}
+
+function ScoreVisual() {
+  return (
+    <div className={styles.visualScore} aria-hidden>
+      <div className={styles.ring}><strong>8</strong><span>/10</span></div>
+      <div className={styles.pair}><span>🐵 Minh</span><i>♥</i><span>Lan 🐷</span></div>
+      <small>Mệnh Kim · Thổ sinh Kim</small>
+    </div>
+  );
+}
+
+function CalendarVisual() {
+  const good = [3, 8, 11, 17, 22, 26];
+  return (
+    <div className={styles.visualCalendar} aria-hidden>
+      <div className={styles.visualTitle}>Tháng 12</div>
+      <div className={styles.miniGrid}>
+        {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
+          <span key={d} className={d === 17 ? styles.picked : good.includes(d) ? styles.goodDay : undefined}>{d}</span>
+        ))}
+      </div>
+      <small>17/12 · Ngày Thanh Long hoàng đạo · 9/10</small>
+    </div>
+  );
+}
+
+function EnvelopeVisual() {
+  return (
+    <div className={styles.visualEnvelope} aria-hidden>
+      <div className={styles.miniEnvelope}>
+        <div className={styles.miniLetter}>Minh &amp; Lan</div>
+        <div className={styles.miniFront} />
+        <div className={styles.miniSeal}>囍</div>
+      </div>
+      <div className={styles.rsvpChips}>
+        <span>🥂 32 người sẽ đến</span>
+        <span>💌 18 lời chúc</span>
+      </div>
+    </div>
+  );
+}
+
+const STEPS = [
+  {
+    no: '01',
+    title: 'Xem hai bạn hợp nhau đến đâu',
+    text: 'Con giáp, thiên can, mệnh và thần số học, chấm điểm và giải thích bằng lời dễ hiểu. Gửi kết quả cho người ấy chỉ bằng một đường link.',
+    to: '/fortune/hop-tuoi',
+    cta: 'Xem tuổi',
+    visual: <ScoreVisual />,
+  },
+  {
+    no: '02',
+    title: 'Chọn một ngày thật đẹp',
+    text: 'Lọc ngày hoàng đạo không xung tuổi cô dâu chú rể, tránh tháng cô hồn, Tam Nương, Nguyệt Kỵ và ngày Tết. Có giờ tốt và cảnh báo Kim Lâu.',
+    to: '/cuoi-hoi/chon-ngay',
+    cta: 'Tìm ngày cưới',
+    visual: <CalendarVisual />,
+  },
+  {
+    no: '03',
+    title: 'Gửi một tấm thiệp biết trả lời',
+    text: 'Khách mở phong bì, xem lịch, chỉ đường, bấm xác nhận và để lại lời chúc. Bạn biết trước bao nhiêu người đến, không cần gọi từng người.',
+    to: '/events/create?type=wedding',
+    cta: 'Tạo thiệp',
+    visual: <EnvelopeVisual />,
+  },
 ];
 
 export default function Home() {
-  const navigate = useNavigate();
-  const [userInfo] = useUserInfo();
-  const isLoggedIn = useMemo(() => handleCheckLoggedIn(userInfo.sessionExp), [userInfo]);
+  const [theme, setTheme] = useState('classic');
   const [corner, setCorner] = useState([]);
 
   useEffect(() => {
     setPageMeta({
       title: null,
-      description: 'Xem tuổi hợp nhau, chọn ngày cưới đẹp và gửi thiệp cưới online miễn phí: khách xác nhận tham dự, gửi lời chúc ngay trên thiệp. Kèm lịch vạn niên và tử vi hằng ngày.',
+      description: 'Thiệp cưới online có phong bì, lịch cưới, chỉ đường, xác nhận tham dự và sổ lưu bút. Kèm xem tuổi hợp nhau và chọn ngày cưới đẹp. Miễn phí.',
     });
     loadCorner();
 
@@ -52,146 +128,165 @@ export default function Home() {
         const stories = (storyRes?.stories ?? []).map(s => ({
           key: `s-${s._id}`, to: getStoryLink(s), title: s.name, kind: 'Truyện', at: s.updatedAt, icon: <IoLibraryOutline />,
         }));
-        setCorner([...blogs, ...stories].sort((a, b) => new Date(b.at) - new Date(a.at)).slice(0, 4));
+        setCorner([...blogs, ...stories].sort((a, b) => new Date(b.at) - new Date(a.at)).slice(0, 3));
       } catch (err) {
         console.log(err);
       }
     }
   }, []);
 
-  function createInvitation() {
-    track('home_create_invitation', { loggedIn: isLoggedIn });
-    // Signed-out visitors sign in first and come back to the editor.
-    navigate('/events/create?type=wedding');
-  }
+  const wishes = [...DEMO_WISHES, ...MORE_WISHES];
 
   return (
     <div className={styles.home}>
-      {/* ---------- Hero ---------- */}
+      {/* ---------- Hero: lacquer, gold and a real invitation ---------- */}
       <section className={styles.hero}>
-        <div className={styles.heroBackdrop} aria-hidden />
+        <Petals count={10} color="#d8b46a" />
         <div className={`container ${styles.heroInner}`}>
-          <div>
-            <span className={`${styles.pill} fade-up`}>💍 Cưới hỏi & những ngày quan trọng</span>
+          <div className={styles.heroText}>
+            <p className={`${styles.eyebrow} fade-up`}>Thiệp cưới · Xem tuổi · Chọn ngày</p>
             <h1 className={`${styles.heroTitle} fade-up`} style={{ animationDelay: '80ms' }}>
-              Từ xem tuổi đến thiệp cưới, <em>tất cả ở một nơi.</em>
+              Ngày vui,<br /><em>gói trọn</em> trong<br />một tấm thiệp.
             </h1>
             <p className={`${styles.heroLead} fade-up`} style={{ animationDelay: '160ms' }}>
-              Xem hai bạn hợp nhau đến đâu, chọn ngày cưới đẹp theo tuổi, rồi gửi thiệp online để khách
-              xác nhận tham dự và gửi lời chúc. Miễn phí, không cần cài ứng dụng.
+              Khách mở phong bì trên điện thoại, xem ngày giờ, chỉ đường, xác nhận tham dự và để lại lời chúc.
+              Bạn chỉ việc gửi một đường link.
             </p>
             <div className={`${styles.heroActions} fade-up`} style={{ animationDelay: '240ms' }}>
-              <Button variant="contained" size="large" endIcon={<IoArrowForward />} onClick={createInvitation}>
-                Tạo thiệp cưới miễn phí
-              </Button>
-              <Button variant="outlined" size="large" startIcon={<IoHeartOutline />} component={Link} to="/fortune/hop-tuoi">
-                Xem tuổi hợp nhau
-              </Button>
+              <Link to="/events/create?type=wedding" className={styles.primary} onClick={() => track('home_create_invitation')}>
+                Tạo thiệp miễn phí <IoArrowForward />
+              </Link>
+              <Link to="/thiep-mau" className={styles.ghost} onClick={() => track('home_open_demo')}>
+                Mở thử thiệp mẫu
+              </Link>
+            </div>
+            <div className={`${styles.themePicker} fade-up`} style={{ animationDelay: '320ms' }}>
+              <span>Đổi mẫu:</span>
+              {THEMES.map(t => (
+                <button
+                  key={t.value}
+                  type="button"
+                  className={`${styles.swatch} ${styles[`sw_${t.value}`]} ${theme === t.value ? styles.swatchOn : ''}`}
+                  onClick={() => setTheme(t.value)}
+                  aria-label={`Mẫu ${t.label}`}
+                  aria-pressed={theme === t.value}
+                  title={t.label}
+                />
+              ))}
             </div>
           </div>
-          <div className={`${styles.heroVisual} fade-up`} style={{ animationDelay: '200ms' }} aria-hidden>
-            <ThemePreview theme="night" type="wedding" groomName="Khoa" brideName="Ngân" startAt="18:30 · 15/05/2027" className={styles.heroBack} />
-            <ThemePreview theme="blush" type="wedding" groomName="Minh" brideName="Lan" startAt="11:00 · 12/12/2026" className={styles.heroFront} />
+          <div className={`${styles.heroPhone} fade-up`} style={{ animationDelay: '200ms' }}>
+            <PhoneDemo theme={theme} />
+            <p className={styles.phoneHint}>↑ Chạm vào con dấu để mở</p>
           </div>
         </div>
       </section>
 
-      {/* ---------- Journey ---------- */}
-      <section className={`container ${styles.section}`}>
-        <Reveal className={styles.sectionHeadCenter}>
-          <div className="eyebrow">Ba bước cho ngày vui</div>
-          <h2 className={styles.sectionTitle}>Chuẩn bị đám cưới nhẹ nhàng hơn</h2>
+      {/* ---------- Marquee ---------- */}
+      <div className={styles.marquee} aria-hidden>
+        <div className={styles.marqueeTrack}>
+          {[...MARQUEE, ...MARQUEE, ...MARQUEE].map((word, i) => (
+            <span key={i}>{word}<i>✦</i></span>
+          ))}
+        </div>
+      </div>
+
+      {/* ---------- Three steps ---------- */}
+      <section className={`container ${styles.steps}`}>
+        <Reveal className={styles.stepsHead}>
+          <p className={styles.kicker}>Ba bước cho ngày vui</p>
+          <h2 className={styles.display}>Từ “mình có hợp nhau không?”<br />đến <em>“hẹn gặp ở tiệc nhé!”</em></h2>
         </Reveal>
-        <Reveal><WeddingJourney /></Reveal>
+        {STEPS.map((step, i) => (
+          <Reveal key={step.no} className={`${styles.step} ${i % 2 ? styles.stepFlip : ''}`}>
+            <div className={styles.stepText}>
+              <span className={styles.stepNo}>{step.no}</span>
+              <h3>{step.title}</h3>
+              <p>{step.text}</p>
+              <Link to={step.to} className={styles.stepLink}>{step.cta} <IoArrowForward /></Link>
+            </div>
+            <div className={styles.stepVisual}>{step.visual}</div>
+          </Reveal>
+        ))}
       </section>
 
-      {/* ---------- Invitations ---------- */}
-      <section className={`container ${styles.section}`}>
-        <Reveal className={styles.invite}>
-          <div className={styles.inviteText}>
-            <div className="eyebrow">Thiệp mời online</div>
-            <h2 className={styles.sectionTitle}>Một tấm thiệp, khách bấm là trả lời</h2>
-            <ul className={styles.checks}>
-              {INVITE_FEATURES.map(f => <li key={f}><IoCheckmarkCircle /> {f}</li>)}
-            </ul>
-            <div className={styles.heroActions}>
-              <Button variant="contained" size="large" endIcon={<IoArrowForward />} onClick={createInvitation}>
-                Tạo thiệp ngay
-              </Button>
-              <Button variant="text" size="large" component={Link} to="/cuoi-hoi">Tìm hiểu thêm</Button>
+      {/* ---------- Wishes wall ---------- */}
+      <section className={styles.wishesBand}>
+        <Reveal className="container">
+          <p className={styles.kicker}>Sổ lưu bút</p>
+          <h2 className={styles.display}>Mỗi tấm thiệp là một cuốn<br /><em>lưu bút</em> cho ngày cưới.</h2>
+        </Reveal>
+        {[wishes, [...wishes].reverse()].map((row, r) => (
+          <div key={r} className={`${styles.wishRow} ${r ? styles.wishRowReverse : ''}`} aria-hidden={r === 1}>
+            <div className={styles.wishTrack}>
+              {[...row, ...row].map((w, i) => (
+                <figure key={`${w._id}-${i}`} className={styles.wish} style={{ '--tilt': `${((i * 37) % 7) - 3}deg` }}>
+                  <blockquote>{w.message}</blockquote>
+                  <figcaption>{w.name}</figcaption>
+                </figure>
+              ))}
             </div>
           </div>
-          <ThemeShowcase />
-        </Reveal>
+        ))}
       </section>
 
       {/* ---------- Today ---------- */}
-      <section className={`container ${styles.section}`}>
-        <Reveal className={styles.sectionHead}>
-          <div>
-            <div className="eyebrow">Hôm nay</div>
-            <h2 className={styles.sectionTitle}>Xem ngày & tử vi hằng ngày</h2>
+      <section className={`container ${styles.today}`}>
+        <Reveal className={styles.todayText}>
+          <p className={styles.kicker}>Hôm nay</p>
+          <h2 className={styles.display}>Xem ngày, <em>xem giờ</em>,<br />xem cả con giáp.</h2>
+          <p>Lịch âm, ngày hoàng đạo, giờ tốt và tử vi hằng ngày cho 12 con giáp. Chọn con giáp của bạn một lần, lần sau vào là thấy.</p>
+          <div className={styles.todayLinks}>
+            <Link to="/fortune/lich#con-giap"><IoSparklesOutline /> Tử vi hôm nay</Link>
+            <Link to="/fortune/numerology">Thần số học</Link>
+            <Link to="/fortune/tu-vi">Lá số tử vi</Link>
           </div>
-          <Link to="/fortune" className={styles.seeAll}>Thần số học & Tử vi <IoArrowForward /></Link>
         </Reveal>
-        <div className={styles.todayGrid}>
-          <Reveal>
-            <TodayAlmanacCard className={styles.todayCard} />
-          </Reveal>
-          <Reveal delay={80}>
-            <Link to="/fortune/numerology" className={styles.fortuneTile}>
-              <span className={styles.featureIcon}><IoCalculatorOutline /></span>
-              <h3>Thần số học</h3>
-              <p>Con số chủ đạo và ý nghĩa họ tên của bạn.</p>
-            </Link>
-          </Reveal>
-          <Reveal delay={160}>
-            <Link to="/fortune/tu-vi" className={styles.fortuneTile}>
-              <span className={styles.featureIcon}><IoGridOutline /></span>
-              <h3>Lá số tử vi</h3>
-              <p>12 cung, chính tinh và vận hạn năm nay.</p>
-            </Link>
-          </Reveal>
-        </div>
+        <Reveal delay={100}>
+          <TodayAlmanacCard />
+        </Reveal>
       </section>
 
-      {/* ---------- Returning readers ---------- */}
-      <ContinueReading className={`container ${styles.section}`} />
+      <ContinueReading className={`container ${styles.continue}`} />
+
+      {/* ---------- Final call ---------- */}
+      <section className="container">
+        <Reveal className={styles.finale}>
+          <div className={styles.finaleSeal} aria-hidden>囍</div>
+          <h2>Ngày vui của bạn,<br /><em>bắt đầu từ một tấm thiệp.</em></h2>
+          <p>Ba phút để tạo, một đường link để gửi. Miễn phí.</p>
+          <div className={styles.heroActions}>
+            <Link to="/events/create?type=wedding" className={styles.primary}>Tạo thiệp ngay <IoArrowForward /></Link>
+            <Link to="/cuoi-hoi" className={styles.ghost}>Xem cách hoạt động</Link>
+          </div>
+        </Reveal>
+      </section>
 
       {/* ---------- The author's corner ---------- */}
-      <section className={`container ${styles.section}`}>
-        <Reveal className={styles.corner}>
-          <div className={styles.cornerAbout}>
-            <img src="/imgs/3 (2).jpg" alt="Sum Quốc" loading="lazy" />
-            <div>
-              <div className="eyebrow">Góc nhỏ</div>
-              <h2 className={styles.cornerTitle}>Của Sum Quốc</h2>
-              <p>
-                Mình là lập trình viên đã tự xây FollMe. Ở góc này mình ghi lại bài học khi làm phần mềm
-                và vài câu chuyện đời thường.
-              </p>
-              <div className={styles.cornerLinks}>
-                <Link to="/blogs">Blog</Link>
-                <Link to="/stories">Truyện</Link>
-                <a href={GITHUB_URL} target="_blank" rel="noreferrer"><IoLogoGithub /> GitHub</a>
-              </div>
-            </div>
-          </div>
-          {corner.length > 0 && (
-            <ul className={styles.cornerList}>
-              {corner.map(item => (
-                <li key={item.key}>
-                  <Link to={item.to}>
-                    <span className={styles.cornerIcon}>{item.icon}</span>
-                    <span className={styles.cornerItemTitle}>{item.title}</span>
-                    <span className={styles.cornerMeta}>{item.kind} · {formatLongDate(item.at)}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Reveal>
+      <section className={`container ${styles.corner}`}>
+        <div className={styles.cornerAbout}>
+          <img src="/imgs/3 (2).jpg" alt="Sum Quốc" loading="lazy" />
+          <p>
+            <strong>Góc nhỏ của Sum Quốc.</strong> Người làm ra FollMe, thỉnh thoảng viết về phần mềm và vài câu chuyện đời thường.
+          </p>
+        </div>
+        <ul className={styles.cornerList}>
+          {corner.map(item => (
+            <li key={item.key}>
+              <Link to={item.to}>
+                {item.icon}
+                <span>{item.title}</span>
+                <small>{item.kind} · {formatLongDate(item.at)}</small>
+              </Link>
+            </li>
+          ))}
+          <li className={styles.cornerMore}>
+            <Link to="/blogs">Blog</Link>
+            <Link to="/stories">Truyện</Link>
+            <a href={GITHUB_URL} target="_blank" rel="noreferrer"><IoLogoGithub /> GitHub</a>
+          </li>
+        </ul>
       </section>
     </div>
-  )
+  );
 }

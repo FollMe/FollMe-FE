@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
@@ -31,6 +31,9 @@ const CORNER_ITEMS = [
 export default function SiteHeader({ isLoggedIn, userInfo }) {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
+  // The home hero is dark lacquer: float a light header over it until scrolling.
+  const { pathname } = useLocation();
+  const onDark = pathname === '/' && !isScrolled;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showRequestLoginDialog, setShowRequestLoginDialog] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -63,7 +66,7 @@ export default function SiteHeader({ isLoggedIn, userInfo }) {
   }
 
   return (
-    <header className={clsx(styles.header, isScrolled && styles.scrolled)}>
+    <header className={clsx(styles.header, isScrolled && styles.scrolled, onDark && styles.onDark)}>
       <div className={clsx('container', styles.inner)}>
         <BrandLogo />
 

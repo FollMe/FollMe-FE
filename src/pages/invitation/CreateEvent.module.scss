@@ -10,9 +10,7 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .previewWrap {
-    grid-row: 1;
-  }
+
 }
 
 .panel {
@@ -143,3 +141,43 @@
 }
 
 
+
+/* Live preview: the real invitation in a phone, scaled down */
+.phone {
+  width: 300px;
+  height: 610px;
+  padding: 10px;
+  border-radius: 44px;
+  background: linear-gradient(145deg, #2c2422, #0d0908);
+  box-shadow: 0 0 0 1px rgba(176, 132, 58, 0.4), var(--shadow-lg);
+}
+
+.phoneScreen {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 34px;
+}
+
+.phoneContent {
+  width: 390px;
+  height: calc(590px / 0.718);
+  overflow-y: auto;
+  transform: scale(0.718);
+  transform-origin: 0 0;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .phone {
+    margin: 0 auto;
+  }
+
+  .previewWrap {
+    position: static;
+  }
+}
