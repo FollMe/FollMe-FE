@@ -281,6 +281,10 @@ function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
   const [name, setName] = useState(guest?.name ?? '');
   const [isSending, setIsSending] = useState(false);
   const [isEditing, setIsEditing] = useState(!existing);
+  // Last answer sent from this form; keeps the answered view even when the
+  // parent holds no guest (demo, preview).
+  const [answered, setAnswered] = useState(null);
+  const current = answered ?? existing;
 
   async function submit(e) {
     e.preventDefault();
@@ -305,6 +309,7 @@ function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
       toast.success(demo
         ? 'Thiệp mẫu: câu trả lời không được gửi đi. Tạo thiệp của bạn để dùng thật nhé!'
         : (status === 'declined' ? 'Đã gửi. Tiếc quá, hẹn bạn dịp khác!' : 'Đã xác nhận. Hẹn gặp bạn nhé!'));
+      setAnswered(res.rsvp);
       setIsEditing(false);
     } catch (err) {
       console.log(err);
@@ -313,13 +318,13 @@ function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
     }
   }
 
-  if (!isEditing && guest?.rsvp) {
+  if (!isEditing && current) {
     return (
       <div className={styles.card}>
         <h2 className={styles.h2}>Xác nhận tham dự</h2>
         <p className={styles.answered}>
-          <IoCheckmarkCircle /> Bạn đã trả lời: <strong>{RSVP_LABELS[guest.rsvp.status]}</strong>
-          {guest.rsvp.status !== 'declined' && guest.rsvp.count > 1 ? ` (${guest.rsvp.count} người)` : ''}
+          <IoCheckmarkCircle /> Bạn đã trả lời: <strong>{RSVP_LABELS[current.status]}</strong>
+          {current.status !== 'declined' && current.count > 1 ? ` (${current.count} người)` : ''}
         </p>
         <Button size="small" className={styles.textButton} onClick={() => setIsEditing(true)}>Đổi câu trả lời</Button>
       </div>

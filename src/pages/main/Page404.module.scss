@@ -8,13 +8,57 @@
     text-align: center;
 }
 
-.animation {
-    width: 280px;
-    max-width: 80vw;
-    margin-bottom: 8px;
+.code {
+    display: flex;
+    align-items: center;
+    gap: clamp(8px, 2vw, 18px);
+    margin-bottom: 20px;
+    font-family: var(--font-serif);
+    font-size: clamp(9rem, 18vw, 15rem);
+    font-weight: 600;
+    line-height: 1;
+    color: var(--brand-text);
+}
 
-    > div {
-        width: 100% !important;
+.seal {
+    display: grid;
+    place-items: center;
+    // em here is the seal's own (0.42em) size: ~0.75 of the digits.
+    width: 1.8em;
+    height: 1.8em;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #c8352f, var(--brand) 60%, #6e1311);
+    box-shadow: 0 0 0 4px rgba(176, 132, 58, 0.35), 0 12px 30px rgba(163, 32, 30, 0.35);
+    color: #f6ead6;
+    font-size: 0.42em;
+    transform: rotate(-8deg);
+    animation: wobble 4s ease-in-out infinite;
+}
+
+@keyframes wobble {
+    0%, 100% { transform: rotate(-8deg); }
+    50% { transform: rotate(6deg) translateY(-4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .seal {
+        animation: none;
+    }
+}
+
+.demoLink {
+    margin-top: 20px;
+    padding: 4px;
+    border: none;
+    background: none;
+    color: var(--gold);
+    font-family: var(--font-serif);
+    font-size: 1.8rem;
+    font-style: italic;
+    cursor: pointer;
+
+    &:hover {
+        text-decoration: underline;
     }
 }
 

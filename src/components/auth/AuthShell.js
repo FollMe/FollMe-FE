@@ -32,24 +32,17 @@ export default function AuthShell({ title, subtitle, children, footer }) {
 
       <aside className={styles.brandSide}>
         <div className={styles.brandInner}>
-          <img src="/imgs/follme-logo.png" alt="" className={styles.brandMark} />
-          <figure className={styles.quote}>
-            <blockquote>
-              “Tôi cảm thấy tự hào khi được chia sẻ câu chuyện của mình đến với mọi người!”
-            </blockquote>
-            <figcaption>
-              <img src="/imgs/3 (2).jpg" alt="" />
-              <span>
-                <strong>Sum Quốc</strong>
-                Tác giả FollMe
-              </span>
-            </figcaption>
-          </figure>
+          <span className={styles.seal} aria-hidden>囍</span>
+          <p className={styles.eyebrow}>FollMe · Cưới hỏi</p>
+          <h2 className={styles.headline}>
+            Từ ngày hợp tuổi<br />đến <em>tấm thiệp</em> trao tay.
+          </h2>
           <ul className={styles.points}>
-            <li>Đọc blog kỹ thuật & truyện dài kỳ</li>
-            <li>Bình luận theo thời gian thực</li>
-            <li>Tạo thư mời điện tử cho sự kiện của bạn</li>
+            <li><strong>Xem tuổi & chọn ngày cưới</strong> theo lịch âm, tránh Kim Lâu.</li>
+            <li><strong>Thiệp cưới online</strong> có phong bì, bản đồ, lịch và nhạc nền.</li>
+            <li><strong>Xác nhận tham dự & sổ lưu bút</strong> gom về một chỗ.</li>
           </ul>
+          <p className={styles.free}>Miễn phí · Không cần cài ứng dụng</p>
         </div>
       </aside>
     </div>

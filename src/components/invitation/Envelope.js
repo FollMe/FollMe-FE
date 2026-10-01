@@ -11,6 +11,20 @@ const OPEN_MS = 1700;
 export default function Envelope({ theme, recipient, headline, onOpened }) {
   const [state, setState] = useState('closed'); // closed | opening | gone
 
+  // Keep the invitation behind the envelope from scrolling.
+  const isShown = state !== 'gone';
+  useEffect(() => {
+    if (!isShown) {
+      return undefined;
+    }
+    const root = document.documentElement;
+    const previous = root.style.overflow;
+    root.style.overflow = 'hidden';
+    return () => {
+      root.style.overflow = previous;
+    };
+  }, [isShown]);
+
   useEffect(() => {
     if (state !== 'opening') {
       return undefined;

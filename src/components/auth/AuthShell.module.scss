@@ -76,20 +76,20 @@
   overflow: hidden;
   margin: 12px;
   border-radius: 28px;
-  color: #f5f1ea;
+  color: #f6ead6;
   background:
-    radial-gradient(70% 60% at 100% 0%, rgba(255, 170, 110, 0.55), transparent 70%),
-    radial-gradient(60% 60% at 0% 100%, rgba(120, 30, 0, 0.55), transparent 70%),
-    linear-gradient(160deg, #f26b2c, #c2410c 60%, #7c2d12);
+    var(--paper-grain),
+    radial-gradient(ellipse at 80% 15%, rgba(216, 180, 106, 0.22), transparent 55%),
+    radial-gradient(ellipse at 0% 100%, rgba(163, 32, 30, 0.6), transparent 60%),
+    linear-gradient(160deg, #3a0d0b 0%, #1d0807 55%, #120605 100%);
 
+  // Thin gold frame, like the edge of a lacquer box.
   &::after {
     content: '';
     position: absolute;
-    inset: 0;
-    background-image: radial-gradient(rgba(255, 255, 255, 0.14) 1px, transparent 1px);
-    background-size: 22px 22px;
-    mask-image: linear-gradient(to bottom, #000, transparent 70%);
-    -webkit-mask-image: linear-gradient(to bottom, #000, transparent 70%);
+    inset: 14px;
+    border: 1px solid rgba(216, 180, 106, 0.35);
+    border-radius: 18px;
     pointer-events: none;
   }
 }
@@ -106,83 +106,78 @@
   padding: 64px 40px;
 }
 
-.brandMark {
-  width: 56px;
-  height: 56px;
+.seal {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.18);
+  background: radial-gradient(circle at 35% 30%, #c8352f, #a3201e 60%, #6e1311);
+  box-shadow: 0 0 0 4px rgba(216, 180, 106, 0.3), 0 12px 30px rgba(0, 0, 0, 0.4);
+  font-size: 2.8rem;
+  transform: rotate(-8deg);
 }
 
-.quote {
-  margin: 40px 0 0;
+.eyebrow {
+  margin: 32px 0 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #d8b46a;
+}
 
-  blockquote {
-    margin: 0;
-    font-family: var(--font-serif);
-    font-size: clamp(2.4rem, 2.4vw, 3.2rem);
-    font-weight: 500;
-    font-style: italic;
-    line-height: 1.35;
-    letter-spacing: -0.01em;
-  }
+.headline {
+  margin: 12px 0 0;
+  font-family: var(--font-serif);
+  font-size: clamp(3.2rem, 3.4vw, 4.4rem);
+  font-weight: 500;
+  line-height: 1.15;
 
-  figcaption {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-top: 28px;
-
-    img {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      object-fit: cover;
-      object-position: 40% 30%;
-      border: 2px solid rgba(255, 255, 255, 0.6);
-    }
-
-    span {
-      display: flex;
-      flex-direction: column;
-      font-size: 1.35rem;
-      color: rgba(255, 255, 255, 0.8);
-    }
-
-    strong {
-      font-size: 1.6rem;
-      color: #fff;
-    }
+  em {
+    color: #e6c57d;
+    font-family: var(--font-hand);
+    font-style: normal;
+    font-size: 1.15em;
   }
 }
 
 .points {
-  margin: 48px 0 0;
+  margin: 40px 0 0;
   padding: 24px 0 0;
   list-style: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  border-top: 1px solid rgba(216, 180, 106, 0.3);
 
   li {
     position: relative;
-    padding-left: 28px;
-    margin: 12px 0;
+    margin: 14px 0;
+    padding-left: 26px;
     font-size: 1.5rem;
-    color: rgba(255, 255, 255, 0.92);
+    line-height: 1.5;
+    color: rgba(246, 234, 214, 0.8);
 
     &::before {
-      content: '✓';
+      content: '❖';
       position: absolute;
       left: 0;
       top: 1px;
-      display: grid;
-      place-items: center;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.22);
-      font-size: 1.1rem;
-      font-weight: 700;
+      color: #d8b46a;
+      font-size: 1.2rem;
     }
   }
+
+  strong {
+    color: #f6ead6;
+    font-weight: 600;
+  }
+}
+
+.free {
+  margin: 24px 0 0;
+  font-family: var(--font-serif);
+  font-size: 1.7rem;
+  font-style: italic;
+  color: #d8b46a;
 }
 
 @media (max-width: 900px) {

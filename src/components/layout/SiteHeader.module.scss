@@ -258,7 +258,13 @@
   }
 
   :global(.MuiButton-outlined) {
-    border-color: rgba(246, 234, 214, 0.4);
-    color: #f6ead6;
+    border-color: rgba(246, 234, 214, 0.45) !important;
+    background: rgba(246, 234, 214, 0.06) !important;
+    color: #f6ead6 !important;
+
+    &:hover {
+      border-color: #e6c57d !important;
+      background: rgba(246, 234, 214, 0.14) !important;
+    }
   }
 }

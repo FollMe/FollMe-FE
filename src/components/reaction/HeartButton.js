@@ -20,6 +20,7 @@ export default function HeartButton({ postKey, variant = 'pill', label }) {
   const [userInfo] = useUserInfo();
   const isLoggedIn = useMemo(() => handleCheckLoggedIn(userInfo.sessionExp), [userInfo]);
   const [count, setCount] = useState(null);
+  const [isUnavailable, setIsUnavailable] = useState(false);
   const [reacted, setReacted] = useState(false);
   const [burstKey, setBurstKey] = useState(0);
   const [showSignIn, setShowSignIn] = useState(false);
@@ -27,6 +28,7 @@ export default function HeartButton({ postKey, variant = 'pill', label }) {
 
   useEffect(() => {
     let isActive = true;
+    setIsUnavailable(false);
     load();
 
     async function load() {
@@ -46,6 +48,9 @@ export default function HeartButton({ postKey, variant = 'pill', label }) {
         }
       } catch (err) {
         console.log(err);
+        if (isActive) {
+          setIsUnavailable(true);
+        }
       }
     }
 
@@ -59,7 +64,7 @@ export default function HeartButton({ postKey, variant = 'pill', label }) {
       setShowSignIn(true);
       return;
     }
-    if (pending.current) {
+    if (pending.current || isUnavailable) {
       return;
     }
     pending.current = true;
@@ -83,7 +88,8 @@ export default function HeartButton({ postKey, variant = 'pill', label }) {
     }
   }
 
-  const countLabel = count === null ? '…' : count.toLocaleString('vi-VN');
+  // While loading show an ellipsis; if reactions are unavailable, just the heart.
+  const countLabel = isUnavailable ? null : count === null ? '…' : count.toLocaleString('vi-VN');
 
   return (
     <>
@@ -105,7 +111,7 @@ export default function HeartButton({ postKey, variant = 'pill', label }) {
             </span>
           )}
         </span>
-        <span className={styles.count}>{countLabel}</span>
+        {countLabel !== null && <span className={styles.count}>{countLabel}</span>}
         {label && <span className={styles.label}>{label}</span>}
       </button>
       {showSignIn && <RequestSignInDialog open={true} setOpen={setShowSignIn} action="thả tim" />}
