@@ -93,12 +93,12 @@ export default function InvitationList() {
   return (
     <div className="container page">
       <PageHeader
-        eyebrow="Thư mời điện tử"
-        title="Sự kiện của bạn"
-        description="Tạo sự kiện, gửi thư mời đến từng khách mời qua email và theo dõi ai đã xem thư mời."
+        eyebrow="Thiệp mời online"
+        title="Thiệp của tôi"
+        description="Thiệp cưới và thiệp mời bạn đã tạo. Mở từng thiệp để xem ai sẽ đến, đọc lời chúc và lấy link gửi khách."
         actions={
           <Button variant="contained" size="large" startIcon={<IoAdd />} onClick={() => navigate("/events/create")}>
-            Tạo sự kiện
+            Tạo thiệp
           </Button>
         }
       />
@@ -114,7 +114,7 @@ export default function InvitationList() {
           ) : invitations.length <= 0 ? (
             <div className="empty-state">
               Bạn chưa tạo sự kiện nào.{' '}
-              <Button variant="text" onClick={() => navigate("/events/create")}>Tạo sự kiện đầu tiên →</Button>
+              <Button variant="text" onClick={() => navigate("/events/create")}>Tạo thiệp đầu tiên →</Button>
             </div>
           ) : (
             <div className="card-grid stagger">

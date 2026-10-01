@@ -1,31 +1,45 @@
-import { useEffect, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useState } from 'react';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Drawer from '@mui/material/Drawer';
 import {
   IoMenu, IoClose, IoHomeOutline, IoNewspaperOutline, IoLibraryOutline, IoTicketOutline, IoCreateOutline,
-  IoSparklesOutline,
+  IoSparklesOutline, IoSearchOutline, IoHeartOutline, IoCalendarOutline,
 } from 'react-icons/io5';
 import RequestSignInDialog from 'components/dialog/RequestSignInDialog';
 import UserMenu from 'components/UserMenu';
+import CommandPalette from 'components/search/CommandPalette';
 import BrandLogo from './BrandLogo';
 import ThemeToggle from './ThemeToggle';
 import styles from './SiteHeader.module.scss';
 
 export const NAV_ITEMS = [
+  { to: '/cuoi-hoi', label: 'Cưới hỏi', icon: <IoTicketOutline />, end: true },
+  { to: '/fortune/hop-tuoi', label: 'Xem tuổi', icon: <IoHeartOutline /> },
+  { to: '/cuoi-hoi/chon-ngay', label: 'Chọn ngày cưới', icon: <IoCalendarOutline /> },
+  { to: '/fortune', label: 'Lịch & Tử vi', icon: <IoSparklesOutline /> },
+];
+
+// The author's corner: still reachable, no longer in the main menu.
+const CORNER_ITEMS = [
   { to: '/blogs', label: 'Blog', icon: <IoNewspaperOutline /> },
   { to: '/stories', label: 'Truyện', icon: <IoLibraryOutline /> },
-  { to: '/fortune', label: 'Tử vi', icon: <IoSparklesOutline /> },
-  { to: '/events', label: 'Thư mời', icon: <IoTicketOutline />, isProtected: true },
 ];
 
 export default function SiteHeader({ isLoggedIn, userInfo }) {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
+  // The home hero is dark lacquer: float a light header over it until scrolling.
+  const { pathname } = useLocation();
+  const onDark = pathname === '/' && !isScrolled;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showRequestLoginDialog, setShowRequestLoginDialog] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const openSearch = useCallback(() => setIsSearchOpen(true), []);
+  const closeSearch = useCallback(() => setIsSearchOpen(false), []);
+  const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 8);
@@ -48,11 +62,11 @@ export default function SiteHeader({ isLoggedIn, userInfo }) {
       setShowRequestLoginDialog(true);
       return;
     }
-    navigate('/blogs/create');
+    navigate('/events/create?type=wedding');
   }
 
   return (
-    <header className={clsx(styles.header, isScrolled && styles.scrolled)}>
+    <header className={clsx(styles.header, isScrolled && styles.scrolled, onDark && styles.onDark)}>
       <div className={clsx('container', styles.inner)}>
         <BrandLogo />
 
@@ -61,6 +75,7 @@ export default function SiteHeader({ isLoggedIn, userInfo }) {
             <NavLink
               key={item.to}
               to={item.to}
+              end={item.end}
               className={({ isActive }) => clsx(styles.navLink, isActive && styles.active)}
               onClick={event => handleClickNav(event, item)}
             >
@@ -70,6 +85,11 @@ export default function SiteHeader({ isLoggedIn, userInfo }) {
         </nav>
 
         <div className={styles.actions}>
+          <button type="button" className={styles.searchTrigger} onClick={openSearch} aria-label="Tìm kiếm">
+            <IoSearchOutline />
+            <span className={styles.searchLabel}>Tìm kiếm…</span>
+            <kbd className={styles.searchKbd}>{isMac ? '⌘' : 'Ctrl'} K</kbd>
+          </button>
           <ThemeToggle />
           {isLoggedIn ? (
             <>
@@ -80,7 +100,7 @@ export default function SiteHeader({ isLoggedIn, userInfo }) {
                 startIcon={<IoCreateOutline />}
                 onClick={handleClickWrite}
               >
-                Viết bài
+                Tạo thiệp
               </Button>
               <UserMenu userInfo={userInfo} />
             </>
@@ -125,8 +145,20 @@ export default function SiteHeader({ isLoggedIn, userInfo }) {
             <NavLink
               key={item.to}
               to={item.to}
+              end={item.end}
               className={({ isActive }) => clsx(styles.drawerLink, isActive && styles.active)}
               onClick={event => handleClickNav(event, item)}
+            >
+              {item.icon} {item.label}
+            </NavLink>
+          ))}
+          <div className={styles.drawerSection}>Góc nhỏ</div>
+          {CORNER_ITEMS.map(item => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) => clsx(styles.drawerLink, styles.drawerMinor, isActive && styles.active)}
+              onClick={() => setIsMenuOpen(false)}
             >
               {item.icon} {item.label}
             </NavLink>
@@ -135,7 +167,7 @@ export default function SiteHeader({ isLoggedIn, userInfo }) {
         <div className={styles.drawerFoot}>
           {isLoggedIn ? (
             <Button fullWidth variant="contained" size="large" startIcon={<IoCreateOutline />} onClick={handleClickWrite}>
-              Viết bài mới
+              Tạo thiệp cưới
             </Button>
           ) : (
             <Button fullWidth variant="contained" size="large" onClick={() => { setIsMenuOpen(false); navigate('/sign-in'); }}>
@@ -144,6 +176,8 @@ export default function SiteHeader({ isLoggedIn, userInfo }) {
           )}
         </div>
       </Drawer>
+
+      <CommandPalette open={isSearchOpen} onOpen={openSearch} onClose={closeSearch} />
 
       {
         showRequestLoginDialog

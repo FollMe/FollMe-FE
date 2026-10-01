@@ -6,6 +6,8 @@ export const fortuneApi = {
   numerology: (payload) => request.post(`${API}/numerology`, payload),
   tuvi: (payload) => request.post(`${API}/tuvi`, payload),
   lunarConvert: (payload) => request.post(`${API}/lunar/convert`, payload),
+  compat: (payload) => request.post(`${API}/compat`, payload),
+  weddingDates: (payload) => request.post(`${API}/wedding-dates`, payload),
 
   listProfiles: () => request.get(`${API}/me/profiles`),
   createProfile: (payload) => request.post(`${API}/me/profiles`, payload),
@@ -180,4 +182,143 @@ export function formatBirth(values) {
     text += `, giờ ${HOUR_BRANCHES[Number(values.hourBranch)]?.name}`;
   }
   return text;
+}
+
+/**
+ * Daily almanac (lịch vạn niên). `date` is "YYYY-MM-DD"; omit for today in
+ * Vietnam.
+ */
+export function getAlmanac(date) {
+  return request.get(`${API}/day${date ? `?date=${date}` : ''}`);
+}
+
+/** Formats a local Date as "YYYY-MM-DD". */
+export function toISODate(d) {
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+/** Adds days to a "YYYY-MM-DD" date. */
+export function addDays(isoDate, days) {
+  const [y, m, d] = isoDate.split('-').map(Number);
+  return toISODate(new Date(y, m - 1, d + days));
+}
+
+/** e.g. "23h–1h" */
+export function formatHourRange(hour) {
+  return `${hour.from}h–${hour.to}h`;
+}
+
+const VN_DATE = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh', year: 'numeric', month: '2-digit', day: '2-digit' });
+const VN_HOUR = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', hourCycle: 'h23' });
+
+/** Today in Vietnam as "YYYY-MM-DD", whatever the browser's time zone. */
+export function todayInVietnam(now = new Date()) {
+  return VN_DATE.format(now);
+}
+
+/** The current two-hour period (0 = Tý) in Vietnam. */
+export function currentHourBranch(now = new Date()) {
+  const hour = Number(VN_HOUR.format(now));
+  return Math.floor((hour + 1) / 2) % 12;
+}
+
+/** "tháng 8" or "tháng 8 nhuận". */
+export function lunarMonthLabel(lunar) {
+  return `tháng ${lunar.month}${lunar.isLeapMonth ? ' nhuận' : ''}`;
+}
+
+// The 12 con giáp, index = earthly branch (0 = Tý). Vietnam has the cat.
+export const ZODIAC = [
+  { branch: 'Tý', name: 'Chuột', emoji: '🐭' },
+  { branch: 'Sửu', name: 'Trâu', emoji: '🐮' },
+  { branch: 'Dần', name: 'Hổ', emoji: '🐯' },
+  { branch: 'Mão', name: 'Mèo', emoji: '🐱' },
+  { branch: 'Thìn', name: 'Rồng', emoji: '🐲' },
+  { branch: 'Tỵ', name: 'Rắn', emoji: '🐍' },
+  { branch: 'Ngọ', name: 'Ngựa', emoji: '🐴' },
+  { branch: 'Mùi', name: 'Dê', emoji: '🐐' },
+  { branch: 'Thân', name: 'Khỉ', emoji: '🐵' },
+  { branch: 'Dậu', name: 'Gà', emoji: '🐔' },
+  { branch: 'Tuất', name: 'Chó', emoji: '🐶' },
+  { branch: 'Hợi', name: 'Lợn', emoji: '🐷' },
+];
+
+export function zodiacOf(branchName) {
+  return ZODIAC.find(z => z.branch === branchName) ?? ZODIAC[0];
+}
+
+/** The branch (0 = Tý) of a solar birth year, ignoring the Tết boundary. */
+export function approxYearBranch(year) {
+  return ((year + 8) % 12 + 12) % 12;
+}
+
+const MY_ZODIAC_KEY = 'follme.myZodiac';
+
+/** The con giáp the visitor picked as theirs, or null. */
+export function getMyZodiac() {
+  try {
+    const value = localStorage.getItem(MY_ZODIAC_KEY);
+    return ZODIAC.some(z => z.branch === value) ? value : null;
+  } catch (err) {
+    return null;
+  }
+}
+
+export function setMyZodiac(branch) {
+  try {
+    if (branch) {
+      localStorage.setItem(MY_ZODIAC_KEY, branch);
+    } else {
+      localStorage.removeItem(MY_ZODIAC_KEY);
+    }
+  } catch (err) {
+    // Private mode: the choice just isn't remembered.
+  }
+}
+
+const COMPAT_KEYS = { name: 'n', birthDate: 'd', calendar: 'c', isLeapMonth: 'l' };
+
+function compactPerson(person) {
+  const out = {};
+  Object.entries(COMPAT_KEYS).forEach(([key, short]) => {
+    const value = person[key];
+    if (value !== undefined && value !== null && value !== '' && value !== false && value !== 'solar') {
+      out[short] = value;
+    }
+  });
+  return out;
+}
+
+function expandPerson(compact = {}) {
+  const person = { name: '', birthDate: '', calendar: 'solar', isLeapMonth: false };
+  Object.entries(COMPAT_KEYS).forEach(([key, short]) => {
+    if (compact[short] !== undefined) {
+      person[key] = compact[short];
+    }
+  });
+  return person;
+}
+
+/** Share link fragment for a compatibility check (#c=…). */
+export function encodeCompatFragment(a, b) {
+  return `c=${toBase64Url(JSON.stringify({ a: compactPerson(a), b: compactPerson(b) }))}`;
+}
+
+export function decodeCompatFragment(hash = '') {
+  const match = /(?:^#?|&)c=([A-Za-z0-9_-]+)/.exec(hash);
+  if (!match) {
+    return null;
+  }
+  try {
+    const data = JSON.parse(fromBase64Url(match[1]));
+    const a = expandPerson(data.a);
+    const b = expandPerson(data.b);
+    if (!parseDateString(a.birthDate) || !parseDateString(b.birthDate)) {
+      return null;
+    }
+    return { a, b };
+  } catch (err) {
+    return null;
+  }
 }

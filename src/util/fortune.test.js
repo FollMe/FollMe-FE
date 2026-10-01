@@ -56,3 +56,44 @@ describe('formatting', () => {
     expect(formatBirth({ birthDate: '1995-07-20', calendar: 'lunar', hourBranch: 5 })).toBe('20/7/1995 (âm lịch), giờ Tỵ');
   });
 });
+
+describe('almanac date helpers', () => {
+  const { addDays, currentHourBranch, todayInVietnam } = require('./fortune');
+
+  it('uses Vietnam time, not the browser time zone', () => {
+    // 18:30 UTC on 30/9 is 01:30 on 1/10 in Vietnam (Sửu hour)
+    const now = new Date(Date.UTC(2026, 8, 30, 18, 30));
+    expect(todayInVietnam(now)).toBe('2026-10-01');
+    expect(currentHourBranch(now)).toBe(1);
+    // 23:10 is already Tý of the next day
+    expect(currentHourBranch(new Date(Date.UTC(2026, 8, 30, 16, 10)))).toBe(0);
+  });
+
+  it('adds days across months and leap years', () => {
+    expect(addDays('2024-02-28', 1)).toBe('2024-02-29');
+    expect(addDays('2024-03-01', -1)).toBe('2024-02-29');
+    expect(addDays('2026-12-31', 1)).toBe('2027-01-01');
+  });
+});
+
+describe('compat share fragment', () => {
+  const { encodeCompatFragment, decodeCompatFragment, approxYearBranch } = require('./fortune');
+
+  it('round-trips two people', () => {
+    const a = { name: 'Minh Anh', birthDate: '1995-07-20', calendar: 'solar', isLeapMonth: false };
+    const b = { name: '', birthDate: '1994-03-01', calendar: 'lunar', isLeapMonth: true };
+    const fragment = encodeCompatFragment(a, b);
+    expect(fragment).toMatch(/^c=[A-Za-z0-9_-]+$/);
+    expect(decodeCompatFragment(`#${fragment}`)).toEqual({ a, b });
+  });
+
+  it('rejects garbage and missing dates', () => {
+    expect(decodeCompatFragment('#c=@@@')).toBeNull();
+    expect(decodeCompatFragment('')).toBeNull();
+  });
+
+  it('maps years to branches', () => {
+    expect(approxYearBranch(2024)).toBe(4); // Thìn
+    expect(approxYearBranch(1990)).toBe(6); // Ngọ
+  });
+});

@@ -3,31 +3,31 @@ import { createTheme, alpha } from '@mui/material/styles';
 // Keep in sync with the tokens in index.css
 const tokens = {
   light: {
-    brand: '#ea580c',
-    brandHover: '#c2410c',
-    bg: '#faf8f5',
-    surface: '#ffffff',
-    surface2: '#f4f1ec',
-    border: '#e8e2d9',
-    text: '#1c1917',
-    text2: '#57534e',
-    text3: '#8a837a',
+    brand: '#a3201e',
+    brandHover: '#821614',
+    bg: '#f4ecdd',
+    surface: '#fbf7ef',
+    surface2: '#efe5d3',
+    border: '#e2d3ba',
+    text: '#241612',
+    text2: '#5e4b42',
+    text3: '#8c776a',
   },
   dark: {
-    brand: '#f26b2c',
-    brandHover: '#ff8446',
-    bg: '#111010',
-    surface: '#1a1817',
-    surface2: '#232120',
-    border: '#2e2b29',
-    text: '#eeeae4',
-    text2: '#b8b0a6',
-    text3: '#877f76',
+    brand: '#d9463c',
+    brandHover: '#ee5d52',
+    bg: '#120c0a',
+    surface: '#1b1310',
+    surface2: '#251a16',
+    border: '#33251f',
+    text: '#f3e9da',
+    text2: '#c8b8a4',
+    text3: '#8f7e6e',
   },
 };
 
 const fontSans = "'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
-const fontSerif = "'Lora', Georgia, 'Times New Roman', serif";
+const fontSerif = "'Cormorant Garamond', 'Lora', Georgia, 'Times New Roman', serif";
 
 export function getTheme(mode = 'light') {
   const t = tokens[mode] ?? tokens.light;

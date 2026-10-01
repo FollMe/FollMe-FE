@@ -62,7 +62,7 @@
 /* Landing page */
 .methods {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 24px;
 }
 
@@ -226,4 +226,7 @@
   .result {
     margin-top: 32px;
   }
+}
+.today {
+  margin-bottom: 24px;
 }

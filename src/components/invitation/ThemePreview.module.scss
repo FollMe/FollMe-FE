@@ -1,0 +1,74 @@
+/* Palettes mirror InvitationView.module.scss */
+.theme_blush {
+  --p-bg: linear-gradient(180deg, #f8dfe5, #fbeef0);
+  --p-paper: #fffaf9;
+  --p-ink: #4a2730;
+  --p-accent: #c45c74;
+}
+
+.theme_classic {
+  --p-bg: #a3201e;
+  --p-paper: #fffaf0;
+  --p-ink: #5c1212;
+  --p-accent: #a3201e;
+}
+
+.theme_minimal {
+  --p-bg: #f3f2ef;
+  --p-paper: #ffffff;
+  --p-ink: #18181b;
+  --p-accent: #18181b;
+}
+
+.theme_night {
+  --p-bg: radial-gradient(circle at 20% 0%, #1e2a52, #0b1026);
+  --p-paper: #111734;
+  --p-ink: #f3ead7;
+  --p-accent: #d9b66b;
+}
+
+.preview {
+  padding: 24px 18px;
+  border-radius: var(--radius-lg);
+  background: var(--p-bg);
+}
+
+.previewPaper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-height: 280px;
+  justify-content: center;
+  padding: 28px 16px;
+  border-radius: 16px;
+  background: var(--p-paper);
+  color: var(--p-ink);
+  text-align: center;
+  box-shadow: 0 20px 40px -24px rgba(0, 0, 0, 0.4);
+
+  small {
+    font-size: 1.2rem;
+    opacity: 0.75;
+  }
+
+  strong {
+    font-family: 'Lora', Georgia, serif;
+    font-size: 2.6rem;
+    font-weight: 600;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+
+  em {
+    font-size: 1.3rem;
+    font-style: normal;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+}
+
+.previewDivider {
+  color: var(--p-accent);
+  font-size: 1.8rem;
+}

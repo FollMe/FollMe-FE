@@ -1,12 +1,23 @@
 # FollMe Frontend
 
-FollMe Frontend is a React-based web application that provides an interactive user interface for managing posts, comments, and real-time interactions. This project is designed to deliver a seamless user experience with modern web technologies.
+FollMe helps couples get ready for their big day: check compatibility (xem tuổi), pick a wedding date (chọn ngày cưới) and send online invitations that guests answer and sign. A lunar calendar with daily horoscopes brings people back; the author's blog and stories live in a small corner.
 
 ## Features
+
+- **Cưới hỏi** (`/cuoi-hoi`): the three-step journey below, with FAQ.
+- **Chọn ngày cưới** (`/cuoi-hoi/chon-ngay`): good wedding days for the couple in a range, with reasons, good hours and Kim Lâu warnings; one click to an invitation for that day.
+- **Thiệp mời online**: wedding, engagement, birthday and party invitations in four themes; personal links per guest and a public link (`/e/:eventId`) for group chats; RSVP with headcount; wishes wall; host dashboard with answers, QR and wish moderation.
+- **Analytics**: Vercel Web Analytics via a script tag; `util/analytics.track()` records funnel events.
 
 - **Post Management**: Create, view, and manage posts.
 - **Comment System**: Add, retrieve, and manage comments for posts.
 - **Real-Time Updates**: WebSocket-based real-time interactions for comments and notifications.
+- **Reading Experience**: Table of contents, "thả tim" reactions, live comments and related posts on blogs; authors can edit and delete their posts.
+- **Site Search**: Ctrl/⌘ + K (or `/`) opens a command palette over pages, blogs and stories, matching Vietnamese with or without accents.
+- **Lịch vạn niên & tử vi hôm nay**: Daily lunar calendar with can chi, ngày hoàng đạo, giờ hoàng đạo and tiết khí, plus a daily reading for each of the 12 con giáp; visitors pick their animal once (`/fortune/lich`).
+- **Xem tuổi hợp nhau**: Compatibility of two people with a score, explanations, a share link and a downloadable image (`/fortune/hop-tuoi`).
+- **Đọc sau & Tiếp tục đọc**: Bookmarks and reading history kept in the browser (no account needed); series resume at the last chapter (`/doc-sau`).
+- **Installable**: Web app manifest with icons and shortcuts.
 - **Responsive Design**: Optimized for both desktop and mobile devices.
 
 ## Project Structure

@@ -21,3 +21,20 @@
     color: var(--on-brand);
     font-size: 1.1rem
 }
+
+.currentThumb {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 1.3rem;
+    color: var(--text-2);
+
+    img {
+        width: 96px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border);
+    }
+}

@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    { "source": "/invitations/:id", "destination": "/api/share?path=/invitations/:id" },
+    { "source": "/e/:id", "destination": "/api/share?path=/e/:id" },
+    { "source": "/blogs/:slug", "destination": "/api/share?path=/blogs/:slug" },
+    { "source": "/cuoi-hoi", "destination": "/api/share?path=/cuoi-hoi" },
+    { "source": "/cuoi-hoi/chon-ngay", "destination": "/api/share?path=/cuoi-hoi/chon-ngay" },
+    { "source": "/fortune/hop-tuoi", "destination": "/api/share?path=/fortune/hop-tuoi" },
+    { "source": "/fortune/lich", "destination": "/api/share?path=/fortune/lich" },
+    { "source": "/((?!api/|static/|imgs/|_vercel/).*)", "destination": "/index.html" }
+  ]
+}

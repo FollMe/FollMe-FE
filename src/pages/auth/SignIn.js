@@ -115,7 +115,7 @@ export default function SignIn() {
   return (
     <AuthShell
       title="Chào mừng trở lại"
-      subtitle="Đăng nhập để bình luận, viết blog và quản lý thư mời của bạn."
+      subtitle="Đăng nhập để tạo thiệp, xem ai sẽ đến và đọc lời chúc của khách."
       footer={<>Chưa có tài khoản? <Link to="/sign-up">Đăng kí ngay</Link></>}
     >
       <div className={styles.oauth}>

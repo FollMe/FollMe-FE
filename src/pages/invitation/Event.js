@@ -1,138 +1,281 @@
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Typography, Stack } from '@mui/material';
-import { useParams } from 'react-router-dom';
-import { request } from 'util/request';
+import clsx from 'clsx';
+import { Stack, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
-import { DataGrid } from '@mui/x-data-grid';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import OvalLoading from 'components/loading/OvalLoading';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
+import { DataGrid } from '@mui/x-data-grid';
+import QRCode from 'react-qr-code';
 import dayjs from 'dayjs';
+import {
+  IoTimeOutline, IoLocationOutline, IoCopyOutline, IoCheckmark, IoEyeOutline, IoCreateOutline, IoShareSocialOutline,
+  IoEyeOffOutline, IoSparkles,
+} from 'react-icons/io5';
+import OvalLoading from 'components/loading/OvalLoading';
 import ArticleHeader from 'components/article/ArticleHeader';
 import InvitationStatusTag from 'components/invitation/InvitationStatusTag';
-
+import {
+  RSVP_LABELS, eventHeadline, invitationApi, personalInvitationUrl, publicInvitationUrl,
+} from 'util/invitation';
 import styles from "./Event.module.scss";
-import { getHostURL } from 'util/stringUtil';
 
-const columns = [
-  { field: 'name', headerName: 'Tên', flex: 1, headerClassName: styles.tableHeader },
-  { field: 'mail', headerName: 'Mail', flex: 1, headerClassName: styles.tableHeader },
-  { field: 'viewed', headerName: 'Lượt xem', align: 'center', headerClassName: styles.tableHeader, width: 126 },
-  {
-    field: "action",
-    headerName: "Action",
-    sortable: false,
-    headerClassName: styles.tableHeader,
-    headerAlign: "center",
-    align:"center",
-    renderCell: (params) => {
-      const handleClick = async (e) => {
-        e.stopPropagation(); // don't select this row after clicking
-        const invitationLink = `${getHostURL()}/invitations/${params.row._id}`;
-        await navigator.clipboard.writeText(invitationLink);
-
-        const tooltipElement = document.querySelector("[role='tooltip'] p");
-        if (tooltipElement) {
-          tooltipElement.innerText = "✓ Đã copy";
-        }
-      };
-
-      return (
-        <Tooltip placement="top" title={<Typography fontSize={"1.3rem"}>Copy link</Typography>}>
-          <ContentCopyIcon
-            sx={{width: 20, height: 20, color: "var(--text-2)", cursor: "pointer"}}
-            onClick={handleClick}
-          />
-        </Tooltip>
-      )
+function CopyButton({ text, label = 'Copy link', variant = 'icon' }) {
+  const [copied, setCopied] = useState(false);
+  async function copy(e) {
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch (err) {
+      console.log(err);
     }
   }
-]
+  if (variant === 'button') {
+    return (
+      <Button variant="outlined" size="small" onClick={copy} startIcon={copied ? <IoCheckmark /> : <IoCopyOutline />}>
+        {copied ? 'Đã copy' : label}
+      </Button>
+    );
+  }
+  return (
+    <Tooltip title={copied ? 'Đã copy' : label}>
+      <button type="button" className={styles.iconButton} onClick={copy} aria-label={label}>
+        {copied ? <IoCheckmark /> : <IoCopyOutline />}
+      </button>
+    </Tooltip>
+  );
+}
+
+const columns = [
+  { field: 'name', headerName: 'Khách', flex: 1, minWidth: 140 },
+  {
+    field: 'rsvp',
+    headerName: 'Trả lời',
+    flex: 1,
+    minWidth: 150,
+    valueGetter: (params) => params.row.rsvp?.status ?? 'pending',
+    renderCell: (params) => {
+      const rsvp = params.row.rsvp;
+      if (!rsvp) {
+        return <span className={clsx(styles.pill, styles.pending)}>Chưa trả lời</span>;
+      }
+      return (
+        <Tooltip title={rsvp.note || ''}>
+          <span className={clsx(styles.pill, styles[rsvp.status])}>
+            {RSVP_LABELS[rsvp.status]}{rsvp.status !== 'declined' && rsvp.count > 1 ? ` · ${rsvp.count}` : ''}
+          </span>
+        </Tooltip>
+      );
+    },
+  },
+  {
+    field: 'source',
+    headerName: 'Nguồn',
+    width: 110,
+    valueGetter: (params) => (params.row.source === 'public' ? 'Link chung' : 'Mời riêng'),
+  },
+  { field: 'viewed', headerName: 'Lượt mở', align: 'center', headerAlign: 'center', width: 100 },
+  {
+    field: 'action',
+    headerName: '',
+    sortable: false,
+    width: 60,
+    align: 'center',
+    renderCell: (params) => (params.row.source === 'public'
+      ? null
+      : <CopyButton text={personalInvitationUrl(params.row._id)} label="Copy link riêng" />),
+  },
+];
 
 export default function Event() {
   const navigate = useNavigate();
   const { eventId } = useParams();
-  const [event, setEvent] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
+  const [searchParams] = useSearchParams();
+  const justCreated = searchParams.get('created') === '1';
+  const [event, setEvent] = useState(null);
 
   useEffect(() => {
-    window.scrollTo(0, 0)
-    getEvent();
+    window.scrollTo(0, 0);
+    invitationApi.hostGet(eventId)
+      .then(({ invitation }) => {
+        document.title = `${invitation.title} | FollMe`;
+        setEvent(invitation);
+      })
+      .catch(() => navigate('/events'));
+  }, [eventId, navigate]);
 
-    async function getEvent() {
-      setIsLoading(true);
-      try {
-        const data = await request.get(`api/events/${eventId}`);
-        if (!data.invitation) {
-          navigate(`/events`);
-          return;
-        }
-        document.title = `${data.invitation.title} | FollMe`;
-        setEvent(data.invitation);
-        setIsLoading(false);
-      } catch (err) {
-        console.log(err);
-        navigate(`/events`);
+  async function toggleWish(wish) {
+    try {
+      if (wish.isHidden) {
+        await invitationApi.unhideWish(eventId, wish._id);
+      } else {
+        await invitationApi.hideWish(eventId, wish._id);
       }
+      setEvent(e => ({ ...e, wishes: e.wishes.map(w => (w._id === wish._id ? { ...w, isHidden: !w.isHidden } : w)) }));
+    } catch (err) {
+      console.log(err);
     }
-  }, [eventId, navigate])
+  }
 
-  if (isLoading) {
-    return <OvalLoading />
+  async function enablePublicLink() {
+    try {
+      await invitationApi.update(eventId, { allowPublicLink: true });
+      setEvent(e => ({ ...e, allowPublicLink: true }));
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  if (!event) {
+    return <OvalLoading />;
   }
 
   const status = new Date(event.startAt) > new Date() ? 'upcoming' : 'happened';
+  const summary = event.summary ?? {};
+  const publicUrl = publicInvitationUrl(event._id);
+  const guests = event.guests ?? [];
+  const firstPersonal = guests.find(g => g.source !== 'public');
+  const previewUrl = event.allowPublicLink ? `/e/${event._id}` : firstPersonal && `/invitations/${firstPersonal._id}`;
+
+  async function share() {
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: eventHeadline(event), text: 'Trân trọng kính mời bạn!', url: publicUrl });
+        return;
+      }
+      await navigator.clipboard.writeText(publicUrl);
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   return (
-    <div className={`container ${styles.page}`}>
+    <div className={`container page ${styles.page}`}>
       <ArticleHeader
-        back={{ to: '/events', label: 'Tất cả sự kiện' }}
-        eyebrow="Sự kiện"
+        back={{ to: '/events', label: 'Thiệp của tôi' }}
+        eyebrow="Thiệp mời"
         title={event.title}
         meta={[
-          <><AccessTimeIcon /> {dayjs(event.startAt).format('HH:mm · DD/MM/YYYY')}</>,
-          <><LocationOnIcon /> {event.location}</>,
+          <><IoTimeOutline /> {dayjs(event.startAt).format('HH:mm · DD/MM/YYYY')}</>,
+          <><IoLocationOutline /> {event.location}</>,
         ]}
-        actions={<InvitationStatusTag status={status} />}
+        actions={
+          <div className={styles.headActions}>
+            <InvitationStatusTag status={status} />
+            {previewUrl && (
+              <Button component={Link} to={previewUrl} target="_blank" variant="outlined" size="small" startIcon={<IoEyeOutline />}>
+                Xem thiệp
+              </Button>
+            )}
+            <Button component={Link} to={`/events/${eventId}/edit`} variant="outlined" size="small" startIcon={<IoCreateOutline />}>
+              Sửa
+            </Button>
+          </div>
+        }
       />
+
+      {justCreated && (
+        <div className={styles.created}>
+          <IoSparkles />
+          <div>
+            <strong>Thiệp đã sẵn sàng!</strong>
+            <p>Gửi link chung vào nhóm Zalo, Messenger, hoặc copy link riêng của từng khách ở bảng bên dưới.</p>
+          </div>
+        </div>
+      )}
+
+      <div className={styles.stats}>
+        {[
+          ['Khách mời', summary.invited],
+          ['Đã mở thiệp', summary.opened],
+          ['Sẽ đến', summary.attending],
+          ['Chưa chắc', summary.maybe],
+          ['Không đến', summary.declined],
+          ['Dự kiến số người', summary.headcount],
+        ].map(([label, value]) => (
+          <div key={label} className={styles.stat}>
+            <strong>{value ?? 0}</strong>
+            <span>{label}</span>
+          </div>
+        ))}
+      </div>
+
+      <section className={clsx(styles.panel, styles.share)}>
+        {event.allowPublicLink ? (
+          <>
+            <div className={styles.qr}>
+              <QRCode value={publicUrl} size={120} />
+            </div>
+            <div className={styles.shareText}>
+              <h2>Link chung</h2>
+              <p>Ai có link này đều xem được thiệp, xác nhận tham dự và gửi lời chúc. Hợp để gửi vào nhóm hoặc in mã QR lên thiệp giấy.</p>
+              <code className={styles.url}>{publicUrl}</code>
+              <div className={styles.shareActions}>
+                <CopyButton text={publicUrl} variant="button" label="Copy link" />
+                <Button variant="contained" size="small" startIcon={<IoShareSocialOutline />} onClick={share}>Chia sẻ</Button>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className={styles.shareText}>
+            <h2>Link chung đang tắt</h2>
+            <p>Chỉ khách có link riêng mới xem được thiệp. Bật link chung để gửi vào nhóm chat.</p>
+            <Button variant="contained" size="small" onClick={enablePublicLink}>Bật link chung</Button>
+          </div>
+        )}
+      </section>
 
       <section className={styles.panel}>
         <div className={styles.panelHead}>
-          <h2>Khách mời</h2>
-          <span>{event.guests?.length ?? 0} người</span>
+          <h2>Khách & xác nhận</h2>
+          <span>{guests.length} người</span>
         </div>
-        <Box sx={{ height: 420, width: '100%' }}>
+        <Box sx={{ height: 440, width: '100%' }}>
           <DataGrid
-            rows={event.guests}
+            rows={guests}
             columns={columns}
-            initialState={{
-              pagination: {
-                paginationModel: {
-                  pageSize: 5,
-                },
-              },
-            }}
-            pageSizeOptions={[5]}
+            initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
+            pageSizeOptions={[10, 25, 50]}
             disableRowSelectionOnClick
             getRowId={(row) => row._id}
             slots={{
               noRowsOverlay: () => (
                 <Stack height="100%" alignItems="center" justifyContent="center">
-                  Chưa có khách mời nào
+                  <Typography>Chưa có khách. Gửi link chung hoặc thêm khách riêng trong phần Sửa.</Typography>
                 </Stack>
               ),
-              noResultsOverlay: () => (
-                <Stack height="100%" alignItems="center" justifyContent="center">
-                  Không tìm thấy khách mời
-                </Stack>
-              )
             }}
           />
         </Box>
       </section>
+
+      <section className={styles.panel}>
+        <div className={styles.panelHead}>
+          <h2>Sổ lưu bút</h2>
+          <span>{event.wishes?.length ?? 0} lời chúc</span>
+        </div>
+        {(event.wishes ?? []).length === 0 ? (
+          <p className={styles.muted}>Chưa có lời chúc nào.</p>
+        ) : (
+          <ul className={styles.wishes}>
+            {event.wishes.map(w => (
+              <li key={w._id} className={clsx(w.isHidden && styles.hidden)}>
+                <div>
+                  <p>{w.message}</p>
+                  <span>{w.name} · {dayjs(w.createdAt).format('HH:mm DD/MM')}{w.isHidden ? ' · Đang ẩn' : ''}</span>
+                </div>
+                <Tooltip title={w.isHidden ? 'Hiện lại' : 'Ẩn khỏi thiệp'}>
+                  <button type="button" className={styles.iconButton} onClick={() => toggleWish(w)} aria-label={w.isHidden ? 'Hiện lại' : 'Ẩn lời chúc'}>
+                    {w.isHidden ? <IoEyeOutline /> : <IoEyeOffOutline />}
+                  </button>
+                </Tooltip>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
-  )
+  );
 }

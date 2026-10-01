@@ -25,6 +25,13 @@ const FortuneHome = lazy(() => import("pages/fortune/FortuneHome"));
 const Numerology = lazy(() => import("pages/fortune/Numerology"));
 const TuVi = lazy(() => import("pages/fortune/TuVi"));
 const FortuneProfiles = lazy(() => import("pages/fortune/Profiles"));
+const Almanac = lazy(() => import("pages/fortune/Almanac"));
+const Compat = lazy(() => import("pages/fortune/Compat"));
+const ReadingListPage = lazy(() => import("pages/reading/ReadingListPage"));
+const WeddingHub = lazy(() => import("pages/wedding/WeddingHub"));
+const ChooseDate = lazy(() => import("pages/wedding/ChooseDate"));
+const PublicInvitation = lazy(() => import("pages/invitation/PublicInvitation"));
+const DemoInvitation = lazy(() => import("pages/invitation/DemoInvitation"));
 
 const withSuspense = (element) => (
   <Suspense fallback={<OvalLoading />}>{element}</Suspense>
@@ -39,6 +46,9 @@ export default function Router() {
         { path: 'sign-up', element: <SignUp /> },
         // The e-card has its own full-screen design
         { path: '/invitations/:id', element: withSuspense(<InvitationCard />) },
+        { path: '/e/:eventId', element: withSuspense(<PublicInvitation />) },
+        { path: '/thiep-mau', element: withSuspense(<DemoInvitation />) },
+        { path: '/thiep-mau/:theme', element: withSuspense(<DemoInvitation />) },
       ]
     },
     {
@@ -63,6 +73,11 @@ export default function Router() {
         { path: '/fortune', element: withSuspense(<FortuneHome />) },
         { path: '/fortune/numerology', element: withSuspense(<Numerology />) },
         { path: '/fortune/tu-vi', element: withSuspense(<TuVi />) },
+        { path: '/fortune/lich', element: withSuspense(<Almanac />) },
+        { path: '/fortune/hop-tuoi', element: withSuspense(<Compat />) },
+        { path: '/doc-sau', element: withSuspense(<ReadingListPage />) },
+        { path: '/cuoi-hoi', element: withSuspense(<WeddingHub />) },
+        { path: '/cuoi-hoi/chon-ngay', element: withSuspense(<ChooseDate />) },
       ]
     },
 
@@ -71,8 +86,10 @@ export default function Router() {
       element: <AuthMainLayout isProtected={true} />,
       children: [
         { path: '/blogs/create', element: withSuspense(<CreateBlog />) },
+        { path: '/blogs/:blogSlug/edit', element: withSuspense(<CreateBlog key="edit" />) },
         { path: '/events', element: withSuspense(<InvitationList />) },
         { path: '/events/create', element: withSuspense(<CreateEvent />) },
+        { path: '/events/:eventId/edit', element: withSuspense(<CreateEvent key="edit" />) },
         { path: '/events/:eventId', element: withSuspense(<Event />) },
         { path: '/fortune/profiles', element: withSuspense(<FortuneProfiles />) },
       ]

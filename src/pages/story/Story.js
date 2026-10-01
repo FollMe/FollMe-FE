@@ -7,10 +7,26 @@ import { getReadingMinutes } from 'util/date.js';
 import OvalLoading from 'components/loading/OvalLoading';
 import ArticleHeader from 'components/article/ArticleHeader';
 import ReadingProgress from 'components/ReadingProgress';
+import HeartButton from 'components/reaction/HeartButton';
+import { storyPostKey } from 'util/reaction';
+import BookmarkButton from 'components/reading/BookmarkButton';
+import { recordRead } from 'util/readingList';
 import { CommentContainer } from 'components/comment/CommentContainer';
 import { useWebSocket } from "customHooks/useWebSocket";
 
 import styles from "./Story.module.scss";
+
+// A series is one entry that remembers the last chapter read.
+function toReadingItem(story, storySlug, chapSlug) {
+  return {
+    key: storyPostKey(storySlug),
+    type: 'story',
+    title: story.name,
+    to: `/stories/long-stories/${storySlug}/${chapSlug}`,
+    image: story.picture?.link,
+    subtitle: story.chaps?.[0]?.name,
+  };
+}
 
 export default function Story() {
   const {wsSend} = useWebSocket();
@@ -32,6 +48,7 @@ export default function Story() {
         }
         document.title = `${data.story.name} - ${data.story.chaps[0].name} | FollMe`;
         setStory(data.story);
+        recordRead(toReadingItem(data.story, storySlug, chapSlug));
         setPreviousChap(data.previousChap);
         setNextChap(data.nextChap);
         setIsLoading(false);
@@ -82,6 +99,12 @@ export default function Story() {
             <><IoBookOutline /> {story.name}</>,
             <><IoTimeOutline /> {getReadingMinutes(chap.content)} phút đọc</>,
           ]}
+          actions={
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              <HeartButton postKey={storyPostKey(storySlug)} />
+              <BookmarkButton item={toReadingItem(story, storySlug, chapSlug)} />
+            </div>
+          }
         />
 
         <div className={clsx('prose', styles.content)}>

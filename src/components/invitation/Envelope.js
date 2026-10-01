@@ -1,0 +1,58 @@
+import { useEffect, useState } from 'react';
+import clsx from 'clsx';
+import styles from './Envelope.module.scss';
+
+const OPEN_MS = 1700;
+
+/**
+ * The closed envelope a guest sees first. Tapping the seal opens the flap,
+ * lifts the card out and then reveals the invitation (onOpened).
+ */
+export default function Envelope({ theme, recipient, headline, onOpened }) {
+  const [state, setState] = useState('closed'); // closed | opening | gone
+
+  useEffect(() => {
+    if (state !== 'opening') {
+      return undefined;
+    }
+    const id = setTimeout(() => {
+      setState('gone');
+      onOpened?.();
+    }, OPEN_MS);
+    return () => clearTimeout(id);
+  }, [state, onOpened]);
+
+  if (state === 'gone') {
+    return null;
+  }
+
+  return (
+    <div className={clsx(styles.stage, styles[theme], state === 'opening' && styles.opening)}>
+      <div className={styles.to}>
+        <span>Gửi</span>
+        <strong>{recipient}</strong>
+      </div>
+
+      <div className={styles.envelope}>
+        <div className={styles.back} />
+        <div className={styles.letter}>
+          <small>Trân trọng kính mời</small>
+          <strong>{headline}</strong>
+        </div>
+        <div className={styles.front} />
+        <div className={styles.flap} />
+        <button
+          type="button"
+          className={styles.seal}
+          onClick={() => setState('opening')}
+          disabled={state !== 'closed'}
+          aria-label="Mở thiệp"
+        >
+          囍
+        </button>
+      </div>
+
+      <p className={styles.hint}>Chạm vào con dấu để mở thiệp</p>
+    </div>
+  );
+}
