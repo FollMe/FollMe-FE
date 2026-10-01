@@ -15,7 +15,8 @@ function* exponentialBackoff() {
 }
 
 const WebSocketProvider = ({ children }) => {
-  const [ws, setWs] = useState(new WebSocket(`${process.env.REACT_APP_WS_BASE_HOST}/comment-svc/ws`));
+  // Lazy: a plain `useState(new WebSocket(...))` opens a socket on every render.
+  const [ws, setWs] = useState(() => new WebSocket(`${process.env.REACT_APP_WS_BASE_HOST}/comment-svc/ws`));
   const wsState = useRef({});
   const durationGenerator = useRef(exponentialBackoff());
   const needRecoverState = useRef(false);

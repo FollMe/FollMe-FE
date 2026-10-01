@@ -20,7 +20,7 @@ import { track } from 'util/analytics';
 import styles from "./CreateEvent.module.scss";
 import previewStyles from "components/invitation/ThemePreview.module.scss";
 
-const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 function parseGuest(text) {

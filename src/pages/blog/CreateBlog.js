@@ -8,6 +8,7 @@ import CreateBlogModel from "./CreateBlogModel";
 import { MIN_CONTENT_CHARACTER } from 'config/constant'
 import { request } from "util/request";
 import { toast } from 'react-toastify';
+import { sanitizeArticle } from 'util/sanitize';
 
 import 'quill/dist/quill.snow.css';
 import './QuillStylesOverride.css';
@@ -112,7 +113,7 @@ export default function CreateBlog() {
                 setEditingBlog(blog);
                 const editor = editorRef.current;
                 editor.setContents([]);
-                editor.clipboard.dangerouslyPasteHTML(0, blog.content ?? '');
+                editor.clipboard.dangerouslyPasteHTML(0, sanitizeArticle(blog.content));
                 content.current = editor.getText();
                 rawContent.current = editor.root.innerHTML;
             } catch (err) {

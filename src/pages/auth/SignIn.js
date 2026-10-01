@@ -18,7 +18,7 @@ const validate = (values) => {
 
   if (!values.email) {
     errors.email = 'Vui lòng nhập email';
-  } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
+  } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)) {
     errors.email = 'Email không hợp lệ';
   }
 

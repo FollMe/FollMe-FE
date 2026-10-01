@@ -4,6 +4,7 @@ import { useState } from "react";
 import { formatDate } from 'util/date.js';
 import { CommentInput } from "./CommentInput";
 import { CommentType } from "instants/comment.instant";
+import { sanitizeComment } from 'util/sanitize';
 import styles from './CommentItem.module.scss';
 
 export function CommentItem({ comment, type, isPosting, handlePosting, isLoggedIn }) {
@@ -40,7 +41,7 @@ export function CommentItem({ comment, type, isPosting, handlePosting, isLoggedI
                   </div>
                 }
               </Typography>
-              <Typography variant="body2" component="div" dangerouslySetInnerHTML={{ __html: comment.content}} />
+              <Typography variant="body2" component="div" dangerouslySetInnerHTML={{ __html: sanitizeComment(comment.content) }} />
             </Box>
             <Stack
               direction="row"
