@@ -12,6 +12,19 @@ import ArticleHeader from 'components/article/ArticleHeader';
 import ReadingProgress from 'components/ReadingProgress';
 import HeartButton from 'components/reaction/HeartButton';
 import { storyPostKey } from 'util/reaction';
+import BookmarkButton from 'components/reading/BookmarkButton';
+import { recordRead } from 'util/readingList';
+
+function toReadingItem(story) {
+  return {
+    key: storyPostKey(story.slug),
+    type: 'story',
+    title: story.name,
+    to: `/stories/short-stories/${story.slug}`,
+    image: story.picture?.link,
+    subtitle: 'Truyện ngắn',
+  };
+}
 
 export default function ShortStory() {
   const {wsSend} = useWebSocket();
@@ -32,6 +45,7 @@ export default function ShortStory() {
         }
         document.title = `${data.story.name} | FollMe`;
         setStory(data.story);
+        recordRead(toReadingItem(data.story));
         setIsLoading(false);
       } catch (err) {
         console.log(err);
@@ -78,7 +92,12 @@ export default function ShortStory() {
             story.updatedAt && <><IoCalendarOutline /> {formatLongDate(story.updatedAt)}</>,
             <><IoTimeOutline /> {getReadingMinutes(story.chaps[0].content)} phút đọc</>,
           ]}
-          actions={<HeartButton postKey={storyPostKey(storySlug)} />}
+          actions={
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              <HeartButton postKey={storyPostKey(storySlug)} />
+              <BookmarkButton item={toReadingItem(story)} />
+            </div>
+          }
         />
 
         <div className={clsx('prose', styles.content)}>

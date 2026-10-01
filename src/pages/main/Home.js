@@ -3,9 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import {
   IoArrowForward, IoNewspaperOutline, IoLibraryOutline, IoTicketOutline, IoLogoGithub, IoSparklesOutline,
-  IoCalculatorOutline, IoGridOutline,
+  IoHeartOutline, IoGridOutline,
 } from 'react-icons/io5';
 import TodayAlmanacCard from 'components/almanac/TodayAlmanacCard';
+import ContinueReading from 'components/reading/ContinueReading';
 import BlogItem from 'components/blog/BlogItem';
 import StoryItem from 'components/story/StoryItem';
 import { PostCardSkeleton } from 'components/cards/PostCard';
@@ -141,6 +142,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ---------- Returning visitors ---------- */}
+      <ContinueReading className={`container ${styles.section}`} />
+
       {/* ---------- Latest blogs ---------- */}
       <section className={`container ${styles.section}`}>
         <Reveal className={styles.sectionHead}>
@@ -195,10 +199,10 @@ export default function Home() {
             <TodayAlmanacCard className={styles.todayCard} />
           </Reveal>
           <Reveal delay={80}>
-            <Link to="/fortune/numerology" className={styles.fortuneTile}>
-              <span className={styles.featureIcon}><IoCalculatorOutline /></span>
-              <h3>Thần số học</h3>
-              <p>Con số chủ đạo và ý nghĩa họ tên của bạn.</p>
+            <Link to="/fortune/hop-tuoi" className={styles.fortuneTile}>
+              <span className={styles.featureIcon}><IoHeartOutline /></span>
+              <h3>Xem tuổi hợp nhau</h3>
+              <p>Hai bạn hợp nhau mấy điểm? Gửi kết quả cho người ấy.</p>
             </Link>
           </Reveal>
           <Reveal delay={160}>

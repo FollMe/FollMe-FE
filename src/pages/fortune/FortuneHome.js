@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import Button from '@mui/material/Button';
-import { IoCalculatorOutline, IoGridOutline, IoBookmarksOutline, IoCalendarOutline } from 'react-icons/io5';
+import { IoCalculatorOutline, IoGridOutline, IoBookmarksOutline, IoCalendarOutline, IoHeartOutline } from 'react-icons/io5';
 import PageHeader from 'components/PageHeader';
 import TodayAlmanacCard from 'components/almanac/TodayAlmanacCard';
 import { useUserInfo } from 'customHooks/useUserInfo';
@@ -10,6 +10,13 @@ import { DISCLAIMER } from 'util/fortune';
 import styles from './Fortune.module.scss';
 
 const METHODS = [
+  {
+    to: '/fortune/hop-tuoi',
+    icon: <IoHeartOutline />,
+    title: 'Xem tuổi hợp nhau',
+    text: 'Nhập ngày sinh hai người để xem độ hợp theo con giáp, mệnh và thần số học, kèm lời giải thích cho từng điểm.',
+    cta: 'Xem độ hợp →',
+  },
   {
     to: '/fortune/numerology',
     icon: <IoCalculatorOutline />,

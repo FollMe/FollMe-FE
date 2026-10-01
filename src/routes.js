@@ -26,6 +26,8 @@ const Numerology = lazy(() => import("pages/fortune/Numerology"));
 const TuVi = lazy(() => import("pages/fortune/TuVi"));
 const FortuneProfiles = lazy(() => import("pages/fortune/Profiles"));
 const Almanac = lazy(() => import("pages/fortune/Almanac"));
+const Compat = lazy(() => import("pages/fortune/Compat"));
+const ReadingListPage = lazy(() => import("pages/reading/ReadingListPage"));
 
 const withSuspense = (element) => (
   <Suspense fallback={<OvalLoading />}>{element}</Suspense>
@@ -65,6 +67,8 @@ export default function Router() {
         { path: '/fortune/numerology', element: withSuspense(<Numerology />) },
         { path: '/fortune/tu-vi', element: withSuspense(<TuVi />) },
         { path: '/fortune/lich', element: withSuspense(<Almanac />) },
+        { path: '/fortune/hop-tuoi', element: withSuspense(<Compat />) },
+        { path: '/doc-sau', element: withSuspense(<ReadingListPage />) },
       ]
     },
 

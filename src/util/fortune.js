@@ -6,6 +6,7 @@ export const fortuneApi = {
   numerology: (payload) => request.post(`${API}/numerology`, payload),
   tuvi: (payload) => request.post(`${API}/tuvi`, payload),
   lunarConvert: (payload) => request.post(`${API}/lunar/convert`, payload),
+  compat: (payload) => request.post(`${API}/compat`, payload),
 
   listProfiles: () => request.get(`${API}/me/profiles`),
   createProfile: (payload) => request.post(`${API}/me/profiles`, payload),
@@ -224,4 +225,99 @@ export function currentHourBranch(now = new Date()) {
 /** "tháng 8" or "tháng 8 nhuận". */
 export function lunarMonthLabel(lunar) {
   return `tháng ${lunar.month}${lunar.isLeapMonth ? ' nhuận' : ''}`;
+}
+
+// The 12 con giáp, index = earthly branch (0 = Tý). Vietnam has the cat.
+export const ZODIAC = [
+  { branch: 'Tý', name: 'Chuột', emoji: '🐭' },
+  { branch: 'Sửu', name: 'Trâu', emoji: '🐮' },
+  { branch: 'Dần', name: 'Hổ', emoji: '🐯' },
+  { branch: 'Mão', name: 'Mèo', emoji: '🐱' },
+  { branch: 'Thìn', name: 'Rồng', emoji: '🐲' },
+  { branch: 'Tỵ', name: 'Rắn', emoji: '🐍' },
+  { branch: 'Ngọ', name: 'Ngựa', emoji: '🐴' },
+  { branch: 'Mùi', name: 'Dê', emoji: '🐐' },
+  { branch: 'Thân', name: 'Khỉ', emoji: '🐵' },
+  { branch: 'Dậu', name: 'Gà', emoji: '🐔' },
+  { branch: 'Tuất', name: 'Chó', emoji: '🐶' },
+  { branch: 'Hợi', name: 'Lợn', emoji: '🐷' },
+];
+
+export function zodiacOf(branchName) {
+  return ZODIAC.find(z => z.branch === branchName) ?? ZODIAC[0];
+}
+
+/** The branch (0 = Tý) of a solar birth year, ignoring the Tết boundary. */
+export function approxYearBranch(year) {
+  return ((year + 8) % 12 + 12) % 12;
+}
+
+const MY_ZODIAC_KEY = 'follme.myZodiac';
+
+/** The con giáp the visitor picked as theirs, or null. */
+export function getMyZodiac() {
+  try {
+    const value = localStorage.getItem(MY_ZODIAC_KEY);
+    return ZODIAC.some(z => z.branch === value) ? value : null;
+  } catch (err) {
+    return null;
+  }
+}
+
+export function setMyZodiac(branch) {
+  try {
+    if (branch) {
+      localStorage.setItem(MY_ZODIAC_KEY, branch);
+    } else {
+      localStorage.removeItem(MY_ZODIAC_KEY);
+    }
+  } catch (err) {
+    // Private mode: the choice just isn't remembered.
+  }
+}
+
+const COMPAT_KEYS = { name: 'n', birthDate: 'd', calendar: 'c', isLeapMonth: 'l' };
+
+function compactPerson(person) {
+  const out = {};
+  Object.entries(COMPAT_KEYS).forEach(([key, short]) => {
+    const value = person[key];
+    if (value !== undefined && value !== null && value !== '' && value !== false && value !== 'solar') {
+      out[short] = value;
+    }
+  });
+  return out;
+}
+
+function expandPerson(compact = {}) {
+  const person = { name: '', birthDate: '', calendar: 'solar', isLeapMonth: false };
+  Object.entries(COMPAT_KEYS).forEach(([key, short]) => {
+    if (compact[short] !== undefined) {
+      person[key] = compact[short];
+    }
+  });
+  return person;
+}
+
+/** Share link fragment for a compatibility check (#c=…). */
+export function encodeCompatFragment(a, b) {
+  return `c=${toBase64Url(JSON.stringify({ a: compactPerson(a), b: compactPerson(b) }))}`;
+}
+
+export function decodeCompatFragment(hash = '') {
+  const match = /(?:^#?|&)c=([A-Za-z0-9_-]+)/.exec(hash);
+  if (!match) {
+    return null;
+  }
+  try {
+    const data = JSON.parse(fromBase64Url(match[1]));
+    const a = expandPerson(data.a);
+    const b = expandPerson(data.b);
+    if (!parseDateString(a.birthDate) || !parseDateString(b.birthDate)) {
+      return null;
+    }
+    return { a, b };
+  } catch (err) {
+    return null;
+  }
 }

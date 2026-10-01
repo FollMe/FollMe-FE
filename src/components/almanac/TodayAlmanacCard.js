@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import Skeleton from '@mui/material/Skeleton';
 import { IoArrowForward, IoCalendarOutline } from 'react-icons/io5';
-import { getAlmanac, lunarMonthLabel } from 'util/fortune';
+import { getAlmanac, getMyZodiac, lunarMonthLabel, zodiacOf } from 'util/fortune';
+import { Stars } from './ZodiacToday';
 import styles from './TodayAlmanacCard.module.scss';
 
 /**
@@ -42,9 +43,11 @@ export default function TodayAlmanacCard({ className }) {
   }
 
   const goodHours = day.hours.filter(h => h.spirit.auspicious).map(h => h.branch);
+  const myBranch = getMyZodiac();
+  const mine = myBranch && day.zodiac?.find(z => z.branch === myBranch);
 
   return (
-    <Link to="/fortune/lich" className={clsx(styles.card, className)}>
+    <Link to="/fortune/lich#con-giap" className={clsx(styles.card, className)}>
       <div className={styles.sheet} aria-hidden>
         <span className={styles.sheetTop}>{day.weekday}</span>
         <span className={styles.sheetDay}>{day.solar.day}</span>
@@ -65,7 +68,18 @@ export default function TodayAlmanacCard({ className }) {
           </span>
         </p>
         <p className={styles.line}>Giờ tốt: {goodHours.join(', ')}</p>
-        <span className={styles.cta}>Xem lịch vạn niên <IoArrowForward /></span>
+        {mine ? (
+          <div className={styles.mine}>
+            <span aria-hidden>{zodiacOf(mine.branch).emoji}</span>
+            <div>
+              <strong>Tuổi {mine.branch} hôm nay</strong> <Stars value={mine.stars} />
+              <div>{mine.headline}</div>
+            </div>
+          </div>
+        ) : null}
+        <span className={styles.cta}>
+          {mine ? 'Xem chi tiết' : 'Xem tử vi 12 con giáp'} <IoArrowForward />
+        </span>
       </div>
     </Link>
   );

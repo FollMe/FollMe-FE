@@ -75,3 +75,25 @@ describe('almanac date helpers', () => {
     expect(addDays('2026-12-31', 1)).toBe('2027-01-01');
   });
 });
+
+describe('compat share fragment', () => {
+  const { encodeCompatFragment, decodeCompatFragment, approxYearBranch } = require('./fortune');
+
+  it('round-trips two people', () => {
+    const a = { name: 'Minh Anh', birthDate: '1995-07-20', calendar: 'solar', isLeapMonth: false };
+    const b = { name: '', birthDate: '1994-03-01', calendar: 'lunar', isLeapMonth: true };
+    const fragment = encodeCompatFragment(a, b);
+    expect(fragment).toMatch(/^c=[A-Za-z0-9_-]+$/);
+    expect(decodeCompatFragment(`#${fragment}`)).toEqual({ a, b });
+  });
+
+  it('rejects garbage and missing dates', () => {
+    expect(decodeCompatFragment('#c=@@@')).toBeNull();
+    expect(decodeCompatFragment('')).toBeNull();
+  });
+
+  it('maps years to branches', () => {
+    expect(approxYearBranch(2024)).toBe(4); // Thìn
+    expect(approxYearBranch(1990)).toBe(6); // Ngọ
+  });
+});

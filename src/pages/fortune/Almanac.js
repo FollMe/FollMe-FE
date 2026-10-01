@@ -6,6 +6,8 @@ import IconButton from '@mui/material/IconButton';
 import Skeleton from '@mui/material/Skeleton';
 import { IoChevronBack, IoChevronForward, IoTodayOutline, IoSunnyOutline, IoAlertCircleOutline } from 'react-icons/io5';
 import PageHeader from 'components/PageHeader';
+import { setPageMeta } from 'util/meta';
+import ZodiacToday from 'components/almanac/ZodiacToday';
 import {
   DISCLAIMER, addDays, currentHourBranch, formatHourRange, getAlmanac, lunarMonthLabel, todayInVietnam,
 } from 'util/fortune';
@@ -48,8 +50,18 @@ export default function Almanac() {
   const nowBranch = useMemo(() => (isToday ? currentHourBranch() : -1), [isToday]);
 
   useEffect(() => {
-    document.title = 'Lịch vạn niên | FollMe';
+    setPageMeta({
+      title: 'Lịch vạn niên & tử vi hôm nay 12 con giáp',
+      description: 'Lịch âm hôm nay, ngày hoàng đạo, giờ tốt, tiết khí và tử vi hằng ngày cho 12 con giáp, tính theo lịch Việt Nam.',
+    });
   }, []);
+
+  // Deep link from "tử vi hôm nay" entry points
+  useEffect(() => {
+    if (day && window.location.hash === '#con-giap') {
+      document.getElementById('con-giap')?.scrollIntoView({ block: 'start' });
+    }
+  }, [day]);
 
   useEffect(() => {
     let isActive = true;
@@ -171,6 +183,8 @@ export default function Almanac() {
           </section>
         </div>
       )}
+
+      {day && <ZodiacToday day={day} isToday={isToday} />}
 
       <p className={styles.disclaimer}>{DISCLAIMER}</p>
     </div>

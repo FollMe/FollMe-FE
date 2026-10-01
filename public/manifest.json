@@ -1,15 +1,22 @@
 {
   "short_name": "FollMe",
-  "name": "FollMe",
+  "name": "FollMe: blog, truyện, tử vi & lịch vạn niên",
+  "description": "Blog kỹ thuật, truyện, lịch vạn niên, tử vi hằng ngày 12 con giáp và xem tuổi hợp nhau.",
+  "lang": "vi",
   "icons": [
-    {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    }
+    { "src": "favicon.ico", "sizes": "64x64 32x32 24x24 16x16", "type": "image/x-icon" },
+    { "src": "imgs/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "imgs/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "imgs/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
-  "start_url": ".",
+  "shortcuts": [
+    { "name": "Tử vi hôm nay", "url": "/fortune/lich#con-giap", "icons": [{ "src": "imgs/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Xem tuổi hợp nhau", "url": "/fortune/hop-tuoi", "icons": [{ "src": "imgs/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Đọc sau", "url": "/doc-sau", "icons": [{ "src": "imgs/icon-192.png", "sizes": "192x192" }] }
+  ],
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#ea580c",
+  "background_color": "#faf8f5"
 }

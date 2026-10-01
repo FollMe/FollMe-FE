@@ -9,7 +9,10 @@ FollMe Frontend is a React-based web application that provides an interactive us
 - **Real-Time Updates**: WebSocket-based real-time interactions for comments and notifications.
 - **Reading Experience**: Table of contents, "thả tim" reactions, live comments and related posts on blogs; authors can edit and delete their posts.
 - **Site Search**: Ctrl/⌘ + K (or `/`) opens a command palette over pages, blogs and stories, matching Vietnamese with or without accents.
-- **Lịch vạn niên**: Daily lunar calendar with can chi, ngày hoàng đạo, giờ hoàng đạo and tiết khí (`/fortune/lich`).
+- **Lịch vạn niên & tử vi hôm nay**: Daily lunar calendar with can chi, ngày hoàng đạo, giờ hoàng đạo and tiết khí, plus a daily reading for each of the 12 con giáp; visitors pick their animal once (`/fortune/lich`).
+- **Xem tuổi hợp nhau**: Compatibility of two people with a score, explanations, a share link and a downloadable image (`/fortune/hop-tuoi`).
+- **Đọc sau & Tiếp tục đọc**: Bookmarks and reading history kept in the browser (no account needed); series resume at the last chapter (`/doc-sau`).
+- **Installable**: Web app manifest with icons and shortcuts.
 - **Responsive Design**: Optimized for both desktop and mobile devices.
 
 ## Project Structure

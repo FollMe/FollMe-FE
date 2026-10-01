@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import Dialog from '@mui/material/Dialog';
 import {
   IoSearchOutline, IoNewspaperOutline, IoLibraryOutline, IoHomeOutline, IoCreateOutline, IoTicketOutline,
-  IoCalculatorOutline, IoGridOutline, IoCalendarOutline, IoBookmarksOutline, IoContrastOutline, IoReturnDownBack,
+  IoCalculatorOutline, IoGridOutline, IoCalendarOutline, IoBookmarksOutline, IoContrastOutline, IoReturnDownBack, IoHeartOutline, IoStarOutline, IoBookmarkOutline,
 } from 'react-icons/io5';
 import { useColorMode } from 'customHooks/useColorMode';
 import { getStoryLink } from 'components/story/StoryItem';
@@ -16,8 +16,11 @@ const PAGES = [
   { title: 'Trang chủ', to: '/', icon: <IoHomeOutline />, keywords: 'home' },
   { title: 'Blog', to: '/blogs', icon: <IoNewspaperOutline />, keywords: 'bai viet ky thuat' },
   { title: 'Viết blog mới', to: '/blogs/create', icon: <IoCreateOutline />, keywords: 'soan bai dang' },
+  { title: 'Đọc sau', to: '/doc-sau', icon: <IoBookmarkOutline />, keywords: 'bookmark luu da doc lich su' },
   { title: 'Truyện', to: '/stories', icon: <IoLibraryOutline />, keywords: 'truyen dai ngan doc' },
   { title: 'Lịch vạn niên hôm nay', to: '/fortune/lich', icon: <IoCalendarOutline />, keywords: 'lich am ngay tot gio hoang dao tiet khi' },
+  { title: 'Tử vi hôm nay 12 con giáp', to: '/fortune/lich#con-giap', icon: <IoStarOutline />, keywords: 'tu vi hang ngay con giap hom nay' },
+  { title: 'Xem tuổi hợp nhau', to: '/fortune/hop-tuoi', icon: <IoHeartOutline />, keywords: 'hop tuoi vo chong nguoi yeu tinh duyen' },
   { title: 'Thần số học', to: '/fortune/numerology', icon: <IoCalculatorOutline />, keywords: 'numerology so chu dao' },
   { title: 'Lá số tử vi', to: '/fortune/tu-vi', icon: <IoGridOutline />, keywords: 'tu vi la so' },
   { title: 'Hồ sơ tử vi đã lưu', to: '/fortune/profiles', icon: <IoBookmarksOutline />, keywords: 'ho so luu' },

@@ -26,6 +26,8 @@ export default function Footer() {
             <Link to="/stories">Truyện</Link>
             <Link to="/fortune">Thần số học &amp; Tử vi</Link>
             <Link to="/fortune/lich">Lịch vạn niên</Link>
+            <Link to="/fortune/hop-tuoi">Xem tuổi hợp nhau</Link>
+            <Link to="/doc-sau">Đọc sau</Link>
             <Link to="/events">Thư mời điện tử</Link>
           </div>
           <div className={styles.column}>

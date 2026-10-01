@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useParams, Link, useNavigate } from 'react-router-dom';
+import { getHistory } from 'util/readingList';
+import { storyPostKey } from 'util/reaction';
 import Button from '@mui/material/Button';
 import { IoArrowForward, IoListOutline } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
@@ -42,6 +44,8 @@ export default function SelectChap() {
     }
 
     const chaps = story.chaps ?? [];
+    // Resume where this browser left off
+    const lastRead = getHistory().find(item => item.key === storyPostKey(storySlug));
 
     return (
         <div className="container container--narrow">
@@ -52,9 +56,18 @@ export default function SelectChap() {
                 author={story.author?.name}
                 meta={[<><IoListOutline /> {chaps.length} chương</>]}
                 actions={chaps.length > 0 && (
-                    <Button variant="contained" endIcon={<IoArrowForward />} onClick={() => navigate(chaps[0].slug)}>
-                        Bắt đầu đọc
-                    </Button>
+                    lastRead ? (
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                            <Button variant="contained" endIcon={<IoArrowForward />} onClick={() => navigate(lastRead.to)}>
+                                Đọc tiếp{lastRead.subtitle ? `: ${lastRead.subtitle}` : ''}
+                            </Button>
+                            <Button variant="outlined" onClick={() => navigate(chaps[0].slug)}>Đọc từ đầu</Button>
+                        </div>
+                    ) : (
+                        <Button variant="contained" endIcon={<IoArrowForward />} onClick={() => navigate(chaps[0].slug)}>
+                            Bắt đầu đọc
+                        </Button>
+                    )
                 )}
             />
 

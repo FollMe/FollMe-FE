@@ -21,6 +21,7 @@ import {
 import { request } from 'util/request';
 import { formatLongDate, getReadingMinutes } from 'util/date.js';
 import { buildToc } from 'util/toc';
+import { excerpt, setPageMeta } from 'util/meta';
 import { blogPostKey } from 'util/reaction';
 import { handleCheckLoggedIn } from 'util/authHelper';
 import { useUserInfo } from 'customHooks/useUserInfo';
@@ -32,6 +33,8 @@ import ShareButton from 'components/ShareButton';
 import Avatar from 'components/Avatar';
 import BlogItem from 'components/blog/BlogItem';
 import HeartButton from 'components/reaction/HeartButton';
+import BookmarkButton from 'components/reading/BookmarkButton';
+import { recordRead } from 'util/readingList';
 import { CommentContainer } from 'components/comment/CommentContainer';
 
 import styles from "./Blog.module.scss";
@@ -49,6 +52,17 @@ function pickRelated(blogs, current) {
     const sameAuthor = others.filter(b => authorId && b.author?._id === authorId);
     const rest = others.filter(b => !sameAuthor.includes(b));
     return [...sameAuthor, ...rest].slice(0, RELATED_COUNT);
+}
+
+function toReadingItem(blog) {
+    return {
+        key: blogPostKey(blog.slug),
+        type: 'blog',
+        title: blog.title,
+        to: `/blogs/${blog.slug}`,
+        image: blog.thumbnail?.link,
+        subtitle: blog.author?.name ?? blog.author?.slEmail,
+    };
 }
 
 export default function Blog() {
@@ -80,8 +94,13 @@ export default function Blog() {
                     navigate(`/blogs`);
                     return;
                 }
-                document.title = `${data.blog.title} | FollMe`;
+                setPageMeta({
+                    title: data.blog.title,
+                    description: excerpt(data.blog.content),
+                    image: data.blog.thumbnail?.link,
+                });
                 setBlog(data.blog);
+                recordRead(toReadingItem(data.blog));
                 getRelated(data.blog);
             } catch (err) {
                 console.log(err);
@@ -172,6 +191,7 @@ export default function Blog() {
                     actions={
                         <div className={styles.actions}>
                             <HeartButton postKey={postKey} />
+                            <BookmarkButton item={toReadingItem(blog)} />
                             <ShareButton title={blog.title} />
                             {isAuthor && (
                                 <IconButton
