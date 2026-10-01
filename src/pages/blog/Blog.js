@@ -21,6 +21,7 @@ import {
 import { request } from 'util/request';
 import { formatLongDate, getReadingMinutes } from 'util/date.js';
 import { buildToc } from 'util/toc';
+import { sanitizeArticle } from 'util/sanitize';
 import { excerpt, setPageMeta } from 'util/meta';
 import { blogPostKey } from 'util/reaction';
 import { handleCheckLoggedIn } from 'util/authHelper';
@@ -80,7 +81,7 @@ export default function Blog() {
     const isLoggedIn = handleCheckLoggedIn(userInfo.sessionExp);
     const isAuthor = isLoggedIn && blog.author?._id && blog.author._id === userInfo._id;
 
-    const { html, headings } = useMemo(() => buildToc(blog.content), [blog.content]);
+    const { html, headings } = useMemo(() => buildToc(sanitizeArticle(blog.content)), [blog.content]);
     const showToc = headings.length >= MIN_TOC_HEADINGS;
 
     useEffect(() => {

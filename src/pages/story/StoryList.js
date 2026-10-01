@@ -29,6 +29,9 @@ export default function StoryList() {
   }, [])
 
   async function populateNumsOfCmt(stories) {
+    if (!stories.length) {
+      return;
+    }
     const payload = {
       postSlugs: stories.map(story => story.slug)
     }

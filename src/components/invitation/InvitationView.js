@@ -19,6 +19,7 @@ import MonthCalendar from './MonthCalendar';
 import { getAlmanac, lunarMonthLabel } from 'util/fortune';
 import { RSVP_LABELS, eventHeadline, invitationApi, isCoupleEvent, savePublicGuest } from 'util/invitation';
 import { track } from 'util/analytics';
+import { vnWallClock } from 'util/date';
 import styles from './InvitationView.module.scss';
 
 const WEEKDAYS = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
@@ -85,15 +86,18 @@ export default function InvitationView({
 }) {
   const startAt = useMemo(() => new Date(event.startAt), [event.startAt]);
   const countdown = useCountdown(startAt);
+  // Shown in Vietnam time, where the event is, also to guests abroad: the
+  // calendar button says Asia/Ho_Chi_Minh, so its times must be Vietnam's.
+  const shownAt = useMemo(() => vnWallClock(event.startAt), [event.startAt]);
   const [lunar, setLunar] = useState(null);
   const [wishes, setWishes] = useState(initialWishes);
   const [showQR, setShowQR] = useState(false);
   const [isOpen, setIsOpen] = useState(() => embedded || prefersReducedMotion());
   const theme = event.theme || 'minimal';
   const couple = isCoupleEvent(event.type) && event.groomName && event.brideName;
-  const endAt = new Date(startAt.getTime() + 3 * 60 * 60 * 1000);
+  const shownEndAt = vnWallClock(startAt.getTime() + 3 * 60 * 60 * 1000);
   const recipient = guest?.name && !isPublic ? guest.name : 'Bạn';
-  const dateKey = dayjs(startAt).format('YYYY-MM-DD');
+  const dateKey = dayjs(shownAt).format('YYYY-MM-DD');
 
   useEffect(() => {
     setWishes(initialWishes);
@@ -135,7 +139,7 @@ export default function InvitationView({
           )}
           <div className={styles.seal} aria-hidden>{couple ? '囍' : '✦'}</div>
           <p className={styles.coverDate}>
-            {dayjs(startAt).format('DD')}<i>·</i>{dayjs(startAt).format('MM')}<i>·</i>{dayjs(startAt).format('YYYY')}
+            {dayjs(shownAt).format('DD')}<i>·</i>{dayjs(shownAt).format('MM')}<i>·</i>{dayjs(shownAt).format('YYYY')}
           </p>
           <a href="#ngay" className={styles.scrollCue} aria-label="Xem tiếp">
             <IoChevronDown />
@@ -156,7 +160,7 @@ export default function InvitationView({
         <Reveal>
           <h2 className={styles.h2}>Ngày chung vui</h2>
           <p className={styles.when}>
-            {WEEKDAYS[startAt.getDay()]} · {dayjs(startAt).format('HH:mm')}
+            {WEEKDAYS[shownAt.getDay()]} · {dayjs(shownAt).format('HH:mm')}
           </p>
           {lunar && (
             <p className={styles.lunar}>
@@ -165,7 +169,7 @@ export default function InvitationView({
           )}
         </Reveal>
         <Reveal delay={100}>
-          <MonthCalendar date={startAt} />
+          <MonthCalendar date={shownAt} />
         </Reveal>
         <Reveal delay={150}>
           {countdown ? (
@@ -208,10 +212,10 @@ export default function InvitationView({
             name={event.title}
             options={['Google', 'Apple', 'Outlook.com']}
             location={event.location}
-            startDate={dayjs(startAt).format('YYYY-MM-DD')}
-            endDate={dayjs(endAt).format('YYYY-MM-DD')}
-            startTime={dayjs(startAt).format('HH:mm')}
-            endTime={dayjs(endAt).format('HH:mm')}
+            startDate={dayjs(shownAt).format('YYYY-MM-DD')}
+            endDate={dayjs(shownEndAt).format('YYYY-MM-DD')}
+            startTime={dayjs(shownAt).format('HH:mm')}
+            endTime={dayjs(shownEndAt).format('HH:mm')}
             timeZone="Asia/Ho_Chi_Minh"
             language="vi"
             size="3"

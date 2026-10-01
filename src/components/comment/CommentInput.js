@@ -13,6 +13,7 @@ import { request } from 'util/request';
 import { throttle, debounce } from 'util/limitCallFunction';
 import styles from './CommentInput.module.scss'
 import TagPopup from "./TagPopup";
+import { escapeHtml } from 'util/sanitize';
 
 const tagRegex = /@[^@]+$/g
 
@@ -61,7 +62,7 @@ export function CommentInput({ parentCmt, onPost, isPosting, isOtherTyping, isLo
     setTimeout(() => {
       cmtInputElement.current.innerHTML = cmtInputElement.current.innerHTML.replace(
         tagRegex,
-        `<span class="cmt-tag" contenteditable="false">${name}&#x200B;</span>`
+        `<span class="cmt-tag" contenteditable="false">${escapeHtml(name)}&#x200B;</span>`
       );
       textCursorHelper.goToEnd(cmtInputElement.current)
       setTagMatchedUsers([]);
