@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import TextField from '@mui/material/TextField';
@@ -9,17 +9,22 @@ import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
 import {
   IoNavigateOutline, IoQrCodeOutline, IoSend, IoCheckmarkCircle, IoChevronDown, IoMailOpenOutline,
-  IoCreateOutline, IoLocationOutline,
+  IoCreateOutline, IoLocationOutline, IoGiftOutline,
 } from 'react-icons/io5';
 import QRModel from 'pages/invitation/QRModel';
 import Reveal from 'components/Reveal';
 import Envelope from './Envelope';
 import Petals from './Petals';
 import MonthCalendar from './MonthCalendar';
+import MusicToggle from './MusicToggle';
+import GiftBox from './GiftBox';
+import ScratchReveal from './ScratchReveal';
 import { getAlmanac, lunarMonthLabel } from 'util/fortune';
 import { RSVP_LABELS, eventHeadline, invitationApi, isCoupleEvent, savePublicGuest } from 'util/invitation';
 import { track } from 'util/analytics';
 import { vnWallClock } from 'util/date';
+import { burst } from 'util/confetti';
+import { MusicBox, canPlayMusic } from 'util/musicBox';
 import styles from './InvitationView.module.scss';
 
 const WEEKDAYS = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
@@ -61,6 +66,62 @@ function mapsUrl(event) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`;
 }
 
+// Foil of the scratch-off date and colors of the confetti, per theme
+const FOILS = { blush: 'rose', classic: 'gold', minimal: 'silver', night: 'gold' };
+const CONFETTI = {
+  blush: ['#e8a3b0', '#f6e3b4', '#c45c74', '#ffffff', '#d9b66b'],
+  classic: ['#a3201e', '#e0b04a', '#f3dc94', '#fff4e2'],
+  minimal: ['#18181b', '#a1a1aa', '#e4e4e7', '#d4af37'],
+  night: ['#d9b66b', '#f3ead7', '#8aa0ff', '#ffffff'],
+};
+
+/**
+ * The background music box. It can only start from a tap (browser rule), so
+ * `play` is called from the envelope's seal or the music button. Pauses
+ * while the tab is hidden.
+ */
+function useMusic(enabled) {
+  const box = useRef(null);
+  const resumeOnShow = useRef(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const play = useCallback(() => {
+    if (!enabled || !canPlayMusic()) {
+      return;
+    }
+    try {
+      box.current = box.current ?? new MusicBox();
+      box.current.play().catch(() => setIsPlaying(false));
+      setIsPlaying(true);
+    } catch (err) {
+      // No audio on this device: the invitation works without it
+    }
+  }, [enabled]);
+
+  const pause = useCallback(() => {
+    box.current?.pause();
+    setIsPlaying(false);
+  }, []);
+
+  useEffect(() => () => box.current?.close(), []);
+
+  useEffect(() => {
+    function onVisibility() {
+      if (document.hidden && isPlaying) {
+        resumeOnShow.current = true;
+        box.current?.pause();
+      } else if (!document.hidden && resumeOnShow.current) {
+        resumeOnShow.current = false;
+        box.current?.play();
+      }
+    }
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, [isPlaying]);
+
+  return { isPlaying, play, toggle: isPlaying ? pause : play };
+}
+
 function prefersReducedMotion() {
   return typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 }
@@ -97,6 +158,11 @@ export default function InvitationView({
   const couple = isCoupleEvent(event.type) && event.groomName && event.brideName;
   const shownEndAt = vnWallClock(startAt.getTime() + 3 * 60 * 60 * 1000);
   const recipient = guest?.name && !isPublic ? guest.name : 'Bạn';
+  // Weddings get the music box and the scratch-off date unless the host
+  // turned them off; other events only if turned on.
+  const withMusic = !embedded && (event.music ? event.music !== 'none' : isCoupleEvent(event.type));
+  const withScratch = !embedded && (event.scratchDate ?? isCoupleEvent(event.type));
+  const music = useMusic(withMusic);
   const dateKey = dayjs(shownAt).format('YYYY-MM-DD');
 
   useEffect(() => {
@@ -104,7 +170,8 @@ export default function InvitationView({
   }, [initialWishes]);
 
   useEffect(() => {
-    getAlmanac(dateKey).then(setLunar).catch(() => setLunar(null));
+    // The lunar date is a nicety: never bother a guest with its errors
+    getAlmanac(dateKey, { quiet: true }).then(setLunar).catch(() => setLunar(null));
   }, [dateKey]);
 
   const onOpened = useCallback(() => {
@@ -112,10 +179,23 @@ export default function InvitationView({
     track('invitation_opened', { theme, demo });
   }, [theme, demo]);
 
+  const onDateRevealed = useCallback(({ x, y }) => {
+    burst({ x, y, colors: CONFETTI[theme] });
+    navigator.vibrate?.(30);
+    track('invitation_date_revealed', { theme, demo });
+  }, [theme, demo]);
+
   return (
     <div className={clsx(styles.page, styles[theme], embedded && styles.embedded)}>
       {!isOpen && (
-        <Envelope theme={theme} recipient={recipient} headline={eventHeadline(event)} onOpened={onOpened} />
+        <Envelope
+          theme={theme}
+          recipient={recipient}
+          headline={eventHeadline(event)}
+          withMusic={withMusic && canPlayMusic()}
+          onOpenStart={music.play}
+          onOpened={onOpened}
+        />
       )}
       {isOpen && !embedded && <Petals count={14} color={PETAL_COLORS[theme]} />}
 
@@ -130,17 +210,26 @@ export default function InvitationView({
           </p>
           {couple ? (
             <h1 className={styles.couple}>
-              <span className={styles.name}>{event.groomName}</span>
+              <span className={clsx(styles.name, styles.shimmer)}>{event.groomName}</span>
               <span className={styles.amp}>&amp;</span>
-              <span className={styles.name}>{event.brideName}</span>
+              <span className={clsx(styles.name, styles.shimmer)}>{event.brideName}</span>
             </h1>
           ) : (
-            <h1 className={styles.title}>{event.title}</h1>
+            <h1 className={clsx(styles.title, styles.shimmer)}>{event.title}</h1>
           )}
           <div className={styles.seal} aria-hidden>{couple ? '囍' : '✦'}</div>
-          <p className={styles.coverDate}>
-            {dayjs(shownAt).format('DD')}<i>·</i>{dayjs(shownAt).format('MM')}<i>·</i>{dayjs(shownAt).format('YYYY')}
-          </p>
+          {withScratch ? (
+            <ScratchReveal
+              className={styles.coverScratch}
+              label={couple ? 'Cào để xem ngày cưới' : 'Cào để xem ngày'}
+              foil={FOILS[theme]}
+              onReveal={onDateRevealed}
+            >
+              <CoverDate date={shownAt} />
+            </ScratchReveal>
+          ) : (
+            <CoverDate date={shownAt} />
+          )}
           <a href="#ngay" className={styles.scrollCue} aria-label="Xem tiếp">
             <IoChevronDown />
           </a>
@@ -238,6 +327,15 @@ export default function InvitationView({
         </section>
       )}
 
+      {/* ---------- Gifts ---------- */}
+      {event.gifts?.length > 0 && (
+        <section id="mung-cuoi" className={styles.section}>
+          <Reveal>
+            <GiftBox event={event} guest={guest} isPublic={isPublic} demo={demo} />
+          </Reveal>
+        </section>
+      )}
+
       {/* ---------- Wishes ---------- */}
       <section id="loi-chuc" className={styles.section}>
         <Reveal>
@@ -268,12 +366,23 @@ export default function InvitationView({
         <nav className={styles.dock} aria-label="Đi nhanh">
           {countdown && <a href="#xac-nhan"><IoMailOpenOutline /> Xác nhận</a>}
           <a href="#dia-diem"><IoLocationOutline /> Chỉ đường</a>
+          {event.gifts?.length > 0 && <a href="#mung-cuoi"><IoGiftOutline /> {couple ? 'Mừng cưới' : 'Quà mừng'}</a>}
           <a href="#loi-chuc"><IoCreateOutline /> Lời chúc</a>
         </nav>
       )}
 
+      {isOpen && withMusic && canPlayMusic() && <MusicToggle isPlaying={music.isPlaying} onToggle={music.toggle} />}
+
       {showQR && <QRModel value={guest._id} handleClose={() => setShowQR(false)} />}
     </div>
+  );
+}
+
+function CoverDate({ date }) {
+  return (
+    <p className={styles.coverDate}>
+      {dayjs(date).format('DD')}<i>·</i>{dayjs(date).format('MM')}<i>·</i>{dayjs(date).format('YYYY')}
+    </p>
   );
 }
 
@@ -310,6 +419,9 @@ function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
       }
       onGuestChange?.({ ...(guest ?? {}), _id: res.guestId ?? guest._id, name: guest?.name ?? name.trim(), rsvp: res.rsvp });
       track('rsvp_submitted', { status, public: Boolean(isPublic), demo });
+      if (status === 'attending') {
+        burst();
+      }
       toast.success(demo
         ? 'Thiệp mẫu: câu trả lời không được gửi đi. Tạo thiệp của bạn để dùng thật nhé!'
         : (status === 'declined' ? 'Đã gửi. Tiếc quá, hẹn bạn dịp khác!' : 'Đã xác nhận. Hẹn gặp bạn nhé!'));

@@ -12,6 +12,7 @@ import dayjs from 'dayjs';
 
 import ArticleHeader from 'components/article/ArticleHeader';
 import InvitationView from 'components/invitation/InvitationView';
+import GiftAccountsField, { isGiftComplete, normalizeGifts } from 'components/invitation/GiftAccountsField';
 import OvalLoading from 'components/loading/OvalLoading';
 import {
   DEFAULT_MESSAGES, EVENT_TYPES, THEMES, invitationApi, isCoupleEvent, suggestTitle,
@@ -52,8 +53,13 @@ export default function CreateEvent() {
       message: DEFAULT_MESSAGES[initialType],
       theme: initialType === 'wedding' || initialType === 'engagement' ? 'blush' : 'minimal',
       allowPublicLink: true,
+      // Weddings get the music box and the scratch-off date by default
+      music: isCoupleEvent(initialType) ? 'canon' : 'none',
+      scratchDate: isCoupleEvent(initialType),
+      gifts: [],
     };
   });
+  const [effectsTouched, setEffectsTouched] = useState(false);
   const [titleTouched, setTitleTouched] = useState(false);
   const [guests, setGuests] = useState([]);
   const [guestInput, setGuestInput] = useState('');
@@ -85,7 +91,11 @@ export default function CreateEvent() {
           message: invitation.message ?? '',
           theme: invitation.theme ?? 'minimal',
           allowPublicLink: Boolean(invitation.allowPublicLink),
+          music: invitation.music ?? (isCoupleEvent(invitation.type) ? 'canon' : 'none'),
+          scratchDate: invitation.scratchDate ?? isCoupleEvent(invitation.type),
+          gifts: invitation.gifts ?? [],
         });
+        setEffectsTouched(true);
         setTitleTouched(true);
         setIsLoading(false);
       })
@@ -102,7 +112,8 @@ export default function CreateEvent() {
 
   function changeType(type) {
     const message = form.message === DEFAULT_MESSAGES[form.type] ? DEFAULT_MESSAGES[type] : form.message;
-    set({ type, message });
+    const effects = effectsTouched ? {} : { music: isCoupleEvent(type) ? 'canon' : 'none', scratchDate: isCoupleEvent(type) };
+    set({ type, message, ...effects });
   }
 
   function onChangeGuests(_, value, reason) {
@@ -138,6 +149,9 @@ export default function CreateEvent() {
     if (!form.startAt?.isValid()) {
       next.startAt = 'Thời gian không hợp lệ';
     }
+    if (!form.gifts.every(isGiftComplete)) {
+      next.gifts = true;
+    }
     setErrors(next);
     return Object.keys(next).length === 0;
   }
@@ -160,6 +174,9 @@ export default function CreateEvent() {
       mapLocation: form.mapLocation.trim(),
       message: form.message.trim(),
       allowPublicLink: form.allowPublicLink,
+      music: form.music,
+      scratchDate: form.scratchDate,
+      gifts: normalizeGifts(form.gifts, couple).map(g => ({ ...g, accountName: g.accountName.trim() })),
     };
     try {
       if (isEditing) {
@@ -191,6 +208,7 @@ export default function CreateEvent() {
     startAt: (form.startAt?.isValid() ? form.startAt : dayjs()).toISOString(),
     location: form.location || 'Địa điểm tổ chức',
     message: form.message,
+    gifts: normalizeGifts(form.gifts, couple).filter(isGiftComplete),
   };
 
   return (
@@ -278,6 +296,44 @@ export default function CreateEvent() {
                 </button>
               ))}
             </div>
+          </fieldset>
+
+          <fieldset className={styles.group}>
+            <legend>Hiệu ứng</legend>
+            <FormControlLabel
+              control={(
+                <Switch
+                  checked={form.music !== 'none'}
+                  onChange={e => {
+                    setEffectsTouched(true);
+                    set({ music: e.target.checked ? 'canon' : 'none' });
+                  }}
+                />
+              )}
+              label="Nhạc nền hộp nhạc (Canon in D) khi khách mở thiệp"
+            />
+            <FormControlLabel
+              control={(
+                <Switch
+                  checked={form.scratchDate}
+                  onChange={e => {
+                    setEffectsTouched(true);
+                    set({ scratchDate: e.target.checked });
+                  }}
+                />
+              )}
+              label={`Khách cào lớp nhũ để xem ${couple ? 'ngày cưới' : 'ngày'}`}
+            />
+          </fieldset>
+
+          <fieldset className={styles.group}>
+            <legend>{couple ? 'Hộp mừng cưới' : 'Quà mừng'} (không bắt buộc)</legend>
+            <GiftAccountsField
+              value={form.gifts}
+              couple={couple}
+              showErrors={Boolean(errors.gifts)}
+              onChange={gifts => set({ gifts })}
+            />
           </fieldset>
 
           <fieldset className={styles.group}>

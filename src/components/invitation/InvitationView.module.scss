@@ -188,6 +188,49 @@
   }
 }
 
+/* The scratch-off foil sits where the date is */
+.coverScratch {
+  margin-top: 28px;
+
+  .coverDate {
+    margin: 0;
+  }
+}
+
+/* A slow gleam of the accent across the names, like gold foil catching light */
+.shimmer {
+  padding: 0 0.12em;
+  background: linear-gradient(
+    105deg,
+    var(--inv-ink) 42%,
+    color-mix(in srgb, var(--inv-accent) 65%, #fff) 50%,
+    var(--inv-ink) 58%
+  );
+  background-size: 260% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gleam 7s ease-in-out 1.5s infinite;
+}
+
+@keyframes gleam {
+  0% {
+    background-position: 100% 0;
+  }
+  30%,
+  100% {
+    background-position: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer {
+    animation: none;
+    background-position: 100% 0;
+  }
+}
+
 .scrollCue {
   position: absolute;
   bottom: 18px;
@@ -527,6 +570,20 @@
 }
 
 /* ---------- Footer & dock ---------- */
+/* Four shortcuts do not fit side by side on a phone: icon over label */
+@media (max-width: 480px) {
+  .dock:has(a:nth-child(4)) a {
+    flex-direction: column;
+    gap: 2px;
+    padding: 7px 12px;
+    font-size: 1.1rem;
+
+    svg {
+      font-size: 1.7rem;
+    }
+  }
+}
+
 .footer {
   max-width: 560px;
   margin: 64px auto 0;

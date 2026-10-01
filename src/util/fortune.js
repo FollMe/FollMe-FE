@@ -188,8 +188,8 @@ export function formatBirth(values) {
  * Daily almanac (lịch vạn niên). `date` is "YYYY-MM-DD"; omit for today in
  * Vietnam.
  */
-export function getAlmanac(date) {
-  return request.get(`${API}/day${date ? `?date=${date}` : ''}`);
+export function getAlmanac(date, opts) {
+  return request.get(`${API}/day${date ? `?date=${date}` : ''}`, opts);
 }
 
 /** Formats a local Date as "YYYY-MM-DD". */

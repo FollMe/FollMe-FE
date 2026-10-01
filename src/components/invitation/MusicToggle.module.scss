@@ -1,0 +1,85 @@
+.toggle {
+  position: fixed;
+  z-index: 30;
+  right: 16px;
+  bottom: 92px;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--inv-accent);
+    outline-offset: 3px;
+  }
+}
+
+/* A small vinyl record: grooves around a label in the theme's accent */
+.disc {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, var(--inv-accent) 0 30%, transparent 31%),
+    repeating-radial-gradient(circle, #1c1917 0 2px, #2c2724 2px 3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3), inset 0 0 0 2px rgba(255, 255, 255, 0.08);
+  color: var(--inv-accent-ink);
+  font-size: 1.6rem;
+}
+
+.playing .disc {
+  animation: spin 4s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.notes {
+  position: absolute;
+  left: 50%;
+  bottom: 70%;
+  pointer-events: none;
+
+  i {
+    position: absolute;
+    left: -6px;
+    font-style: normal;
+    font-size: 1.5rem;
+    color: var(--inv-accent);
+    opacity: 0;
+    animation: float 3s ease-out infinite;
+  }
+
+  i:nth-child(2) {
+    animation-delay: 1s;
+  }
+
+  i:nth-child(3) {
+    animation-delay: 2s;
+  }
+}
+
+@keyframes float {
+  15% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-18px, -42px) rotate(-20deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .playing .disc,
+  .notes i {
+    animation: none;
+  }
+}

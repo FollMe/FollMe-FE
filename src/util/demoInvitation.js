@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import { toAccountName } from './vietqr';
 
 export const DEMO_COUPLES = {
   blush: { groomName: 'Minh', brideName: 'Lan' },
@@ -22,6 +23,11 @@ export function demoEvent(theme = 'blush') {
     mapLocation: '',
     message: 'Sau 5 năm thương nhau, tụi mình quyết định về chung một nhà.\nRất mong có bạn trong ngày vui này!',
     allowPublicLink: true,
+    // Shown as a sample: the QR code does not encode these accounts
+    gifts: [
+      { side: 'groom', bankBin: '970436', accountNumber: '0000000000', accountName: toAccountName(`Nguyễn Văn ${couple.groomName}`) },
+      { side: 'bride', bankBin: '970407', accountNumber: '0000000000', accountName: toAccountName(`Trần Thị ${couple.brideName}`) },
+    ],
   };
 }
 

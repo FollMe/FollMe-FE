@@ -1,0 +1,37 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.account {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-2);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.add {
+  align-self: flex-start;
+}
+
+.error {
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--danger);
+}
+
+.help {
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--text-3);
+}

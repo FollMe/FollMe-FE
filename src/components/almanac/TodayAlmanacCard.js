@@ -17,7 +17,7 @@ export default function TodayAlmanacCard({ className }) {
 
   useEffect(() => {
     let isActive = true;
-    getAlmanac()
+    getAlmanac(undefined, { quiet: true })
       .then(res => isActive && setDay(res))
       .catch(() => isActive && setFailed(true));
     return () => {

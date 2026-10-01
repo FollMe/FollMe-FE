@@ -18,7 +18,7 @@
   background:
     radial-gradient(circle at 50% 40%, rgba(255, 240, 210, 0.9), transparent 60%),
     #efe2c8;
-  transition: opacity 0.6s ease 1.1s;
+  transition: opacity 0.5s ease 1.2s;
 }
 
 .blush {
@@ -87,8 +87,27 @@
   border-radius: 10px;
 }
 
+/* The inside, seen once the flap lifts: a liner with a fine gold pattern */
 .back {
-  background: var(--env-dark);
+  background:
+    radial-gradient(circle, rgba(255, 226, 160, 0.38) 1.4px, transparent 1.8px) 0 0 / 14px 14px,
+    radial-gradient(circle, rgba(255, 226, 160, 0.22) 1px, transparent 1.4px) 7px 7px / 14px 14px,
+    linear-gradient(180deg, var(--env-dark), color-mix(in srgb, var(--env-dark) 80%, #000));
+}
+
+/* Light spilling out of the envelope as it opens */
+.glow {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: 30%;
+  width: 140%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 236, 190, 0.95), rgba(255, 220, 150, 0.35) 35%, transparent 65%);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.3);
+  pointer-events: none;
 }
 
 /* The front pocket: a V cut at the top, with shaded side folds */
@@ -162,27 +181,35 @@
   }
 }
 
+/* A wax seal: uneven edge, a pressed rim and the embossed 囍 */
 .seal {
   position: absolute;
   z-index: 5;
   left: 50%;
   top: 62%;
-  width: 72px;
-  height: 72px;
-  margin: -36px 0 0 -36px;
+  width: 78px;
+  height: 78px;
+  margin: -39px 0 0 -39px;
   display: grid;
   place-items: center;
   border: none;
-  border-radius: 50%;
+  border-radius: 47% 53% 49% 51% / 52% 47% 53% 48%;
   background:
-    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.45), transparent 45%),
-    var(--seal);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--seal) 60%, #000 10%), 0 8px 18px rgba(0, 0, 0, 0.35);
-  color: var(--env-dark);
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.5), transparent 38%),
+    radial-gradient(circle at 50% 50%, var(--seal) 52%, color-mix(in srgb, var(--seal) 78%, #000) 100%);
+  box-shadow:
+    inset 0 0 0 5px color-mix(in srgb, var(--seal) 85%, #000 15%),
+    inset 0 0 0 7px color-mix(in srgb, var(--seal) 70%, #fff 30%),
+    0 10px 22px rgba(0, 0, 0, 0.35);
+  color: color-mix(in srgb, var(--seal) 45%, var(--env-dark));
   font-size: 3.2rem;
   cursor: pointer;
   animation: pulse 2.4s ease-in-out infinite;
   transition: transform 0.4s ease, opacity 0.4s ease;
+
+  span {
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55), 0 -1px 0 rgba(0, 0, 0, 0.25);
+  }
 
   &:focus-visible {
     outline: 3px solid #fff;
@@ -197,11 +224,21 @@
 }
 
 .hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
   margin: 0;
   font-size: 1.35rem;
   letter-spacing: 0.08em;
   color: #6b4a35;
   animation: blink 2.4s ease-in-out infinite;
+}
+
+.hint small {
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+  opacity: 0.75;
 }
 
 @keyframes blink {
@@ -216,9 +253,11 @@
   pointer-events: none;
 
   .seal {
-    animation: none;
-    transform: scale(0.4);
-    opacity: 0;
+    animation: crack 0.55s cubic-bezier(0.3, 0, 0.2, 1) forwards;
+  }
+
+  .glow {
+    animation: glow 1.6s ease-out 0.35s forwards;
   }
 
   .flap {
@@ -227,13 +266,46 @@
   }
 
   .letter {
-    transform: translateY(-58%) scale(1.04);
+    animation: letterOut 1.45s cubic-bezier(0.3, 0, 0.2, 1) 0.5s forwards;
   }
 
   .hint,
   .to {
     opacity: 0;
     transition: opacity 0.3s ease;
+  }
+}
+
+/* The seal pops, then breaks away */
+@keyframes crack {
+  30% {
+    transform: scale(1.18) rotate(-6deg);
+  }
+  100% {
+    transform: scale(0.2) rotate(25deg);
+    opacity: 0;
+  }
+}
+
+@keyframes glow {
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.6);
+  }
+}
+
+/* The card rises out of the pocket, then fills the screen */
+@keyframes letterOut {
+  50% {
+    transform: translateY(-62%) scale(1.04);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-40%) scale(2.4);
+    opacity: 0;
   }
 }
 
@@ -247,5 +319,11 @@
   .letter,
   .stage {
     transition: none;
+  }
+
+  .opening .seal,
+  .opening .glow,
+  .opening .letter {
+    animation: none;
   }
 }
