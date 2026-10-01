@@ -56,3 +56,22 @@ describe('formatting', () => {
     expect(formatBirth({ birthDate: '1995-07-20', calendar: 'lunar', hourBranch: 5 })).toBe('20/7/1995 (âm lịch), giờ Tỵ');
   });
 });
+
+describe('almanac date helpers', () => {
+  const { addDays, currentHourBranch, todayInVietnam } = require('./fortune');
+
+  it('uses Vietnam time, not the browser time zone', () => {
+    // 18:30 UTC on 30/9 is 01:30 on 1/10 in Vietnam (Sửu hour)
+    const now = new Date(Date.UTC(2026, 8, 30, 18, 30));
+    expect(todayInVietnam(now)).toBe('2026-10-01');
+    expect(currentHourBranch(now)).toBe(1);
+    // 23:10 is already Tý of the next day
+    expect(currentHourBranch(new Date(Date.UTC(2026, 8, 30, 16, 10)))).toBe(0);
+  });
+
+  it('adds days across months and leap years', () => {
+    expect(addDays('2024-02-28', 1)).toBe('2024-02-29');
+    expect(addDays('2024-03-01', -1)).toBe('2024-02-29');
+    expect(addDays('2026-12-31', 1)).toBe('2027-01-01');
+  });
+});

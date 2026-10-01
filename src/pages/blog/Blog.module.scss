@@ -81,3 +81,151 @@
         color: var(--text);
     }
 }
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Reading column, plus a sticky table of contents on wide screens */
+.layout {
+    display: grid;
+    grid-template-columns: minmax(0, var(--reading));
+    justify-content: center;
+    column-gap: 56px;
+}
+
+.main {
+    min-width: 0;
+}
+
+.content {
+    :global(h1),
+    :global(h2),
+    :global(h3) {
+        scroll-margin-top: calc(var(--header-h) + 20px);
+    }
+}
+
+.tocAside {
+    display: none;
+}
+
+.tocInline {
+    margin-top: 32px;
+    padding: 14px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+
+    summary {
+        cursor: pointer;
+        font-weight: 600;
+        color: var(--text);
+    }
+
+    &[open] summary {
+        margin-bottom: 14px;
+    }
+}
+
+/* The reading column stays centred (aligned with the title); the table of
+   contents lives in the right gutter. */
+@media (min-width: 1280px) {
+    .withToc {
+        max-width: calc(var(--reading) + 2 * 256px + 48px);
+        grid-template-columns: minmax(0, 1fr) minmax(0, var(--reading)) minmax(0, 1fr);
+        column-gap: 48px;
+
+        .main {
+            grid-column: 2;
+        }
+    }
+
+    .withToc .tocInline {
+        display: none;
+    }
+
+    .tocAside {
+        display: block;
+        grid-column: 3;
+        grid-row: 1;
+        align-self: start;
+        position: sticky;
+        top: calc(var(--header-h) + 32px);
+        max-width: 240px;
+        max-height: calc(100vh - var(--header-h) - 64px);
+        overflow-y: auto;
+        padding-top: 48px;
+    }
+}
+
+.reactRow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px 24px;
+    margin-top: 56px;
+    padding: 24px 28px;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, var(--brand-soft), var(--surface));
+    border: 1px solid var(--border);
+
+    h2 {
+        margin: 0;
+        font-family: var(--font-serif);
+        font-size: 2.2rem;
+        font-weight: 600;
+        color: var(--text);
+    }
+
+    p {
+        margin: 6px 0 0;
+        color: var(--text-2);
+        font-size: 1.45rem;
+    }
+}
+
+.comments {
+    margin-top: 24px;
+}
+
+.related {
+    margin-top: 32px;
+    padding-top: 40px;
+    padding-bottom: 24px;
+    border-top: 1px solid var(--border);
+}
+
+.relatedHead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 24px;
+
+    h2 {
+        margin: 4px 0 0;
+        font-family: var(--font-serif);
+        font-size: clamp(2.4rem, 3vw, 3rem);
+        font-weight: 600;
+        color: var(--text);
+    }
+}
+
+.relatedAll {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    color: var(--brand-text);
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}

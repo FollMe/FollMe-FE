@@ -10,6 +10,8 @@ import { useWebSocket } from "customHooks/useWebSocket";
 import OvalLoading from 'components/loading/OvalLoading';
 import ArticleHeader from 'components/article/ArticleHeader';
 import ReadingProgress from 'components/ReadingProgress';
+import HeartButton from 'components/reaction/HeartButton';
+import { storyPostKey } from 'util/reaction';
 
 export default function ShortStory() {
   const {wsSend} = useWebSocket();
@@ -76,6 +78,7 @@ export default function ShortStory() {
             story.updatedAt && <><IoCalendarOutline /> {formatLongDate(story.updatedAt)}</>,
             <><IoTimeOutline /> {getReadingMinutes(story.chaps[0].content)} phút đọc</>,
           ]}
+          actions={<HeartButton postKey={storyPostKey(storySlug)} />}
         />
 
         <div className={clsx('prose', styles.content)}>

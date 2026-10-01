@@ -453,3 +453,72 @@ button.ctaButton {
     padding: 56px 20px;
   }
 }
+
+/* ---------- Today ---------- */
+.todayGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+
+  > * {
+    height: 100%;
+  }
+}
+
+.todayCard {
+  height: 100%;
+}
+
+.fortuneTile {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  height: 100%;
+  padding: 22px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  color: var(--text);
+  text-decoration: none;
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease), transform 0.2s var(--ease);
+
+  h3 {
+    margin: 10px 0 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0;
+    color: var(--text-2);
+    font-size: 1.45rem;
+  }
+
+  &:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+
+    .featureIcon {
+      background: var(--brand);
+      color: var(--on-brand);
+      transform: rotate(-6deg);
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .todayGrid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+
+    > :first-child {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+@media (max-width: 520px) {
+  .todayGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

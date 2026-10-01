@@ -3,7 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import {
   IoArrowForward, IoNewspaperOutline, IoLibraryOutline, IoTicketOutline, IoLogoGithub, IoSparklesOutline,
+  IoCalculatorOutline, IoGridOutline,
 } from 'react-icons/io5';
+import TodayAlmanacCard from 'components/almanac/TodayAlmanacCard';
 import BlogItem from 'components/blog/BlogItem';
 import StoryItem from 'components/story/StoryItem';
 import { PostCardSkeleton } from 'components/cards/PostCard';
@@ -176,6 +178,36 @@ export default function Home() {
                 <StoryItem story={story} />
               </Reveal>
             ))}
+        </div>
+      </section>
+
+      {/* ---------- Today ---------- */}
+      <section className={`container ${styles.section}`}>
+        <Reveal className={styles.sectionHead}>
+          <div>
+            <div className="eyebrow">Hôm nay</div>
+            <h2 className={styles.sectionTitle}>Xem ngày & khám phá bản thân</h2>
+          </div>
+          <Link to="/fortune" className={styles.seeAll}>Thần số học & Tử vi <IoArrowForward /></Link>
+        </Reveal>
+        <div className={styles.todayGrid}>
+          <Reveal>
+            <TodayAlmanacCard className={styles.todayCard} />
+          </Reveal>
+          <Reveal delay={80}>
+            <Link to="/fortune/numerology" className={styles.fortuneTile}>
+              <span className={styles.featureIcon}><IoCalculatorOutline /></span>
+              <h3>Thần số học</h3>
+              <p>Con số chủ đạo và ý nghĩa họ tên của bạn.</p>
+            </Link>
+          </Reveal>
+          <Reveal delay={160}>
+            <Link to="/fortune/tu-vi" className={styles.fortuneTile}>
+              <span className={styles.featureIcon}><IoGridOutline /></span>
+              <h3>Lá số tử vi</h3>
+              <p>12 cung, chính tinh và vận hạn năm nay.</p>
+            </Link>
+          </Reveal>
         </div>
       </section>
 

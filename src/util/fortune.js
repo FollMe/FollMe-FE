@@ -181,3 +181,47 @@ export function formatBirth(values) {
   }
   return text;
 }
+
+/**
+ * Daily almanac (lịch vạn niên). `date` is "YYYY-MM-DD"; omit for today in
+ * Vietnam.
+ */
+export function getAlmanac(date) {
+  return request.get(`${API}/day${date ? `?date=${date}` : ''}`);
+}
+
+/** Formats a local Date as "YYYY-MM-DD". */
+export function toISODate(d) {
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+/** Adds days to a "YYYY-MM-DD" date. */
+export function addDays(isoDate, days) {
+  const [y, m, d] = isoDate.split('-').map(Number);
+  return toISODate(new Date(y, m - 1, d + days));
+}
+
+/** e.g. "23h–1h" */
+export function formatHourRange(hour) {
+  return `${hour.from}h–${hour.to}h`;
+}
+
+const VN_DATE = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh', year: 'numeric', month: '2-digit', day: '2-digit' });
+const VN_HOUR = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', hourCycle: 'h23' });
+
+/** Today in Vietnam as "YYYY-MM-DD", whatever the browser's time zone. */
+export function todayInVietnam(now = new Date()) {
+  return VN_DATE.format(now);
+}
+
+/** The current two-hour period (0 = Tý) in Vietnam. */
+export function currentHourBranch(now = new Date()) {
+  const hour = Number(VN_HOUR.format(now));
+  return Math.floor((hour + 1) / 2) % 12;
+}
+
+/** "tháng 8" or "tháng 8 nhuận". */
+export function lunarMonthLabel(lunar) {
+  return `tháng ${lunar.month}${lunar.isLeapMonth ? ' nhuận' : ''}`;
+}

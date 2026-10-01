@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import Button from '@mui/material/Button';
@@ -6,10 +6,11 @@ import IconButton from '@mui/material/IconButton';
 import Drawer from '@mui/material/Drawer';
 import {
   IoMenu, IoClose, IoHomeOutline, IoNewspaperOutline, IoLibraryOutline, IoTicketOutline, IoCreateOutline,
-  IoSparklesOutline,
+  IoSparklesOutline, IoSearchOutline,
 } from 'react-icons/io5';
 import RequestSignInDialog from 'components/dialog/RequestSignInDialog';
 import UserMenu from 'components/UserMenu';
+import CommandPalette from 'components/search/CommandPalette';
 import BrandLogo from './BrandLogo';
 import ThemeToggle from './ThemeToggle';
 import styles from './SiteHeader.module.scss';
@@ -26,6 +27,10 @@ export default function SiteHeader({ isLoggedIn, userInfo }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showRequestLoginDialog, setShowRequestLoginDialog] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const openSearch = useCallback(() => setIsSearchOpen(true), []);
+  const closeSearch = useCallback(() => setIsSearchOpen(false), []);
+  const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 8);
@@ -70,6 +75,11 @@ export default function SiteHeader({ isLoggedIn, userInfo }) {
         </nav>
 
         <div className={styles.actions}>
+          <button type="button" className={styles.searchTrigger} onClick={openSearch} aria-label="Tìm kiếm">
+            <IoSearchOutline />
+            <span className={styles.searchLabel}>Tìm kiếm…</span>
+            <kbd className={styles.searchKbd}>{isMac ? '⌘' : 'Ctrl'} K</kbd>
+          </button>
           <ThemeToggle />
           {isLoggedIn ? (
             <>
@@ -144,6 +154,8 @@ export default function SiteHeader({ isLoggedIn, userInfo }) {
           )}
         </div>
       </Drawer>
+
+      <CommandPalette open={isSearchOpen} onOpen={openSearch} onClose={closeSearch} />
 
       {
         showRequestLoginDialog

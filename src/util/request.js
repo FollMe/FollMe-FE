@@ -8,11 +8,11 @@ function ServerError(message) {
     return error;
 }
 
-async function post(url = '', data = {}, isHaveFile = false) {
+async function post(url = '', data = {}, isHaveFile = false, method = 'POST') {
     try {
         const token = localStorage.getItem('token');
         const requestConfigs = {
-            method: 'POST',
+            method,
             cache: 'no-cache',
             credentials: 'same-origin',
             headers: {
@@ -98,6 +98,8 @@ async function send(method, url = '', data) {
 }
 
 const put = (url, data = {}) => send('PUT', url, data);
+// Multipart PUT, e.g. to replace a blog's thumbnail
+const putForm = (url, formData) => post(url, formData, true, 'PUT');
 const del = (url) => send('DELETE', url);
 
 async function authenticate(route, data) {
@@ -126,4 +128,4 @@ export const authRouteList = {
     'default': 'api/auth/local'
 }
 
-export const request = { get, post, put, del, authenticate };
+export const request = { get, post, put, putForm, del, authenticate };

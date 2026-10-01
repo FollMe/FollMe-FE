@@ -3,7 +3,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import { IoCreateOutline } from 'react-icons/io5';
+import InputAdornment from '@mui/material/InputAdornment';
+import TextField from '@mui/material/TextField';
+import IconButton from '@mui/material/IconButton';
+import { IoCreateOutline, IoSearchOutline, IoClose } from 'react-icons/io5';
 import PageHeader from 'components/PageHeader';
 import BlogItem from 'components/blog/BlogItem';
 import { PostCardSkeleton } from 'components/cards/PostCard';
@@ -12,6 +15,8 @@ import { useUserInfo } from 'customHooks/useUserInfo';
 import { request } from 'util/request';
 import { handleCheckLoggedIn } from "util/authHelper";
 import { getSortingValue } from 'util/stringUtil';
+import { searchItems } from 'util/search';
+import { blogPostKey, reactionApi } from 'util/reaction';
 
 export default function BlogList() {
   const navigate = useNavigate();
@@ -21,6 +26,7 @@ export default function BlogList() {
   const [isLoading, setIsLoading] = useState(true);
   const [showRequestLoginDialog, setShowRequestLoginDialog] = useState(false);
   const sort = getSortingValue(searchParams.get('sort'));
+  const [query, setQuery] = useState(searchParams.get('q') ?? '');
   const isLoggedIn = useMemo(
     () => handleCheckLoggedIn(userInfo.sessionExp)
     , [userInfo]
@@ -48,9 +54,11 @@ export default function BlogList() {
       const queryParams = []
       if (sort) {
         queryParams.push(`sort=${sort}`);
-        searchParams.set('sort', sort);
+        setSearchParams(prev => {
+          prev.set('sort', sort);
+          return prev;
+        }, { replace: true });
       }
-      setSearchParams(searchParams);
 
       let url = 'api/blogs';
       if (queryParams.length > 0) {
@@ -62,6 +70,7 @@ export default function BlogList() {
         return;
       }
       setBlogs(blogs);
+      populateHearts(blogs);
     } catch (err) {
       console.log(err);
     } finally {
@@ -70,6 +79,35 @@ export default function BlogList() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  async function populateHearts(blogs) {
+    try {
+      const counts = await reactionApi.counts(blogs.map(blog => blogPostKey(blog.slug)));
+      setBlogs(current => current.map(blog => ({ ...blog, hearts: counts[blogPostKey(blog.slug)] ?? 0 })));
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  function handleSearch(value) {
+    setQuery(value);
+    setSearchParams(prev => {
+      if (value.trim()) {
+        prev.set('q', value);
+      } else {
+        prev.delete('q');
+      }
+      return prev;
+    }, { replace: true });
+  }
+
+  const results = useMemo(
+    () => (query.trim()
+      ? searchItems(blogs, query, blog => `${blog.title} ${blog.author?.name ?? ''}`)
+      : blogs),
+    [blogs, query]
+  );
+  const isSearching = query.trim().length > 0;
+
   useEffect(() => {
     document.title = "Blog | FollMe";
     const sort = searchParams.get('sort')
@@ -77,8 +115,8 @@ export default function BlogList() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const showFeatured = sort === '-updatedAt' && blogs.length > 2;
-  const [featured, ...rest] = blogs;
+  const showFeatured = !isSearching && sort === '-updatedAt' && blogs.length > 2;
+  const [featured, ...rest] = results;
 
   return (
     <div className="container page">
@@ -94,11 +132,35 @@ export default function BlogList() {
       />
 
       <div className="toolbar">
-        <ToggleButtonGroup value={sort} exclusive onChange={onSorting} aria-label="Sắp xếp" size="small">
-          <ToggleButton value="-updatedAt">Mới nhất</ToggleButton>
-          <ToggleButton value="updatedAt">Cũ nhất</ToggleButton>
-        </ToggleButtonGroup>
-        {!isLoading && <span className="toolbar__count">{blogs.length} bài viết</span>}
+        <div className="toolbar__group">
+          <TextField
+            size="small"
+            placeholder="Tìm bài viết…"
+            value={query}
+            onChange={e => handleSearch(e.target.value)}
+            inputProps={{ 'aria-label': 'Tìm bài viết' }}
+            sx={{ width: { xs: '100%', sm: 280 } }}
+            InputProps={{
+              startAdornment: <InputAdornment position="start"><IoSearchOutline /></InputAdornment>,
+              endAdornment: query && (
+                <InputAdornment position="end">
+                  <IconButton size="small" aria-label="Xóa tìm kiếm" onClick={() => handleSearch('')}>
+                    <IoClose />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+          <ToggleButtonGroup value={sort} exclusive onChange={onSorting} aria-label="Sắp xếp" size="small">
+            <ToggleButton value="-updatedAt">Mới nhất</ToggleButton>
+            <ToggleButton value="updatedAt">Cũ nhất</ToggleButton>
+          </ToggleButtonGroup>
+        </div>
+        {!isLoading && (
+          <span className="toolbar__count">
+            {isSearching ? `${results.length} / ${blogs.length} bài viết` : `${blogs.length} bài viết`}
+          </span>
+        )}
       </div>
 
       {
@@ -110,6 +172,8 @@ export default function BlogList() {
           </div>
         ) : blogs.length <= 0 ? (
           <div className="empty-state">Hiện chưa có blog nào.</div>
+        ) : results.length <= 0 ? (
+          <div className="empty-state">Không có bài viết nào khớp với “{query}”.</div>
         ) : (
           <>
             {showFeatured && (
@@ -118,7 +182,7 @@ export default function BlogList() {
               </div>
             )}
             <div className="card-grid stagger">
-              {(showFeatured ? rest : blogs).map(blog =>
+              {(showFeatured ? rest : results).map(blog =>
                 <BlogItem key={blog._id} blog={blog} />
               )}
             </div>

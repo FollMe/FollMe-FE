@@ -25,6 +25,7 @@ const FortuneHome = lazy(() => import("pages/fortune/FortuneHome"));
 const Numerology = lazy(() => import("pages/fortune/Numerology"));
 const TuVi = lazy(() => import("pages/fortune/TuVi"));
 const FortuneProfiles = lazy(() => import("pages/fortune/Profiles"));
+const Almanac = lazy(() => import("pages/fortune/Almanac"));
 
 const withSuspense = (element) => (
   <Suspense fallback={<OvalLoading />}>{element}</Suspense>
@@ -63,6 +64,7 @@ export default function Router() {
         { path: '/fortune', element: withSuspense(<FortuneHome />) },
         { path: '/fortune/numerology', element: withSuspense(<Numerology />) },
         { path: '/fortune/tu-vi', element: withSuspense(<TuVi />) },
+        { path: '/fortune/lich', element: withSuspense(<Almanac />) },
       ]
     },
 
@@ -71,6 +73,7 @@ export default function Router() {
       element: <AuthMainLayout isProtected={true} />,
       children: [
         { path: '/blogs/create', element: withSuspense(<CreateBlog />) },
+        { path: '/blogs/:blogSlug/edit', element: withSuspense(<CreateBlog key="edit" />) },
         { path: '/events', element: withSuspense(<InvitationList />) },
         { path: '/events/create', element: withSuspense(<CreateEvent />) },
         { path: '/events/:eventId', element: withSuspense(<Event />) },

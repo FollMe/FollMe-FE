@@ -7,6 +7,8 @@ import { getReadingMinutes } from 'util/date.js';
 import OvalLoading from 'components/loading/OvalLoading';
 import ArticleHeader from 'components/article/ArticleHeader';
 import ReadingProgress from 'components/ReadingProgress';
+import HeartButton from 'components/reaction/HeartButton';
+import { storyPostKey } from 'util/reaction';
 import { CommentContainer } from 'components/comment/CommentContainer';
 import { useWebSocket } from "customHooks/useWebSocket";
 
@@ -82,6 +84,7 @@ export default function Story() {
             <><IoBookOutline /> {story.name}</>,
             <><IoTimeOutline /> {getReadingMinutes(chap.content)} phút đọc</>,
           ]}
+          actions={<HeartButton postKey={storyPostKey(storySlug)} />}
         />
 
         <div className={clsx('prose', styles.content)}>

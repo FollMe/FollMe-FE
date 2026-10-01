@@ -7,6 +7,9 @@ FollMe Frontend is a React-based web application that provides an interactive us
 - **Post Management**: Create, view, and manage posts.
 - **Comment System**: Add, retrieve, and manage comments for posts.
 - **Real-Time Updates**: WebSocket-based real-time interactions for comments and notifications.
+- **Reading Experience**: Table of contents, "thả tim" reactions, live comments and related posts on blogs; authors can edit and delete their posts.
+- **Site Search**: Ctrl/⌘ + K (or `/`) opens a command palette over pages, blogs and stories, matching Vietnamese with or without accents.
+- **Lịch vạn niên**: Daily lunar calendar with can chi, ngày hoàng đạo, giờ hoàng đạo and tiết khí (`/fortune/lich`).
 - **Responsive Design**: Optimized for both desktop and mobile devices.
 
 ## Project Structure

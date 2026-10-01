@@ -1,4 +1,4 @@
-import { useState, forwardRef, useRef } from 'react';
+import { useState, forwardRef, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -31,11 +31,14 @@ const Transition = forwardRef(function Transition(props, ref) {
 export default function CreateBlogModel({
     isOpen,
     onCloseCreateModel,
-    onPostBlog
+    onPostBlog,
+    initialTitle = '',
+    currentThumbnail,
+    isEditing = false,
 }) {
     const navigate = useNavigate();
     const [mode] = useColorMode();
-    const [txtLabel, setTxtLabel] = useState("");
+    const [txtLabel, setTxtLabel] = useState(initialTitle);
     const [errorLabel, setErrorLabel] = useState(false);
     const [isPosting, setIsPosting] = useState(false);
 
@@ -48,6 +51,13 @@ export default function CreateBlogModel({
         }
     }).use(FileInput))
 
+    // The blog being edited loads after the first render
+    useEffect(() => {
+        if (initialTitle) {
+            setTxtLabel(initialTitle);
+        }
+    }, [initialTitle]);
+
     async function handlePostBlog() {
         try {
             setIsPosting(true);
@@ -59,8 +69,8 @@ export default function CreateBlogModel({
             const thumbnail = uppy.current.getFiles().length > 0
                 ? uppy.current.getFiles()[0].data
                 : undefined;
-            await onPostBlog(label, thumbnail);
-            navigate('/blogs');
+            const res = await onPostBlog(label, thumbnail);
+            navigate(res?.slug ? `/blogs/${res.slug}` : '/blogs');
         } catch (err) {
             console.log(err);
         } finally {
@@ -74,7 +84,7 @@ export default function CreateBlogModel({
                 TransitionComponent={Transition}
                 open={isOpen}
             >
-                <DialogTitle>Chia sẻ blog của bạn</DialogTitle>
+                <DialogTitle>{isEditing ? 'Cập nhật blog' : 'Chia sẻ blog của bạn'}</DialogTitle>
                 <DialogContent>
                     <div className={styles.inpBlogTitle}>
                         <TextField
@@ -97,8 +107,16 @@ export default function CreateBlogModel({
                         />
                         <div className={styles.txtCounter}>{txtLabel.trim().length}/150</div>
                     </div>
+                    {isEditing && currentThumbnail && (
+                        <div className={styles.currentThumb}>
+                            <img src={currentThumbnail} alt="" />
+                            <span>Ảnh bìa hiện tại</span>
+                        </div>
+                    )}
                     <DialogContentText>
-                        Mẹo: Thêm ảnh bìa giúp blog của bạn trở nên hấp dẫn hơn!
+                        {isEditing
+                            ? 'Chọn ảnh mới nếu muốn thay ảnh bìa, hoặc để trống để giữ nguyên.'
+                            : 'Mẹo: Thêm ảnh bìa giúp blog của bạn trở nên hấp dẫn hơn!'}
                     </DialogContentText>
                     <Dashboard uppy={uppy.current} plugins={['FileInput']} hideUploadButton={true} height={400} theme={mode} />
                 </DialogContent>
@@ -112,7 +130,7 @@ export default function CreateBlogModel({
                         loadingPosition="end"
                         endIcon={<RocketIcon />}
                     >
-                        Đăng
+                        {isEditing ? 'Lưu thay đổi' : 'Đăng'}
                     </LoadingButton>
                 </DialogActions>
             </Dialog>

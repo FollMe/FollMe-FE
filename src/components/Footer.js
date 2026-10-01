@@ -24,6 +24,8 @@ export default function Footer() {
             <h3>Khám phá</h3>
             <Link to="/blogs">Blog</Link>
             <Link to="/stories">Truyện</Link>
+            <Link to="/fortune">Thần số học &amp; Tử vi</Link>
+            <Link to="/fortune/lich">Lịch vạn niên</Link>
             <Link to="/events">Thư mời điện tử</Link>
           </div>
           <div className={styles.column}>
