@@ -1,0 +1,265 @@
+.gift {
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--inv-title);
+  font-size: clamp(3.2rem, 9vw, 4.2rem);
+  font-style: italic;
+  font-weight: 600;
+}
+
+.sub {
+  max-width: 34ch;
+  margin: 8px auto 24px;
+  font-size: 1.4rem;
+  line-height: 1.6;
+  color: var(--inv-muted);
+}
+
+.stage {
+  display: grid;
+  place-items: center;
+  perspective: 1000px;
+}
+
+/* ---------- The red envelope (bao lì xì) ---------- */
+.packet {
+  --red: #b3141b;
+  --red-dark: #7d0c11;
+  --gold: #e6c36a;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  width: 210px;
+  aspect-ratio: 3 / 4.2;
+  padding: 0;
+  border: none;
+  border-radius: 14px;
+  background:
+    /* gold coin dots */
+    radial-gradient(circle, rgba(230, 195, 106, 0.28) 1.6px, transparent 2px) 0 0 / 16px 16px,
+    /* the flap's curve */
+    radial-gradient(ellipse 80% 32% at 50% 0%, var(--red-dark) 98%, transparent 100%),
+    linear-gradient(160deg, var(--red), var(--red-dark));
+  box-shadow:
+    inset 0 0 0 3px var(--red-dark),
+    inset 0 0 0 5px var(--gold),
+    0 18px 36px rgba(125, 12, 17, 0.35);
+  color: var(--gold);
+  cursor: pointer;
+  overflow: hidden;
+  transform: rotate(-3deg);
+  transition: transform 0.35s var(--ease, ease);
+  animation: sway 3.2s ease-in-out infinite;
+
+  &:hover,
+  &:focus-visible {
+    transform: rotate(0deg) translateY(-4px) scale(1.03);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--inv-accent);
+    outline-offset: 4px;
+  }
+
+  /* light sweeping across the paper */
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -60%;
+    width: 45%;
+    background: linear-gradient(100deg, transparent, rgba(255, 236, 190, 0.35), transparent);
+    transform: skewX(-12deg);
+    animation: shine 3.6s ease-in-out 0.8s infinite;
+  }
+}
+
+@keyframes sway {
+  50% {
+    transform: rotate(2deg);
+  }
+}
+
+@keyframes shine {
+  55%,
+  100% {
+    left: 130%;
+  }
+}
+
+.medal {
+  display: grid;
+  place-items: center;
+  width: 92px;
+  height: 92px;
+  margin-top: 26px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff3c9, var(--gold) 55%, #b88a2c);
+  box-shadow: 0 0 0 4px var(--red-dark), 0 0 0 6px var(--gold), 0 6px 14px rgba(0, 0, 0, 0.3);
+  color: var(--red);
+  font-size: 4.6rem;
+  font-weight: 700;
+}
+
+.packetText {
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* ---------- The opened card ---------- */
+.card {
+  width: min(100%, 320px);
+  padding: 22px 20px 20px;
+  border: 1px solid var(--inv-line);
+  border-radius: 20px;
+  background: var(--inv-paper);
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.12);
+  animation: unfold 0.6s var(--ease, ease) both;
+}
+
+@keyframes unfold {
+  from {
+    opacity: 0;
+    transform: rotateY(70deg) scale(0.9);
+  }
+}
+
+.sides {
+  display: flex;
+  gap: 4px;
+  margin: 0 auto 18px;
+  padding: 4px;
+  width: fit-content;
+  border-radius: 999px;
+  background: var(--inv-soft);
+}
+
+.side {
+  padding: 7px 16px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--inv-muted);
+  font: inherit;
+  font-size: 1.35rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &.active {
+    background: var(--inv-accent);
+    color: var(--inv-accent-ink);
+  }
+}
+
+.qr {
+  position: relative;
+  width: fit-content;
+  margin: 0 auto;
+  padding: 12px;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+
+  svg {
+    display: block;
+  }
+}
+
+.qrBadge {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border-radius: 10px;
+  background: #b3141b;
+  box-shadow: 0 0 0 4px #ffffff;
+  color: #f3d27a;
+  font-size: 2.2rem;
+}
+
+/* Below the code, clear of its corner finder patterns */
+.sample {
+  position: absolute;
+  left: 50%;
+  bottom: -11px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: #1c1917;
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transform: translateX(-50%) rotate(-3deg);
+}
+
+.bank {
+  margin-top: 16px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--inv-muted);
+}
+
+.account {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+  padding: 4px 10px;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  color: var(--inv-ink);
+  font-family: var(--inv-title);
+  font-size: 2.6rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  font-variant-numeric: lining-nums tabular-nums;
+  cursor: pointer;
+
+  svg {
+    font-size: 1.8rem;
+    color: var(--inv-accent);
+  }
+
+  &:hover {
+    background: var(--inv-soft);
+  }
+}
+
+.holder {
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.hint {
+  margin: 14px 0 0;
+  font-size: 1.25rem;
+  color: var(--inv-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .packet,
+  .packet::after,
+  .card {
+    animation: none;
+  }
+}

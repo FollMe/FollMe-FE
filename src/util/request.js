@@ -42,7 +42,12 @@ async function post(url = '', data = {}, isHaveFile = false, method = 'POST') {
     }
 }
 
-async function get(url = '') {
+/**
+ * @param {string} url
+ * @param {{ quiet?: boolean }} [opts] quiet: no toast on failure, for
+ *   decorative data the page can do without
+ */
+async function get(url = '', { quiet = false } = {}) {
     try {
         const token = localStorage.getItem('token');
         const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/${url}`, {
@@ -54,13 +59,15 @@ async function get(url = '') {
         const dataRes = await response.json();
 
         if (!dataRes.meta.ok) {
-            handleError(response, dataRes.meta.message);
+            if (!quiet) {
+                handleError(response, dataRes.meta.message);
+            }
             throw ServerError(dataRes.meta.message);
         }
 
         return dataRes.data;
     } catch (err) {
-        if (err.name !== 'SERVER_ERROR') {
+        if (err.name !== 'SERVER_ERROR' && !quiet) {
             toast.error("Xảy ra lỗi, vui lòng thử lại!");
         }
         throw err;

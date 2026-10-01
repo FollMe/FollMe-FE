@@ -1,0 +1,81 @@
+.wrap {
+  position: relative;
+  display: inline-block;
+  border-radius: 14px;
+  outline-offset: 6px;
+
+  &:focus-visible {
+    outline: 2px solid var(--inv-accent, currentColor);
+  }
+}
+
+/* The foil reaches a little past the text it hides */
+.foil,
+.sheen {
+  position: absolute;
+  inset: -8px -14px;
+  width: calc(100% + 28px);
+  height: calc(100% + 16px);
+  border-radius: 14px;
+}
+
+.foil {
+  touch-action: none;
+  cursor: grab;
+  box-shadow: 0 6px 18px rgba(90, 60, 10, 0.25), inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+/* A light sweeping across the foil, inviting a touch */
+.sheen {
+  pointer-events: none;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 40%;
+    left: -50%;
+    background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+    animation: sweep 2.8s ease-in-out 1s infinite;
+  }
+}
+
+@keyframes sweep {
+  60%,
+  100% {
+    left: 120%;
+  }
+}
+
+.scratching .sheen {
+  display: none;
+}
+
+.revealed {
+  .foil {
+    opacity: 0;
+    transform: scale(1.06);
+    pointer-events: none;
+  }
+
+  .sheen {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheen::after {
+    animation: none;
+  }
+
+  .foil {
+    transition: none;
+  }
+}
