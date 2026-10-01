@@ -14,24 +14,31 @@ export default function Footer() {
         <div className={styles.about}>
           <BrandLogo />
           <p className={styles.tagline}>
-            Nơi chia sẻ những bài viết về lập trình, những câu chuyện đời thường
-            và những lời mời gửi đến người thân yêu.
+            Xem tuổi, chọn ngày cưới và gửi thiệp cưới online, cùng lịch vạn niên
+            và tử vi hằng ngày cho những ngày quan trọng của bạn.
           </p>
         </div>
 
         <div className={styles.columns}>
           <div className={styles.column}>
-            <h3>Khám phá</h3>
-            <Link to="/blogs">Blog</Link>
-            <Link to="/stories">Truyện</Link>
-            <Link to="/fortune">Thần số học &amp; Tử vi</Link>
-            <Link to="/fortune/lich">Lịch vạn niên</Link>
+            <h3>Cưới hỏi</h3>
             <Link to="/fortune/hop-tuoi">Xem tuổi hợp nhau</Link>
-            <Link to="/doc-sau">Đọc sau</Link>
-            <Link to="/events">Thư mời điện tử</Link>
+            <Link to="/cuoi-hoi/chon-ngay">Chọn ngày cưới</Link>
+            <Link to="/cuoi-hoi">Thiệp cưới online</Link>
+            <Link to="/events">Thiệp của tôi</Link>
           </div>
           <div className={styles.column}>
-            <h3>Kết nối</h3>
+            <h3>Xem ngày</h3>
+            <Link to="/fortune/lich">Lịch vạn niên</Link>
+            <Link to="/fortune/lich#con-giap">Tử vi hôm nay</Link>
+            <Link to="/fortune/numerology">Thần số học</Link>
+            <Link to="/fortune/tu-vi">Lá số tử vi</Link>
+          </div>
+          <div className={styles.column}>
+            <h3>Góc nhỏ</h3>
+            <Link to="/blogs">Blog</Link>
+            <Link to="/stories">Truyện</Link>
+            <Link to="/doc-sau">Đọc sau</Link>
             <a href={GITHUB_URL} target="_blank" rel="noreferrer">
               <IoLogoGithub /> GitHub
             </a>

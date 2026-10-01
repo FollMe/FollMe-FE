@@ -210,3 +210,17 @@
   padding: 20px;
   border-top: 1px solid var(--border);
 }
+
+.drawerSection {
+  margin: 16px 12px 4px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.drawerMinor {
+  font-size: 1.45rem !important;
+  color: var(--text-2);
+}

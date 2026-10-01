@@ -1,8 +1,13 @@
 # FollMe Frontend
 
-FollMe Frontend is a React-based web application that provides an interactive user interface for managing posts, comments, and real-time interactions. This project is designed to deliver a seamless user experience with modern web technologies.
+FollMe helps couples get ready for their big day: check compatibility (xem tuổi), pick a wedding date (chọn ngày cưới) and send online invitations that guests answer and sign. A lunar calendar with daily horoscopes brings people back; the author's blog and stories live in a small corner.
 
 ## Features
+
+- **Cưới hỏi** (`/cuoi-hoi`): the three-step journey below, with FAQ.
+- **Chọn ngày cưới** (`/cuoi-hoi/chon-ngay`): good wedding days for the couple in a range, with reasons, good hours and Kim Lâu warnings; one click to an invitation for that day.
+- **Thiệp mời online**: wedding, engagement, birthday and party invitations in four themes; personal links per guest and a public link (`/e/:eventId`) for group chats; RSVP with headcount; wishes wall; host dashboard with answers, QR and wish moderation.
+- **Analytics**: Vercel Web Analytics via a script tag; `util/analytics.track()` records funnel events.
 
 - **Post Management**: Create, view, and manage posts.
 - **Comment System**: Add, retrieve, and manage comments for posts.

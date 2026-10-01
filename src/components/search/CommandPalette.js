@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import Dialog from '@mui/material/Dialog';
 import {
   IoSearchOutline, IoNewspaperOutline, IoLibraryOutline, IoHomeOutline, IoCreateOutline, IoTicketOutline,
-  IoCalculatorOutline, IoGridOutline, IoCalendarOutline, IoBookmarksOutline, IoContrastOutline, IoReturnDownBack, IoHeartOutline, IoStarOutline, IoBookmarkOutline,
+  IoCalculatorOutline, IoGridOutline, IoCalendarOutline, IoBookmarksOutline, IoContrastOutline, IoReturnDownBack, IoHeartOutline, IoStarOutline, IoBookmarkOutline, IoMailOpenOutline,
 } from 'react-icons/io5';
 import { useColorMode } from 'customHooks/useColorMode';
 import { getStoryLink } from 'components/story/StoryItem';
@@ -14,6 +14,10 @@ import styles from './CommandPalette.module.scss';
 
 const PAGES = [
   { title: 'Trang chủ', to: '/', icon: <IoHomeOutline />, keywords: 'home' },
+  { title: 'Tạo thiệp cưới online', to: '/events/create?type=wedding', icon: <IoMailOpenOutline />, keywords: 'thiep cuoi moi online tao' },
+  { title: 'Chọn ngày cưới', to: '/cuoi-hoi/chon-ngay', icon: <IoCalendarOutline />, keywords: 'ngay cuoi dep xem ngay kim lau' },
+  { title: 'Cưới hỏi', to: '/cuoi-hoi', icon: <IoHeartOutline />, keywords: 'dam cuoi an hoi' },
+  { title: 'Thiệp của tôi', to: '/events', icon: <IoTicketOutline />, keywords: 'su kien thiep moi quan ly' },
   { title: 'Blog', to: '/blogs', icon: <IoNewspaperOutline />, keywords: 'bai viet ky thuat' },
   { title: 'Viết blog mới', to: '/blogs/create', icon: <IoCreateOutline />, keywords: 'soan bai dang' },
   { title: 'Đọc sau', to: '/doc-sau', icon: <IoBookmarkOutline />, keywords: 'bookmark luu da doc lich su' },
@@ -24,7 +28,6 @@ const PAGES = [
   { title: 'Thần số học', to: '/fortune/numerology', icon: <IoCalculatorOutline />, keywords: 'numerology so chu dao' },
   { title: 'Lá số tử vi', to: '/fortune/tu-vi', icon: <IoGridOutline />, keywords: 'tu vi la so' },
   { title: 'Hồ sơ tử vi đã lưu', to: '/fortune/profiles', icon: <IoBookmarksOutline />, keywords: 'ho so luu' },
-  { title: 'Thư mời điện tử', to: '/events', icon: <IoTicketOutline />, keywords: 'su kien thiep moi' },
 ];
 
 // Blogs and stories are fetched once per page load, on first open.

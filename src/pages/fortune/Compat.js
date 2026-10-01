@@ -2,67 +2,17 @@ import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import Button from '@mui/material/Button';
 import LoadingButton from '@mui/lab/LoadingButton';
-import TextField from '@mui/material/TextField';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import { toast } from 'react-toastify';
-import { IoHeart, IoImageOutline, IoLinkOutline, IoCheckmark, IoSwapHorizontal } from 'react-icons/io5';
+import { IoHeart, IoImageOutline, IoLinkOutline, IoCheckmark, IoSwapHorizontal, IoCalendarOutline } from 'react-icons/io5';
+import { Link } from 'react-router-dom';
 import ArticleHeader from 'components/article/ArticleHeader';
+import PersonInput, { EMPTY_PERSON as EMPTY } from 'components/fortune/PersonInput';
 import { setPageMeta } from 'util/meta';
+import { track } from 'util/analytics';
 import {
   DISCLAIMER, decodeCompatFragment, encodeCompatFragment, fortuneApi, parseDateString, zodiacOf,
 } from 'util/fortune';
 import styles from './Compat.module.scss';
-
-const EMPTY = { name: '', birthDate: '', calendar: 'solar', isLeapMonth: false };
-
-function PersonInput({ label, value, onChange }) {
-  const set = (patch) => onChange({ ...value, ...patch });
-  return (
-    <fieldset className={styles.person}>
-      <legend>{label}</legend>
-      <TextField
-        label="Tên (không bắt buộc)"
-        size="small"
-        fullWidth
-        value={value.name}
-        inputProps={{ maxLength: 50 }}
-        onChange={e => set({ name: e.target.value })}
-      />
-      <TextField
-        label="Ngày sinh"
-        type="date"
-        size="small"
-        fullWidth
-        required
-        value={value.birthDate}
-        InputLabelProps={{ shrink: true }}
-        inputProps={{ min: '1900-01-31', max: '2199-12-31' }}
-        onChange={e => set({ birthDate: e.target.value })}
-      />
-      <div className={styles.calendarRow}>
-        <ToggleButtonGroup
-          size="small"
-          exclusive
-          value={value.calendar}
-          onChange={(_, calendar) => calendar && set({ calendar, isLeapMonth: calendar === 'lunar' && value.isLeapMonth })}
-          aria-label="Loại lịch"
-        >
-          <ToggleButton value="solar">Dương lịch</ToggleButton>
-          <ToggleButton value="lunar">Âm lịch</ToggleButton>
-        </ToggleButtonGroup>
-        {value.calendar === 'lunar' && (
-          <FormControlLabel
-            control={<Checkbox size="small" checked={value.isLeapMonth} onChange={e => set({ isLeapMonth: e.target.checked })} />}
-            label="Tháng nhuận"
-          />
-        )}
-      </div>
-    </fieldset>
-  );
-}
 
 function ScoreRing({ score }) {
   const [shown, setShown] = useState(0);
@@ -147,6 +97,7 @@ export default function Compat() {
     try {
       const res = await fortuneApi.compat({ a: pa, b: pb });
       setResult(res);
+      track('compat_checked', { score: res.score });
       window.history.replaceState(null, '', `#${encodeCompatFragment(pa, pb)}`);
       setTimeout(() => cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
     } catch (err) {
@@ -248,6 +199,16 @@ export default function Compat() {
             </Button>
             <Button variant="outlined" size="small" onClick={handleDownload} disabled={isExporting} startIcon={<IoImageOutline />}>
               {isExporting ? 'Đang tạo ảnh…' : 'Tải ảnh'}
+            </Button>
+            <Button
+              variant="contained"
+              size="small"
+              component={Link}
+              to="/cuoi-hoi/chon-ngay"
+              state={{ groom: a, bride: b }}
+              startIcon={<IoCalendarOutline />}
+            >
+              Chọn ngày cưới cho hai bạn
             </Button>
           </div>
 

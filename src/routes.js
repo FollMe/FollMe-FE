@@ -28,6 +28,9 @@ const FortuneProfiles = lazy(() => import("pages/fortune/Profiles"));
 const Almanac = lazy(() => import("pages/fortune/Almanac"));
 const Compat = lazy(() => import("pages/fortune/Compat"));
 const ReadingListPage = lazy(() => import("pages/reading/ReadingListPage"));
+const WeddingHub = lazy(() => import("pages/wedding/WeddingHub"));
+const ChooseDate = lazy(() => import("pages/wedding/ChooseDate"));
+const PublicInvitation = lazy(() => import("pages/invitation/PublicInvitation"));
 
 const withSuspense = (element) => (
   <Suspense fallback={<OvalLoading />}>{element}</Suspense>
@@ -42,6 +45,7 @@ export default function Router() {
         { path: 'sign-up', element: <SignUp /> },
         // The e-card has its own full-screen design
         { path: '/invitations/:id', element: withSuspense(<InvitationCard />) },
+        { path: '/e/:eventId', element: withSuspense(<PublicInvitation />) },
       ]
     },
     {
@@ -69,6 +73,8 @@ export default function Router() {
         { path: '/fortune/lich', element: withSuspense(<Almanac />) },
         { path: '/fortune/hop-tuoi', element: withSuspense(<Compat />) },
         { path: '/doc-sau', element: withSuspense(<ReadingListPage />) },
+        { path: '/cuoi-hoi', element: withSuspense(<WeddingHub />) },
+        { path: '/cuoi-hoi/chon-ngay', element: withSuspense(<ChooseDate />) },
       ]
     },
 
@@ -80,6 +86,7 @@ export default function Router() {
         { path: '/blogs/:blogSlug/edit', element: withSuspense(<CreateBlog key="edit" />) },
         { path: '/events', element: withSuspense(<InvitationList />) },
         { path: '/events/create', element: withSuspense(<CreateEvent />) },
+        { path: '/events/:eventId/edit', element: withSuspense(<CreateEvent key="edit" />) },
         { path: '/events/:eventId', element: withSuspense(<Event />) },
         { path: '/fortune/profiles', element: withSuspense(<FortuneProfiles />) },
       ]

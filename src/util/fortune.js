@@ -7,6 +7,7 @@ export const fortuneApi = {
   tuvi: (payload) => request.post(`${API}/tuvi`, payload),
   lunarConvert: (payload) => request.post(`${API}/lunar/convert`, payload),
   compat: (payload) => request.post(`${API}/compat`, payload),
+  weddingDates: (payload) => request.post(`${API}/wedding-dates`, payload),
 
   listProfiles: () => request.get(`${API}/me/profiles`),
   createProfile: (payload) => request.post(`${API}/me/profiles`, payload),

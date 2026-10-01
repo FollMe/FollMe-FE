@@ -1,0 +1,413 @@
+/* Each theme sets its own palette; the layout is shared. The card is
+   meant to be opened on a phone from a chat app. */
+.page {
+  --inv-bg: #faf7f2;
+  --inv-paper: #ffffff;
+  --inv-ink: #1f1b16;
+  --inv-muted: #6b6259;
+  --inv-accent: #b08a4a;
+  --inv-accent-ink: #ffffff;
+  --inv-line: #e9e1d4;
+  --inv-soft: #f6f1e8;
+  --inv-title: 'Lora', Georgia, serif;
+
+  min-height: 100vh;
+  padding: 24px 12px 40px;
+  background: var(--inv-bg);
+  color: var(--inv-ink);
+}
+
+.blush {
+  --inv-bg: linear-gradient(180deg, #fde8ec 0%, #fff6f3 60%, #fde8ec 100%);
+  --inv-paper: #fffaf9;
+  --inv-ink: #4a2730;
+  --inv-muted: #8a6570;
+  --inv-accent: #d4687f;
+  --inv-line: #f4d6dc;
+  --inv-soft: #fdeef1;
+}
+
+.classic {
+  --inv-bg: #8f1d1d;
+  --inv-paper: #fffaf0;
+  --inv-ink: #5c1212;
+  --inv-muted: #8a5a3c;
+  --inv-accent: #b8862b;
+  --inv-line: #ecd9b0;
+  --inv-soft: #fbf1dc;
+}
+
+.minimal {
+  --inv-bg: #f3f2ef;
+  --inv-paper: #ffffff;
+  --inv-ink: #18181b;
+  --inv-muted: #71717a;
+  --inv-accent: #18181b;
+  --inv-line: #e4e4e7;
+  --inv-soft: #f4f4f5;
+}
+
+.night {
+  --inv-bg: radial-gradient(circle at 20% 0%, #1e2a52 0%, #0b1026 55%, #070a18 100%);
+  --inv-paper: #111734;
+  --inv-ink: #f3ead7;
+  --inv-muted: #b9b1a0;
+  --inv-accent: #d9b66b;
+  --inv-accent-ink: #111734;
+  --inv-line: #2a3462;
+  --inv-soft: #18204a;
+}
+
+.paper {
+  max-width: 560px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 24px;
+  background: var(--inv-paper);
+  border: 1px solid var(--inv-line);
+  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.35);
+  animation: rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .paper {
+    animation: none;
+  }
+}
+
+.hero {
+  padding: 48px 28px 28px;
+  text-align: center;
+  background:
+    radial-gradient(circle at 50% -20%, var(--inv-soft), transparent 70%);
+}
+
+.invite {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+  color: var(--inv-muted);
+
+  strong {
+    color: var(--inv-ink);
+  }
+}
+
+.couple {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 18px 0 0;
+  font-family: var(--inv-title);
+  font-size: clamp(3.6rem, 11vw, 5.2rem);
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--inv-ink);
+}
+
+.amp {
+  font-style: italic;
+  font-size: 0.7em;
+  color: var(--inv-accent);
+}
+
+.title {
+  margin: 18px 0 0;
+  font-family: var(--inv-title);
+  font-size: clamp(3rem, 8vw, 4.2rem);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+  font-size: 2rem;
+  color: var(--inv-accent);
+
+  span {
+    width: 64px;
+    height: 1px;
+    background: var(--inv-accent);
+    opacity: 0.6;
+  }
+}
+
+.when {
+  padding: 8px 28px 28px;
+  text-align: center;
+}
+
+.dateRow {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+}
+
+.dateSide {
+  padding: 8px 0;
+  border-top: 1px solid var(--inv-line);
+  border-bottom: 1px solid var(--inv-line);
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--inv-muted);
+}
+
+.dateBig {
+  font-family: var(--inv-title);
+  font-size: 7rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--inv-accent);
+}
+
+.time {
+  margin-top: 10px;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.lunar {
+  margin: 4px 0 0;
+  font-size: 1.35rem;
+  font-style: italic;
+  color: var(--inv-muted);
+}
+
+.countdown {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 20px;
+
+  div {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 4px;
+    border-radius: 12px;
+    background: var(--inv-soft);
+  }
+
+  strong {
+    font-size: 2.4rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  span {
+    font-size: 1.1rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--inv-muted);
+  }
+}
+
+.over {
+  margin: 16px 0 0;
+  color: var(--inv-muted);
+}
+
+.where {
+  margin: 0 20px;
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--inv-soft);
+  text-align: center;
+
+  p {
+    margin: 6px 0 12px;
+    font-size: 1.6rem;
+    font-weight: 600;
+  }
+}
+
+.whereIcon {
+  font-size: 2.4rem;
+  color: var(--inv-accent);
+}
+
+.whereActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  :global(.MuiButton-root) {
+    border-color: var(--inv-accent);
+    color: var(--inv-ink);
+    text-transform: none;
+  }
+}
+
+.message {
+  margin: 24px 28px 0;
+  font-family: var(--inv-title);
+  font-size: 1.7rem;
+  font-style: italic;
+  line-height: 1.7;
+  text-align: center;
+  color: var(--inv-ink);
+  white-space: pre-line;
+}
+
+.card {
+  margin: 24px 20px 0;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid var(--inv-line);
+
+  h2 {
+    margin: 0;
+    font-family: var(--inv-title);
+    font-size: 2.2rem;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  /* Form fields follow the theme */
+  :global(.MuiInputBase-root) {
+    color: var(--inv-ink);
+    background: var(--inv-paper);
+  }
+
+  :global(.MuiInputLabel-root),
+  :global(.MuiFormLabel-root) {
+    color: var(--inv-muted);
+  }
+
+  :global(.MuiOutlinedInput-notchedOutline) {
+    border-color: var(--inv-line);
+  }
+
+  :global(.MuiButton-contained) {
+    background: var(--inv-accent);
+    color: var(--inv-accent-ink);
+    text-transform: none;
+  }
+}
+
+.cardSub {
+  margin: 4px 0 16px;
+  font-size: 1.35rem;
+  color: var(--inv-muted);
+  text-align: center;
+}
+
+.rsvp,
+.wishForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.choices {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.choice {
+  padding: 10px 6px;
+  border-radius: 12px;
+  border: 1px solid var(--inv-line);
+  background: var(--inv-paper);
+  color: var(--inv-ink);
+  font-size: 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chosen {
+  border-color: var(--inv-accent);
+  background: var(--inv-accent);
+  color: var(--inv-accent-ink);
+}
+
+.answered {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 12px 0 4px;
+
+  svg {
+    color: var(--inv-accent);
+  }
+}
+
+.card > :global(.MuiButton-text) {
+  display: flex;
+  margin: 0 auto;
+  color: var(--inv-accent);
+}
+
+.wishes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 420px;
+  margin: 20px 0 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+
+  li {
+    display: flex;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--inv-soft);
+  }
+
+  p {
+    margin: 0;
+    line-height: 1.55;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+  }
+
+  span {
+    font-size: 1.2rem;
+    color: var(--inv-muted);
+  }
+}
+
+.wishIcon {
+  flex: none;
+  margin-top: 3px;
+  color: var(--inv-accent);
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 32px;
+  padding: 20px;
+  border-top: 1px solid var(--inv-line);
+  font-size: 1.3rem;
+  color: var(--inv-muted);
+
+  a {
+    font-weight: 700;
+    color: var(--inv-accent);
+    text-decoration: none;
+  }
+}

@@ -6,7 +6,7 @@ import IconButton from '@mui/material/IconButton';
 import Drawer from '@mui/material/Drawer';
 import {
   IoMenu, IoClose, IoHomeOutline, IoNewspaperOutline, IoLibraryOutline, IoTicketOutline, IoCreateOutline,
-  IoSparklesOutline, IoSearchOutline,
+  IoSparklesOutline, IoSearchOutline, IoHeartOutline, IoCalendarOutline,
 } from 'react-icons/io5';
 import RequestSignInDialog from 'components/dialog/RequestSignInDialog';
 import UserMenu from 'components/UserMenu';
@@ -16,10 +16,16 @@ import ThemeToggle from './ThemeToggle';
 import styles from './SiteHeader.module.scss';
 
 export const NAV_ITEMS = [
+  { to: '/cuoi-hoi', label: 'Cưới hỏi', icon: <IoTicketOutline />, end: true },
+  { to: '/fortune/hop-tuoi', label: 'Xem tuổi', icon: <IoHeartOutline /> },
+  { to: '/cuoi-hoi/chon-ngay', label: 'Chọn ngày cưới', icon: <IoCalendarOutline /> },
+  { to: '/fortune', label: 'Lịch & Tử vi', icon: <IoSparklesOutline /> },
+];
+
+// The author's corner: still reachable, no longer in the main menu.
+const CORNER_ITEMS = [
   { to: '/blogs', label: 'Blog', icon: <IoNewspaperOutline /> },
   { to: '/stories', label: 'Truyện', icon: <IoLibraryOutline /> },
-  { to: '/fortune', label: 'Tử vi', icon: <IoSparklesOutline /> },
-  { to: '/events', label: 'Thư mời', icon: <IoTicketOutline />, isProtected: true },
 ];
 
 export default function SiteHeader({ isLoggedIn, userInfo }) {
@@ -53,7 +59,7 @@ export default function SiteHeader({ isLoggedIn, userInfo }) {
       setShowRequestLoginDialog(true);
       return;
     }
-    navigate('/blogs/create');
+    navigate('/events/create?type=wedding');
   }
 
   return (
@@ -66,6 +72,7 @@ export default function SiteHeader({ isLoggedIn, userInfo }) {
             <NavLink
               key={item.to}
               to={item.to}
+              end={item.end}
               className={({ isActive }) => clsx(styles.navLink, isActive && styles.active)}
               onClick={event => handleClickNav(event, item)}
             >
@@ -90,7 +97,7 @@ export default function SiteHeader({ isLoggedIn, userInfo }) {
                 startIcon={<IoCreateOutline />}
                 onClick={handleClickWrite}
               >
-                Viết bài
+                Tạo thiệp
               </Button>
               <UserMenu userInfo={userInfo} />
             </>
@@ -135,8 +142,20 @@ export default function SiteHeader({ isLoggedIn, userInfo }) {
             <NavLink
               key={item.to}
               to={item.to}
+              end={item.end}
               className={({ isActive }) => clsx(styles.drawerLink, isActive && styles.active)}
               onClick={event => handleClickNav(event, item)}
+            >
+              {item.icon} {item.label}
+            </NavLink>
+          ))}
+          <div className={styles.drawerSection}>Góc nhỏ</div>
+          {CORNER_ITEMS.map(item => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) => clsx(styles.drawerLink, styles.drawerMinor, isActive && styles.active)}
+              onClick={() => setIsMenuOpen(false)}
             >
               {item.icon} {item.label}
             </NavLink>
@@ -145,7 +164,7 @@ export default function SiteHeader({ isLoggedIn, userInfo }) {
         <div className={styles.drawerFoot}>
           {isLoggedIn ? (
             <Button fullWidth variant="contained" size="large" startIcon={<IoCreateOutline />} onClick={handleClickWrite}>
-              Viết bài mới
+              Tạo thiệp cưới
             </Button>
           ) : (
             <Button fullWidth variant="contained" size="large" onClick={() => { setIsMenuOpen(false); navigate('/sign-in'); }}>

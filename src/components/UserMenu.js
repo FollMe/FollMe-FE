@@ -73,7 +73,7 @@ export default function UserMenu({ userInfo = {} }) {
                 </MenuItem>
                 <MenuItem onClick={() => goTo('/events')}>
                     <ListItemIcon className={styles.icon}><IoTicketOutline /></ListItemIcon>
-                    Thư mời của tôi
+                    Thiệp của tôi
                 </MenuItem>
                 <MenuItem onClick={() => goTo('/doc-sau')}>
                     <ListItemIcon className={styles.icon}><IoBookmarkOutline /></ListItemIcon>
