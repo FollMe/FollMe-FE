@@ -41,8 +41,11 @@
     radial-gradient(ellipse at 10% 90%, rgba(163, 32, 30, 0.55), transparent 60%),
     linear-gradient(160deg, #3a0d0b 0%, #1d0807 55%, #120605 100%);
 
+  // Petals fall inside the hero, below the see-through header and behind the copy.
   > div[aria-hidden] {
     position: absolute;
+    top: var(--header-h);
+    z-index: 0;
   }
 }
 
@@ -225,6 +228,11 @@
 @media (max-width: 600px) {
   .heroTitle {
     line-height: 1.08;
+  }
+
+  .eyebrow {
+    font-size: 1.1rem;
+    letter-spacing: 0.18em;
   }
 }
 
