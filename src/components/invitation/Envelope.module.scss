@@ -301,6 +301,7 @@
 @keyframes letterOut {
   50% {
     transform: translateY(-62%) scale(1.04);
+    opacity: 1;
   }
   100% {
     transform: translateY(-40%) scale(2.4);
