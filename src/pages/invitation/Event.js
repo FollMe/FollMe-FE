@@ -401,8 +401,9 @@ export default function Event() {
           <div>
             <strong>Thiệp đã sẵn sàng!</strong>
             <p>
-              Thêm vài tấm ảnh cưới để thiệp có ảnh bìa và album, rồi gửi link chung vào nhóm Zalo, Messenger, hoặc copy
-              link riêng của từng khách ở bảng bên dưới.
+              {(event.photos ?? []).length === 0 && 'Thêm vài tấm ảnh để thiệp có ảnh bìa và album, rồi '}
+              {(event.photos ?? []).length === 0 ? 'gửi' : 'Gửi'} link chung vào nhóm Zalo, Messenger, hoặc gửi link riêng
+              cho từng khách ở danh sách bên dưới.
             </p>
           </div>
         </div>
