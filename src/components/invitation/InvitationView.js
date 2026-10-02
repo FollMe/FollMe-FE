@@ -4,7 +4,6 @@ import clsx from 'clsx';
 import TextField from '@mui/material/TextField';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Button from '@mui/material/Button';
-import { AddToCalendarButton } from 'add-to-calendar-button-react';
 import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
 import {
@@ -18,6 +17,7 @@ import Petals from './Petals';
 import MonthCalendar from './MonthCalendar';
 import MusicToggle from './MusicToggle';
 import GiftBox from './GiftBox';
+import AddToCalendar from './AddToCalendar';
 import ScratchReveal from './ScratchReveal';
 import PhotoAlbum from './PhotoAlbum';
 import { getAlmanac, lunarMonthLabel } from 'util/fortune';
@@ -169,7 +169,6 @@ export default function InvitationView({
   ));
   const theme = event.theme || 'minimal';
   const couple = isCoupleEvent(event.type) && event.groomName && event.brideName;
-  const shownEndAt = vnWallClock(startAt.getTime() + 3 * 60 * 60 * 1000);
   // On the public link, the name they gave when answering
   const recipient = guest?.name || 'Bạn';
   // Weddings get the music box and the scratch-off date unless the host
@@ -338,20 +337,7 @@ export default function InvitationView({
           <Button href={mapsUrl(event)} target="_blank" rel="noreferrer" variant="outlined" startIcon={<IoNavigateOutline />}>
             Chỉ đường
           </Button>
-          <AddToCalendarButton
-            label="Lưu vào lịch"
-            name={event.title}
-            options={['Google', 'Apple', 'Outlook.com']}
-            location={event.location}
-            startDate={dayjs(shownAt).format('YYYY-MM-DD')}
-            endDate={dayjs(shownEndAt).format('YYYY-MM-DD')}
-            startTime={dayjs(shownAt).format('HH:mm')}
-            endTime={dayjs(shownEndAt).format('HH:mm')}
-            timeZone="Asia/Ho_Chi_Minh"
-            language="vi"
-            size="3"
-            lightMode={theme === 'night' ? 'dark' : 'light'}
-          />
+          <AddToCalendar event={event} />
           {guest?._id && !isPublic && !demo && (
             <Button variant="outlined" startIcon={<IoQrCodeOutline />} onClick={() => setShowQR(true)}>
               Mã check-in

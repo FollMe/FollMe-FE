@@ -4,7 +4,8 @@ import clsx from 'clsx';
 import { TextField } from '@mui/material';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
-import { DateTimeField } from '@mui/x-date-pickers';
+import { DateTimeField, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { toast } from 'react-toastify';
 import { IoSparklesOutline } from 'react-icons/io5';
@@ -26,7 +27,16 @@ import previewStyles from "components/invitation/ThemePreview.module.scss";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
+// Only this form picks dates: the date picker stays out of the main bundle
 export default function CreateEvent() {
+  return (
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <CreateEventForm />
+    </LocalizationProvider>
+  );
+}
+
+function CreateEventForm() {
   const navigate = useNavigate();
   const { eventId } = useParams();
   const isEditing = Boolean(eventId);

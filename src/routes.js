@@ -1,22 +1,23 @@
 import { lazy, Suspense } from "react";
 import { Navigate, useRoutes } from "react-router-dom";
-import SignIn from "./pages/auth/SignIn";
-import SignUp from "./pages/auth/SignUp";
-import SelectChap from "./pages/story/SelectChap";
-import Story from "./pages/story/Story";
-import ShortStory from "pages/story/ShortStory";
-import StoryList from "./pages/story/StoryList";
-import FacebookDataDeletionInstructions from "pages/document/FacebookDataDeletionInstructions";
-import PrivacyPolicy from "pages/document/PrivacyPolicy";
 import MainLayout from "./layouts/MainLayout";
 import AuthMainLayout from "layouts/AuthMainLayout";
 import Home from "pages/main/Home";
 import Page404 from "pages/main/Page404";
-import BlogList from "pages/blog/BlogList";
-import Blog from "pages/blog/Blog";
 import OvalLoading from "components/loading/OvalLoading";
 
-// Heavy pages (rich-text editor, date picker, uploader) are split into their own chunks
+// Every page but the home page is its own chunk: a guest opening an
+// invitation from Zalo downloads the invitation, not the blog or stories.
+const SignIn = lazy(() => import("./pages/auth/SignIn"));
+const SignUp = lazy(() => import("./pages/auth/SignUp"));
+const SelectChap = lazy(() => import("./pages/story/SelectChap"));
+const Story = lazy(() => import("./pages/story/Story"));
+const ShortStory = lazy(() => import("pages/story/ShortStory"));
+const StoryList = lazy(() => import("./pages/story/StoryList"));
+const FacebookDataDeletionInstructions = lazy(() => import("pages/document/FacebookDataDeletionInstructions"));
+const PrivacyPolicy = lazy(() => import("pages/document/PrivacyPolicy"));
+const BlogList = lazy(() => import("pages/blog/BlogList"));
+const Blog = lazy(() => import("pages/blog/Blog"));
 const CreateBlog = lazy(() => import("pages/blog/CreateBlog"));
 const InvitationCard = lazy(() => import("pages/invitation/InvitationCard"));
 const InvitationList = lazy(() => import("pages/invitation/InvitationList"));
@@ -44,8 +45,8 @@ export default function Router() {
     {
       element: <MainLayout hideHeader />,
       children: [
-        { path: 'sign-in', element: <SignIn /> },
-        { path: 'sign-up', element: <SignUp /> },
+        { path: 'sign-in', element: withSuspense(<SignIn />) },
+        { path: 'sign-up', element: withSuspense(<SignUp />) },
         // The e-card has its own full-screen design
         { path: '/invitations/:id', element: withSuspense(<InvitationCard />) },
         { path: '/e/:eventId', element: withSuspense(<PublicInvitation />) },
@@ -60,8 +61,8 @@ export default function Router() {
       element: <MainLayout />,
       children: [
         { path: '/404', element: <Page404 /> },
-        { path: '/documents/facebook-data-deletion-instructions-url', element: <FacebookDataDeletionInstructions /> },
-        { path: '/chinh-sach-bao-mat', element: <PrivacyPolicy /> },
+        { path: '/documents/facebook-data-deletion-instructions-url', element: withSuspense(<FacebookDataDeletionInstructions />) },
+        { path: '/chinh-sach-bao-mat', element: withSuspense(<PrivacyPolicy />) },
       ]
     },
 
@@ -70,12 +71,12 @@ export default function Router() {
       element: <AuthMainLayout />,
       children: [
         { path: '/', element: <Home /> },
-        { path: '/stories', element: <StoryList /> },
-        { path: '/stories/long-stories/:storySlug', element: <SelectChap /> },
-        { path: '/stories/long-stories/:storySlug/:chapSlug', element: <Story /> },
-        { path: '/stories/short-stories/:storySlug', element: <ShortStory /> },
-        { path: '/blogs', element: <BlogList /> },
-        { path: '/blogs/:blogSlug', element: <Blog /> },
+        { path: '/stories', element: withSuspense(<StoryList />) },
+        { path: '/stories/long-stories/:storySlug', element: withSuspense(<SelectChap />) },
+        { path: '/stories/long-stories/:storySlug/:chapSlug', element: withSuspense(<Story />) },
+        { path: '/stories/short-stories/:storySlug', element: withSuspense(<ShortStory />) },
+        { path: '/blogs', element: withSuspense(<BlogList />) },
+        { path: '/blogs/:blogSlug', element: withSuspense(<Blog />) },
         { path: '/fortune', element: withSuspense(<FortuneHome />) },
         { path: '/fortune/numerology', element: withSuspense(<Numerology />) },
         { path: '/fortune/tu-vi', element: withSuspense(<TuVi />) },
