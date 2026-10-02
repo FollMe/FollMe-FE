@@ -64,6 +64,8 @@ export const invitationApi = {
   hostGet: (eventId) => request.get(`api/events/${eventId}`),
   hideWish: (eventId, wishId) => request.put(`api/events/${eventId}/wishes/${wishId}/hide`),
   unhideWish: (eventId, wishId) => request.del(`api/events/${eventId}/wishes/${wishId}/hide`),
+  updateGuest: (eventId, guestId, payload) => request.put(`api/events/${eventId}/guests/${guestId}`, payload),
+  removeGuest: (eventId, guestId) => request.del(`api/events/${eventId}/guests/${guestId}`),
   addPhoto: (eventId, blob) => {
     const form = new FormData();
     form.append('photo', blob, 'photo.jpg');
@@ -79,6 +81,29 @@ export const invitationApi = {
 };
 
 export const MAX_PHOTOS = 12;
+
+/** Who answered what and how many are coming (live, as the host edits). */
+export function summarizeGuests(guests) {
+  const summary = { invited: guests.length, sent: 0, opened: 0, attending: 0, maybe: 0, declined: 0, pending: 0, headcount: 0 };
+  for (const guest of guests) {
+    if (guest.sentAt) {
+      summary.sent += 1;
+    }
+    if (guest.viewed > 0) {
+      summary.opened += 1;
+    }
+    const status = guest.rsvp?.status;
+    if (status in RSVP_LABELS) {
+      summary[status] += 1;
+    } else {
+      summary.pending += 1;
+    }
+    if (status === 'attending') {
+      summary.headcount += guest.rsvp.count || 1;
+    }
+  }
+  return summary;
+}
 
 // Someone who answered on a public link gets a guest id; remember it so
 // they can change their answer from the same browser.

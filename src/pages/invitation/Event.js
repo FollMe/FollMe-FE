@@ -1,8 +1,6 @@
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
-import { Stack, Typography } from '@mui/material';
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import Dialog from '@mui/material/Dialog';
@@ -12,22 +10,24 @@ import DialogActions from '@mui/material/DialogActions';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { toast } from 'react-toastify';
-import { DataGrid } from '@mui/x-data-grid';
 import QRCode from 'react-qr-code';
 import dayjs from 'dayjs';
 import {
   IoTimeOutline, IoLocationOutline, IoCopyOutline, IoCheckmark, IoEyeOutline, IoCreateOutline, IoShareSocialOutline,
-  IoEyeOffOutline, IoSparkles, IoDownloadOutline, IoTvOutline, IoRefresh, IoPersonAddOutline,
+  IoEyeOffOutline, IoSparkles, IoDownloadOutline, IoTvOutline, IoRefresh, IoPersonAddOutline, IoPaperPlaneOutline,
 } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
 import ArticleHeader from 'components/article/ArticleHeader';
 import InvitationStatusTag from 'components/invitation/InvitationStatusTag';
 import PhotoManager from 'components/invitation/PhotoManager';
 import GuestListInput, { guestListError } from 'components/invitation/GuestListInput';
+import GuestList from 'components/invitation/GuestList';
+import SendQueue, { TemplateEditor } from 'components/invitation/SendQueue';
 import {
   MAX_PHOTOS, RSVP_LABELS, eventHeadline, invitationApi, isCoupleEvent, personalInvitationUrl, publicInvitationUrl,
-  screenUrl,
+  screenUrl, summarizeGuests,
 } from 'util/invitation';
+import { defaultTemplate, loadTemplate, saveTemplate } from 'util/inviteMessage';
 import { downloadCsv } from 'util/csv';
 import { parseGuestList } from 'util/guestList';
 import { track } from 'util/analytics';
@@ -64,13 +64,14 @@ function CopyButton({ text, label = 'Copy link', variant = 'icon' }) {
 /** The guest list as spreadsheet rows, for seating plans and thank-you notes. */
 export function guestRows(guests) {
   return [
-    ['Tên', 'Trả lời', 'Số người', 'Lời nhắn', 'Nguồn', 'Lượt mở', 'Email', 'Link riêng'],
+    ['Tên', 'Trả lời', 'Số người', 'Lời nhắn', 'Nguồn', 'Đã gửi', 'Lượt mở', 'Email', 'Link riêng'],
     ...guests.map(g => [
       g.name,
       g.rsvp ? RSVP_LABELS[g.rsvp.status] : 'Chưa trả lời',
       g.rsvp?.status === 'attending' || g.rsvp?.status === 'maybe' ? g.rsvp.count || 1 : '',
       g.rsvp?.note ?? '',
       g.source === 'public' ? 'Link chung' : 'Mời riêng',
+      g.sentAt ? 'Đã gửi' : '',
       g.viewed ?? 0,
       g.mail ?? '',
       g.source === 'public' ? '' : personalInvitationUrl(g._id),
@@ -182,47 +183,6 @@ function AddGuestsDialog({ event, onClose, onAdded }) {
   );
 }
 
-const columns = [
-  { field: 'name', headerName: 'Khách', flex: 1, minWidth: 140 },
-  {
-    field: 'rsvp',
-    headerName: 'Trả lời',
-    flex: 1,
-    minWidth: 150,
-    valueGetter: (params) => params.row.rsvp?.status ?? 'pending',
-    renderCell: (params) => {
-      const rsvp = params.row.rsvp;
-      if (!rsvp) {
-        return <span className={clsx(styles.pill, styles.pending)}>Chưa trả lời</span>;
-      }
-      return (
-        <Tooltip title={rsvp.note || ''}>
-          <span className={clsx(styles.pill, styles[rsvp.status])}>
-            {RSVP_LABELS[rsvp.status]}{rsvp.status !== 'declined' && rsvp.count > 1 ? ` · ${rsvp.count}` : ''}
-          </span>
-        </Tooltip>
-      );
-    },
-  },
-  {
-    field: 'source',
-    headerName: 'Nguồn',
-    width: 110,
-    valueGetter: (params) => (params.row.source === 'public' ? 'Link chung' : 'Mời riêng'),
-  },
-  { field: 'viewed', headerName: 'Lượt mở', align: 'center', headerAlign: 'center', width: 100 },
-  {
-    field: 'action',
-    headerName: '',
-    sortable: false,
-    width: 60,
-    align: 'center',
-    renderCell: (params) => (params.row.source === 'public'
-      ? null
-      : <CopyButton text={personalInvitationUrl(params.row._id)} label="Copy link riêng" />),
-  },
-];
-
 export default function Event() {
   const navigate = useNavigate();
   const { eventId } = useParams();
@@ -230,6 +190,17 @@ export default function Event() {
   const justCreated = searchParams.get('created') === '1';
   const [event, setEvent] = useState(null);
   const [isAddingGuests, setIsAddingGuests] = useState(false);
+  const [isSendingAll, setIsSendingAll] = useState(false);
+  const [isEditingTemplate, setIsEditingTemplate] = useState(false);
+  // The host's own invitation message; the default follows the event's details
+  const [customTemplate, setCustomTemplate] = useState(() => loadTemplate(eventId));
+
+  const setGuests = useCallback(update => setEvent(e => ({ ...e, guests: update(e.guests ?? []) })), []);
+
+  function changeTemplate(next) {
+    setCustomTemplate(next);
+    saveTemplate(eventId, next);
+  }
 
   const load = useCallback(() => invitationApi.hostGet(eventId)
     .then(({ invitation }) => {
@@ -246,7 +217,7 @@ export default function Event() {
   async function onGuestsAdded(count) {
     await load();
     setIsAddingGuests(false);
-    toast.success(`Đã thêm ${count} khách. Copy link riêng của từng người ở bảng bên dưới để gửi qua Zalo.`);
+    toast.success(`Đã thêm ${count} khách. Bấm "Gửi lần lượt" để gửi link riêng cho từng người.`);
   }
 
   async function toggleWish(wish) {
@@ -276,9 +247,11 @@ export default function Event() {
   }
 
   const status = new Date(event.startAt) > new Date() ? 'upcoming' : 'happened';
-  const summary = event.summary ?? {};
   const publicUrl = publicInvitationUrl(event._id);
   const guests = event.guests ?? [];
+  const summary = summarizeGuests(guests);
+  const unsent = guests.filter(g => g.source !== 'public' && !g.sentAt).length;
+  const template = customTemplate ?? defaultTemplate(event);
   const firstPersonal = guests.find(g => g.source !== 'public');
   const previewUrl = event.allowPublicLink ? `/e/${event._id}` : firstPersonal && `/invitations/${firstPersonal._id}`;
 
@@ -335,6 +308,7 @@ export default function Event() {
       <div className={styles.stats}>
         {[
           ['Khách mời', summary.invited],
+          ['Đã gửi thiệp', summary.sent],
           ['Đã mở thiệp', summary.opened],
           ['Sẽ đến', summary.attending],
           ['Chưa chắc', summary.maybe],
@@ -393,9 +367,8 @@ export default function Event() {
 
       <section className={styles.panel}>
         <div className={styles.panelHead}>
-          <h2>Khách & xác nhận</h2>
+          <h2>Khách mời <span className={styles.headCount}>{guests.length}</span></h2>
           <div className={styles.panelTools}>
-            <span>{guests.length} người</span>
             <Button size="small" variant="contained" startIcon={<IoPersonAddOutline />} onClick={() => setIsAddingGuests(true)}>
               Thêm khách
             </Button>
@@ -408,28 +381,24 @@ export default function Event() {
                   track('guests_exported');
                 }}
               >
-                Tải danh sách
+                Tải Excel
               </Button>
             )}
           </div>
         </div>
-        <Box sx={{ height: 440, width: '100%' }}>
-          <DataGrid
-            rows={guests}
-            columns={columns}
-            initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
-            pageSizeOptions={[10, 25, 50]}
-            disableRowSelectionOnClick
-            getRowId={(row) => row._id}
-            slots={{
-              noRowsOverlay: () => (
-                <Stack height="100%" alignItems="center" justifyContent="center">
-                  <Typography>Chưa có khách. Bấm "Thêm khách" để tạo link riêng ghi tên từng người, hoặc gửi link chung.</Typography>
-                </Stack>
-              ),
-            }}
-          />
-        </Box>
+        {unsent > 0 && (
+          <div className={styles.sendBar}>
+            <IoPaperPlaneOutline aria-hidden />
+            <div>
+              <strong>{unsent} khách chưa được gửi thiệp</strong>
+              <button type="button" className={styles.linkButton} onClick={() => setIsEditingTemplate(true)}>
+                Sửa lời mời
+              </button>
+            </div>
+            <Button variant="contained" size="small" onClick={() => setIsSendingAll(true)}>Gửi lần lượt</Button>
+          </div>
+        )}
+        <GuestList event={event} guests={guests} template={template} onChange={setGuests} />
       </section>
 
       <section className={styles.panel}>
@@ -457,6 +426,30 @@ export default function Event() {
           </ul>
         )}
       </section>
+
+      {isSendingAll && (
+        <SendQueue
+          event={event}
+          guests={guests}
+          template={template}
+          onTemplateChange={changeTemplate}
+          onTemplateReset={() => changeTemplate(null)}
+          onSent={guest => setGuests(list => list.map(g => (g._id === guest._id ? guest : g)))}
+          onClose={() => setIsSendingAll(false)}
+        />
+      )}
+
+      {isEditingTemplate && (
+        <Dialog open onClose={() => setIsEditingTemplate(false)} fullWidth maxWidth="sm">
+          <DialogTitle>Lời mời gửi kèm link</DialogTitle>
+          <DialogContent sx={{ pt: '8px !important' }}>
+            <TemplateEditor value={template} onChange={changeTemplate} onReset={() => changeTemplate(null)} />
+          </DialogContent>
+          <DialogActions sx={{ px: 3, pb: 2 }}>
+            <Button variant="contained" onClick={() => setIsEditingTemplate(false)}>Xong</Button>
+          </DialogActions>
+        </Dialog>
+      )}
 
       {isAddingGuests && (
         <AddGuestsDialog event={event} onClose={() => setIsAddingGuests(false)} onAdded={onGuestsAdded} />
