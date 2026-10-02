@@ -15,7 +15,7 @@ import BlogList from "pages/blog/BlogList";
 import Blog from "pages/blog/Blog";
 import OvalLoading from "components/loading/OvalLoading";
 
-// Heavy pages (rich-text editor, data grid, uploader) are split into their own chunks
+// Heavy pages (rich-text editor, date picker, uploader) are split into their own chunks
 const CreateBlog = lazy(() => import("pages/blog/CreateBlog"));
 const InvitationCard = lazy(() => import("pages/invitation/InvitationCard"));
 const InvitationList = lazy(() => import("pages/invitation/InvitationList"));

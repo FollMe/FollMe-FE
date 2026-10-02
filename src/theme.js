@@ -272,23 +272,6 @@ export function getTheme(mode = 'light') {
           },
         },
       },
-      MuiDataGrid: {
-        styleOverrides: {
-          root: {
-            fontSize: '1.45rem',
-            borderColor: t.border,
-            borderRadius: 14,
-            backgroundColor: t.surface,
-          },
-          columnHeaders: {
-            backgroundColor: t.surface2,
-            borderColor: t.border,
-          },
-          cell: {
-            borderColor: t.border,
-          },
-        },
-      },
       MuiTablePagination: {
         styleOverrides: {
           displayedRows: {

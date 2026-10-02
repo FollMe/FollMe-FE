@@ -61,6 +61,7 @@ export const invitationApi = {
   wishPublic: (eventId, payload) => request.post(`api/events/${eventId}/public/wishes`, payload),
   create: (payload) => request.post('api/events', payload),
   update: (eventId, payload) => request.put(`api/events/${eventId}`, payload),
+  remove: (eventId) => request.del(`api/events/${eventId}`),
   hostGet: (eventId) => request.get(`api/events/${eventId}`),
   hideWish: (eventId, wishId) => request.put(`api/events/${eventId}/wishes/${wishId}/hide`),
   unhideWish: (eventId, wishId) => request.del(`api/events/${eventId}/wishes/${wishId}/hide`),
@@ -81,6 +82,23 @@ export const invitationApi = {
 };
 
 export const MAX_PHOTOS = 12;
+
+/** Got their personal link but has not answered yet. */
+export function awaitsAnswer(guest) {
+  return guest.source !== 'public' && Boolean(guest.sentAt) && !guest.rsvp;
+}
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+const dayOld = (date, now) => now - new Date(date).getTime() >= DAY_MS;
+
+/**
+ * Who to nudge: guests who got their link a day ago or more and have not
+ * answered, unless reminded in the last day. Never reminded ones first.
+ */
+export function reminderQueue(guests, now = Date.now()) {
+  const due = guests.filter(g => awaitsAnswer(g) && dayOld(g.sentAt, now) && (!g.remindedAt || dayOld(g.remindedAt, now)));
+  return [...due.filter(g => !g.remindedAt), ...due.filter(g => g.remindedAt)];
+}
 
 /** The link itself is wrong or gone (not a passing server or network error). */
 export function isGoneError(err) {

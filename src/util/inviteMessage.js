@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { vnWallClock } from './date';
-import { eventHeadline } from './invitation';
+import { eventHeadline, isCoupleEvent } from './invitation';
 
 export const NAME_TOKEN = '{tên}';
 export const LINK_TOKEN = '{link}';
@@ -24,28 +24,39 @@ export function defaultTemplate(event) {
     + `Thiệp mời dành riêng cho ${NAME_TOKEN}: ${LINK_TOKEN}`;
 }
 
+/** The nudge for guests who got their link but have not answered yet. */
+export function defaultReminder(event) {
+  const when = inviteWhen(event.startAt);
+  const what = { wedding: 'lễ thành hôn', engagement: 'lễ ăn hỏi' }[event.type];
+  const first = isCoupleEvent(event.type) && event.groomName && event.brideName
+    ? `${eventHeadline(event)} rất mong được đón ${NAME_TOKEN} tới dự ${what} vào ${when}.`
+    : `Rất mong được đón ${NAME_TOKEN} tới dự ${event.title} vào ${when}.`;
+  return `${first}\nMong ${NAME_TOKEN} xác nhận tham dự trên thiệp mời để việc đón tiếp được chu đáo hơn: ${LINK_TOKEN}`;
+}
+
 /** The template for one guest. A template without {link} gets it at the end. */
 export function inviteMessage(template, name, url) {
   const text = template.split(NAME_TOKEN).join(name);
   return text.includes(LINK_TOKEN) ? text.split(LINK_TOKEN).join(url) : `${text.trimEnd()}\n${url}`;
 }
 
-const storageKey = eventId => `follme.inviteTemplate.${eventId}`;
+// `kind` is 'invite' (the invitation) or 'remind' (the nudge to answer)
+const storageKey = (eventId, kind) => `follme.${kind === 'remind' ? 'remind' : 'invite'}Template.${eventId}`;
 
-export function loadTemplate(eventId) {
+export function loadTemplate(eventId, kind = 'invite') {
   try {
-    return localStorage.getItem(storageKey(eventId));
+    return localStorage.getItem(storageKey(eventId, kind));
   } catch (err) {
     return null;
   }
 }
 
-export function saveTemplate(eventId, template) {
+export function saveTemplate(eventId, template, kind = 'invite') {
   try {
     if (template) {
-      localStorage.setItem(storageKey(eventId), template);
+      localStorage.setItem(storageKey(eventId, kind), template);
     } else {
-      localStorage.removeItem(storageKey(eventId));
+      localStorage.removeItem(storageKey(eventId, kind));
     }
   } catch (err) {
     // Kept for this visit only

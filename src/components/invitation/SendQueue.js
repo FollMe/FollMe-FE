@@ -10,25 +10,52 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { toast } from 'react-toastify';
 import { IoPaperPlaneOutline, IoCopyOutline, IoCreateOutline, IoSparkles } from 'react-icons/io5';
-import { invitationApi, personalInvitationUrl } from 'util/invitation';
+import { invitationApi, personalInvitationUrl, reminderQueue } from 'util/invitation';
 import { LINK_TOKEN, NAME_TOKEN, canShareText, inviteMessage, sendInvite } from 'util/inviteMessage';
 import { track } from 'util/analytics';
 import styles from './SendQueue.module.scss';
 
+// Sending the invitations, or nudging those who have not answered
+export const QUEUE_MODES = {
+  invite: {
+    noun: 'lời mời',
+    title: 'Gửi thiệp lần lượt',
+    to: 'Gửi cho',
+    pick: guests => guests.filter(g => g.source !== 'public' && !g.sentAt),
+    mark: { sent: true },
+    track: 'invite_sent',
+    allDone: 'Tất cả khách đã được gửi thiệp',
+    done: n => `Xong! Đã gửi ${n} thiệp`,
+    next: 'Theo dõi ai đã mở thiệp và trả lời ngay trong danh sách khách.',
+  },
+  remind: {
+    noun: 'lời nhắc',
+    title: 'Nhắc khách trả lời',
+    to: 'Nhắc',
+    pick: reminderQueue,
+    mark: { reminded: true },
+    track: 'reminder_sent',
+    allDone: 'Khách đã nhận thiệp đều đã trả lời',
+    done: n => `Xong! Đã nhắc ${n} khách`,
+    next: 'Khi khách trả lời trên thiệp, câu trả lời hiện ngay trong danh sách khách.',
+  },
+};
+
 /** Edits the message sent with each personal link. */
-export function TemplateEditor({ value, onChange, onReset }) {
+export function TemplateEditor({ value, onChange, onReset, mode = 'invite' }) {
+  const noun = QUEUE_MODES[mode].noun;
   return (
     <div className={styles.editor}>
       <TextField
         multiline
         minRows={3}
         fullWidth
-        label="Lời mời"
+        label={noun[0].toUpperCase() + noun.slice(1)}
         value={value}
         onChange={e => onChange(e.target.value)}
         helperText={`${NAME_TOKEN} là tên khách, ${LINK_TOKEN} là link thiệp riêng của họ.`}
       />
-      <Button size="small" onClick={onReset}>Dùng lời mời mặc định</Button>
+      <Button size="small" onClick={onReset}>Dùng {noun} mặc định</Button>
     </div>
   );
 }
@@ -36,11 +63,12 @@ export function TemplateEditor({ value, onChange, onReset }) {
 /**
  * Sends the personal links one after another: on a phone, one tap opens
  * the share sheet (Zalo, Messenger) with the message for that guest, and
- * the next guest comes up once it is sent.
+ * the next guest comes up once it is sent. `mode` is 'invite' or 'remind'.
  */
-export default function SendQueue({ event, guests, template, onTemplateChange, onTemplateReset, onSent, onClose }) {
+export default function SendQueue({ event, guests, mode = 'invite', template, onTemplateChange, onTemplateReset, onSent, onClose }) {
+  const config = QUEUE_MODES[mode];
   // Who was still waiting when the queue opened, in list order
-  const [queue] = useState(() => guests.filter(g => g.source !== 'public' && !g.sentAt).map(g => g._id));
+  const [queue] = useState(() => config.pick(guests).map(g => g._id));
   const [index, setIndex] = useState(0);
   const [sentCount, setSentCount] = useState(0);
   const [isSending, setIsSending] = useState(false);
@@ -61,10 +89,10 @@ export default function SendQueue({ event, guests, template, onTemplateChange, o
     try {
       const how = await sendInvite(text);
       if (how === 'copied') {
-        toast.success(`Đã copy lời mời cho ${guest.name}. Dán vào Zalo hoặc Messenger.`, { autoClose: 2000 });
+        toast.success(`Đã copy ${config.noun} cho ${guest.name}. Dán vào Zalo hoặc Messenger.`, { autoClose: 2000 });
       }
-      onSent(await invitationApi.updateGuest(event._id, guest._id, { sent: true }));
-      track('invite_sent', { how, queue: true });
+      onSent(await invitationApi.updateGuest(event._id, guest._id, config.mark));
+      track(config.track, { how, queue: true });
       setSentCount(n => n + 1);
       setIndex(i => i + 1);
     } catch (err) {
@@ -77,7 +105,7 @@ export default function SendQueue({ event, guests, template, onTemplateChange, o
   return (
     <Dialog open onClose={onClose} fullWidth maxWidth="sm" fullScreen={fullScreen}>
       <DialogTitle className={styles.title}>
-        Gửi thiệp lần lượt
+        {config.title}
         {!done && <span>{index + 1}/{queue.length}</span>}
       </DialogTitle>
       <LinearProgress variant="determinate" value={queue.length ? (Math.min(index, queue.length) / queue.length) * 100 : 100} />
@@ -85,20 +113,20 @@ export default function SendQueue({ event, guests, template, onTemplateChange, o
         {done ? (
           <div className={styles.done}>
             <IoSparkles />
-            <h3>{queue.length === 0 ? 'Tất cả khách đã được gửi thiệp' : `Xong! Đã gửi ${sentCount} thiệp`}</h3>
-            <p>Theo dõi ai đã mở thiệp và trả lời ngay trong danh sách khách.</p>
+            <h3>{queue.length === 0 ? config.allDone : config.done(sentCount)}</h3>
+            <p>{config.next}</p>
           </div>
         ) : guest && (
           <>
-            <p className={styles.next}>Gửi cho</p>
+            <p className={styles.next}>{config.to}</p>
             <h3 className={styles.name}>{guest.name}</h3>
             {isEditing ? (
-              <TemplateEditor value={template} onChange={onTemplateChange} onReset={onTemplateReset} />
+              <TemplateEditor mode={mode} value={template} onChange={onTemplateChange} onReset={onTemplateReset} />
             ) : (
               <div className={styles.preview}>
                 {text}
                 <button type="button" className={styles.edit} onClick={() => setIsEditing(true)}>
-                  <IoCreateOutline /> Sửa lời mời
+                  <IoCreateOutline /> Sửa {config.noun}
                 </button>
               </div>
             )}
@@ -123,7 +151,7 @@ export default function SendQueue({ event, guests, template, onTemplateChange, o
               startIcon={share ? <IoPaperPlaneOutline /> : <IoCopyOutline />}
               onClick={send}
             >
-              {share ? 'Gửi' : 'Copy lời mời'}
+              {share ? 'Gửi' : `Copy ${config.noun}`}
             </LoadingButton>
           </>
         )}
