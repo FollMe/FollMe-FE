@@ -172,9 +172,18 @@ async function handler(req, res) {
 
   res.statusCode = 200;
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  if (isPrivatePath(pathname)) {
+    // Link previews (Zalo, Messenger) still work; search engines leave it out
+    res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+  }
   // Short CDN cache: an edited invitation shows up within minutes.
   res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=300, stale-while-revalidate=86400');
   res.end(out);
+}
+
+/** Invitations name the guest and the couple: not for search results. */
+function isPrivatePath(pathname) {
+  return /^\/(invitations|e)\//.test(pathname);
 }
 
 function absolute(image, origin) {
@@ -187,4 +196,5 @@ function absolute(image, origin) {
 module.exports = handler;
 module.exports.injectMeta = injectMeta;
 module.exports.resolveMeta = resolveMeta;
+module.exports.isPrivatePath = isPrivatePath;
 module.exports.resetCache = () => { indexCache = null; };
