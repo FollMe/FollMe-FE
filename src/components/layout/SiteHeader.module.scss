@@ -3,7 +3,6 @@
   top: 0;
   z-index: 100;
   height: var(--header-h);
-  background: var(--bg);
   background: color-mix(in srgb, var(--bg) 82%, transparent);
   backdrop-filter: saturate(180%) blur(14px);
   -webkit-backdrop-filter: saturate(180%) blur(14px);
@@ -266,5 +265,17 @@
       border-color: #e6c57d !important;
       background: rgba(246, 234, 214, 0.14) !important;
     }
+  }
+}
+
+/* Safari before 16.2: color-mix() with var() drops the whole declaration
+   (a plain fallback line before it does not help) */
+@supports not (color: color-mix(in srgb, red, blue)) {
+  .header {
+    background: var(--bg);
+  }
+
+  .scrolled {
+    border-bottom-color: var(--border);
   }
 }

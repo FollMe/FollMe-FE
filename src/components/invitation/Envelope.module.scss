@@ -327,3 +327,28 @@
     animation: none;
   }
 }
+
+/* Safari before 16.2 (iPhones left on iOS 15) has no color-mix(), and a
+   declaration using it is dropped whole: the same look from plain layers,
+   so the envelope and its seal still show */
+@supports not (color: color-mix(in srgb, red, blue)) {
+  .back {
+    background:
+      radial-gradient(circle, rgba(255, 226, 160, 0.38) 1.4px, transparent 1.8px) 0 0 / 14px 14px,
+      radial-gradient(circle, rgba(255, 226, 160, 0.22) 1px, transparent 1.4px) 7px 7px / 14px 14px,
+      linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.2)),
+      var(--env-dark);
+  }
+
+  .seal {
+    background:
+      radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.5), transparent 38%),
+      radial-gradient(circle at 50% 50%, transparent 52%, rgba(0, 0, 0, 0.22) 100%),
+      var(--seal);
+    box-shadow:
+      inset 0 0 0 5px rgba(0, 0, 0, 0.15),
+      inset 0 0 0 7px rgba(255, 255, 255, 0.3),
+      0 10px 22px rgba(0, 0, 0, 0.35);
+    color: var(--env-dark);
+  }
+}

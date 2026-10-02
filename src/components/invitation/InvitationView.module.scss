@@ -74,6 +74,8 @@
 .cover {
   display: grid;
   place-items: center;
+  // svh: iOS 15.4+; older Safari keeps the vh line
+  min-height: 100vh;
   min-height: 100svh;
   padding: 20px;
 }
@@ -712,5 +714,21 @@
   .scrollCue,
   .dock {
     animation: none;
+  }
+}
+
+/* Safari before 16.2 (iPhones left on iOS 15) has no color-mix(), and a
+   declaration using it is dropped whole: without these the couple's names
+   would be transparent text on no background */
+@supports not (color: color-mix(in srgb, red, blue)) {
+  .shimmer {
+    background: none;
+    color: var(--inv-ink);
+    animation: none;
+  }
+
+  .coverFrame,
+  .dock {
+    background: var(--inv-paper);
   }
 }
