@@ -18,16 +18,24 @@ export function moveItem(list, from, to) {
 }
 
 /**
- * The host's album editor. Changes are saved as they are made (no form).
- * `onChange` gets an updater function, as photos arrive one by one.
+ * The host's album editor. With `eventId`, changes are saved as they are
+ * made. Without it (an invitation not created yet), photos stay on the
+ * device, shrunk and in order, each with its `blob` for the form to upload.
+ * `onChange` gets an updater function, as photos arrive one by one;
+ * `onBusyChange` hears when photos are being added.
  */
-export default function PhotoManager({ eventId, photos, onChange }) {
+export default function PhotoManager({ eventId, photos, onChange, onBusyChange }) {
+  const local = !eventId;
   const [pending, setPending] = useState([]);
+  const busy = pending.length > 0;
+  useEffect(() => {
+    onBusyChange?.(busy);
+  }, [busy, onBusyChange]);
   const [busyId, setBusyId] = useState(null);
   const inputRef = useRef(null);
   const free = MAX_PHOTOS - photos.length - pending.length;
 
-  // Previews of photos still uploading
+  // Previews of photos being added, and of photos kept on the device
   const previews = useRef([]);
   useEffect(() => () => previews.current.forEach(URL.revokeObjectURL), []);
 
@@ -46,9 +54,15 @@ export default function PhotoManager({ eventId, photos, onChange }) {
     for (const item of items) {
       try {
         const { blob } = await shrinkPhoto(item.file);
-        const photo = await invitationApi.addPhoto(eventId, blob);
-        onChange(list => [...list, photo]);
-        track('photo_uploaded');
+        if (local) {
+          const url = URL.createObjectURL(blob);
+          previews.current.push(url);
+          onChange(list => [...list, { _id: item.key, url, blob }]);
+        } else {
+          const photo = await invitationApi.addPhoto(eventId, blob);
+          onChange(list => [...list, photo]);
+          track('photo_uploaded');
+        }
       } catch (err) {
         if (err.name !== 'SERVER_ERROR') {
           toast.error(`Không đọc được ảnh "${item.file.name}". Hãy chọn ảnh JPG hoặc PNG.`);
@@ -63,6 +77,9 @@ export default function PhotoManager({ eventId, photos, onChange }) {
     const before = photos;
     const next = moveItem(photos, from, to);
     onChange(() => next);
+    if (local) {
+      return;
+    }
     try {
       await invitationApi.orderPhotos(eventId, next.map(p => p._id));
     } catch (err) {
@@ -71,6 +88,10 @@ export default function PhotoManager({ eventId, photos, onChange }) {
   }
 
   async function remove(photo) {
+    if (local) {
+      onChange(list => list.filter(p => p._id !== photo._id));
+      return;
+    }
     if (!window.confirm('Xoá ảnh này khỏi thiệp?')) {
       return;
     }

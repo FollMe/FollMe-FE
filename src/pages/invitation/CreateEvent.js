@@ -15,6 +15,7 @@ import ArticleHeader from 'components/article/ArticleHeader';
 import InvitationView from 'components/invitation/InvitationView';
 import GiftAccountsField, { isGiftComplete, normalizeGifts } from 'components/invitation/GiftAccountsField';
 import GuestListInput, { guestListError } from 'components/invitation/GuestListInput';
+import PhotoManager from 'components/invitation/PhotoManager';
 import OvalLoading from 'components/loading/OvalLoading';
 import {
   DEFAULT_MESSAGES, EVENT_TYPES, THEMES, invitationApi, isCoupleEvent, suggestTitle,
@@ -67,7 +68,10 @@ function CreateEventForm() {
     };
   });
   // Managed on the event page; shown here in the preview only
+  // On a new invitation: photos picked but kept on the device until it is created
   const [photos, setPhotos] = useState([]);
+  const [uploading, setUploading] = useState(null);
+  const [isAddingPhotos, setIsAddingPhotos] = useState(false);
   const [effectsTouched, setEffectsTouched] = useState(false);
   const [titleTouched, setTitleTouched] = useState(false);
   // One guest per line; on edit, only the guests to add
@@ -189,12 +193,29 @@ function CreateEventForm() {
         navigate(`/events/${eventId}`);
       } else {
         const event = await invitationApi.create({ ...payload, guests: guestList.guests });
-        track('invitation_created', { type: form.type, theme: form.theme, guests: guestList.guests.length });
+        track('invitation_created', { type: form.type, theme: form.theme, guests: guestList.guests.length, photos: photos.length });
+        await uploadPhotos(event._id);
         navigate(`/events/${event._id}?created=1`);
       }
     } catch (err) {
       console.log(err);
       setIsPosting(false);
+    }
+  }
+
+  /** Uploads the photos picked on the form, in order (the first is the cover). */
+  async function uploadPhotos(id) {
+    let failed = 0;
+    for (const [i, photo] of photos.entries()) {
+      setUploading({ done: i, total: photos.length });
+      try {
+        await invitationApi.addPhoto(id, photo.blob);
+      } catch (err) {
+        failed += 1;
+      }
+    }
+    if (failed) {
+      toast.error(`Chưa tải được ${failed} ảnh. Bạn thêm lại ở mục Ảnh cưới bên dưới nhé.`);
     }
   }
 
@@ -290,6 +311,20 @@ function CreateEventForm() {
           </fieldset>
 
           <fieldset className={styles.group}>
+            <legend>{couple ? 'Ảnh cưới' : 'Hình ảnh'} (không bắt buộc)</legend>
+            <p className={styles.hint}>
+              Ảnh đầu tiên là ảnh bìa, cũng là ảnh hiện ra khi gửi link qua Zalo, Messenger. Từ 2 ảnh trở lên, thiệp có thêm
+              album.{isEditing ? ' Ảnh được lưu ngay khi bạn thêm, xoá hay đổi thứ tự.' : ''}
+            </p>
+            <PhotoManager
+              eventId={isEditing ? eventId : undefined}
+              photos={photos}
+              onChange={setPhotos}
+              onBusyChange={setIsAddingPhotos}
+            />
+          </fieldset>
+
+          <fieldset className={styles.group}>
             <legend>Mẫu thiệp</legend>
             <div className={styles.themes} role="radiogroup" aria-label="Mẫu thiệp">
               {THEMES.map(t => (
@@ -362,8 +397,18 @@ function CreateEventForm() {
           </fieldset>
 
           <div className={styles.submit}>
-            <LoadingButton type="submit" variant="contained" size="large" loading={isPosting} startIcon={<IoSparklesOutline />}>
-              {isEditing ? 'Lưu thay đổi' : 'Tạo thiệp'}
+            <LoadingButton
+              type="submit"
+              variant="contained"
+              size="large"
+              loading={isPosting}
+              disabled={isAddingPhotos}
+              loadingPosition="start"
+              startIcon={<IoSparklesOutline />}
+            >
+              {uploading && `Đang tải ảnh ${uploading.done + 1}/${uploading.total}…`}
+              {!uploading && isAddingPhotos && 'Đang xử lý ảnh…'}
+              {!uploading && !isAddingPhotos && (isEditing ? 'Lưu thay đổi' : 'Tạo thiệp')}
             </LoadingButton>
           </div>
         </div>
