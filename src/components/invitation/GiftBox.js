@@ -20,14 +20,15 @@ export function groupDigits(account = '') {
  * VietQR code, scanned by any Vietnamese banking app with the note prefilled.
  * In samples (`demo`) the code is not a real account.
  */
-export default function GiftBox({ event, guest, isPublic, demo }) {
+export default function GiftBox({ event, guest, demo }) {
   const gifts = event.gifts ?? [];
   const [isOpen, setIsOpen] = useState(false);
   const [side, setSide] = useState(gifts[0]?.side);
   const [copied, setCopied] = useState(false);
   const couple = isCoupleEvent(event.type);
   const gift = gifts.find(g => g.side === side) ?? gifts[0];
-  const sender = guest?.name && !isPublic ? guest.name : '';
+  // Prefills "<name> mung cuoi" so the couple knows who sent it
+  const sender = guest?.name ?? '';
 
   const payload = useMemo(() => {
     if (!gift) {

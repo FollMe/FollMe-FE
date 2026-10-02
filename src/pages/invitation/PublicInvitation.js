@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import InvitationLoading from 'components/invitation/InvitationLoading';
+import InvitationUnavailable from 'components/invitation/InvitationUnavailable';
 import InvitationView from 'components/invitation/InvitationView';
-import { eventHeadline, getPublicGuest, invitationApi, savePublicGuest } from 'util/invitation';
+import { eventHeadline, getPublicGuest, invitationApi, isGoneError, savePublicGuest } from 'util/invitation';
 import { setPageMeta } from 'util/meta';
 
 /** The shared link of an event (/e/:eventId), for group chats. */
@@ -10,11 +11,13 @@ export default function PublicInvitation() {
   const { eventId } = useParams();
   const [data, setData] = useState(null);
   const [guest, setGuest] = useState(() => getPublicGuest(eventId));
-  const [failed, setFailed] = useState(false);
+  const [failed, setFailed] = useState(null);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let isActive = true;
-    invitationApi.getPublic(eventId)
+    setFailed(null);
+    invitationApi.getPublic(eventId, { quiet: true })
       .then(res => {
         if (!isActive) {
           return;
@@ -22,14 +25,14 @@ export default function PublicInvitation() {
         setPageMeta({ title: `Thiệp mời: ${eventHeadline(res.event)}`, description: res.event.location });
         setData(res);
       })
-      .catch(() => isActive && setFailed(true));
+      .catch(err => isActive && setFailed(isGoneError(err) ? 'missing' : 'offline'));
     return () => {
       isActive = false;
     };
-  }, [eventId]);
+  }, [eventId, attempt]);
 
   if (failed) {
-    return <div className="container page empty-state">Thiệp mời này không tồn tại hoặc gia chủ đã tắt link chung.</div>;
+    return <InvitationUnavailable reason={failed} isPublic onRetry={() => setAttempt(n => n + 1)} />;
   }
   if (!data) {
     return <InvitationLoading />;

@@ -28,6 +28,7 @@ export default function GuestListInput({ value, onChange, existing = [], label =
   const caret = useRef(null);
   const parsed = useMemo(() => parseGuestList(value, existing), [value, existing]);
   const count = parsed.guests.length;
+  const error = guestListError(parsed);
 
   // Put the caret back after a shortcut changed the text
   useLayoutEffect(() => {
@@ -69,6 +70,7 @@ export default function GuestListInput({ value, onChange, existing = [], label =
         value={value}
         autoFocus={autoFocus}
         onChange={e => onChange(e.target.value)}
+        error={Boolean(error)}
         placeholder={'Cô Ba\nAnh Tuấn & người thương\nGia đình chú Tư'}
         helperText="Mỗi dòng một khách. Có thể dán cả danh sách từ Ghi chú, Zalo hay Excel."
         inputProps={{ spellCheck: false, autoCapitalize: 'words' }}
@@ -124,7 +126,7 @@ export default function GuestListInput({ value, onChange, existing = [], label =
           )}
         </ul>
       )}
-      {guestListError(parsed) && <p className={styles.error}>{guestListError(parsed)}</p>}
+      {error && <p className={styles.error}>{error}</p>}
     </div>
   );
 }

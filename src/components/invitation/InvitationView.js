@@ -21,7 +21,9 @@ import GiftBox from './GiftBox';
 import ScratchReveal from './ScratchReveal';
 import PhotoAlbum from './PhotoAlbum';
 import { getAlmanac, lunarMonthLabel } from 'util/fortune';
-import { RSVP_LABELS, eventHeadline, invitationApi, isCoupleEvent, savePublicGuest } from 'util/invitation';
+import {
+  RSVP_LABELS, eventHeadline, invitationApi, isCoupleEvent, rememberOpened, savePublicGuest, wasOpened,
+} from 'util/invitation';
 import { track } from 'util/analytics';
 import { vnWallClock } from 'util/date';
 import { burst } from 'util/confetti';
@@ -160,11 +162,16 @@ export default function InvitationView({
   const [lunar, setLunar] = useState(null);
   const [wishes, setWishes] = useState(initialWishes);
   const [showQR, setShowQR] = useState(false);
-  const [isOpen, setIsOpen] = useState(() => embedded || prefersReducedMotion() || opensOnWishes());
+  // Samples always play the envelope; real invitations only the first time
+  const openedKey = demo || embedded ? null : (guest?._id && !isPublic ? `g.${guest._id}` : `e.${event._id}`);
+  const [isOpen, setIsOpen] = useState(() => (
+    embedded || prefersReducedMotion() || opensOnWishes() || wasOpened(openedKey)
+  ));
   const theme = event.theme || 'minimal';
   const couple = isCoupleEvent(event.type) && event.groomName && event.brideName;
   const shownEndAt = vnWallClock(startAt.getTime() + 3 * 60 * 60 * 1000);
-  const recipient = guest?.name && !isPublic ? guest.name : 'Bạn';
+  // On the public link, the name they gave when answering
+  const recipient = guest?.name || 'Bạn';
   // Weddings get the music box and the scratch-off date unless the host
   // turned them off; other events only if turned on.
   const withMusic = !embedded && (event.music ? event.music !== 'none' : isCoupleEvent(event.type));
@@ -192,8 +199,9 @@ export default function InvitationView({
 
   const onOpened = useCallback(() => {
     setIsOpen(true);
+    rememberOpened(openedKey);
     track('invitation_opened', { theme, demo });
-  }, [theme, demo]);
+  }, [theme, demo, openedKey]);
 
   const onDateRevealed = useCallback(({ x, y }) => {
     burst({ x, y, colors: CONFETTI[theme] });
@@ -365,7 +373,7 @@ export default function InvitationView({
       {event.gifts?.length > 0 && (
         <section id="mung-cuoi" className={styles.section}>
           <Reveal>
-            <GiftBox event={event} guest={guest} isPublic={isPublic} demo={demo} />
+            <GiftBox event={event} guest={guest} demo={demo} />
           </Reveal>
         </section>
       )}

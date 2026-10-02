@@ -1,19 +1,23 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import InvitationLoading from 'components/invitation/InvitationLoading';
+import InvitationUnavailable from 'components/invitation/InvitationUnavailable';
 import InvitationView from 'components/invitation/InvitationView';
-import { eventHeadline, invitationApi } from 'util/invitation';
+import { eventHeadline, invitationApi, isGoneError } from 'util/invitation';
 import { setPageMeta } from 'util/meta';
 
 /** A guest's personal invitation (/invitations/:id). */
 export default function InvitationCard() {
   const { id: guestId } = useParams();
   const [data, setData] = useState(null);
-  const [failed, setFailed] = useState(false);
+  // 'missing' (link no longer works) or 'offline' (could not load it)
+  const [failed, setFailed] = useState(null);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let isActive = true;
-    invitationApi.get(guestId)
+    setFailed(null);
+    invitationApi.get(guestId, { quiet: true })
       .then(res => {
         if (!isActive) {
           return;
@@ -25,14 +29,14 @@ export default function InvitationCard() {
         });
         setData(invitation);
       })
-      .catch(() => isActive && setFailed(true));
+      .catch(err => isActive && setFailed(isGoneError(err) ? 'missing' : 'offline'));
     return () => {
       isActive = false;
     };
-  }, [guestId]);
+  }, [guestId, attempt]);
 
   if (failed) {
-    return <div className="container page empty-state">Không tìm thấy thiệp mời này.</div>;
+    return <InvitationUnavailable reason={failed} onRetry={() => setAttempt(n => n + 1)} />;
   }
   if (!data) {
     return <InvitationLoading />;

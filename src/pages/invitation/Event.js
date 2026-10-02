@@ -30,6 +30,7 @@ import {
 import { defaultTemplate, loadTemplate, saveTemplate } from 'util/inviteMessage';
 import { downloadCsv } from 'util/csv';
 import { parseGuestList } from 'util/guestList';
+import { vnWallClock } from 'util/date';
 import { track } from 'util/analytics';
 import styles from "./Event.module.scss";
 
@@ -274,7 +275,7 @@ export default function Event() {
         eyebrow="Thiệp mời"
         title={event.title}
         meta={[
-          <><IoTimeOutline /> {dayjs(event.startAt).format('HH:mm · DD/MM/YYYY')}</>,
+          <><IoTimeOutline /> {dayjs(vnWallClock(event.startAt)).format('HH:mm · DD/MM/YYYY')}</>,
           <><IoLocationOutline /> {event.location}</>,
         ]}
         actions={
@@ -377,7 +378,7 @@ export default function Event() {
                 size="small"
                 startIcon={<IoDownloadOutline />}
                 onClick={() => {
-                  downloadCsv(`khach-moi-${dayjs(event.startAt).format('YYYY-MM-DD')}.csv`, guestRows(guests));
+                  downloadCsv(`khach-moi-${dayjs(vnWallClock(event.startAt)).format('YYYY-MM-DD')}.csv`, guestRows(guests));
                   track('guests_exported');
                 }}
               >

@@ -32,3 +32,16 @@ describe('summarizeGuests', () => {
     });
   });
 });
+
+describe('isGoneError', () => {
+  const { isGoneError } = require('util/invitation');
+  const api = status => Object.assign(new Error('x'), { name: 'SERVER_ERROR', status });
+
+  it('is only a link that is wrong or gone', () => {
+    expect(isGoneError(api(404))).toBe(true);
+    expect(isGoneError(api(400))).toBe(true);
+    expect(isGoneError(api(500))).toBe(false);
+    expect(isGoneError(api(429))).toBe(false);
+    expect(isGoneError(new TypeError('Failed to fetch'))).toBe(false);
+  });
+});
