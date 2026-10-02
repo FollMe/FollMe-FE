@@ -1,20 +1,7 @@
-import { useEffect, useRef } from "react";
-import lottie from "lottie-web";
-import TypingAnimation from "animationData/Typing.json";
+import LottieAnimation from './LottieAnimation';
 
-const Typing = ({ width }) => {
-  const anime = useRef(null);
-  useEffect(() => {
-    lottie.loadAnimation({
-      container: anime.current,
-      renderer: "svg",
-      loop: true,
-      autoplay: true,
-      animationData: TypingAnimation,
-    });
-    return () => lottie.destroy();
-  }, []);
-  return <div style={{ width: width ?? 50 }} ref={anime}></div>;
-};
+const load = () => import('animationData/Typing.json');
+
+const Typing = ({ width }) => <LottieAnimation load={load} style={{ width: width ?? 50 }} />;
 
 export default Typing;
