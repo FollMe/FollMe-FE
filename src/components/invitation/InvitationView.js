@@ -7,10 +7,9 @@ import Button from '@mui/material/Button';
 import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
 import {
-  IoNavigateOutline, IoQrCodeOutline, IoSend, IoCheckmarkCircle, IoChevronDown, IoMailOpenOutline,
+  IoNavigateOutline, IoSend, IoCheckmarkCircle, IoChevronDown, IoMailOpenOutline,
   IoCreateOutline, IoLocationOutline, IoGiftOutline,
 } from 'react-icons/io5';
-import QRModel from 'pages/invitation/QRModel';
 import Reveal from 'components/Reveal';
 import Envelope from './Envelope';
 import Petals from './Petals';
@@ -161,7 +160,6 @@ export default function InvitationView({
   const shownAt = useMemo(() => vnWallClock(event.startAt), [event.startAt]);
   const [lunar, setLunar] = useState(null);
   const [wishes, setWishes] = useState(initialWishes);
-  const [showQR, setShowQR] = useState(false);
   // Samples always play the envelope; real invitations only the first time
   const openedKey = demo || embedded ? null : (guest?._id && !isPublic ? `g.${guest._id}` : `e.${event._id}`);
   const [isOpen, setIsOpen] = useState(() => (
@@ -338,11 +336,6 @@ export default function InvitationView({
             Chỉ đường
           </Button>
           <AddToCalendar event={event} />
-          {guest?._id && !isPublic && !demo && (
-            <Button variant="outlined" startIcon={<IoQrCodeOutline />} onClick={() => setShowQR(true)}>
-              Mã check-in
-            </Button>
-          )}
         </Reveal>
       </section>
 
@@ -401,7 +394,6 @@ export default function InvitationView({
 
       {isOpen && withMusic && canPlayMusic() && <MusicToggle isPlaying={music.isPlaying} onToggle={music.toggle} />}
 
-      {showQR && <QRModel value={guest._id} handleClose={() => setShowQR(false)} />}
     </div>
   );
 }

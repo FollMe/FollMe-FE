@@ -15,10 +15,12 @@ import styles from './WeddingHub.module.scss';
 
 const FAQ = [
   ['Tạo thiệp có mất phí không?', 'Không. Bạn chỉ cần một tài khoản FollMe để quản lý thiệp; khách mở thiệp không cần đăng nhập.'],
-  ['Link chung và link riêng khác nhau thế nào?', 'Link chung dùng để gửi vào nhóm Zalo, Messenger: ai có link cũng xem được, xác nhận tham dự bằng cách nhập tên. Link riêng ghi sẵn tên từng khách ("Trân trọng kính mời anh Minh") và có mã check-in.'],
+  ['Link chung và link riêng khác nhau thế nào?', 'Link chung dùng để gửi vào nhóm Zalo, Messenger: ai có link cũng xem được, xác nhận tham dự bằng cách nhập tên. Link riêng ghi sẵn tên từng khách ("Trân trọng kính mời anh Minh"). Chủ thiệp biết từng người đã mở thiệp và trả lời gì.'],
   ['Có chiếu lời chúc lên màn hình ở tiệc được không?', 'Được. Trong trang quản lý thiệp có link "Màn hình lời chúc": mở trên laptop nối với TV hoặc máy chiếu, hoặc gửi cho bên âm thanh ánh sáng. Khách quét mã QR trên màn hình để gửi lời chúc, lời chúc hiện lên sau vài giây, kèm album ảnh cưới chạy tự động.'],
   ['Tôi vẫn muốn in thiệp giấy?', 'Cứ in như bình thường và thêm mã QR của link chung lên thiệp. Khách quét mã là xem được chỉ đường, lưu vào lịch và gửi lời chúc.'],
-  ['Làm sao biết bao nhiêu người sẽ đến?', 'Trang quản lý thiệp tổng hợp ai đã mở thiệp, ai sẽ đến, đi mấy người, ai chưa trả lời. Bạn nhắn riêng cho người chưa trả lời là xong.'],
+  ['Nhập danh sách khách có lâu không?', 'Dán cả danh sách từ Ghi chú, Zalo hay Excel, mỗi dòng một tên. Dòng như "Nhà trai:" hay "Bạn bè:" sẽ chia khách thành nhóm. Trên Android còn chọn được khách từ danh bạ.'],
+  ['Làm sao biết bao nhiêu người sẽ đến?', 'Trang quản lý thiệp tổng hợp ai đã mở thiệp, ai sẽ đến, đi mấy người, tách riêng nhà trai, nhà gái và từng nhóm bạn. Khách đã nhận thiệp mà chưa trả lời được nhắc lần lượt qua Zalo, mỗi người một lần bấm.'],
+  ['Thông tin của khách có bị lộ không?', 'Thiệp không hiện trên Google, chỉ người có link mới xem được. Khi bạn xoá thiệp, mọi link ngừng hoạt động ngay. Chi tiết ở trang Chính sách bảo mật.'],
   ['Ngày cưới được chọn theo quy tắc nào?', 'Chỉ giữ ngày hoàng đạo, không xung tuổi cô dâu chú rể, tránh tháng 7 âm lịch, ngày Tam Nương và Nguyệt Kỵ, rồi xếp hạng theo độ hợp với tuổi hai bạn. Kim Lâu được báo riêng để gia đình cân nhắc.'],
 ];
 
