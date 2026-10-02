@@ -1,0 +1,77 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  button {
+    padding: 5px 11px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    font-size: 1.35rem;
+    font-weight: 600;
+    cursor: pointer;
+    touch-action: manipulation;
+
+    &:hover,
+    &:focus-visible {
+      border-color: var(--brand);
+      color: var(--brand-text);
+    }
+
+    &:active {
+      background: var(--brand-soft);
+    }
+  }
+
+  .suffix {
+    font-weight: 500;
+    color: var(--text-2);
+  }
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.count {
+  flex: 1 1 220px;
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--text-2);
+
+  svg {
+    margin-right: 2px;
+    vertical-align: -2px;
+    color: var(--success);
+  }
+
+  strong {
+    color: var(--text);
+  }
+}
+
+.notes {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 1.3rem;
+  color: var(--text-3);
+}
+
+.error {
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--danger);
+}

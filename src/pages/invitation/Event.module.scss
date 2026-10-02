@@ -68,8 +68,10 @@
 
 .panelHead {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
+  gap: 8px;
   margin-bottom: 16px;
 
   h2 {
@@ -219,6 +221,7 @@
 
 .panelTools {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
 }

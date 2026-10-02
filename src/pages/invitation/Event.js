@@ -1,26 +1,35 @@
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import { Stack, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import LoadingButton from '@mui/lab/LoadingButton';
+import { toast } from 'react-toastify';
 import { DataGrid } from '@mui/x-data-grid';
 import QRCode from 'react-qr-code';
 import dayjs from 'dayjs';
 import {
   IoTimeOutline, IoLocationOutline, IoCopyOutline, IoCheckmark, IoEyeOutline, IoCreateOutline, IoShareSocialOutline,
-  IoEyeOffOutline, IoSparkles, IoDownloadOutline, IoTvOutline, IoRefresh,
+  IoEyeOffOutline, IoSparkles, IoDownloadOutline, IoTvOutline, IoRefresh, IoPersonAddOutline,
 } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
 import ArticleHeader from 'components/article/ArticleHeader';
 import InvitationStatusTag from 'components/invitation/InvitationStatusTag';
 import PhotoManager from 'components/invitation/PhotoManager';
+import GuestListInput, { guestListError } from 'components/invitation/GuestListInput';
 import {
   MAX_PHOTOS, RSVP_LABELS, eventHeadline, invitationApi, isCoupleEvent, personalInvitationUrl, publicInvitationUrl,
   screenUrl,
 } from 'util/invitation';
 import { downloadCsv } from 'util/csv';
+import { parseGuestList } from 'util/guestList';
 import { track } from 'util/analytics';
 import styles from "./Event.module.scss";
 
@@ -132,6 +141,47 @@ function ScreenPanel({ event, onEnablePublicLink }) {
   );
 }
 
+/** Adds guests by name, without going through the edit form. */
+function AddGuestsDialog({ event, onClose, onAdded }) {
+  const [text, setText] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const fullScreen = useMediaQuery('(max-width: 600px)');
+  const existing = useMemo(() => (event.guests ?? []).map(g => g.name), [event.guests]);
+  const parsed = useMemo(() => parseGuestList(text, existing), [text, existing]);
+  const count = parsed.guests.length;
+
+  async function save() {
+    setIsSaving(true);
+    try {
+      await invitationApi.update(event._id, { addGuests: parsed.guests });
+      track('guests_added', { count });
+      onAdded(count);
+    } catch (err) {
+      setIsSaving(false);
+    }
+  }
+
+  return (
+    <Dialog open onClose={isSaving ? undefined : onClose} fullWidth maxWidth="sm" fullScreen={fullScreen}>
+      <DialogTitle>Thêm khách mời</DialogTitle>
+      <DialogContent sx={{ pt: '8px !important' }}>
+        <GuestListInput value={text} onChange={setText} existing={existing} label="Tên khách" autoFocus />
+      </DialogContent>
+      <DialogActions sx={{ px: 3, pb: 2 }}>
+        <Button onClick={onClose} disabled={isSaving}>Huỷ</Button>
+        <LoadingButton
+          variant="contained"
+          loading={isSaving}
+          disabled={count === 0 || Boolean(guestListError(parsed))}
+          onClick={save}
+        >
+          {count ? `Thêm ${count} khách` : 'Thêm khách'}
+        </LoadingButton>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
 const columns = [
   { field: 'name', headerName: 'Khách', flex: 1, minWidth: 140 },
   {
@@ -179,16 +229,25 @@ export default function Event() {
   const [searchParams] = useSearchParams();
   const justCreated = searchParams.get('created') === '1';
   const [event, setEvent] = useState(null);
+  const [isAddingGuests, setIsAddingGuests] = useState(false);
+
+  const load = useCallback(() => invitationApi.hostGet(eventId)
+    .then(({ invitation }) => {
+      document.title = `${invitation.title} | FollMe`;
+      setEvent(invitation);
+    })
+    .catch(() => navigate('/events')), [eventId, navigate]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    invitationApi.hostGet(eventId)
-      .then(({ invitation }) => {
-        document.title = `${invitation.title} | FollMe`;
-        setEvent(invitation);
-      })
-      .catch(() => navigate('/events'));
-  }, [eventId, navigate]);
+    load();
+  }, [load]);
+
+  async function onGuestsAdded(count) {
+    await load();
+    setIsAddingGuests(false);
+    toast.success(`Đã thêm ${count} khách. Copy link riêng của từng người ở bảng bên dưới để gửi qua Zalo.`);
+  }
 
   async function toggleWish(wish) {
     try {
@@ -337,6 +396,9 @@ export default function Event() {
           <h2>Khách & xác nhận</h2>
           <div className={styles.panelTools}>
             <span>{guests.length} người</span>
+            <Button size="small" variant="contained" startIcon={<IoPersonAddOutline />} onClick={() => setIsAddingGuests(true)}>
+              Thêm khách
+            </Button>
             {guests.length > 0 && (
               <Button
                 size="small"
@@ -362,7 +424,7 @@ export default function Event() {
             slots={{
               noRowsOverlay: () => (
                 <Stack height="100%" alignItems="center" justifyContent="center">
-                  <Typography>Chưa có khách. Gửi link chung hoặc thêm khách riêng trong phần Sửa.</Typography>
+                  <Typography>Chưa có khách. Bấm "Thêm khách" để tạo link riêng ghi tên từng người, hoặc gửi link chung.</Typography>
                 </Stack>
               ),
             }}
@@ -395,6 +457,10 @@ export default function Event() {
           </ul>
         )}
       </section>
+
+      {isAddingGuests && (
+        <AddGuestsDialog event={event} onClose={() => setIsAddingGuests(false)} onAdded={onGuestsAdded} />
+      )}
     </div>
   );
 }

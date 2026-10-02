@@ -1,7 +1,7 @@
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
-import { Autocomplete, Chip, TextField } from '@mui/material';
+import { TextField } from '@mui/material';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import { DateTimeField } from '@mui/x-date-pickers';
@@ -13,21 +13,17 @@ import dayjs from 'dayjs';
 import ArticleHeader from 'components/article/ArticleHeader';
 import InvitationView from 'components/invitation/InvitationView';
 import GiftAccountsField, { isGiftComplete, normalizeGifts } from 'components/invitation/GiftAccountsField';
+import GuestListInput, { guestListError } from 'components/invitation/GuestListInput';
 import OvalLoading from 'components/loading/OvalLoading';
 import {
   DEFAULT_MESSAGES, EVENT_TYPES, THEMES, invitationApi, isCoupleEvent, suggestTitle,
 } from 'util/invitation';
 import { track } from 'util/analytics';
+import { parseGuestList } from 'util/guestList';
 import styles from "./CreateEvent.module.scss";
 import previewStyles from "components/invitation/ThemePreview.module.scss";
 
-const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
-
-function parseGuest(text) {
-  const [name, email] = text.split(' | ');
-  return { name, email };
-}
 
 export default function CreateEvent() {
   const navigate = useNavigate();
@@ -63,14 +59,16 @@ export default function CreateEvent() {
   const [photos, setPhotos] = useState([]);
   const [effectsTouched, setEffectsTouched] = useState(false);
   const [titleTouched, setTitleTouched] = useState(false);
-  const [guests, setGuests] = useState([]);
-  const [guestInput, setGuestInput] = useState('');
+  // One guest per line; on edit, only the guests to add
+  const [guestText, setGuestText] = useState('');
+  const [invitedNames, setInvitedNames] = useState([]);
   const [errors, setErrors] = useState({});
   const [isPosting, setIsPosting] = useState(false);
   const [isLoading, setIsLoading] = useState(isEditing);
 
   const set = (patch) => setForm(f => ({ ...f, ...patch }));
   const couple = isCoupleEvent(form.type);
+  const guestList = useMemo(() => parseGuestList(guestText, invitedNames), [guestText, invitedNames]);
 
   useEffect(() => {
     document.title = `${isEditing ? 'Sửa thiệp' : 'Tạo thiệp mời'} | FollMe`;
@@ -98,6 +96,7 @@ export default function CreateEvent() {
           gifts: invitation.gifts ?? [],
         });
         setPhotos(invitation.photos ?? []);
+        setInvitedNames((invitation.guests ?? []).map(g => g.name));
         setEffectsTouched(true);
         setTitleTouched(true);
         setIsLoading(false);
@@ -119,25 +118,6 @@ export default function CreateEvent() {
     set({ type, message, ...effects });
   }
 
-  function onChangeGuests(_, value, reason) {
-    if (reason !== 'createOption') {
-      setGuests(value);
-      return;
-    }
-    const inputValue = value.pop();
-    const detailValues = inputValue.split('|');
-    const name = detailValues[0].trim().replace(/\s+/g, ' ');
-    const email = detailValues?.[1]?.trim()?.toLowerCase();
-    if (!name || detailValues.length > 2 || (detailValues.length === 2 && !emailRegex.test(email))) {
-      setGuestInput(inputValue);
-      return;
-    }
-    const newValue = `${name}${email ? ` | ${email}` : ''}`;
-    if (!value.includes(newValue)) {
-      setGuests([...value, newValue]);
-    }
-  }
-
   function validate() {
     const next = {};
     if (couple && (!form.groomName.trim() || !form.brideName.trim())) {
@@ -154,6 +134,9 @@ export default function CreateEvent() {
     }
     if (!form.gifts.every(isGiftComplete)) {
       next.gifts = true;
+    }
+    if (guestListError(guestList)) {
+      next.guests = true;
     }
     setErrors(next);
     return Object.keys(next).length === 0;
@@ -183,12 +166,12 @@ export default function CreateEvent() {
     };
     try {
       if (isEditing) {
-        await invitationApi.update(eventId, { ...payload, addGuests: guests.map(parseGuest) });
+        await invitationApi.update(eventId, { ...payload, addGuests: guestList.guests });
         toast.success('Đã lưu thay đổi');
         navigate(`/events/${eventId}`);
       } else {
-        const event = await invitationApi.create({ ...payload, guests: guests.map(parseGuest) });
-        track('invitation_created', { type: form.type, theme: form.theme, guests: guests.length });
+        const event = await invitationApi.create({ ...payload, guests: guestList.guests });
+        track('invitation_created', { type: form.type, theme: form.theme, guests: guestList.guests.length });
         navigate(`/events/${event._id}?created=1`);
       }
     } catch (err) {
@@ -346,28 +329,11 @@ export default function CreateEvent() {
               control={<Switch checked={form.allowPublicLink} onChange={e => set({ allowPublicLink: e.target.checked })} />}
               label="Tạo link chung để gửi vào nhóm (ai có link cũng xem và xác nhận được)"
             />
-            <Autocomplete
-              clearIcon={false}
-              options={[]}
-              value={guests}
-              onChange={onChangeGuests}
-              inputValue={guestInput}
-              onInputChange={(_, value) => setGuestInput(value)}
-              freeSolo
-              multiple
-              renderTags={(value, props) => value.map((option, index) => <Chip label={option} {...props({ index })} />)}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label={`${isEditing ? 'Mời thêm khách' : 'Khách mời riêng'}${guests.length ? ` (${guests.length})` : ''}`}
-                  helperText="Gõ tên rồi Enter, mỗi khách có một link riêng ghi tên họ. Thêm email theo cú pháp: Tên | email để gửi thư mời tự động."
-                  onKeyDown={(event) => {
-                    if (event.key === 'Backspace') {
-                      event.stopPropagation();
-                    }
-                  }}
-                />
-              )}
+            <GuestListInput
+              value={guestText}
+              onChange={setGuestText}
+              existing={invitedNames}
+              label={isEditing ? 'Mời thêm khách' : 'Khách mời riêng (không bắt buộc)'}
             />
           </fieldset>
 
