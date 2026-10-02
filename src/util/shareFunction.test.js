@@ -51,6 +51,14 @@ it('fills in a wedding invitation preview', async () => {
   expect(res.body).toContain('content="https://follme.vercel.app/imgs/og-wedding.png"');
   expect(res.body).toContain(`<meta property="og:url" content="https://follme.vercel.app/e/${EVENT_ID}" />`);
   expect(res.body.match(/og:title/g)).toHaveLength(1);
+  expect(res.headers['X-Robots-Tag']).toBe('noindex, nofollow');
+});
+
+it('keeps invitations out of search engines, not other pages', () => {
+  expect(handler.isPrivatePath(`/invitations/${EVENT_ID}`)).toBe(true);
+  expect(handler.isPrivatePath(`/e/${EVENT_ID}`)).toBe(true);
+  expect(handler.isPrivatePath('/blogs/git-co-ban')).toBe(false);
+  expect(handler.isPrivatePath('/events')).toBe(false);
 });
 
 it('uses the blog cover and static pages', async () => {
@@ -62,6 +70,7 @@ it('uses the blog cover and static pages', async () => {
   expect(res.body).toContain('content="https://cdn.example.com/cover.png"');
   res = await call('/cuoi-hoi/chon-ngay');
   expect(res.body).toContain('<title>Chọn ngày cưới đẹp theo tuổi | FollMe</title>');
+  expect(res.headers['X-Robots-Tag']).toBeUndefined();
 });
 
 it('serves the plain page when the API fails or the id is bad', async () => {

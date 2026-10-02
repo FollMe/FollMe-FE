@@ -3,7 +3,6 @@ import { IoLogoGithub, IoArrowUp } from 'react-icons/io5';
 import BrandLogo from 'components/layout/BrandLogo';
 import styles from './Footer.module.scss';
 
-const PRIVACY_POLICY_URL = 'https://www.freeprivacypolicy.com/live/b2e00735-5907-4d28-9a1a-875d2f56053c';
 const TERMS_URL = 'https://www.freeprivacypolicy.com/live/882e116b-73b8-4713-85a2-bbc173c68be0';
 const GITHUB_URL = 'https://github.com/sumsv50';
 
@@ -45,7 +44,7 @@ export default function Footer() {
           </div>
           <div className={styles.column}>
             <h3>Pháp lý</h3>
-            <a href={PRIVACY_POLICY_URL} target="_blank" rel="noreferrer">Privacy Policy</a>
+            <Link to="/chinh-sach-bao-mat">Chính sách bảo mật</Link>
             <a href={TERMS_URL} target="_blank" rel="noreferrer">Terms & Conditions</a>
           </div>
         </div>

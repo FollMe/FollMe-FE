@@ -1,8 +1,8 @@
+import { Link } from 'react-router-dom';
 import BrandLogo from 'components/layout/BrandLogo';
 import ThemeToggle from 'components/layout/ThemeToggle';
 import styles from './AuthShell.module.scss';
 
-const PRIVACY_POLICY_URL = 'https://www.freeprivacypolicy.com/live/b2e00735-5907-4d28-9a1a-875d2f56053c';
 const TERMS_URL = 'https://www.freeprivacypolicy.com/live/882e116b-73b8-4713-85a2-bbc173c68be0';
 
 /**
@@ -25,7 +25,7 @@ export default function AuthShell({ title, subtitle, children, footer }) {
         </div>
 
         <div className={styles.legal}>
-          <a href={PRIVACY_POLICY_URL} target="_blank" rel="noreferrer">Privacy Policy</a>
+          <Link to="/chinh-sach-bao-mat">Chính sách bảo mật</Link>
           <a href={TERMS_URL} target="_blank" rel="noreferrer">Terms & Conditions</a>
         </div>
       </div>

@@ -7,6 +7,7 @@ import Story from "./pages/story/Story";
 import ShortStory from "pages/story/ShortStory";
 import StoryList from "./pages/story/StoryList";
 import FacebookDataDeletionInstructions from "pages/document/FacebookDataDeletionInstructions";
+import PrivacyPolicy from "pages/document/PrivacyPolicy";
 import MainLayout from "./layouts/MainLayout";
 import AuthMainLayout from "layouts/AuthMainLayout";
 import Home from "pages/main/Home";
@@ -60,6 +61,7 @@ export default function Router() {
       children: [
         { path: '/404', element: <Page404 /> },
         { path: '/documents/facebook-data-deletion-instructions-url', element: <FacebookDataDeletionInstructions /> },
+        { path: '/chinh-sach-bao-mat', element: <PrivacyPolicy /> },
       ]
     },
 

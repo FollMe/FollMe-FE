@@ -34,6 +34,7 @@ import { downloadCsv } from 'util/csv';
 import { groupPresets, parseGuestList } from 'util/guestList';
 import { vnWallClock } from 'util/date';
 import { track } from 'util/analytics';
+import { CONTACT_EMAIL } from 'config/constant';
 import styles from "./Event.module.scss";
 
 function CopyButton({ text, label = 'Copy link', variant = 'icon' }) {
@@ -258,11 +259,15 @@ function DeleteEventDialog({ event, onClose }) {
       <DialogTitle>Xoá thiệp này?</DialogTitle>
       <DialogContent>
         <p className={styles.dialogText}>
-          Link riêng của khách, link chung và màn hình lời chúc sẽ không mở được nữa. Không thể hoàn tác.
+          Link riêng của khách, link chung và màn hình lời chúc sẽ không mở được nữa, ảnh bị xoá ngay.
         </p>
         {losses.length > 0 && (
           <p className={styles.dialogText}>Sẽ mất: {losses.join(', ')}.</p>
         )}
+        <p className={styles.dialogText}>
+          Lỡ xoá nhầm? Email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> trong 30 ngày để khôi phục danh sách
+          khách và lời chúc.
+        </p>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button onClick={onClose} disabled={isDeleting}>Giữ lại</Button>
@@ -551,7 +556,7 @@ export default function Event() {
       <section className={clsx(styles.panel, styles.dangerZone)}>
         <div>
           <h2>Xoá thiệp</h2>
-          <p className={styles.muted}>Khách sẽ không mở được thiệp nữa. Danh sách khách, lời chúc và ảnh cũng mất theo.</p>
+          <p className={styles.muted}>Khách sẽ không mở được thiệp nữa. Ảnh bị xoá ngay, danh sách khách và lời chúc bị xoá hẳn sau 30 ngày.</p>
         </div>
         <Button color="error" variant="outlined" size="small" startIcon={<IoTrashOutline />} onClick={() => setIsConfirmingDelete(true)}>
           Xoá thiệp
