@@ -310,3 +310,60 @@
   font-size: 1.45rem;
   line-height: 1.55;
 }
+
+.groupTable {
+  margin-bottom: 16px;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.4rem;
+  }
+
+  th,
+  td {
+    // Numbers take what they need, the group name the rest
+    width: 1%;
+    padding: 8px 0 8px 14px;
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+    white-space: nowrap;
+
+    &:first-child {
+      width: auto;
+      padding-left: 0;
+      text-align: left;
+      white-space: normal;
+    }
+  }
+
+  th {
+    color: var(--text-3);
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  abbr {
+    text-decoration: none;
+  }
+
+  td {
+    color: var(--text-2);
+    font-variant-numeric: tabular-nums;
+
+    &:first-child {
+      color: var(--text);
+      font-weight: 600;
+    }
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  strong {
+    color: var(--text);
+  }
+}

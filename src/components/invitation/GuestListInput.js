@@ -4,7 +4,7 @@ import Button from '@mui/material/Button';
 import { IoPeopleOutline, IoCheckmarkCircle } from 'react-icons/io5';
 import {
   MAX_GUEST_NAME, MAX_GUESTS_PER_SAVE, NAME_PREFIXES, NAME_SUFFIXES,
-  appendNames, lineAt, parseGuestList, withPrefix, withSuffix,
+  appendNames, countByGroup, lineAt, parseGuestList, withPrefix, withSuffix,
 } from 'util/guestList';
 import { track } from 'util/analytics';
 import styles from './GuestListInput.module.scss';
@@ -22,12 +22,15 @@ function names(list) {
  * Guest names, one per line: type them, paste a list, or pick from the
  * phone book. Buttons add "Anh", "Cô"... to the line being typed.
  * `existing` are names already invited, which are not added twice.
+ * A "Nhà trai:" line puts the guests below it in that group; `group` is
+ * the group of those above any such line.
  */
-export default function GuestListInput({ value, onChange, existing = [], label = 'Danh sách khách mời', autoFocus }) {
+export default function GuestListInput({ value, onChange, existing = [], group = '', label = 'Danh sách khách mời', autoFocus }) {
   const inputRef = useRef(null);
   const caret = useRef(null);
-  const parsed = useMemo(() => parseGuestList(value, existing), [value, existing]);
+  const parsed = useMemo(() => parseGuestList(value, existing, group), [value, existing, group]);
   const count = parsed.guests.length;
+  const groups = countByGroup(parsed.guests);
   const error = guestListError(parsed);
 
   // Put the caret back after a shortcut changed the text
@@ -72,7 +75,8 @@ export default function GuestListInput({ value, onChange, existing = [], label =
         onChange={e => onChange(e.target.value)}
         error={Boolean(error)}
         placeholder={'Cô Ba\nAnh Tuấn & người thương\nGia đình chú Tư'}
-        helperText="Mỗi dòng một khách. Có thể dán cả danh sách từ Ghi chú, Zalo hay Excel."
+        helperText={'Mỗi dòng một khách. Có thể dán cả danh sách từ Ghi chú, Zalo hay Excel. '
+          + 'Dòng có dấu hai chấm như "Nhà trai:" là tên nhóm của các khách bên dưới.'}
         inputProps={{ spellCheck: false, autoCapitalize: 'words' }}
       />
 
@@ -105,7 +109,10 @@ export default function GuestListInput({ value, onChange, existing = [], label =
         <p className={styles.count} aria-live="polite">
           {count > 0 ? (
             <>
-              <IoCheckmarkCircle /><strong>{count} khách</strong>, mỗi người có một link riêng ghi tên họ
+              <IoCheckmarkCircle /><strong>{count} khách</strong>
+              {groups.length > 1 || groups[0]?.[0]
+                ? `: ${groups.map(([g, n]) => `${g || 'Chưa xếp nhóm'} ${n}`).join(' · ')}`
+                : ', mỗi người có một link riêng ghi tên họ'}
             </>
           ) : (
             'Chưa có khách nào trong danh sách'

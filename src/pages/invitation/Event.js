@@ -23,14 +23,15 @@ import InvitationStatusTag from 'components/invitation/InvitationStatusTag';
 import PhotoManager from 'components/invitation/PhotoManager';
 import GuestListInput, { guestListError } from 'components/invitation/GuestListInput';
 import GuestList from 'components/invitation/GuestList';
+import GroupPicker from 'components/invitation/GroupPicker';
 import SendQueue, { TemplateEditor } from 'components/invitation/SendQueue';
 import {
-  MAX_PHOTOS, RSVP_LABELS, eventHeadline, invitationApi, isCoupleEvent, personalInvitationUrl, publicInvitationUrl,
-  reminderQueue, screenUrl, summarizeGuests,
+  MAX_PHOTOS, RSVP_LABELS, eventHeadline, groupSummary, invitationApi, isCoupleEvent, personalInvitationUrl,
+  publicInvitationUrl, reminderQueue, screenUrl, summarizeGuests,
 } from 'util/invitation';
 import { defaultReminder, defaultTemplate, loadTemplate, saveTemplate } from 'util/inviteMessage';
 import { downloadCsv } from 'util/csv';
-import { parseGuestList } from 'util/guestList';
+import { groupPresets, parseGuestList } from 'util/guestList';
 import { vnWallClock } from 'util/date';
 import { track } from 'util/analytics';
 import styles from "./Event.module.scss";
@@ -66,9 +67,10 @@ function CopyButton({ text, label = 'Copy link', variant = 'icon' }) {
 /** The guest list as spreadsheet rows, for seating plans and thank-you notes. */
 export function guestRows(guests) {
   return [
-    ['Tên', 'Trả lời', 'Số người', 'Lời nhắn', 'Nguồn', 'Đã gửi', 'Đã nhắc', 'Lượt mở', 'Email', 'Link riêng'],
+    ['Tên', 'Nhóm', 'Trả lời', 'Số người', 'Lời nhắn', 'Nguồn', 'Đã gửi', 'Đã nhắc', 'Lượt mở', 'Email', 'Link riêng'],
     ...guests.map(g => [
       g.name,
+      g.group ?? '',
       g.rsvp ? RSVP_LABELS[g.rsvp.status] : 'Chưa trả lời',
       g.rsvp?.status === 'attending' || g.rsvp?.status === 'maybe' ? g.rsvp.count || 1 : '',
       g.rsvp?.note ?? '',
@@ -145,13 +147,51 @@ function ScreenPanel({ event, onEnablePublicLink }) {
   );
 }
 
+/** The groups offered for guests: the usual ones, then the host's own. */
+function groupOptions(event) {
+  return [...new Set([...groupPresets(event.type), ...(event.guests ?? []).map(g => g.group).filter(Boolean)])];
+}
+
+/** Guests, answers and expected headcount per group, for planning tables. */
+function GroupTable({ guests }) {
+  const rows = groupSummary(guests);
+  if (rows.length < 2 && !rows[0]?.group) {
+    return null;
+  }
+  return (
+    <div className={styles.groupTable}>
+      <table>
+        <thead>
+          <tr>
+            <th>Nhóm</th>
+            <th>Khách</th>
+            <th>Trả lời</th>
+            <th><abbr title="Số người dự kiến đến">Dự kiến</abbr></th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(row => (
+            <tr key={row.group}>
+              <td>{row.group || 'Chưa xếp nhóm'}</td>
+              <td>{row.invited}</td>
+              <td>{row.invited - row.pending}</td>
+              <td><strong>{row.headcount}</strong></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 /** Adds guests by name, without going through the edit form. */
 function AddGuestsDialog({ event, onClose, onAdded }) {
   const [text, setText] = useState('');
+  const [group, setGroup] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const fullScreen = useMediaQuery('(max-width: 600px)');
   const existing = useMemo(() => (event.guests ?? []).map(g => g.name), [event.guests]);
-  const parsed = useMemo(() => parseGuestList(text, existing), [text, existing]);
+  const parsed = useMemo(() => parseGuestList(text, existing, group), [text, existing, group]);
   const count = parsed.guests.length;
 
   async function save() {
@@ -168,8 +208,9 @@ function AddGuestsDialog({ event, onClose, onAdded }) {
   return (
     <Dialog open onClose={isSaving ? undefined : onClose} fullWidth maxWidth="sm" fullScreen={fullScreen}>
       <DialogTitle>Thêm khách mời</DialogTitle>
-      <DialogContent sx={{ pt: '8px !important' }}>
-        <GuestListInput value={text} onChange={setText} existing={existing} label="Tên khách" autoFocus />
+      <DialogContent sx={{ pt: '8px !important', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <GroupPicker value={group} onChange={setGroup} options={groupOptions(event)} label="Thêm vào nhóm" />
+        <GuestListInput value={text} onChange={setText} existing={existing} group={group} label="Tên khách" autoFocus />
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button onClick={onClose} disabled={isSaving}>Huỷ</Button>
@@ -470,11 +511,13 @@ export default function Event() {
             <Button variant="contained" size="small" onClick={() => setQueueMode('remind')}>Nhắc lần lượt</Button>
           </div>
         )}
+        <GroupTable guests={guests} />
         <GuestList
           event={event}
           guests={guests}
           template={templates.invite}
           reminderTemplate={templates.remind}
+          groupOptions={groupOptions(event)}
           onChange={setGuests}
         />
       </section>

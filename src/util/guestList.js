@@ -2,6 +2,19 @@
 
 export const MAX_GUEST_NAME = 100;
 export const MAX_GUESTS_PER_SAVE = 500;
+export const MAX_GROUP_NAME = 40;
+
+/** Groups offered when adding guests; hosts can type their own too. */
+export function groupPresets(type) {
+  return type === 'wedding' || type === 'engagement'
+    ? ['Nhà trai', 'Nhà gái', 'Bạn bè', 'Đồng nghiệp']
+    : ['Gia đình', 'Bạn bè', 'Đồng nghiệp'];
+}
+
+/** A group name with single spaces ('' for none). */
+export function cleanGroup(group) {
+  return (group ?? '').replace(/\s+/g, ' ').trim();
+}
 
 // Shortcuts shown under the list: how people are named on invitations
 export const NAME_PREFIXES = ['Anh', 'Chị', 'Cô', 'Chú', 'Bác', 'Em', 'Gia đình'];
@@ -29,18 +42,36 @@ export function parseGuestLine(line) {
 }
 
 /**
- * The guests in the text, without repeats (also of `existing` names, the
- * guests already invited). Reports what was left out and why.
+ * "Nhà trai:" on a line of its own starts a group: the guests below it
+ * belong to it, the way lists are often written in notes. Null otherwise.
  */
-export function parseGuestList(text, existing = []) {
+export function parseGroupHeader(line) {
+  const match = line.replace(LIST_MARKER_RE, '').match(/^(.+?)\s*[:：]\s*$/);
+  const group = match && cleanGroup(match[1]);
+  return group && group.length <= MAX_GROUP_NAME && !line.includes('|') ? group : null;
+}
+
+/**
+ * The guests in the text, without repeats (also of `existing` names, the
+ * guests already invited). Reports what was left out and why. Guests get
+ * the group of the header above them, or `group` before any header.
+ */
+export function parseGuestList(text, existing = [], group = '') {
   const invited = new Set(existing.map(key));
   const seen = new Set();
   const result = { guests: [], repeated: [], alreadyInvited: [], tooLong: [] };
+  let current = cleanGroup(group);
   for (const line of text.split(/\r?\n/)) {
-    const guest = parseGuestLine(line);
-    if (!guest) {
+    const header = parseGroupHeader(line);
+    if (header) {
+      current = header;
       continue;
     }
+    const parsed = parseGuestLine(line);
+    if (!parsed) {
+      continue;
+    }
+    const guest = current ? { ...parsed, group: current } : parsed;
     const k = key(guest.name);
     if (guest.name.length > MAX_GUEST_NAME) {
       result.tooLong.push(guest.name);
@@ -54,6 +85,16 @@ export function parseGuestList(text, existing = []) {
     }
   }
   return result;
+}
+
+/** [group, count] of the parsed guests, in the order the groups appear. */
+export function countByGroup(guests) {
+  const counts = new Map();
+  for (const guest of guests) {
+    const g = guest.group ?? '';
+    counts.set(g, (counts.get(g) ?? 0) + 1);
+  }
+  return [...counts];
 }
 
 /** The line around `caret`: its start and end offsets in `text`. */

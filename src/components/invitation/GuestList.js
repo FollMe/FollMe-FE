@@ -19,6 +19,7 @@ import {
 import { RSVP_LABELS, awaitsAnswer, invitationApi, personalInvitationUrl } from 'util/invitation';
 import { inviteMessage, sendInvite } from 'util/inviteMessage';
 import { normalizeText } from 'util/search';
+import GroupPicker from './GroupPicker';
 import { track } from 'util/analytics';
 import styles from './GuestList.module.scss';
 
@@ -33,29 +34,48 @@ export const FILTERS = [
   ['declined', 'Không đến', g => g.rsvp?.status === 'declined'],
 ];
 
-/** Guests matching the filter and the search, as typed without accents too. */
-export function filterGuests(guests, filter, query) {
+/**
+ * Guests matching the filter, the group ('' for those without one, null
+ * for all) and the search, as typed without accents too.
+ */
+export function filterGuests(guests, filter, query, group = null) {
   const test = FILTERS.find(([key]) => key === filter)?.[2] ?? (() => true);
   const q = normalizeText(query);
-  return guests.filter(g => test(g) && (!q || normalizeText(g.name).includes(q)));
+  return guests.filter(g => test(g)
+    && (group === null || (g.group || '') === group)
+    && (!q || normalizeText(g.name).includes(q)));
 }
 
 /**
  * The host's guest list: who got their link, opened it, and answered.
  * Each personal link can be sent from here, and a reminder to whoever has
- * not answered; `onChange` gets an updater.
+ * not answered; `onChange` gets an updater. `groupOptions` are the groups
+ * offered when editing a guest.
  */
-export default function GuestList({ event, guests, template, reminderTemplate, onChange }) {
+export default function GuestList({ event, guests, template, reminderTemplate, groupOptions = [], onChange }) {
   const [filter, setFilter] = useState('all');
+  const [group, setGroup] = useState(null);
   const [query, setQuery] = useState('');
   const [shown, setShown] = useState(PAGE);
   const [menu, setMenu] = useState(null);
-  const [renaming, setRenaming] = useState(null);
-  const shownGuests = useMemo(() => filterGuests(guests, filter, query), [guests, filter, query]);
+  const [editing, setEditing] = useState(null);
+  const shownGuests = useMemo(() => filterGuests(guests, filter, query, group), [guests, filter, query, group]);
   const counts = useMemo(
     () => Object.fromEntries(FILTERS.map(([key, , test]) => [key, guests.filter(test).length])),
     [guests],
   );
+  // [group, count], '' for guests without one; none when nobody has a group
+  const groups = useMemo(() => {
+    const byGroup = new Map();
+    for (const g of guests) {
+      byGroup.set(g.group || '', (byGroup.get(g.group || '') ?? 0) + 1);
+    }
+    return byGroup.size > 1 || !byGroup.has('') ? [...byGroup].sort((a, b) => (a[0] === '') - (b[0] === '')) : [];
+  }, [guests]);
+  // A group emptied meanwhile (guests moved or removed) is not kept selected
+  if (group !== null && !groups.some(([g]) => g === group)) {
+    setGroup(null);
+  }
 
   // The server sends the whole guest back (an unmarked guest has no sentAt)
   function replace(guest) {
@@ -158,6 +178,31 @@ export default function GuestList({ event, guests, template, reminderTemplate, o
             )
           ))}
         </div>
+        {groups.length > 0 && (
+          <div className={styles.filters} role="tablist" aria-label="Lọc theo nhóm">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={group === null}
+              className={clsx(group === null && styles.on)}
+              onClick={() => { setGroup(null); setShown(PAGE); }}
+            >
+              Mọi nhóm
+            </button>
+            {groups.map(([g, n]) => (
+              <button
+                key={g}
+                type="button"
+                role="tab"
+                aria-selected={group === g}
+                className={clsx(group === g && styles.on)}
+                onClick={() => { setGroup(g); setShown(PAGE); }}
+              >
+                {g || 'Chưa xếp nhóm'} <span>{n}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {shownGuests.length === 0 ? (
@@ -173,6 +218,7 @@ export default function GuestList({ event, guests, template, reminderTemplate, o
               <div className={styles.who}>
                 <strong>{guest.name}</strong>
                 <div className={styles.tags}>
+                  {guest.group && <span className={clsx(styles.tag, styles.group)}>{guest.group}</span>}
                   {guest.source === 'public' ? (
                     <span className={styles.tag}>Qua link chung</span>
                   ) : (
@@ -252,22 +298,23 @@ export default function GuestList({ event, guests, template, reminderTemplate, o
             {menuGuest.sentAt ? 'Đánh dấu chưa gửi' : 'Đánh dấu đã gửi'}
           </MenuItem>
         )}
-        <MenuItem onClick={() => { setRenaming(menuGuest); setMenu(null); }}>
-          <ListItemIcon><IoCreateOutline /></ListItemIcon>Sửa tên
+        <MenuItem onClick={() => { setEditing(menuGuest); setMenu(null); }}>
+          <ListItemIcon><IoCreateOutline /></ListItemIcon>Sửa tên, nhóm
         </MenuItem>
         <MenuItem onClick={() => { remove(menuGuest); setMenu(null); }} className={styles.danger}>
           <ListItemIcon><IoTrashOutline /></ListItemIcon>Xoá khách
         </MenuItem>
       </Menu>
 
-      {renaming && (
-        <RenameDialog
+      {editing && (
+        <EditGuestDialog
           event={event}
-          guest={renaming}
-          onClose={() => setRenaming(null)}
+          guest={editing}
+          groupOptions={groupOptions}
+          onClose={() => setEditing(null)}
           onSaved={guest => {
             replace(guest);
-            setRenaming(null);
+            setEditing(null);
           }}
         />
       )}
@@ -275,20 +322,28 @@ export default function GuestList({ event, guests, template, reminderTemplate, o
   );
 }
 
-function RenameDialog({ event, guest, onClose, onSaved }) {
+function EditGuestDialog({ event, guest, groupOptions, onClose, onSaved }) {
   const [name, setName] = useState(guest.name);
+  const [group, setGroup] = useState(guest.group ?? '');
   const [isSaving, setIsSaving] = useState(false);
   const clean = name.replace(/\s+/g, ' ').trim();
 
   async function save(e) {
     e.preventDefault();
-    if (!clean || clean === guest.name) {
+    const change = {};
+    if (clean && clean !== guest.name) {
+      change.name = clean;
+    }
+    if (group !== (guest.group ?? '')) {
+      change.group = group;
+    }
+    if (!Object.keys(change).length) {
       onClose();
       return;
     }
     setIsSaving(true);
     try {
-      onSaved(await invitationApi.updateGuest(event._id, guest._id, { name: clean }));
+      onSaved(await invitationApi.updateGuest(event._id, guest._id, change));
     } catch (err) {
       setIsSaving(false);
     }
@@ -297,8 +352,8 @@ function RenameDialog({ event, guest, onClose, onSaved }) {
   return (
     <Dialog open onClose={onClose} fullWidth maxWidth="xs">
       <form onSubmit={save}>
-        <DialogTitle>Sửa tên khách</DialogTitle>
-        <DialogContent sx={{ pt: '8px !important' }}>
+        <DialogTitle>Sửa khách</DialogTitle>
+        <DialogContent sx={{ pt: '8px !important', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <TextField
             fullWidth
             autoFocus
@@ -308,6 +363,7 @@ function RenameDialog({ event, guest, onClose, onSaved }) {
             onChange={e => setName(e.target.value)}
             helperText={guest.source === 'public' ? 'Tên khách tự nhập khi xác nhận qua link chung.' : 'Link riêng giữ nguyên, thiệp sẽ ghi tên mới.'}
           />
+          <GroupPicker value={group} onChange={setGroup} options={groupOptions} />
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={onClose}>Huỷ</Button>
