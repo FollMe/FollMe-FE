@@ -11,13 +11,10 @@ describe('buildScore', () => {
   });
 
   it('is sorted and fits in one loop', () => {
-    score.forEach((n, i) => {
-      expect(n.time).toBeGreaterThanOrEqual(0);
-      expect(n.time).toBeLessThan(LOOP_SECONDS);
-      if (i > 0) {
-        expect(n.time).toBeGreaterThanOrEqual(score[i - 1].time);
-      }
-    });
+    const times = score.map(n => n.time);
+    expect(times).toEqual([...times].sort((a, b) => a - b));
+    expect(Math.min(...times)).toBeGreaterThanOrEqual(0);
+    expect(Math.max(...times)).toBeLessThan(LOOP_SECONDS);
   });
 
   it('starts with the bass and the melody together', () => {

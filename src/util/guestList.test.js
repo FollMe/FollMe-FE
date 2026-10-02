@@ -1,4 +1,6 @@
-import { appendNames, lineAt, parseGuestLine, parseGuestList, withPrefix, withSuffix } from './guestList';
+import {
+  appendNames, countByGroup, lineAt, parseGroupHeader, parseGuestLine, parseGuestList, withPrefix, withSuffix,
+} from './guestList';
 
 describe('parseGuestLine', () => {
   it('cleans up list markers and spaces', () => {
@@ -36,6 +38,36 @@ describe('parseGuestList', () => {
     expect(res.guests.map(g => g.name)).toEqual(['Chú Tư']);
     expect(res.alreadyInvited).toEqual(['Cô Ba']);
     expect(res.tooLong).toHaveLength(1);
+  });
+});
+
+describe('groups', () => {
+  it('reads a line ending with a colon as a group', () => {
+    expect(parseGroupHeader('Nhà trai:')).toBe('Nhà trai');
+    expect(parseGroupHeader('  Bạn   cô dâu :  ')).toBe('Bạn cô dâu');
+    expect(parseGroupHeader('1. Đồng nghiệp:')).toBe('Đồng nghiệp');
+    expect(parseGroupHeader('Nhà gái：')).toBe('Nhà gái');
+    expect(parseGroupHeader('Cô Ba')).toBeNull();
+    expect(parseGroupHeader(':')).toBeNull();
+    expect(parseGroupHeader(`${'G'.repeat(41)}:`)).toBeNull();
+    expect(parseGroupHeader('Anh Tuấn | tuan@x.vn:')).toBeNull();
+  });
+
+  it('puts guests under the header above them', () => {
+    const text = 'Cô Ba\nNhà trai:\n1. Chú Tư\n2. Bác Hai\n\nNhà gái:\n- Chị Lan\n';
+    const res = parseGuestList(text, [], 'Bạn bè');
+    expect(res.guests).toEqual([
+      { name: 'Cô Ba', group: 'Bạn bè' },
+      { name: 'Chú Tư', group: 'Nhà trai' },
+      { name: 'Bác Hai', group: 'Nhà trai' },
+      { name: 'Chị Lan', group: 'Nhà gái' },
+    ]);
+    expect(countByGroup(res.guests)).toEqual([['Bạn bè', 1], ['Nhà trai', 2], ['Nhà gái', 1]]);
+  });
+
+  it('leaves guests without a group when there is none', () => {
+    expect(parseGuestList('Cô Ba\nChú Tư').guests).toEqual([{ name: 'Cô Ba' }, { name: 'Chú Tư' }]);
+    expect(countByGroup([{ name: 'A' }, { name: 'B', group: 'X' }])).toEqual([['', 1], ['X', 1]]);
   });
 });
 

@@ -128,6 +128,24 @@ export function summarizeGuests(guests) {
   return summary;
 }
 
+/**
+ * The summary per group ("Nhà trai", "Nhà gái"...), for planning tables:
+ * groups in the order they were first used, guests without one last.
+ */
+export function groupSummary(guests) {
+  const groups = new Map();
+  for (const guest of guests) {
+    const group = guest.group || '';
+    if (!groups.has(group)) {
+      groups.set(group, []);
+    }
+    groups.get(group).push(guest);
+  }
+  return [...groups]
+    .map(([group, list]) => ({ group, ...summarizeGuests(list) }))
+    .sort((a, b) => (a.group === '') - (b.group === ''));
+}
+
 // Someone who answered on a public link gets a guest id; remember it so
 // they can change their answer from the same browser.
 const publicGuestKey = (eventId) => `follme.guest.${eventId}`;

@@ -1,0 +1,55 @@
+.picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+
+  button,
+  input {
+    padding: 5px 11px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    font-size: 1.35rem;
+    font-weight: 600;
+  }
+
+  button {
+    cursor: pointer;
+    touch-action: manipulation;
+
+    &:hover,
+    &:focus-visible {
+      border-color: var(--brand);
+    }
+  }
+
+  input {
+    width: 140px;
+    outline: none;
+    border-color: var(--brand);
+  }
+
+  .on {
+    border-color: var(--brand);
+    background: var(--brand);
+    color: var(--on-brand, #fff);
+  }
+
+  .other {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    border-style: dashed;
+    color: var(--text-2);
+  }
+}
+
+.label {
+  margin-right: 2px;
+  color: var(--text-2);
+  font-size: 1.35rem;
+  font-weight: 600;
+}

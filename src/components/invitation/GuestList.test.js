@@ -1,5 +1,5 @@
 import { filterGuests } from './GuestList';
-import { reminderQueue, summarizeGuests } from 'util/invitation';
+import { groupSummary, reminderQueue, summarizeGuests } from 'util/invitation';
 
 const guests = [
   { _id: '1', name: 'Cô Ba', source: 'host', sentAt: '2026-10-01', viewed: 2, rsvp: { status: 'attending', count: 2 } },
@@ -65,5 +65,29 @@ describe('reminderQueue', () => {
 
   it('waits a day after sending or reminding', () => {
     expect(ids(reminderQueue(list, now - 47 * 3600 * 1000))).toEqual(['b']);
+  });
+});
+
+describe('groups', () => {
+  const list = [
+    { _id: '1', name: 'Cô Ba', group: 'Nhà trai', rsvp: { status: 'attending', count: 2 } },
+    { _id: '2', name: 'Chị Lan', group: 'Nhà gái' },
+    { _id: '3', name: 'Đức Huy', source: 'public', rsvp: { status: 'attending', count: 1 } },
+    { _id: '4', name: 'Chú Tư', group: 'Nhà trai', rsvp: { status: 'declined', count: 0 } },
+  ];
+
+  it('filters by group, "" for guests without one', () => {
+    expect(ids(filterGuests(list, 'all', '', 'Nhà trai'))).toEqual(['1', '4']);
+    expect(ids(filterGuests(list, 'all', '', ''))).toEqual(['3']);
+    expect(ids(filterGuests(list, 'attending', '', 'Nhà trai'))).toEqual(['1']);
+    expect(ids(filterGuests(list, 'all', '', null))).toEqual(['1', '2', '3', '4']);
+  });
+
+  it('sums up each group, guests without one last', () => {
+    expect(groupSummary(list).map(r => [r.group, r.invited, r.invited - r.pending, r.headcount])).toEqual([
+      ['Nhà trai', 2, 2, 2],
+      ['Nhà gái', 1, 0, 0],
+      ['', 1, 1, 1],
+    ]);
   });
 });
