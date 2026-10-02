@@ -1,0 +1,190 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--text-3);
+
+  &:focus-within {
+    border-color: var(--brand);
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 0;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    font-size: 1.5rem;
+    outline: none;
+  }
+}
+
+/* One row of filters that scrolls sideways on phones */
+.filters {
+  display: flex;
+  gap: 6px;
+  margin: 0 -4px;
+  padding: 0 4px 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  button {
+    flex: none;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-2);
+    font: inherit;
+    font-size: 1.3rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+
+    span {
+      margin-left: 2px;
+      color: var(--text-3);
+      font-weight: 500;
+    }
+  }
+
+  .on {
+    border-color: var(--brand);
+    background: var(--brand);
+    color: var(--on-brand, #fff);
+
+    span {
+      color: inherit;
+      opacity: 0.8;
+    }
+  }
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 2px;
+    border-bottom: 1px solid var(--border);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}
+
+.who {
+  flex: 1;
+  min-width: 0;
+
+  strong {
+    display: block;
+    overflow: hidden;
+    color: var(--text);
+    font-size: 1.5rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.tag {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text-3);
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.unsent {
+  background: color-mix(in srgb, #f59e0b 14%, transparent);
+  color: #b45309;
+}
+
+.sent,
+.opened {
+  background: var(--info-soft, var(--surface-2));
+  color: var(--text-2);
+}
+
+.attending {
+  background: color-mix(in srgb, var(--success) 14%, transparent);
+  color: var(--success);
+}
+
+.maybe {
+  background: color-mix(in srgb, #f59e0b 16%, transparent);
+  color: #b45309;
+}
+
+.declined {
+  background: var(--surface-3);
+  color: var(--text-2);
+}
+
+.note {
+  margin: 4px 0 0;
+  overflow: hidden;
+  color: var(--text-2);
+  font-size: 1.3rem;
+  font-style: italic;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.send {
+  flex: none;
+}
+
+.empty {
+  margin: 8px 0;
+  color: var(--text-3);
+}
+
+.more {
+  align-self: center;
+}
+
+.danger {
+  color: var(--danger) !important;
+
+  svg {
+    color: var(--danger);
+  }
+}
