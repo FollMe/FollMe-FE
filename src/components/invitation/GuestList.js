@@ -14,9 +14,9 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { toast } from 'react-toastify';
 import {
   IoPaperPlaneOutline, IoEllipsisHorizontal, IoCopyOutline, IoEyeOutline, IoCreateOutline, IoCheckmarkDoneOutline,
-  IoArrowUndoOutline, IoTrashOutline, IoSearch,
+  IoArrowUndoOutline, IoTrashOutline, IoSearch, IoNotificationsOutline,
 } from 'react-icons/io5';
-import { RSVP_LABELS, invitationApi, personalInvitationUrl } from 'util/invitation';
+import { RSVP_LABELS, awaitsAnswer, invitationApi, personalInvitationUrl } from 'util/invitation';
 import { inviteMessage, sendInvite } from 'util/inviteMessage';
 import { normalizeText } from 'util/search';
 import { track } from 'util/analytics';
@@ -42,9 +42,10 @@ export function filterGuests(guests, filter, query) {
 
 /**
  * The host's guest list: who got their link, opened it, and answered.
- * Each personal link can be sent from here; `onChange` gets an updater.
+ * Each personal link can be sent from here, and a reminder to whoever has
+ * not answered; `onChange` gets an updater.
  */
-export default function GuestList({ event, guests, template, onChange }) {
+export default function GuestList({ event, guests, template, reminderTemplate, onChange }) {
   const [filter, setFilter] = useState('all');
   const [query, setQuery] = useState('');
   const [shown, setShown] = useState(PAGE);
@@ -61,9 +62,9 @@ export default function GuestList({ event, guests, template, onChange }) {
     onChange(list => list.map(g => (g._id === guest._id ? guest : g)));
   }
 
-  async function markSent(guest, sent) {
+  async function mark(guest, change) {
     try {
-      replace(await invitationApi.updateGuest(event._id, guest._id, { sent }));
+      replace(await invitationApi.updateGuest(event._id, guest._id, change));
     } catch (err) {
       console.log(err);
     }
@@ -77,7 +78,21 @@ export default function GuestList({ event, guests, template, onChange }) {
       if (how === 'copied') {
         toast.success(`Đã copy lời mời cho ${guest.name}. Dán vào Zalo hoặc Messenger để gửi.`);
       }
-      await markSent(guest, true);
+      await mark(guest, { sent: true });
+    } catch (err) {
+      // Closed the share sheet without sending
+    }
+  }
+
+  async function remind(guest) {
+    const text = inviteMessage(reminderTemplate, guest.name, personalInvitationUrl(guest._id));
+    try {
+      const how = await sendInvite(text);
+      track('reminder_sent', { how });
+      if (how === 'copied') {
+        toast.success(`Đã copy lời nhắc cho ${guest.name}. Dán vào Zalo hoặc Messenger để gửi.`);
+      }
+      await mark(guest, { reminded: true });
     } catch (err) {
       // Closed the share sheet without sending
     }
@@ -106,6 +121,7 @@ export default function GuestList({ event, guests, template, onChange }) {
 
   const menuGuest = menu?.guest;
   const personal = menuGuest && menuGuest.source !== 'public';
+  const canRemind = menuGuest && awaitsAnswer(menuGuest) && new Date(event.startAt) > new Date();
 
   return (
     <div className={styles.list}>
@@ -169,6 +185,9 @@ export default function GuestList({ event, guests, template, onChange }) {
                       Đã mở{guest.viewed > 1 ? ` ${guest.viewed} lần` : ''}
                     </span>
                   )}
+                  {guest.remindedAt && awaitsAnswer(guest) && (
+                    <span className={clsx(styles.tag, styles.sent)}>Đã nhắc</span>
+                  )}
                   {guest.rsvp && (
                     <span className={clsx(styles.tag, styles[guest.rsvp.status])}>
                       {RSVP_LABELS[guest.rsvp.status]}
@@ -211,6 +230,12 @@ export default function GuestList({ event, guests, template, onChange }) {
       )}
 
       <Menu anchorEl={menu?.anchor} open={Boolean(menu)} onClose={() => setMenu(null)}>
+        {canRemind && (
+          <MenuItem onClick={() => { remind(menuGuest); setMenu(null); }}>
+            <ListItemIcon><IoNotificationsOutline /></ListItemIcon>
+            {menuGuest.remindedAt ? 'Nhắc trả lời lần nữa' : 'Nhắc trả lời'}
+          </MenuItem>
+        )}
         {personal && (
           <MenuItem onClick={() => { copyLink(menuGuest); setMenu(null); }}>
             <ListItemIcon><IoCopyOutline /></ListItemIcon>Copy link riêng
@@ -222,7 +247,7 @@ export default function GuestList({ event, guests, template, onChange }) {
           </MenuItem>
         )}
         {personal && (
-          <MenuItem onClick={() => { markSent(menuGuest, !menuGuest.sentAt); setMenu(null); }}>
+          <MenuItem onClick={() => { mark(menuGuest, { sent: !menuGuest.sentAt }); setMenu(null); }}>
             <ListItemIcon>{menuGuest.sentAt ? <IoArrowUndoOutline /> : <IoCheckmarkDoneOutline />}</ListItemIcon>
             {menuGuest.sentAt ? 'Đánh dấu chưa gửi' : 'Đánh dấu đã gửi'}
           </MenuItem>

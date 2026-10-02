@@ -285,3 +285,28 @@
   color: var(--text-3);
   font-weight: 500;
 }
+
+.dangerZone {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  h2 {
+    margin: 0 0 4px;
+    font-size: 1.6rem;
+    font-weight: 700;
+  }
+
+  p {
+    font-size: 1.35rem;
+  }
+}
+
+.dialogText {
+  margin: 0 0 10px;
+  color: var(--text-2);
+  font-size: 1.45rem;
+  line-height: 1.55;
+}

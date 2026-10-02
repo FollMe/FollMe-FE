@@ -1,4 +1,4 @@
-import { defaultTemplate, inviteMessage, inviteWhen } from './inviteMessage';
+import { defaultReminder, defaultTemplate, inviteMessage, inviteWhen } from './inviteMessage';
 
 const wedding = {
   type: 'wedding', groomName: 'Đức', brideName: 'Hạnh', title: 'Lễ thành hôn', startAt: '2027-01-16T04:00:00Z',
@@ -19,6 +19,17 @@ describe('defaultTemplate', () => {
     );
     expect(defaultTemplate({ ...wedding, type: 'birthday', title: 'Sinh nhật Vy' }))
       .toMatch(/^Trân trọng kính mời \{tên\} tới dự Sinh nhật Vy vào/);
+  });
+});
+
+describe('defaultReminder', () => {
+  it('nudges the guest to answer on their card', () => {
+    expect(defaultReminder(wedding)).toBe(
+      'Đức & Hạnh rất mong được đón {tên} tới dự lễ thành hôn vào 11:00 thứ Bảy, 16/01/2027.\n'
+      + 'Mong {tên} xác nhận tham dự trên thiệp mời để việc đón tiếp được chu đáo hơn: {link}',
+    );
+    expect(defaultReminder({ ...wedding, type: 'birthday', title: 'Sinh nhật Vy' }))
+      .toMatch(/^Rất mong được đón \{tên\} tới dự Sinh nhật Vy vào 11:00/);
   });
 });
 

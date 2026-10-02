@@ -1,5 +1,5 @@
 import { filterGuests } from './GuestList';
-import { summarizeGuests } from 'util/invitation';
+import { reminderQueue, summarizeGuests } from 'util/invitation';
 
 const guests = [
   { _id: '1', name: 'Cô Ba', source: 'host', sentAt: '2026-10-01', viewed: 2, rsvp: { status: 'attending', count: 2 } },
@@ -43,5 +43,27 @@ describe('isGoneError', () => {
     expect(isGoneError(api(500))).toBe(false);
     expect(isGoneError(api(429))).toBe(false);
     expect(isGoneError(new TypeError('Failed to fetch'))).toBe(false);
+  });
+});
+
+describe('reminderQueue', () => {
+  const now = new Date('2026-10-10T12:00:00Z').getTime();
+  const hoursAgo = h => new Date(now - h * 3600 * 1000).toISOString();
+  const list = [
+    { _id: 'a', name: 'Reminded 2 days ago', sentAt: hoursAgo(96), remindedAt: hoursAgo(48) },
+    { _id: 'b', name: 'Sent 3 days ago', sentAt: hoursAgo(72) },
+    { _id: 'c', name: 'Sent an hour ago', sentAt: hoursAgo(1) },
+    { _id: 'd', name: 'Reminded an hour ago', sentAt: hoursAgo(72), remindedAt: hoursAgo(1) },
+    { _id: 'e', name: 'Answered', sentAt: hoursAgo(72), rsvp: { status: 'attending' } },
+    { _id: 'f', name: 'Not sent' },
+    { _id: 'g', name: 'Public', source: 'public', sentAt: hoursAgo(72) },
+  ];
+
+  it('nudges who got their link a day ago, never reminded first', () => {
+    expect(ids(reminderQueue(list, now))).toEqual(['b', 'a']);
+  });
+
+  it('waits a day after sending or reminding', () => {
+    expect(ids(reminderQueue(list, now - 47 * 3600 * 1000))).toEqual(['b']);
   });
 });

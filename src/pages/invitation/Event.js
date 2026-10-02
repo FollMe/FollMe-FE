@@ -15,6 +15,7 @@ import dayjs from 'dayjs';
 import {
   IoTimeOutline, IoLocationOutline, IoCopyOutline, IoCheckmark, IoEyeOutline, IoCreateOutline, IoShareSocialOutline,
   IoEyeOffOutline, IoSparkles, IoDownloadOutline, IoTvOutline, IoRefresh, IoPersonAddOutline, IoPaperPlaneOutline,
+  IoNotificationsOutline, IoTrashOutline,
 } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
 import ArticleHeader from 'components/article/ArticleHeader';
@@ -25,9 +26,9 @@ import GuestList from 'components/invitation/GuestList';
 import SendQueue, { TemplateEditor } from 'components/invitation/SendQueue';
 import {
   MAX_PHOTOS, RSVP_LABELS, eventHeadline, invitationApi, isCoupleEvent, personalInvitationUrl, publicInvitationUrl,
-  screenUrl, summarizeGuests,
+  reminderQueue, screenUrl, summarizeGuests,
 } from 'util/invitation';
-import { defaultTemplate, loadTemplate, saveTemplate } from 'util/inviteMessage';
+import { defaultReminder, defaultTemplate, loadTemplate, saveTemplate } from 'util/inviteMessage';
 import { downloadCsv } from 'util/csv';
 import { parseGuestList } from 'util/guestList';
 import { vnWallClock } from 'util/date';
@@ -65,7 +66,7 @@ function CopyButton({ text, label = 'Copy link', variant = 'icon' }) {
 /** The guest list as spreadsheet rows, for seating plans and thank-you notes. */
 export function guestRows(guests) {
   return [
-    ['Tên', 'Trả lời', 'Số người', 'Lời nhắn', 'Nguồn', 'Đã gửi', 'Lượt mở', 'Email', 'Link riêng'],
+    ['Tên', 'Trả lời', 'Số người', 'Lời nhắn', 'Nguồn', 'Đã gửi', 'Đã nhắc', 'Lượt mở', 'Email', 'Link riêng'],
     ...guests.map(g => [
       g.name,
       g.rsvp ? RSVP_LABELS[g.rsvp.status] : 'Chưa trả lời',
@@ -73,6 +74,7 @@ export function guestRows(guests) {
       g.rsvp?.note ?? '',
       g.source === 'public' ? 'Link chung' : 'Mời riêng',
       g.sentAt ? 'Đã gửi' : '',
+      g.remindedAt ? 'Đã nhắc' : '',
       g.viewed ?? 0,
       g.mail ?? '',
       g.source === 'public' ? '' : personalInvitationUrl(g._id),
@@ -184,6 +186,51 @@ function AddGuestsDialog({ event, onClose, onAdded }) {
   );
 }
 
+/** Deleting is for good for the guests: their links stop working. */
+function DeleteEventDialog({ event, onClose }) {
+  const navigate = useNavigate();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const summary = summarizeGuests(event.guests ?? []);
+  const answered = summary.attending + summary.maybe + summary.declined;
+  const losses = [
+    summary.invited && `${summary.invited} khách mời${answered ? ` (${answered} người đã trả lời)` : ''}`,
+    event.wishes?.length && `${event.wishes.length} lời chúc`,
+    event.photos?.length && `${event.photos.length} ảnh`,
+  ].filter(Boolean);
+
+  async function remove() {
+    setIsDeleting(true);
+    try {
+      await invitationApi.remove(event._id);
+      saveTemplate(event._id, null, 'invite');
+      saveTemplate(event._id, null, 'remind');
+      track('event_deleted', { guests: summary.invited });
+      toast.success(`Đã xoá thiệp "${event.title}"`);
+      navigate('/events', { replace: true });
+    } catch (err) {
+      setIsDeleting(false);
+    }
+  }
+
+  return (
+    <Dialog open onClose={isDeleting ? undefined : onClose} fullWidth maxWidth="xs">
+      <DialogTitle>Xoá thiệp này?</DialogTitle>
+      <DialogContent>
+        <p className={styles.dialogText}>
+          Link riêng của khách, link chung và màn hình lời chúc sẽ không mở được nữa. Không thể hoàn tác.
+        </p>
+        {losses.length > 0 && (
+          <p className={styles.dialogText}>Sẽ mất: {losses.join(', ')}.</p>
+        )}
+      </DialogContent>
+      <DialogActions sx={{ px: 3, pb: 2 }}>
+        <Button onClick={onClose} disabled={isDeleting}>Giữ lại</Button>
+        <LoadingButton variant="contained" color="error" loading={isDeleting} onClick={remove}>Xoá thiệp</LoadingButton>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
 export default function Event() {
   const navigate = useNavigate();
   const { eventId } = useParams();
@@ -191,16 +238,21 @@ export default function Event() {
   const justCreated = searchParams.get('created') === '1';
   const [event, setEvent] = useState(null);
   const [isAddingGuests, setIsAddingGuests] = useState(false);
-  const [isSendingAll, setIsSendingAll] = useState(false);
-  const [isEditingTemplate, setIsEditingTemplate] = useState(false);
-  // The host's own invitation message; the default follows the event's details
-  const [customTemplate, setCustomTemplate] = useState(() => loadTemplate(eventId));
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  // 'invite' or 'remind' while sending one by one / editing that message
+  const [queueMode, setQueueMode] = useState(null);
+  const [editingMode, setEditingMode] = useState(null);
+  // The host's own messages; the defaults follow the event's details
+  const [customTemplates, setCustomTemplates] = useState(() => ({
+    invite: loadTemplate(eventId, 'invite'),
+    remind: loadTemplate(eventId, 'remind'),
+  }));
 
   const setGuests = useCallback(update => setEvent(e => ({ ...e, guests: update(e.guests ?? []) })), []);
 
-  function changeTemplate(next) {
-    setCustomTemplate(next);
-    saveTemplate(eventId, next);
+  function changeTemplate(mode, next) {
+    setCustomTemplates(t => ({ ...t, [mode]: next }));
+    saveTemplate(eventId, next, mode);
   }
 
   const load = useCallback(() => invitationApi.hostGet(eventId)
@@ -252,7 +304,11 @@ export default function Event() {
   const guests = event.guests ?? [];
   const summary = summarizeGuests(guests);
   const unsent = guests.filter(g => g.source !== 'public' && !g.sentAt).length;
-  const template = customTemplate ?? defaultTemplate(event);
+  const toRemind = status === 'upcoming' ? reminderQueue(guests).length : 0;
+  const templates = {
+    invite: customTemplates.invite ?? defaultTemplate(event),
+    remind: customTemplates.remind ?? defaultReminder(event),
+  };
   const firstPersonal = guests.find(g => g.source !== 'public');
   const previewUrl = event.allowPublicLink ? `/e/${event._id}` : firstPersonal && `/invitations/${firstPersonal._id}`;
 
@@ -330,7 +386,10 @@ export default function Event() {
               <QRCode value={publicUrl} size={120} />
             </div>
             <div className={styles.shareText}>
-              <h2>Link chung</h2>
+              <h2>
+                Link chung
+                {event.publicViews > 0 && <span className={styles.headCount}>{event.publicViews} lượt mở</span>}
+              </h2>
               <p>Ai có link này đều xem được thiệp, xác nhận tham dự và gửi lời chúc. Hợp để gửi vào nhóm hoặc in mã QR lên thiệp giấy.</p>
               <code className={styles.url}>{publicUrl}</code>
               <div className={styles.shareActions}>
@@ -392,14 +451,32 @@ export default function Event() {
             <IoPaperPlaneOutline aria-hidden />
             <div>
               <strong>{unsent} khách chưa được gửi thiệp</strong>
-              <button type="button" className={styles.linkButton} onClick={() => setIsEditingTemplate(true)}>
+              <button type="button" className={styles.linkButton} onClick={() => setEditingMode('invite')}>
                 Sửa lời mời
               </button>
             </div>
-            <Button variant="contained" size="small" onClick={() => setIsSendingAll(true)}>Gửi lần lượt</Button>
+            <Button variant="contained" size="small" onClick={() => setQueueMode('invite')}>Gửi lần lượt</Button>
           </div>
         )}
-        <GuestList event={event} guests={guests} template={template} onChange={setGuests} />
+        {toRemind > 0 && (
+          <div className={styles.sendBar}>
+            <IoNotificationsOutline aria-hidden />
+            <div>
+              <strong>{toRemind} khách chưa trả lời</strong>
+              <button type="button" className={styles.linkButton} onClick={() => setEditingMode('remind')}>
+                Sửa lời nhắc
+              </button>
+            </div>
+            <Button variant="contained" size="small" onClick={() => setQueueMode('remind')}>Nhắc lần lượt</Button>
+          </div>
+        )}
+        <GuestList
+          event={event}
+          guests={guests}
+          template={templates.invite}
+          reminderTemplate={templates.remind}
+          onChange={setGuests}
+        />
       </section>
 
       <section className={styles.panel}>
@@ -428,29 +505,47 @@ export default function Event() {
         )}
       </section>
 
-      {isSendingAll && (
+      <section className={clsx(styles.panel, styles.dangerZone)}>
+        <div>
+          <h2>Xoá thiệp</h2>
+          <p className={styles.muted}>Khách sẽ không mở được thiệp nữa. Danh sách khách, lời chúc và ảnh cũng mất theo.</p>
+        </div>
+        <Button color="error" variant="outlined" size="small" startIcon={<IoTrashOutline />} onClick={() => setIsConfirmingDelete(true)}>
+          Xoá thiệp
+        </Button>
+      </section>
+
+      {queueMode && (
         <SendQueue
           event={event}
           guests={guests}
-          template={template}
-          onTemplateChange={changeTemplate}
-          onTemplateReset={() => changeTemplate(null)}
+          mode={queueMode}
+          template={templates[queueMode]}
+          onTemplateChange={next => changeTemplate(queueMode, next)}
+          onTemplateReset={() => changeTemplate(queueMode, null)}
           onSent={guest => setGuests(list => list.map(g => (g._id === guest._id ? guest : g)))}
-          onClose={() => setIsSendingAll(false)}
+          onClose={() => setQueueMode(null)}
         />
       )}
 
-      {isEditingTemplate && (
-        <Dialog open onClose={() => setIsEditingTemplate(false)} fullWidth maxWidth="sm">
-          <DialogTitle>Lời mời gửi kèm link</DialogTitle>
+      {editingMode && (
+        <Dialog open onClose={() => setEditingMode(null)} fullWidth maxWidth="sm">
+          <DialogTitle>{editingMode === 'remind' ? 'Lời nhắc gửi kèm link' : 'Lời mời gửi kèm link'}</DialogTitle>
           <DialogContent sx={{ pt: '8px !important' }}>
-            <TemplateEditor value={template} onChange={changeTemplate} onReset={() => changeTemplate(null)} />
+            <TemplateEditor
+              mode={editingMode}
+              value={templates[editingMode]}
+              onChange={next => changeTemplate(editingMode, next)}
+              onReset={() => changeTemplate(editingMode, null)}
+            />
           </DialogContent>
           <DialogActions sx={{ px: 3, pb: 2 }}>
-            <Button variant="contained" onClick={() => setIsEditingTemplate(false)}>Xong</Button>
+            <Button variant="contained" onClick={() => setEditingMode(null)}>Xong</Button>
           </DialogActions>
         </Dialog>
       )}
+
+      {isConfirmingDelete && <DeleteEventDialog event={event} onClose={() => setIsConfirmingDelete(false)} />}
 
       {isAddingGuests && (
         <AddGuestsDialog event={event} onClose={() => setIsAddingGuests(false)} onAdded={onGuestsAdded} />
