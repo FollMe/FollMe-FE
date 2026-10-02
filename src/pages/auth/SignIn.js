@@ -12,6 +12,7 @@ import { useUserInfo } from "customHooks/useUserInfo";
 import { useColorMode } from "customHooks/useColorMode";
 import { request, authRouteList } from "util/request";
 import { handleCheckLoggedIn } from "util/authHelper";
+import { loadGoogleSignIn } from 'util/googleSignIn';
 
 const validate = (values) => {
   const errors = {};
@@ -62,13 +63,25 @@ export default function SignIn() {
       return navigate('/');
     }
 
-    if (window.google?.accounts?.id) {
-      window.google.accounts.id.initialize({
-        client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
-        callback: oauthGoogleCallback,
+    let active = true;
+    loadGoogleSignIn()
+      .then(google => {
+        if (!active) {
+          return;
+        }
+        google.initialize({
+          client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+          callback: oauthGoogleCallback,
+        });
+        google.prompt();
+        renderGoogleButton(mode);
       })
-      window.google.accounts.id.prompt();
-    }
+      .catch(() => {
+        // Email and password still work
+      });
+    return () => {
+      active = false;
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

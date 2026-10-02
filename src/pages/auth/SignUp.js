@@ -13,6 +13,7 @@ import { handleCheckLoggedIn } from "util/authHelper";
 import { renderGoogleButton } from "./SignIn";
 
 import styles from './SignIn.module.scss';
+import { loadGoogleSignIn } from 'util/googleSignIn';
 
 // unit: second
 const REQUEST_CODE_INTERVAL = 30;
@@ -53,13 +54,25 @@ export default function SignUp() {
     }
 
     // Init Google Oauth
-    if (window.google?.accounts?.id) {
-      window.google.accounts.id.initialize({
-        client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
-        callback: oauthGoogleCallback,
+    let active = true;
+    loadGoogleSignIn()
+      .then(google => {
+        if (!active) {
+          return;
+        }
+        google.initialize({
+          client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+          callback: oauthGoogleCallback,
+        });
+        google.prompt();
+        renderGoogleButton(mode);
       })
-      window.google.accounts.id.prompt();
-    }
+      .catch(() => {
+        // Email and password still work
+      });
+    return () => {
+      active = false;
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
