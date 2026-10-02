@@ -2,9 +2,11 @@ import { toast } from 'react-toastify';
 import jwt_decode from "jwt-decode";
 import handleError from './handleError';
 
-function ServerError(message) {
+/** An error the API answered with; `status` tells a 404 from a 500. */
+function ServerError(message, status) {
     const error = new Error(message);
     error.name = 'SERVER_ERROR';
+    error.status = status;
     return error;
 }
 
@@ -30,7 +32,7 @@ async function post(url = '', data = {}, isHaveFile = false, method = 'POST') {
 
         if (!dataRes.meta.ok) {
             handleError(response, dataRes.meta.message);
-            throw ServerError(dataRes.meta.message);
+            throw ServerError(dataRes.meta.message, response.status);
         }
 
         return dataRes.data;
@@ -62,7 +64,7 @@ async function get(url = '', { quiet = false } = {}) {
             if (!quiet) {
                 handleError(response, dataRes.meta.message);
             }
-            throw ServerError(dataRes.meta.message);
+            throw ServerError(dataRes.meta.message, response.status);
         }
 
         return dataRes.data;
@@ -92,7 +94,7 @@ async function send(method, url = '', data) {
 
         if (!dataRes.meta.ok) {
             handleError(response, dataRes.meta.message);
-            throw ServerError(dataRes.meta.message);
+            throw ServerError(dataRes.meta.message, response.status);
         }
 
         return dataRes.data;

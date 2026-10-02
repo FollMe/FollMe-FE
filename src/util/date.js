@@ -55,3 +55,21 @@ export function vnWallClock(date) {
         vn.getUTCHours(), vn.getUTCMinutes(), vn.getUTCSeconds(),
     );
 }
+
+/**
+ * The real moment of a Vietnam wall clock time: the inverse of vnWallClock.
+ * `wall` is a Date (or dayjs) whose local fields hold the time in Vietnam,
+ * e.g. what the host typed in the event form, wherever they are.
+ */
+export function fromVnWallClock(wall) {
+    const d = new Date(wall);
+    return new Date(Date.UTC(
+        d.getFullYear(), d.getMonth(), d.getDate(),
+        d.getHours(), d.getMinutes(), d.getSeconds(),
+    ) - VN_OFFSET_MS);
+}
+
+/** True when the viewer's clock is not on Vietnam time. */
+export function isAwayFromVietnam(at = new Date()) {
+    return at.getTimezoneOffset() !== -VN_OFFSET_MS / 60000;
+}

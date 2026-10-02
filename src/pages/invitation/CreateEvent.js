@@ -20,6 +20,7 @@ import {
 } from 'util/invitation';
 import { track } from 'util/analytics';
 import { parseGuestList } from 'util/guestList';
+import { fromVnWallClock, isAwayFromVietnam, vnWallClock } from 'util/date';
 import styles from "./CreateEvent.module.scss";
 import previewStyles from "components/invitation/ThemePreview.module.scss";
 
@@ -85,7 +86,8 @@ export default function CreateEvent() {
           groomName: invitation.groomName ?? '',
           brideName: invitation.brideName ?? '',
           title: invitation.title,
-          startAt: dayjs(invitation.startAt),
+          // The form holds the time as read in Vietnam, where the event is
+          startAt: dayjs(vnWallClock(invitation.startAt)),
           location: invitation.location,
           mapLocation: invitation.mapLocation ?? '',
           message: invitation.message ?? '',
@@ -146,6 +148,12 @@ export default function CreateEvent() {
     e.preventDefault();
     if (!validate()) {
       toast.error('Vui lòng kiểm tra lại thông tin');
+      // The field to fix is often far above the button: bring it into view
+      requestAnimationFrame(() => {
+        const field = e.target.querySelector('[aria-invalid="true"]');
+        field?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        field?.focus({ preventScroll: true });
+      });
       return;
     }
     setIsPosting(true);
@@ -155,7 +163,7 @@ export default function CreateEvent() {
       title: form.title.trim(),
       groomName: couple ? form.groomName.trim() : '',
       brideName: couple ? form.brideName.trim() : '',
-      startAt: form.startAt.toISOString(),
+      startAt: fromVnWallClock(form.startAt.toDate()).toISOString(),
       location: form.location.trim(),
       mapLocation: form.mapLocation.trim(),
       message: form.message.trim(),
@@ -191,7 +199,7 @@ export default function CreateEvent() {
     title: form.title || 'Tên sự kiện',
     groomName: form.groomName.trim(),
     brideName: form.brideName.trim(),
-    startAt: (form.startAt?.isValid() ? form.startAt : dayjs()).toISOString(),
+    startAt: fromVnWallClock((form.startAt?.isValid() ? form.startAt : dayjs()).toDate()).toISOString(),
     location: form.location || 'Địa điểm tổ chức',
     message: form.message,
     gifts: normalizeGifts(form.gifts, couple).filter(isGiftComplete),
@@ -258,7 +266,13 @@ export default function CreateEvent() {
               ampm={false}
               value={form.startAt}
               onChange={value => set({ startAt: value })}
-              slotProps={{ textField: { error: Boolean(errors.startAt), helperText: errors.startAt } }}
+              slotProps={{
+                textField: {
+                  error: Boolean(errors.startAt),
+                  // Hosts abroad: the time is read as Vietnam time, like guests see it
+                  helperText: errors.startAt ?? (isAwayFromVietnam() ? 'Theo giờ Việt Nam (GMT+7)' : undefined),
+                },
+              }}
             />
             <TextField fullWidth label="Địa điểm" value={form.location} inputProps={{ maxLength: 300 }} onChange={e => set({ location: e.target.value })} error={Boolean(errors.location)} helperText={errors.location ?? 'Ví dụ: Trung tâm tiệc cưới ABC, 123 Lê Lợi, Quận 1'} />
             <TextField fullWidth label="Link Google Maps (không bắt buộc)" value={form.mapLocation} inputProps={{ maxLength: 1000 }} onChange={e => set({ mapLocation: e.target.value })} helperText="Để trống thì khách sẽ được chỉ đường theo địa chỉ ở trên." />

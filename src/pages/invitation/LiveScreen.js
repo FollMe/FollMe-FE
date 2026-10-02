@@ -5,7 +5,7 @@ import QRCode from 'react-qr-code';
 import dayjs from 'dayjs';
 import { IoExpandOutline, IoContractOutline } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
-import { eventHeadline, invitationApi, isCoupleEvent, wishesUrl } from 'util/invitation';
+import { eventHeadline, invitationApi, isCoupleEvent, isGoneError, wishesUrl } from 'util/invitation';
 import { DEMO_WISHES, demoEvent } from 'util/demoInvitation';
 import { vnWallClock } from 'util/date';
 import { cldUrl } from 'util/photos';
@@ -222,6 +222,12 @@ export default function LiveScreen({ demo = false }) {
         setOffline(false);
         receive(res.wishes);
       } catch (err) {
+        if (isGoneError(err)) {
+          // The host made a new link: this one will not work again.
+          // Anything else (a deploy, a hiccup) is retried: it is a party.
+          setFailed(true);
+          return;
+        }
         setOffline(true);
       }
       if (!stopped) {

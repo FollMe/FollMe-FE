@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import PostCard from 'components/cards/PostCard';
 import InvitationStatusTag from './InvitationStatusTag';
 import { cldUrl } from 'util/photos';
+import { vnWallClock } from 'util/date';
 
 export default function InvitationItem({ invitation, style }) {
   const { title, location, startAt, numGuests } = invitation;
@@ -16,7 +17,7 @@ export default function InvitationItem({ invitation, style }) {
       aside={<InvitationStatusTag status={status} />}
       title={title}
       stats={[
-        { icon: <IoCalendarOutline />, label: dayjs(startAt).format('HH:mm · DD/MM/YYYY'), title: 'Thời gian' },
+        { icon: <IoCalendarOutline />, label: dayjs(vnWallClock(startAt)).format('HH:mm · DD/MM/YYYY'), title: 'Thời gian' },
         { icon: <IoLocationOutline />, label: location, title: 'Địa điểm' },
         { icon: <IoPeopleOutline />, label: numGuests ?? "…", title: 'Khách mời' },
       ]}

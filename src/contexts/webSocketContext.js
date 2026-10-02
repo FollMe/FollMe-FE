@@ -1,4 +1,4 @@
-import { useState, useRef, createContext, useEffect } from "react";
+import { useState, useRef, createContext, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
 
 const WebSocketContext = createContext();
@@ -14,46 +14,55 @@ function* exponentialBackoff() {
   }
 }
 
+const WS_URL = `${process.env.REACT_APP_WS_BASE_HOST}/comment-svc/ws`;
+
+/** Resolves once the socket is open (at once if it already is). */
+function whenOpen(socket) {
+  if (socket.readyState === WebSocket.OPEN) {
+    return Promise.resolve();
+  }
+  if (socket.readyState === WebSocket.CLOSING || socket.readyState === WebSocket.CLOSED) {
+    return Promise.reject(new Error("Cannot connect WebSocket"));
+  }
+  return new Promise((resolve, reject) => {
+    socket.addEventListener("open", () => resolve(), { once: true });
+    socket.addEventListener("error", () => reject(new Error("Cannot connect WebSocket")), { once: true });
+  });
+}
+
+/**
+ * The connection to the comment service, for live comments and
+ * notifications. Opened on first use, not on every page: wedding guests
+ * and the venue screen never need it.
+ */
 const WebSocketProvider = ({ children }) => {
-  // Lazy: a plain `useState(new WebSocket(...))` opens a socket on every render.
-  const [ws, setWs] = useState(() => new WebSocket(`${process.env.REACT_APP_WS_BASE_HOST}/comment-svc/ws`));
+  const [ws, setWs] = useState(null);
+  const wsRef = useRef(null);
   const wsState = useRef({});
   const durationGenerator = useRef(exponentialBackoff());
   const needRecoverState = useRef(false);
   const handlersPool = useRef({});
+  const retryTimer = useRef(null);
+  const openRef = useRef(null);
 
-  useEffect(() => {
-    const onClose = ws.onclose;
-    let timeoutId;
-    ws.onclose = function () {
-      needRecoverState.current = true;
-      timeoutId = setTimeout(function () {
-        setWs(new WebSocket(`${process.env.REACT_APP_WS_BASE_HOST}/comment-svc/ws`))
-      }, durationGenerator.current.next().value);
+  // Handlers are set as soon as the socket exists, so "authenticate" is
+  // always the first message, before anything a page sends.
+  openRef.current = () => {
+    const socket = new WebSocket(WS_URL);
+    wsRef.current = socket;
 
-      if (onClose) {
-        onClose()
-      }
-    };
-
-    const onOpen = ws.onopen
-    ws.onopen = function () {
-      if (onOpen) {
-        onOpen();
-      }
-
+    socket.onopen = () => {
       // Reset exponential backoff
       durationGenerator.current = exponentialBackoff();
 
-      // Authenticate
-      ws.send(JSON.stringify({
+      socket.send(JSON.stringify({
         action: "authenticate",
         message: process.env.REACT_APP_WS_TOKEN
       }))
 
       // Recover current state to server
       if (needRecoverState.current && Object.keys(wsState.current).length > 0) {
-        ws.send(JSON.stringify({
+        socket.send(JSON.stringify({
           action: "recover_state",
           message: JSON.stringify(wsState.current)
         }))
@@ -61,95 +70,58 @@ const WebSocketProvider = ({ children }) => {
           autoClose: 10000
         })
       }
-      ws.send(JSON.stringify({
+      socket.send(JSON.stringify({
         action: "ping"
       }))
-    }
+    };
 
-    ws.onmessage = (e) => {
+    socket.onclose = () => {
+      needRecoverState.current = true;
+      retryTimer.current = setTimeout(() => openRef.current(), durationGenerator.current.next().value);
+    };
+
+    socket.onmessage = (e) => {
       const data = JSON.parse(e.data)
-      const isMatchedCommonAction = processCommonAction(ws, data);
+      const isMatchedCommonAction = processCommonAction(socket, data);
       if (isMatchedCommonAction) {
         return;
       }
       if (handlersPool.current[data.action]) {
         handlersPool.current[data.action](data.message)
       }
-    }
-  
-    return () => {
-      clearTimeout(timeoutId);
     };
-  }, [ws])
 
-  const waitConnectWS = () => {
-    return new Promise((res, rej) => {
-      if (ws.readyState === ws.OPEN) {
-        res()
-      }
-      if (ws.readyState === ws.CLOSED || ws.readyState === ws.CLOSING) {
-        rej("Cannot connect WebSocket")
-      }
-      const onOpen = ws.onopen
-      ws.onopen = () => {
-        res()
-        if (onOpen) {
-          onOpen()
-        }
-      }
+    setWs(socket);
+    return socket;
+  };
 
-      const onError = ws.onerror
-      ws.onerror = () => {
-        res()
-        if (onError) {
-          onError()
-        }
-      }
-    })
-  }
+  useEffect(() => () => clearTimeout(retryTimer.current), []);
 
-  const wsSend = async (body) => {
+  // A new function after each reconnect, so pages that send in an effect
+  // (join a post...) send again on the new connection.
+  const wsSend = useCallback(async (body) => {
     wsState.current[body.action] = body.message;
     try {
-      await waitConnectWS();
-      ws.send(JSON.stringify(body));
+      const socket = wsRef.current ?? openRef.current();
+      await whenOpen(socket);
+      socket.send(JSON.stringify(body));
     } catch (err) {
       console.log(err);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ws]);
 
-  }
-
-  const addActions = (handlers) => {
+  const addActions = useCallback((handlers) => {
     handlers.forEach(handler => {
       handlersPool.current[handler.action] = handler.do;
     })
-    ws.onmessage = (e) => {
-      const data = JSON.parse(e.data)
-      const isMatchedCommonAction = processCommonAction(ws, data);
-      if (isMatchedCommonAction) {
-        return;
-      }
-      if (handlersPool.current[data.action]) {
-        handlersPool.current[data.action](data.message)
-      }
-    }
-  }
+  }, []);
 
-  const removeActions = (actions) => {
+  const removeActions = useCallback((actions) => {
     actions.forEach(action => {
       delete handlersPool.current[action];
     })
-    ws.onmessage = (e) => {
-      const data = JSON.parse(e.data)
-      const isMatchedCommonAction = processCommonAction(ws, data);
-      if (isMatchedCommonAction) {
-        return;
-      }
-      if (handlersPool.current[data.action]) {
-        handlersPool.current[data.action](data.message)
-      }
-    }
-  }
+  }, []);
 
   return (
     <WebSocketContext.Provider value={{ wsSend, addActions, removeActions }} >

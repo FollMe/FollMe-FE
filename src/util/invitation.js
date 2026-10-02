@@ -53,8 +53,8 @@ export function suggestTitle(type, groomName, brideName) {
 }
 
 export const invitationApi = {
-  get: (guestId) => request.get(`api/invitations/${guestId}`),
-  getPublic: (eventId) => request.get(`api/events/${eventId}/public`),
+  get: (guestId, opts) => request.get(`api/invitations/${guestId}`, opts),
+  getPublic: (eventId, opts) => request.get(`api/events/${eventId}/public`, opts),
   rsvp: (guestId, payload) => request.put(`api/invitations/${guestId}/rsvp`, payload),
   rsvpPublic: (eventId, payload) => request.post(`api/events/${eventId}/public/rsvp`, payload),
   wish: (guestId, payload) => request.post(`api/invitations/${guestId}/wishes`, payload),
@@ -81,6 +81,11 @@ export const invitationApi = {
 };
 
 export const MAX_PHOTOS = 12;
+
+/** The link itself is wrong or gone (not a passing server or network error). */
+export function isGoneError(err) {
+  return err?.name === 'SERVER_ERROR' && (err.status === 404 || err.status === 400);
+}
 
 /** Who answered what and how many are coming (live, as the host edits). */
 export function summarizeGuests(guests) {
@@ -122,6 +127,28 @@ export function savePublicGuest(eventId, guest) {
     localStorage.setItem(publicGuestKey(eventId), JSON.stringify(guest));
   } catch (err) {
     // Not remembered; they can still answer again.
+  }
+}
+
+// An envelope opened once is not shown again on this device: a guest
+// coming back for the address or to change their answer goes straight in.
+const openedKey = key => `follme.opened.${key}`;
+
+export function wasOpened(key) {
+  try {
+    return Boolean(key) && localStorage.getItem(openedKey(key)) === '1';
+  } catch (err) {
+    return false;
+  }
+}
+
+export function rememberOpened(key) {
+  try {
+    if (key) {
+      localStorage.setItem(openedKey(key), '1');
+    }
+  } catch (err) {
+    // Shown again next time
   }
 }
 
