@@ -42,6 +42,10 @@ export default function PrivacyPolicy() {
           <li>
             <b>Nhật ký truy cập:</b> địa chỉ IP, trình duyệt, loại thiết bị và trang đã gọi, để chống lạm dụng và xử lý sự cố.
           </li>
+          <li>
+            <b>Báo lỗi kỹ thuật:</b> khi một trang gặp lỗi trên máy bạn, trình duyệt gửi về thông báo lỗi, đường dẫn trang
+            (không kèm tham số) và loại trình duyệt, để chúng mình sửa.
+          </li>
         </ul>
 
         <h2>Ai xem được</h2>
@@ -80,7 +84,7 @@ export default function PrivacyPolicy() {
             khách, câu trả lời và lời chúc được giữ thêm 30 ngày để khôi phục nếu bạn xoá nhầm, sau đó bị xoá hẳn.
           </li>
           <li><b>Xoá một khách:</b> link của khách ngừng hoạt động ngay, dữ liệu của khách bị xoá hẳn sau 30 ngày.</li>
-          <li><b>Nhật ký truy cập</b> tự xoá sau 90 ngày.</li>
+          <li><b>Nhật ký truy cập</b> tự xoá sau 90 ngày, <b>báo lỗi kỹ thuật</b> sau 30 ngày.</li>
           <li>
             Muốn xoá tài khoản, xoá một lời chúc của bạn trên thiệp người khác hay hỏi về dữ liệu của mình, hãy gửi email
             tới <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. Chúng mình trả lời trong vòng 7 ngày.

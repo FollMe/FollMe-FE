@@ -4,6 +4,10 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { ColorModeProvider, UserInfoProvider, WebSocketProvider } from './contexts';
+import ErrorBoundary from 'components/error/ErrorBoundary';
+import { installErrorReporting } from 'util/errorReporter';
+
+installErrorReporting();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -11,7 +15,9 @@ root.render(
     <ColorModeProvider>
       <UserInfoProvider>
         <WebSocketProvider>
-          <App />
+          <ErrorBoundary>
+            <App />
+          </ErrorBoundary>
         </WebSocketProvider>
       </UserInfoProvider>
     </ColorModeProvider>
