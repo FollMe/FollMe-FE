@@ -235,9 +235,13 @@
   }
 }
 
-/* A slow gleam of the accent across the names, like gold foil catching light */
+/* A slow gleam of the accent across the names, like gold foil catching light.
+   The text is painted by the background, so the box reaches below the tight
+   line height: descenders and dots below (y, g, ạ, ọ, ỵ) would be cut off.
+   The negative margins keep the layout where it was. */
 .shimmer {
-  padding: 0 0.12em;
+  padding: 0.12em 0.12em 0.24em;
+  margin: -0.12em 0 -0.24em;
   background: linear-gradient(
     105deg,
     var(--inv-ink) 42%,

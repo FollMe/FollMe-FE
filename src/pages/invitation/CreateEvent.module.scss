@@ -187,3 +187,49 @@
   color: var(--text-3);
   font-size: 1.35rem;
 }
+
+/* Phones: a button to see the invitation full screen, as guests will */
+.previewFab,
+.previewClose {
+  position: fixed;
+  z-index: 50;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 18px;
+  border: none;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--bg);
+  box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.45);
+  font: inherit;
+  font-size: 1.45rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.previewFab {
+  // Left: the submit button sits on the right at the end of the form
+  left: 16px;
+}
+
+.previewClose {
+  display: inline-flex;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.previewDialog {
+  min-height: 100%;
+}
+
+@media (max-width: 900px) {
+  .previewWrap {
+    display: none;
+  }
+
+  .previewFab {
+    display: inline-flex;
+  }
+}

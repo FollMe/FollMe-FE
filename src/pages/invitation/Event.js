@@ -454,23 +454,6 @@ export default function Event() {
         )}
       </section>
 
-      <section className={styles.panel}>
-        <div className={styles.panelHead}>
-          <h2>{isCoupleEvent(event.type) ? 'Ảnh cưới' : 'Hình ảnh'}</h2>
-          <span>{(event.photos ?? []).length}/{MAX_PHOTOS}</span>
-        </div>
-        <p className={styles.panelHint}>
-          Ảnh đầu tiên là ảnh bìa của thiệp, cũng là ảnh hiện ra khi gửi link qua Zalo, Messenger. Từ 2 ảnh trở lên, thiệp
-          có thêm album.
-        </p>
-        <PhotoManager
-          eventId={eventId}
-          photos={event.photos ?? []}
-          onChange={update => setEvent(e => ({ ...e, photos: update(e.photos ?? []) }))}
-        />
-      </section>
-
-      <ScreenPanel event={event} onEnablePublicLink={enablePublicLink} />
 
       <section className={styles.panel}>
         <div className={styles.panelHead}>
@@ -553,6 +536,24 @@ export default function Event() {
           </ul>
         )}
       </section>
+
+      <section className={styles.panel}>
+        <div className={styles.panelHead}>
+          <h2>{isCoupleEvent(event.type) ? 'Ảnh cưới' : 'Hình ảnh'}</h2>
+          <span>{(event.photos ?? []).length}/{MAX_PHOTOS}</span>
+        </div>
+        <p className={styles.panelHint}>
+          Ảnh đầu tiên là ảnh bìa của thiệp, cũng là ảnh hiện ra khi gửi link qua Zalo, Messenger. Từ 2 ảnh trở lên, thiệp
+          có thêm album.
+        </p>
+        <PhotoManager
+          eventId={eventId}
+          photos={event.photos ?? []}
+          onChange={update => setEvent(e => ({ ...e, photos: update(e.photos ?? []) }))}
+        />
+      </section>
+
+      <ScreenPanel event={event} onEnablePublicLink={enablePublicLink} />
 
       <section className={clsx(styles.panel, styles.dangerZone)}>
         <div>
