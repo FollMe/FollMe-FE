@@ -5,24 +5,29 @@ const tokens = {
   light: {
     brand: '#a3201e',
     brandHover: '#821614',
+    // Behind white text: 4.5:1 or more
+    brandFill: '#a3201e',
+    brandFillHover: '#821614',
     bg: '#f4ecdd',
     surface: '#fbf7ef',
     surface2: '#efe5d3',
     border: '#e2d3ba',
     text: '#241612',
     text2: '#5e4b42',
-    text3: '#8c776a',
+    text3: '#736257',
   },
   dark: {
     brand: '#d9463c',
     brandHover: '#ee5d52',
+    brandFill: '#bf3b32',
+    brandFillHover: '#a8342c',
     bg: '#120c0a',
     surface: '#1b1310',
     surface2: '#251a16',
     border: '#33251f',
     text: '#f3e9da',
     text2: '#c8b8a4',
-    text3: '#8f7e6e',
+    text3: '#9c8d7f',
   },
 };
 
@@ -94,6 +99,12 @@ export function getTheme(mode = 'light') {
           sizeSmall: {
             fontSize: '1.3rem',
             padding: '5px 12px',
+          },
+          containedPrimary: {
+            backgroundColor: t.brandFill,
+            '&:hover': {
+              backgroundColor: t.brandFillHover,
+            },
           },
           outlined: {
             borderColor: t.border,

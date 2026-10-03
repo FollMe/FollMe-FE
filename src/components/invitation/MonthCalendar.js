@@ -14,7 +14,12 @@ export default function MonthCalendar({ date }) {
   return (
     <div className={styles.calendar}>
       <div className={styles.title}>Tháng {month + 1} · {year}</div>
-      <div className={styles.grid} role="grid" aria-label={`Tháng ${month + 1} năm ${year}`}>
+      {/* A picture of the month: read out as one sentence, not 35 numbers */}
+      <div
+        className={styles.grid}
+        role="img"
+        aria-label={`Lịch tháng ${month + 1} năm ${year}, khoanh tròn ngày ${date.getDate()}`}
+      >
         {HEAD.map(h => <span key={h} className={styles.head}>{h}</span>)}
         {cells.map((d, i) => (
           <span key={i} className={d === date.getDate() ? styles.day + ' ' + styles.marked : styles.day}>

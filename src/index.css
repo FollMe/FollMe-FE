@@ -11,6 +11,8 @@
   --font-mono: ui-monospace, SFMono-Regular, 'Cascadia Code', Menlo, Consolas, monospace;
 
   --brand: #a3201e;
+  /* Behind white text (buttons, chips): 4.5:1 or more */
+  --brand-fill: #a3201e;
   --brand-hover: #821614;
   --brand-text: #9a1c1a;
   --brand-soft: #f5e2d8;
@@ -27,9 +29,12 @@
   --border-strong: #cdb896;
   --text: #241612;
   --text-2: #5e4b42;
-  --text-3: #8c776a;
+  --text-3: #736257;
   --danger: #b42318;
   --success: #3f7d3a;
+  /* Small text on a light tint of --success */
+  --success-text: #2f6a2b;
+  --warning-text: #92400e;
   --info-soft: #e8eeff;
 
   --shadow-sm: 0 1px 2px rgba(60, 30, 15, 0.08);
@@ -64,6 +69,7 @@
 /* Black lacquer */
 [data-theme='dark'] {
   --brand: #d9463c;
+  --brand-fill: #bf3b32;
   --brand-hover: #ee5d52;
   --brand-text: #f08a7e;
   --brand-soft: rgba(217, 70, 60, 0.14);
@@ -80,9 +86,11 @@
   --border-strong: #4a3830;
   --text: #f3e9da;
   --text-2: #c8b8a4;
-  --text-3: #8f7e6e;
+  --text-3: #9c8d7f;
   --danger: #f87171;
   --success: #86c17c;
+  --success-text: #86c17c;
+  --warning-text: #fbbf24;
   --info-soft: rgba(99, 122, 255, 0.18);
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);

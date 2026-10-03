@@ -58,7 +58,7 @@
 
 .sheetHead {
   padding: 12px 20px;
-  background: var(--brand);
+  background: var(--brand-fill);
   color: var(--on-brand);
   font-size: 1.5rem;
   font-weight: 700;
@@ -251,7 +251,7 @@
   right: 8px;
   padding: 1px 8px;
   border-radius: 999px;
-  background: var(--brand);
+  background: var(--brand-fill);
   color: var(--on-brand);
   font-size: 1.05rem;
   font-weight: 700;

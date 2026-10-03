@@ -6,6 +6,10 @@
   --inv-ink: #1f1b16;
   --inv-muted: #6b6259;
   --inv-accent: #b08a4a;
+  // The accent for small text, readable (4.5:1) on paper and soft
+  --inv-accent-text: #846838;
+  // Behind --inv-accent-ink text (filled buttons, the chosen answer)
+  --inv-accent-fill: #846838;
   --inv-accent-ink: #ffffff;
   --inv-line: #e9e1d4;
   --inv-soft: #f6f1e8;
@@ -25,8 +29,10 @@
   --inv-bg: #fbeef0;
   --inv-paper: #fffaf9;
   --inv-ink: #4a2730;
-  --inv-muted: #8a6570;
+  --inv-muted: #795963;
   --inv-accent: #c45c74;
+  --inv-accent-text: #9d4a5d;
+  --inv-accent-fill: #b04f66;
   --inv-line: #f1d3da;
   --inv-soft: #f9e1e6;
 }
@@ -37,6 +43,8 @@
   --inv-ink: #5c1212;
   --inv-muted: #8a5a3c;
   --inv-accent: #a3201e;
+  --inv-accent-text: #a3201e;
+  --inv-accent-fill: #a3201e;
   --inv-line: #e6cf9f;
   --inv-soft: #f3e3c3;
 }
@@ -45,8 +53,10 @@
   --inv-bg: #f5f4f1;
   --inv-paper: #ffffff;
   --inv-ink: #18181b;
-  --inv-muted: #71717a;
+  --inv-muted: #63636b;
   --inv-accent: #18181b;
+  --inv-accent-text: #18181b;
+  --inv-accent-fill: #18181b;
   --inv-line: #e4e4e7;
   --inv-soft: #eeede9;
 }
@@ -57,6 +67,8 @@
   --inv-ink: #f3ead7;
   --inv-muted: #b9b1a0;
   --inv-accent: #d9b66b;
+  --inv-accent-text: #d9b66b;
+  --inv-accent-fill: #d9b66b;
   --inv-accent-ink: #111734;
   --inv-line: #2a3462;
   --inv-soft: #18204a;
@@ -149,7 +161,7 @@
   font-weight: 600;
   letter-spacing: 0.4em;
   text-transform: uppercase;
-  color: var(--inv-accent);
+  color: var(--inv-accent-text);
 }
 
 .invite {
@@ -436,6 +448,17 @@
   }
 }
 
+/* The invitation keeps its own colors when the site is in dark mode:
+   outlined buttons would otherwise get the dark surface under its ink */
+.page :global(.MuiButton-outlined) {
+  background: var(--inv-paper);
+  color: var(--inv-ink);
+
+  &:hover {
+    background: var(--inv-soft);
+  }
+}
+
 /* ---------- Cards & forms ---------- */
 .card {
   padding: 28px 22px;
@@ -472,7 +495,7 @@
   }
 
   :global(.MuiButton-contained) {
-    background: var(--inv-accent);
+    background: var(--inv-accent-fill);
     color: var(--inv-accent-ink);
     border-radius: 999px;
   }
@@ -510,8 +533,8 @@
 }
 
 .chosen {
-  border-color: var(--inv-accent);
-  background: var(--inv-accent);
+  border-color: var(--inv-accent-fill);
+  background: var(--inv-accent-fill);
   color: var(--inv-accent-ink);
   transform: translateY(-2px);
 }
@@ -560,7 +583,7 @@
 }
 
 .textButton {
-  color: var(--inv-accent) !important;
+  color: var(--inv-accent-text) !important;
 }
 
 /* ---------- Wishes ---------- */
@@ -652,7 +675,7 @@
 
   a {
     font-weight: 700;
-    color: var(--inv-accent);
+    color: var(--inv-accent-text);
     text-decoration: none;
   }
 }
@@ -687,7 +710,7 @@
     white-space: nowrap;
 
     &:first-child {
-      background: var(--inv-accent);
+      background: var(--inv-accent-fill);
       color: var(--inv-accent-ink);
     }
   }
