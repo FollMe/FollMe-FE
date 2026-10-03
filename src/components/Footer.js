@@ -20,21 +20,21 @@ export default function Footer() {
 
         <div className={styles.columns}>
           <div className={styles.column}>
-            <h3>Cưới hỏi</h3>
+            <h2>Cưới hỏi</h2>
             <Link to="/fortune/hop-tuoi">Xem tuổi hợp nhau</Link>
             <Link to="/cuoi-hoi/chon-ngay">Chọn ngày cưới</Link>
             <Link to="/cuoi-hoi">Thiệp cưới online</Link>
             <Link to="/events">Thiệp của tôi</Link>
           </div>
           <div className={styles.column}>
-            <h3>Xem ngày</h3>
+            <h2>Xem ngày</h2>
             <Link to="/fortune/lich">Lịch vạn niên</Link>
             <Link to="/fortune/lich#con-giap">Tử vi hôm nay</Link>
             <Link to="/fortune/numerology">Thần số học</Link>
             <Link to="/fortune/tu-vi">Lá số tử vi</Link>
           </div>
           <div className={styles.column}>
-            <h3>Góc nhỏ</h3>
+            <h2>Góc nhỏ</h2>
             <Link to="/blogs">Blog</Link>
             <Link to="/stories">Truyện</Link>
             <Link to="/doc-sau">Đọc sau</Link>
@@ -43,7 +43,7 @@ export default function Footer() {
             </a>
           </div>
           <div className={styles.column}>
-            <h3>Pháp lý</h3>
+            <h2>Pháp lý</h2>
             <Link to="/chinh-sach-bao-mat">Chính sách bảo mật</Link>
             <a href={TERMS_URL} target="_blank" rel="noreferrer">Terms & Conditions</a>
           </div>

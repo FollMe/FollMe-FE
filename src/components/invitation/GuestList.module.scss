@@ -72,7 +72,7 @@
 
   .on {
     border-color: var(--brand);
-    background: var(--brand);
+    background: var(--brand-fill);
     color: var(--on-brand, #fff);
 
     span {
@@ -139,7 +139,7 @@
 
 .unsent {
   background: color-mix(in srgb, #f59e0b 14%, transparent);
-  color: #b45309;
+  color: var(--warning-text);
 }
 
 .sent,
@@ -150,12 +150,12 @@
 
 .attending {
   background: color-mix(in srgb, var(--success) 14%, transparent);
-  color: var(--success);
+  color: var(--success-text);
 }
 
 .maybe {
   background: color-mix(in srgb, #f59e0b 16%, transparent);
-  color: #b45309;
+  color: var(--warning-text);
 }
 
 .declined {

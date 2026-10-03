@@ -5,7 +5,10 @@ export default function MainLayout({ hideHeader }) {
   return (
     <>
       {!hideHeader && <LogoHeader />}
-      <Outlet />
+      {/* The page's main landmark, for screen readers (no styling) */}
+      <main>
+        <Outlet />
+      </main>
     </>
   )
 }

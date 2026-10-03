@@ -156,7 +156,7 @@
   cursor: pointer;
 
   &.active {
-    background: var(--inv-accent);
+    background: var(--inv-accent-fill);
     color: var(--inv-accent-ink);
   }
 }
