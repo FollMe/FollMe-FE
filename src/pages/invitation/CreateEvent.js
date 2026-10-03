@@ -8,7 +8,8 @@ import { DateTimeField, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { toast } from 'react-toastify';
-import { IoSparklesOutline } from 'react-icons/io5';
+import Dialog from '@mui/material/Dialog';
+import { IoSparklesOutline, IoEyeOutline, IoClose } from 'react-icons/io5';
 import dayjs from 'dayjs';
 
 import ArticleHeader from 'components/article/ArticleHeader';
@@ -72,6 +73,8 @@ function CreateEventForm() {
   const [photos, setPhotos] = useState([]);
   const [uploading, setUploading] = useState(null);
   const [isAddingPhotos, setIsAddingPhotos] = useState(false);
+  // Phones: the preview opens full screen instead of sitting below the form
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [effectsTouched, setEffectsTouched] = useState(false);
   const [titleTouched, setTitleTouched] = useState(false);
   // One guest per line; on edit, only the guests to add
@@ -423,6 +426,20 @@ function CreateEventForm() {
             </div>
           </div>
         </aside>
+
+        <button type="button" className={styles.previewFab} onClick={() => setIsPreviewOpen(true)}>
+          <IoEyeOutline aria-hidden /> Xem trước
+        </button>
+        {isPreviewOpen && (
+          <Dialog open fullScreen onClose={() => setIsPreviewOpen(false)} aria-label="Xem trước thiệp">
+            <div className={styles.previewDialog}>
+              <InvitationView event={previewEvent} demo embedded />
+            </div>
+            <button type="button" className={styles.previewClose} onClick={() => setIsPreviewOpen(false)}>
+              <IoClose aria-hidden /> Quay lại sửa
+            </button>
+          </Dialog>
+        )}
       </form>
     </div>
   );
