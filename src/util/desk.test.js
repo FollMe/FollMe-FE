@@ -1,4 +1,6 @@
-import { deskGuests, deskSummary, mergeDesk, partySize, rsvpHint } from './desk';
+import {
+  applyPending, cacheDesk, deskGuests, deskSummary, loadCachedDesk, loadPending, partySize, rsvpHint, savePending,
+} from './desk';
 
 const guests = [
   { _id: '1', name: 'Chú Tư', group: 'Nhà trai', rsvp: { status: 'attending', count: 3 } },
@@ -56,11 +58,35 @@ describe('deskSummary', () => {
   });
 });
 
-describe('mergeDesk', () => {
-  it('takes the server list but keeps changes still on their way', () => {
-    const local = [{ _id: '1', name: 'A', arrivedAt: 'x', arrivedCount: 3 }, { _id: '2', name: 'B' }];
-    const server = [{ _id: '1', name: 'A' }, { _id: '2', name: 'B', arrivedAt: 'y' }, { _id: '3', name: 'C' }];
-    expect(mergeDesk(local, server, new Set())).toBe(server);
-    expect(mergeDesk(local, server, new Set(['1']))).toEqual([local[0], server[1], server[2]]);
+describe('check-ins waiting for the network', () => {
+  const list = [
+    { _id: '1', name: 'A' },
+    { _id: '2', name: 'B', arrivedAt: '2027-01-16T04:00:00Z', arrivedCount: 2 },
+    { _id: '3', name: 'C', arrivedAt: '2027-01-16T04:05:00Z', arrivedCount: 1 },
+  ];
+
+  it('shows them on top of the server list', () => {
+    const shown = applyPending(list, {
+      1: { arrived: true, count: 3, at: '2027-01-16T04:10:00Z' },
+      2: { arrived: true, count: 4, at: '2027-01-16T04:11:00Z' },
+      3: { arrived: false, at: '2027-01-16T04:12:00Z' },
+    });
+    expect(shown).toEqual([
+      { _id: '1', name: 'A', arrivedAt: '2027-01-16T04:10:00Z', arrivedCount: 3 },
+      { _id: '2', name: 'B', arrivedAt: '2027-01-16T04:00:00Z', arrivedCount: 4 },
+      { _id: '3', name: 'C' },
+    ]);
+    expect(applyPending(list, {})).toEqual(list);
+  });
+
+  it('are kept per event across reloads', () => {
+    savePending('e1', { 1: { arrived: true, count: 2, at: 'x' } });
+    expect(loadPending('e1')).toEqual({ 1: { arrived: true, count: 2, at: 'x' } });
+    expect(loadPending('e2')).toEqual({});
+    savePending('e1', {});
+    expect(localStorage.getItem('follme.desk.e1.pending')).toBeNull();
+    cacheDesk('e1', { event: { _id: 'e1' }, guests: list });
+    expect(loadCachedDesk('e1').guests).toHaveLength(3);
+    expect(loadCachedDesk('e2')).toBeNull();
   });
 });

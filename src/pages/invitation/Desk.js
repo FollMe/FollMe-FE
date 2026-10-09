@@ -14,7 +14,10 @@ import { IoSearch, IoCloseCircle, IoCheckmarkCircle, IoAdd, IoRemove, IoPersonAd
 import OvalLoading from 'components/loading/OvalLoading';
 import GroupPicker from 'components/invitation/GroupPicker';
 import { eventHeadline, invitationApi, isGoneError } from 'util/invitation';
-import { DESK_TABS, MAX_PARTY, deskGuests, deskSummary, mergeDesk, partySize, rsvpHint } from 'util/desk';
+import {
+  DESK_TABS, MAX_PARTY, applyPending, cacheDesk, deskGuests, deskSummary, loadCachedDesk, loadPending, partySize, rsvpHint,
+  savePending,
+} from 'util/desk';
 import { groupPresets } from 'util/guestList';
 import { tableLabel } from 'util/seating';
 import { vnWallClock } from 'util/date';
@@ -148,18 +151,26 @@ export default function Desk() {
   const [keep, setKeep] = useState(() => new Set());
   const [walkIn, setWalkIn] = useState(null);
   const [busy, setBusy] = useState(() => new Set());
-  // Latest request per guest: an older answer arriving late is ignored
-  const seq = useRef({});
-  const inFlight = useRef(new Set());
+  // Check-ins not on the server yet (no signal): sent again until they are
+  const [pending, setPending] = useState(() => loadPending(eventId));
+  const pendingRef = useRef(pending);
+  const flushing = useRef(false);
   const searchRef = useRef(null);
 
   const replace = useCallback(guest => setGuests(list => list.map(g => (g._id === guest._id ? guest : g))), []);
+
+  const updatePending = useCallback(update => {
+    pendingRef.current = update(pendingRef.current);
+    savePending(eventId, pendingRef.current);
+    setPending(pendingRef.current);
+  }, [eventId]);
 
   const load = useCallback(async (poll = false) => {
     try {
       const res = await invitationApi.desk(eventId, key, poll);
       setEvent(res.event);
-      setGuests(list => mergeDesk(list, res.guests, inFlight.current));
+      setGuests(applyPending(res.guests, pendingRef.current));
+      cacheDesk(eventId, res);
       setStatus('ready');
       setOffline(false);
       if (!poll) {
@@ -168,115 +179,111 @@ export default function Desk() {
     } catch (err) {
       if (isGoneError(err)) {
         setStatus('gone');
-      } else if (poll) {
-        setOffline(true);
-      } else {
+        return;
+      }
+      setOffline(true);
+      // Opened without signal: work from the last list this phone saw
+      const cached = !poll && loadCachedDesk(eventId);
+      if (cached) {
+        setEvent(cached.event);
+        setGuests(applyPending(cached.guests, pendingRef.current));
+        setStatus('ready');
+      } else if (!poll) {
         setStatus('error');
       }
     }
   }, [eventId, key]);
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  /**
+   * Sends the check-ins waiting, oldest first. Stops at the first one the
+   * network loses (tried again later); one the server refuses is dropped.
+   */
+  const flush = useCallback(async () => {
+    if (flushing.current) {
+      return;
+    }
+    flushing.current = true;
+    try {
+      let sentAll = true;
+      for (const [guestId, op] of Object.entries(pendingRef.current)) {
+        try {
+          const saved = await invitationApi.setArrival(eventId, key, guestId, { arrived: op.arrived, count: op.count });
+          // A newer change made meanwhile stays waiting, and shown
+          if (pendingRef.current[guestId]?.at === op.at) {
+            updatePending(({ [guestId]: done, ...rest }) => rest);
+            replace(saved);
+          }
+        } catch (err) {
+          if (err?.name === 'SERVER_ERROR') {
+            updatePending(({ [guestId]: refused, ...rest }) => rest);
+            load(true);
+          } else {
+            sentAll = false;
+            break;
+          }
+        }
+      }
+      setOffline(!sentAll);
+    } finally {
+      flushing.current = false;
+    }
+  }, [eventId, key, load, replace, updatePending]);
 
-  // Catch up with the other phones while this one is in use
+  useEffect(() => {
+    load().then(flush);
+  }, [load, flush]);
+
+  // Catch up with the other phones while this one is in use, and send what waits
   useEffect(() => {
     if (status !== 'ready') {
       return undefined;
     }
-    const id = setInterval(() => {
+    function tick() {
       if (!document.hidden) {
-        load(true);
-      }
-    }, POLL_MS);
-    function onVisible() {
-      if (!document.hidden) {
-        load(true);
+        flush().then(() => load(true));
       }
     }
-    document.addEventListener('visibilitychange', onVisible);
+    const id = setInterval(tick, POLL_MS);
+    document.addEventListener('visibilitychange', tick);
+    window.addEventListener('online', tick);
     return () => {
       clearInterval(id);
-      document.removeEventListener('visibilitychange', onVisible);
+      document.removeEventListener('visibilitychange', tick);
+      window.removeEventListener('online', tick);
     };
-  }, [status, load]);
+  }, [status, load, flush]);
 
-  /** Shows the change at once, sends it, and keeps only the latest answer. */
-  async function change(guest, optimistic, send) {
-    const id = guest._id;
-    const n = (seq.current[id] ?? 0) + 1;
-    seq.current[id] = n;
-    inFlight.current.add(id);
-    if (optimistic) {
-      replace(optimistic);
-    }
-    try {
-      const saved = await send();
-      if (seq.current[id] === n) {
-        inFlight.current.delete(id);
-        return saved;
-      }
-    } catch (err) {
-      if (seq.current[id] === n) {
-        inFlight.current.delete(id);
-        // Back to what the server has
-        load(true);
-      }
-      throw err;
-    }
-    return null;
+  /** Shows a check-in (or its undo) at once, keeps it until the server has it. */
+  function arrival(guest, arrived, count) {
+    const op = { arrived, count, at: new Date().toISOString() };
+    updatePending(p => ({ ...p, [guest._id]: op }));
+    setGuests(list => applyPending(list, { [guest._id]: op }));
+    flush();
   }
 
-  async function arrive(guest) {
-    const count = partySize(guest);
+  function arrive(guest) {
     setKeep(k => new Set(k).add(guest._id));
     track('desk_checked_in');
-    try {
-      const saved = await change(
-        guest,
-        { ...guest, arrivedAt: new Date().toISOString(), arrivedCount: count },
-        () => invitationApi.setArrival(eventId, key, guest._id, { arrived: true, count }),
-      );
-      if (saved) {
-        replace(saved);
-      }
-    } catch (err) {
-      console.log(err);
-    }
+    arrival(guest, true, partySize(guest));
   }
 
-  async function setCount(guest, count) {
-    try {
-      const saved = await change(
-        guest,
-        { ...guest, arrivedCount: count },
-        () => invitationApi.setArrival(eventId, key, guest._id, { arrived: true, count }),
-      );
-      if (saved) {
-        replace(saved);
-      }
-    } catch (err) {
-      console.log(err);
-    }
+  function setCount(guest, count) {
+    arrival(guest, true, count);
   }
 
   async function undo(guest) {
-    if (guest.source === 'desk' && !window.confirm(`Xoá ${guest.name} khỏi danh sách khách?`)) {
+    if (guest.source !== 'desk') {
+      arrival(guest, false);
+      return;
+    }
+    if (!window.confirm(`Xoá ${guest.name} khỏi danh sách khách?`)) {
       return;
     }
     setBusy(b => new Set(b).add(guest._id));
     try {
-      if (guest.source === 'desk') {
-        await change(guest, null, () => invitationApi.removeWalkIn(eventId, key, guest._id));
-        setGuests(list => list.filter(g => g._id !== guest._id));
-      } else {
-        const { arrivedAt, arrivedCount, ...rest } = guest;
-        const saved = await change(guest, rest, () => invitationApi.setArrival(eventId, key, guest._id, { arrived: false }));
-        if (saved) {
-          replace(saved);
-        }
-      }
+      await invitationApi.removeWalkIn(eventId, key, guest._id);
+      updatePending(({ [guest._id]: dropped, ...rest }) => rest);
+      setGuests(list => list.filter(g => g._id !== guest._id));
     } catch (err) {
       console.log(err);
     } finally {
@@ -306,6 +313,7 @@ export default function Desk() {
   }
 
   const summary = useMemo(() => deskSummary(guests), [guests]);
+  const waiting = Object.keys(pending).length;
   const shownGuests = useMemo(() => deskGuests(guests, { tab, query, group, keep }), [guests, tab, query, group, keep]);
   const tabCounts = useMemo(
     () => Object.fromEntries(DESK_TABS.map(([k, , test]) => [k, guests.filter(test).length])),
@@ -354,9 +362,12 @@ export default function Desk() {
         {summary.expected > 0 && ` · ${summary.expected} người báo sẽ đến`}
       </p>
 
-      {offline && (
+      {(offline || waiting > 0) && (
         <p className={styles.offline} role="status">
-          <IoCloudOfflineOutline aria-hidden /> Mất kết nối, đang thử lại. Thao tác mới có thể chưa được lưu.
+          <IoCloudOfflineOutline aria-hidden />
+          {waiting > 0
+            ? `Chưa gửi được ${waiting} lượt đánh dấu, sẽ tự gửi khi có mạng. Cứ đón khách tiếp.`
+            : 'Mất kết nối, đang thử lại. Danh sách có thể chưa mới nhất.'}
         </p>
       )}
 

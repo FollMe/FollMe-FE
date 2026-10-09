@@ -69,14 +69,60 @@ export function deskSummary(guests) {
   return summary;
 }
 
-/**
- * The polled list, except guests with a change still on its way: those keep
- * what this phone shows until the server answers.
- */
-export function mergeDesk(local, server, inFlight) {
-  if (!inFlight.size) {
-    return server;
+// Check-ins made at the desk wait here until the server has them: a
+// party hall's basement often has no signal. One entry per guest, the
+// latest change wins: { [guestId]: { arrived, count, at } }.
+const pendingKey = eventId => `follme.desk.${eventId}.pending`;
+const cacheKey = eventId => `follme.desk.${eventId}.list`;
+
+export function loadPending(eventId) {
+  try {
+    return JSON.parse(localStorage.getItem(pendingKey(eventId))) ?? {};
+  } catch (err) {
+    return {};
   }
-  const mine = new Map(local.map(g => [g._id, g]));
-  return server.map(g => (inFlight.has(g._id) && mine.has(g._id) ? mine.get(g._id) : g));
+}
+
+export function savePending(eventId, pending) {
+  try {
+    if (Object.keys(pending).length) {
+      localStorage.setItem(pendingKey(eventId), JSON.stringify(pending));
+    } else {
+      localStorage.removeItem(pendingKey(eventId));
+    }
+  } catch (err) {
+    // Kept in memory only
+  }
+}
+
+/** The last list this phone saw, to keep working when it cannot load. */
+export function loadCachedDesk(eventId) {
+  try {
+    return JSON.parse(localStorage.getItem(cacheKey(eventId)));
+  } catch (err) {
+    return null;
+  }
+}
+
+export function cacheDesk(eventId, data) {
+  try {
+    localStorage.setItem(cacheKey(eventId), JSON.stringify(data));
+  } catch (err) {
+    // Full or blocked: nothing to fall back on next time
+  }
+}
+
+/** The list as this phone has it: the server's, with changes still waiting on top. */
+export function applyPending(guests, pending) {
+  return guests.map(guest => {
+    const op = pending[guest._id];
+    if (!op) {
+      return guest;
+    }
+    if (!op.arrived) {
+      const { arrivedAt, arrivedCount, ...rest } = guest;
+      return rest;
+    }
+    return { ...guest, arrivedAt: guest.arrivedAt ?? op.at, arrivedCount: op.count };
+  });
 }
