@@ -29,7 +29,7 @@ describe('summarizeGuests', () => {
   it('counts sent, opened, answers and headcount', () => {
     expect(summarizeGuests(guests)).toEqual({
       invited: 4, sent: 2, opened: 2, attending: 1, maybe: 1, declined: 1, pending: 1, headcount: 2,
-      arrived: 0, arrivedPeople: 0,
+      arrived: 0, arrivedPeople: 0, gifts: 0, giftTotal: 0,
     });
   });
 

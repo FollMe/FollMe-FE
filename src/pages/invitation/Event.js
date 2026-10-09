@@ -15,7 +15,7 @@ import dayjs from 'dayjs';
 import {
   IoTimeOutline, IoLocationOutline, IoCopyOutline, IoCheckmark, IoEyeOutline, IoCreateOutline, IoShareSocialOutline,
   IoEyeOffOutline, IoSparkles, IoDownloadOutline, IoTvOutline, IoRefresh, IoPersonAddOutline, IoPaperPlaneOutline,
-  IoNotificationsOutline, IoTrashOutline, IoPeopleOutline,
+  IoNotificationsOutline, IoTrashOutline, IoPeopleOutline, IoWalletOutline,
 } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
 import ArticleHeader from 'components/article/ArticleHeader';
@@ -31,6 +31,7 @@ import {
 } from 'util/invitation';
 import { defaultReminder, defaultTemplate, loadTemplate, saveTemplate } from 'util/inviteMessage';
 import { downloadCsv } from 'util/csv';
+import { formatVnd } from 'util/gifts';
 import { groupPresets, parseGuestList } from 'util/guestList';
 import { vnWallClock } from 'util/date';
 import { track } from 'util/analytics';
@@ -65,23 +66,25 @@ function CopyButton({ text, label = 'Copy link', variant = 'icon' }) {
   );
 }
 
-const SOURCES = { public: 'Link chung', desk: 'Thêm tại tiệc' };
+const SOURCES = { public: 'Link chung', desk: 'Thêm tại tiệc', ledger: 'Thêm từ sổ mừng' };
 
 /** The guest list as spreadsheet rows, for seating plans and thank-you notes. */
 export function guestRows(guests) {
   return [
     [
-      'Tên', 'Nhóm', 'Trả lời', 'Số người', 'Lời nhắn', 'Đã đến', 'Số người đến', 'Nguồn', 'Đã gửi', 'Đã nhắc', 'Lượt mở',
-      'Email', 'Link riêng',
+      'Tên', 'Nhóm', 'Trả lời', 'Số người', 'Lời nhắn', 'Đã đến', 'Số người đến', 'Tiền mừng', 'Ghi chú mừng', 'Nguồn',
+      'Đã gửi', 'Đã nhắc', 'Lượt mở', 'Email', 'Link riêng',
     ],
     ...guests.map(g => [
       g.name,
       g.group ?? '',
-      g.rsvp ? RSVP_LABELS[g.rsvp.status] : (g.source === 'desk' ? '' : 'Chưa trả lời'),
+      g.rsvp ? RSVP_LABELS[g.rsvp.status] : (hasPersonalLink(g) ? 'Chưa trả lời' : ''),
       g.rsvp?.status === 'attending' || g.rsvp?.status === 'maybe' ? g.rsvp.count || 1 : '',
       g.rsvp?.note ?? '',
       g.arrivedAt ? dayjs(vnWallClock(g.arrivedAt)).format('HH:mm DD/MM/YYYY') : '',
       g.arrivedAt ? g.arrivedCount || 1 : '',
+      g.gift?.amount || '',
+      g.gift?.note ?? '',
       SOURCES[g.source] ?? 'Mời riêng',
       g.sentAt ? 'Đã gửi' : '',
       g.remindedAt ? 'Đã nhắc' : '',
@@ -227,6 +230,34 @@ function DeskPanel({ event, summary }) {
           {url && <Button variant="outlined" size="small" startIcon={<IoShareSocialOutline />} onClick={share}>Gửi link</Button>}
           {url && <CopyButton text={url} variant="button" label="Copy link" />}
           {url && <Button size="small" startIcon={<IoRefresh />} onClick={rotate}>Đổi link</Button>}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** The gift ledger in short, and the way in. Only the host sees it. */
+function LedgerPanel({ event, summary }) {
+  return (
+    <section className={clsx(styles.panel, styles.screenPanel)}>
+      <div className={styles.screenIcon} aria-hidden><IoWalletOutline /></div>
+      <div className={styles.shareText}>
+        <h2>
+          Sổ mừng
+          {summary.gifts > 0 && <span className={styles.headCount}>{summary.gifts} người mừng</span>}
+        </h2>
+        {summary.gifts > 0 ? (
+          <p className={styles.ledgerTotal}>{formatVnd(summary.giftTotal)}</p>
+        ) : (
+          <p>
+            Sau tiệc, mở phong bì và ghi lại ai mừng bao nhiêu: tìm tên, gõ "500k" hay "1tr2" là xong. Có tổng theo nhà
+            trai, nhà gái, tải về Excel để giữ. Chỉ bạn xem được.
+          </p>
+        )}
+        <div className={styles.shareActions}>
+          <Button component={Link} to={`/events/${event._id}/so-mung`} variant="contained" size="small" startIcon={<IoWalletOutline />}>
+            {summary.gifts > 0 ? 'Mở sổ mừng' : 'Ghi sổ mừng'}
+          </Button>
         </div>
       </div>
     </section>
@@ -515,6 +546,9 @@ export default function Event() {
         ))}
       </div>
 
+      {/* After the party, the envelopes come first */}
+      {status === 'happened' && <LedgerPanel event={event} summary={summary} />}
+
       <section className={clsx(styles.panel, styles.share)}>
         {event.allowPublicLink ? (
           <>
@@ -645,6 +679,8 @@ export default function Event() {
       <ScreenPanel event={event} onEnablePublicLink={enablePublicLink} />
 
       <DeskPanel event={event} summary={summary} />
+
+      {status !== 'happened' && <LedgerPanel event={event} summary={summary} />}
 
       <section className={clsx(styles.panel, styles.dangerZone)}>
         <div>

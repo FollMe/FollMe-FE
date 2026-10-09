@@ -28,7 +28,7 @@ const PAGE = 100;
 export const FILTERS = [
   ['all', 'Tất cả', () => true],
   ['unsent', 'Chưa gửi', g => hasPersonalLink(g) && !g.sentAt],
-  ['pending', 'Chưa trả lời', g => !g.rsvp && g.source !== 'desk'],
+  ['pending', 'Chưa trả lời', g => !g.rsvp && hasPersonalLink(g)],
   ['attending', 'Sẽ đến', g => g.rsvp?.status === 'attending'],
   ['maybe', 'Chưa chắc', g => g.rsvp?.status === 'maybe'],
   ['declined', 'Không đến', g => g.rsvp?.status === 'declined'],
@@ -222,6 +222,7 @@ export default function GuestList({ event, guests, template, reminderTemplate, g
                   {guest.group && <span className={clsx(styles.tag, styles.group)}>{guest.group}</span>}
                   {guest.source === 'public' && <span className={styles.tag}>Qua link chung</span>}
                   {guest.source === 'desk' && <span className={styles.tag}>Thêm tại tiệc</span>}
+                  {guest.source === 'ledger' && <span className={styles.tag}>Thêm từ sổ mừng</span>}
                   {hasPersonalLink(guest) && (
                     <span className={clsx(styles.tag, guest.sentAt ? styles.sent : styles.unsent)}>
                       {guest.sentAt ? 'Đã gửi' : 'Chưa gửi'}
@@ -370,6 +371,7 @@ function EditGuestDialog({ event, guest, groupOptions, onClose, onSaved }) {
             helperText={{
               public: 'Tên khách tự nhập khi xác nhận qua link chung.',
               desk: 'Khách được thêm lúc đón khách tại tiệc.',
+              ledger: 'Người mừng được thêm khi ghi sổ mừng.',
             }[guest.source] ?? 'Link riêng giữ nguyên, thiệp sẽ ghi tên mới.'}
           />
           <GroupPicker value={group} onChange={setGroup} options={groupOptions} />
