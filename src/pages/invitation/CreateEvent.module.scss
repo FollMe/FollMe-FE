@@ -233,3 +233,16 @@
     display: inline-flex;
   }
 }
+
+/* Answer-by date, with a one-tap suggestion */
+.deadline {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.deadlineActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
