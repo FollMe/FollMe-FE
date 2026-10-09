@@ -123,6 +123,20 @@ export function applyPending(guests, pending) {
       const { arrivedAt, arrivedCount, ...rest } = guest;
       return rest;
     }
-    return { ...guest, arrivedAt: guest.arrivedAt ?? op.at, arrivedCount: op.count };
+    const next = { ...guest, arrivedAt: guest.arrivedAt ?? op.at, arrivedCount: op.count ?? guest.arrivedCount };
+    if (op.table !== undefined) {
+      const { table, ...rest } = next;
+      return op.table ? { ...rest, table: op.table } : rest;
+    }
+    return next;
   });
+}
+
+/**
+ * Tables that can still seat `need` people, the guest's group's first:
+ * where to send someone the plan did not expect. `plan` is seatingPlan().
+ */
+export function tablesWithRoom(plan, need, group = '') {
+  const fits = plan.tables.filter(t => t.free >= need);
+  return [...fits.filter(t => group && t.group === group), ...fits.filter(t => !group || t.group !== group)];
 }

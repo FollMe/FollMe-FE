@@ -230,8 +230,8 @@
   color: var(--success-text);
 }
 
-/* Where to take them */
-.table {
+/* Where to take them (inside .who, whose spans are grey: hence the nesting) */
+.who .table {
   flex: none;
   padding: 1px 8px;
   border-radius: 999px;
@@ -389,5 +389,63 @@ button.arrive {
   .actions,
   button.arrive {
     margin-left: auto;
+  }
+}
+
+/* "Xếp bàn" under a guest who came without a table */
+.seat {
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 2px 0;
+  border: none;
+  background: none;
+  color: var(--brand-text);
+  font: inherit;
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.tableChoices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  > span {
+    flex-basis: 100%;
+    color: var(--text-2);
+    font-size: 1.3rem;
+  }
+
+  em {
+    color: var(--text-2);
+    font-size: 1.3rem;
+  }
+
+  button {
+    min-height: 36px;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-2);
+    font: inherit;
+    font-size: 1.3rem;
+    cursor: pointer;
+
+    strong {
+      color: var(--text);
+    }
+  }
+
+  .on {
+    border-color: var(--brand);
+    background: var(--brand-fill);
+    color: var(--on-brand, #fff);
+
+    strong {
+      color: inherit;
+    }
   }
 }

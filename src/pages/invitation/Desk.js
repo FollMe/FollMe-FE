@@ -16,10 +16,10 @@ import GroupPicker from 'components/invitation/GroupPicker';
 import { eventHeadline, invitationApi, isGoneError } from 'util/invitation';
 import {
   DESK_TABS, MAX_PARTY, applyPending, cacheDesk, deskGuests, deskSummary, loadCachedDesk, loadPending, partySize, rsvpHint,
-  savePending,
+  savePending, tablesWithRoom,
 } from 'util/desk';
 import { groupPresets } from 'util/guestList';
-import { tableLabel } from 'util/seating';
+import { DEFAULT_SEATS, seatingPlan, tableLabel } from 'util/seating';
 import { vnWallClock } from 'util/date';
 import { setPageMeta } from 'util/meta';
 import { track } from 'util/analytics';
@@ -42,11 +42,53 @@ function Stepper({ value, onChange, label, disabled }) {
   );
 }
 
+/** Tables with room for `need`, to tap; '' (none) first. Shown only when there is a plan. */
+function TableChoices({ plan, need, group, value, onChange }) {
+  if (plan.tables.length === 0) {
+    return null;
+  }
+  const choices = tablesWithRoom(plan, need, group).slice(0, 8);
+  return (
+    <div className={styles.tableChoices} role="group" aria-label="Bàn còn chỗ">
+      <span>Bàn còn chỗ</span>
+      {choices.length === 0 && <em>Không bàn nào còn đủ {need} chỗ</em>}
+      {choices.map(t => (
+        <button
+          key={t.table}
+          type="button"
+          aria-pressed={value === t.table}
+          className={clsx(value === t.table && styles.on)}
+          onClick={() => onChange(value === t.table ? '' : t.table)}
+        >
+          <strong>{tableLabel(t.table)}</strong> còn {t.free}{t.group ? ` · ${t.group}` : ''}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** Seats a guest who came without a table. */
+function SeatDialog({ guest, plan, onClose, onSeat }) {
+  const need = guest.arrivedCount || 1;
+  return (
+    <Dialog open onClose={onClose} fullWidth maxWidth="xs">
+      <DialogTitle>Xếp bàn cho {guest.name}</DialogTitle>
+      <DialogContent sx={{ pt: '8px !important' }}>
+        <TableChoices plan={plan} need={need} group={guest.group || ''} value="" onChange={onSeat} />
+      </DialogContent>
+      <DialogActions sx={{ px: 3, pb: 2 }}>
+        <Button onClick={onClose}>Đóng</Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
 /** Someone who is not on the list: added and checked in at once. */
-function WalkInDialog({ initialName, groups, onClose, onAdd }) {
+function WalkInDialog({ initialName, groups, plan, onClose, onAdd }) {
   const [name, setName] = useState(initialName);
   const [count, setCount] = useState(1);
   const [group, setGroup] = useState('');
+  const [table, setTable] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const clean = name.replace(/\s+/g, ' ').trim();
 
@@ -54,7 +96,7 @@ function WalkInDialog({ initialName, groups, onClose, onAdd }) {
     e.preventDefault();
     setIsSaving(true);
     try {
-      await onAdd({ name: clean, count, group });
+      await onAdd({ name: clean, count, group, table });
     } catch (err) {
       setIsSaving(false);
     }
@@ -79,6 +121,7 @@ function WalkInDialog({ initialName, groups, onClose, onAdd }) {
             <Stepper value={count} onChange={setCount} label="Số người đến" />
           </div>
           <GroupPicker value={group} onChange={setGroup} options={groups} />
+          <TableChoices plan={plan} need={count} group={group} value={table} onChange={setTable} />
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={onClose} disabled={isSaving}>Huỷ</Button>
@@ -89,7 +132,7 @@ function WalkInDialog({ initialName, groups, onClose, onAdd }) {
   );
 }
 
-function GuestRow({ guest, busy, onArrive, onCount, onUndo }) {
+function GuestRow({ guest, busy, canSeat, onArrive, onCount, onUndo, onSeat }) {
   const arrived = Boolean(guest.arrivedAt);
   return (
     <li className={clsx(styles.row, arrived && styles.arrived)}>
@@ -105,6 +148,11 @@ function GuestRow({ guest, busy, onArrive, onCount, onUndo }) {
             arrived ? `Đến lúc ${dayjs(vnWallClock(guest.arrivedAt)).format('HH:mm')}` : rsvpHint(guest),
           ].filter(Boolean).join(' · ')}
         </span>
+        {arrived && canSeat && !guest.table && (
+          <button type="button" className={styles.seat} aria-label={`Xếp bàn cho ${guest.name}`} onClick={() => onSeat(guest)}>
+            Xếp bàn
+          </button>
+        )}
       </div>
       {arrived ? (
         <div className={styles.actions}>
@@ -150,6 +198,7 @@ export default function Desk() {
   // Checked in from this phone: stay in view until the next search
   const [keep, setKeep] = useState(() => new Set());
   const [walkIn, setWalkIn] = useState(null);
+  const [seating, setSeating] = useState(null);
   const [busy, setBusy] = useState(() => new Set());
   // Check-ins not on the server yet (no signal): sent again until they are
   const [pending, setPending] = useState(() => loadPending(eventId));
@@ -207,7 +256,7 @@ export default function Desk() {
       let sentAll = true;
       for (const [guestId, op] of Object.entries(pendingRef.current)) {
         try {
-          const saved = await invitationApi.setArrival(eventId, key, guestId, { arrived: op.arrived, count: op.count });
+          const saved = await invitationApi.setArrival(eventId, key, guestId, { arrived: op.arrived, count: op.count, table: op.table });
           // A newer change made meanwhile stays waiting, and shown
           if (pendingRef.current[guestId]?.at === op.at) {
             updatePending(({ [guestId]: done, ...rest }) => rest);
@@ -253,12 +302,27 @@ export default function Desk() {
     };
   }, [status, load, flush]);
 
-  /** Shows a check-in (or its undo) at once, keeps it until the server has it. */
-  function arrival(guest, arrived, count) {
-    const op = { arrived, count, at: new Date().toISOString() };
-    updatePending(p => ({ ...p, [guest._id]: op }));
+  /**
+   * Shows a check-in (or its undo, a headcount, a table) at once and keeps
+   * it until the server has it. A change still waiting for the same guest
+   * is merged in, so a table picked offline survives a headcount fix.
+   */
+  function arrival(guest, arrived, count, table) {
+    const at = new Date().toISOString();
+    const change = { arrived, ...(count !== undefined && { count }), ...(table !== undefined && { table }), at };
+    let op = change;
+    updatePending(p => {
+      op = arrived && p[guest._id]?.arrived ? { ...p[guest._id], ...change } : change;
+      return { ...p, [guest._id]: op };
+    });
     setGuests(list => applyPending(list, { [guest._id]: op }));
     flush();
+  }
+
+  function seat(guest, table) {
+    track('desk_seated');
+    arrival(guest, true, guest.arrivedCount || 1, table);
+    setSeating(null);
   }
 
   function arrive(guest) {
@@ -295,8 +359,8 @@ export default function Desk() {
     }
   }
 
-  async function addWalkIn({ name, count, group: walkInGroup }) {
-    const guest = await invitationApi.addWalkIn(eventId, key, { name, count, group: walkInGroup || undefined });
+  async function addWalkIn({ name, count, group: walkInGroup, table }) {
+    const guest = await invitationApi.addWalkIn(eventId, key, { name, count, group: walkInGroup || undefined, table: table || undefined });
     track('desk_walk_in');
     setGuests(list => [...list, guest]);
     setKeep(new Set([guest._id]));
@@ -313,6 +377,7 @@ export default function Desk() {
   }
 
   const summary = useMemo(() => deskSummary(guests), [guests]);
+  const plan = useMemo(() => seatingPlan(guests, event?.seatsPerTable ?? DEFAULT_SEATS), [guests, event]);
   const waiting = Object.keys(pending).length;
   const shownGuests = useMemo(() => deskGuests(guests, { tab, query, group, keep }), [guests, tab, query, group, keep]);
   const tabCounts = useMemo(
@@ -448,7 +513,9 @@ export default function Desk() {
               key={guest._id}
               guest={guest}
               busy={busy.has(guest._id)}
+              canSeat={plan.tables.length > 0}
               onArrive={arrive}
+              onSeat={setSeating}
               onCount={setCount}
               onUndo={undo}
             />
@@ -468,7 +535,15 @@ export default function Desk() {
       </div>
 
       {walkIn !== null && (
-        <WalkInDialog initialName={walkIn} groups={groupOptions} onClose={() => setWalkIn(null)} onAdd={addWalkIn} />
+        <WalkInDialog initialName={walkIn} groups={groupOptions} plan={plan} onClose={() => setWalkIn(null)} onAdd={addWalkIn} />
+      )}
+      {seating && (
+        <SeatDialog
+          guest={seating}
+          plan={plan}
+          onClose={() => setSeating(null)}
+          onSeat={table => seat(seating, table)}
+        />
       )}
     </div>
   );
