@@ -51,7 +51,8 @@ export default function PrivacyPolicy() {
         <h2>Ai xem được</h2>
         <ul>
           <li>
-            <b>Chủ thiệp</b> xem được danh sách khách, câu trả lời, lời nhắn và mọi lời chúc của thiệp mình.
+            <b>Chủ thiệp</b> xem được danh sách khách, câu trả lời, lời nhắn và mọi lời chúc của thiệp mình. Sổ mừng
+            (ai mừng bao nhiêu) chỉ chủ thiệp xem được.
           </li>
           <li>
             <b>Người có link thiệp</b> xem được thông tin sự kiện, ảnh, tài khoản nhận mừng và các lời chúc chủ thiệp

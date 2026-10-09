@@ -67,6 +67,7 @@ export const invitationApi = {
   unhideWish: (eventId, wishId) => request.del(`api/events/${eventId}/wishes/${wishId}/hide`),
   updateGuest: (eventId, guestId, payload) => request.put(`api/events/${eventId}/guests/${guestId}`, payload),
   removeGuest: (eventId, guestId) => request.del(`api/events/${eventId}/guests/${guestId}`),
+  addGiftGiver: (eventId, payload) => request.post(`api/events/${eventId}/gift-givers`, payload),
   addPhoto: (eventId, blob) => {
     const form = new FormData();
     form.append('photo', blob, 'photo.jpg');
@@ -91,10 +92,11 @@ export const MAX_PHOTOS = 12;
 
 /**
  * Invited by the host with a personal link to send. Not someone who
- * answered on the public link, nor a walk-in added at the reception desk.
+ * answered on the public link, a walk-in added at the reception desk, or a
+ * giver added to the gift ledger.
  */
 export function hasPersonalLink(guest) {
-  return guest.source !== 'public' && guest.source !== 'desk';
+  return !guest.source || guest.source === 'host';
 }
 
 /** Got their personal link but has not answered yet. */
@@ -123,7 +125,7 @@ export function isGoneError(err) {
 export function summarizeGuests(guests) {
   const summary = {
     invited: guests.length, sent: 0, opened: 0, attending: 0, maybe: 0, declined: 0, pending: 0, headcount: 0,
-    arrived: 0, arrivedPeople: 0,
+    arrived: 0, arrivedPeople: 0, gifts: 0, giftTotal: 0,
   };
   for (const guest of guests) {
     if (guest.sentAt) {
@@ -135,8 +137,8 @@ export function summarizeGuests(guests) {
     const status = guest.rsvp?.status;
     if (status in RSVP_LABELS) {
       summary[status] += 1;
-    } else if (guest.source !== 'desk') {
-      // Walk-ins added at the desk were never asked
+    } else if (hasPersonalLink(guest)) {
+      // Walk-ins and gift givers added later were never asked
       summary.pending += 1;
     }
     if (status === 'attending') {
@@ -145,6 +147,10 @@ export function summarizeGuests(guests) {
     if (guest.arrivedAt) {
       summary.arrived += 1;
       summary.arrivedPeople += guest.arrivedCount || 1;
+    }
+    if (guest.gift) {
+      summary.gifts += 1;
+      summary.giftTotal += guest.gift.amount || 0;
     }
   }
   return summary;

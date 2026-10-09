@@ -22,6 +22,7 @@ const CreateBlog = lazy(() => import("pages/blog/CreateBlog"));
 const InvitationCard = lazy(() => import("pages/invitation/InvitationCard"));
 const InvitationList = lazy(() => import("pages/invitation/InvitationList"));
 const Event = lazy(() => import("pages/invitation/Event"));
+const Ledger = lazy(() => import("pages/invitation/Ledger"));
 const CreateEvent = lazy(() => import("pages/invitation/CreateEvent"));
 const FortuneHome = lazy(() => import("pages/fortune/FortuneHome"));
 const Numerology = lazy(() => import("pages/fortune/Numerology"));
@@ -101,6 +102,7 @@ export default function Router() {
         { path: '/events/create', element: withSuspense(<CreateEvent />) },
         { path: '/events/:eventId/edit', element: withSuspense(<CreateEvent key="edit" />) },
         { path: '/events/:eventId', element: withSuspense(<Event />) },
+        { path: '/events/:eventId/so-mung', element: withSuspense(<Ledger />) },
         { path: '/fortune/profiles', element: withSuspense(<FortuneProfiles />) },
       ]
     },
