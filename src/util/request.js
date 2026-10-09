@@ -76,7 +76,11 @@ async function get(url = '', { quiet = false } = {}) {
     }
 }
 
-async function send(method, url = '', data) {
+/**
+ * @param {{ quiet?: boolean }} [opts] quiet: no toast on failure, for callers
+ *   that say themselves what went wrong (and retry)
+ */
+async function send(method, url = '', data, { quiet = false } = {}) {
     try {
         const token = localStorage.getItem('token');
         const requestConfigs = {
@@ -93,20 +97,22 @@ async function send(method, url = '', data) {
         const dataRes = await response.json();
 
         if (!dataRes.meta.ok) {
-            handleError(response, dataRes.meta.message);
+            if (!quiet) {
+                handleError(response, dataRes.meta.message);
+            }
             throw ServerError(dataRes.meta.message, response.status);
         }
 
         return dataRes.data;
     } catch (err) {
-        if (err.name !== 'SERVER_ERROR') {
+        if (err.name !== 'SERVER_ERROR' && !quiet) {
             toast.error("Xảy ra lỗi, vui lòng thử lại!");
         }
         throw err;
     }
 }
 
-const put = (url, data = {}) => send('PUT', url, data);
+const put = (url, data = {}, opts) => send('PUT', url, data, opts);
 // Multipart PUT, e.g. to replace a blog's thumbnail
 const putForm = (url, formData) => post(url, formData, true, 'PUT');
 const del = (url) => send('DELETE', url);

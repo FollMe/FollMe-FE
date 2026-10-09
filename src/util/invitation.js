@@ -84,7 +84,8 @@ export const invitationApi = {
   deskKey: (eventId, rotate = false) => request.post(`api/events/${eventId}/desk-key`, { rotate }),
   // The desk page says itself when its link is wrong or offline
   desk: (eventId, key, poll = false) => request.get(`api/events/${eventId}/desk/${key}${poll ? '?poll=1' : ''}`, { quiet: true }),
-  setArrival: (eventId, key, guestId, payload) => request.put(`api/events/${eventId}/desk/${key}/guests/${guestId}`, payload),
+  // The desk keeps check-ins made offline and sends them later: it says itself what failed
+  setArrival: (eventId, key, guestId, payload) => request.put(`api/events/${eventId}/desk/${key}/guests/${guestId}`, payload, { quiet: true }),
   addWalkIn: (eventId, key, payload) => request.post(`api/events/${eventId}/desk/${key}/guests`, payload),
   removeWalkIn: (eventId, key, guestId) => request.del(`api/events/${eventId}/desk/${key}/guests/${guestId}`),
 };
