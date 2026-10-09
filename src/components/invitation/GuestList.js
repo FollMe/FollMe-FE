@@ -16,7 +16,7 @@ import {
   IoPaperPlaneOutline, IoEllipsisHorizontal, IoCopyOutline, IoEyeOutline, IoCreateOutline, IoCheckmarkDoneOutline,
   IoArrowUndoOutline, IoTrashOutline, IoSearch, IoNotificationsOutline,
 } from 'react-icons/io5';
-import { RSVP_LABELS, awaitsAnswer, invitationApi, personalInvitationUrl } from 'util/invitation';
+import { RSVP_LABELS, awaitsAnswer, hasPersonalLink, invitationApi, personalInvitationUrl } from 'util/invitation';
 import { inviteMessage, sendInvite } from 'util/inviteMessage';
 import { normalizeText } from 'util/search';
 import GroupPicker from './GroupPicker';
@@ -27,11 +27,12 @@ const PAGE = 100;
 
 export const FILTERS = [
   ['all', 'Tất cả', () => true],
-  ['unsent', 'Chưa gửi', g => g.source !== 'public' && !g.sentAt],
-  ['pending', 'Chưa trả lời', g => !g.rsvp],
+  ['unsent', 'Chưa gửi', g => hasPersonalLink(g) && !g.sentAt],
+  ['pending', 'Chưa trả lời', g => !g.rsvp && g.source !== 'desk'],
   ['attending', 'Sẽ đến', g => g.rsvp?.status === 'attending'],
   ['maybe', 'Chưa chắc', g => g.rsvp?.status === 'maybe'],
   ['declined', 'Không đến', g => g.rsvp?.status === 'declined'],
+  ['arrived', 'Đã đến tiệc', g => Boolean(g.arrivedAt)],
 ];
 
 /**
@@ -140,7 +141,7 @@ export default function GuestList({ event, guests, template, reminderTemplate, g
   }
 
   const menuGuest = menu?.guest;
-  const personal = menuGuest && menuGuest.source !== 'public';
+  const personal = menuGuest && hasPersonalLink(menuGuest);
   const canRemind = menuGuest && awaitsAnswer(menuGuest) && new Date(event.startAt) > new Date();
 
   return (
@@ -219,9 +220,9 @@ export default function GuestList({ event, guests, template, reminderTemplate, g
                 <strong>{guest.name}</strong>
                 <div className={styles.tags}>
                   {guest.group && <span className={clsx(styles.tag, styles.group)}>{guest.group}</span>}
-                  {guest.source === 'public' ? (
-                    <span className={styles.tag}>Qua link chung</span>
-                  ) : (
+                  {guest.source === 'public' && <span className={styles.tag}>Qua link chung</span>}
+                  {guest.source === 'desk' && <span className={styles.tag}>Thêm tại tiệc</span>}
+                  {hasPersonalLink(guest) && (
                     <span className={clsx(styles.tag, guest.sentAt ? styles.sent : styles.unsent)}>
                       {guest.sentAt ? 'Đã gửi' : 'Chưa gửi'}
                     </span>
@@ -240,10 +241,15 @@ export default function GuestList({ event, guests, template, reminderTemplate, g
                       {guest.rsvp.status !== 'declined' && guest.rsvp.count > 1 ? ` · ${guest.rsvp.count} người` : ''}
                     </span>
                   )}
+                  {guest.arrivedAt && (
+                    <span className={clsx(styles.tag, styles.arrived)}>
+                      Đã đến{(guest.arrivedCount || 1) > 1 ? ` · ${guest.arrivedCount} người` : ''}
+                    </span>
+                  )}
                 </div>
                 {guest.rsvp?.note && <p className={styles.note}>“{guest.rsvp.note}”</p>}
               </div>
-              {guest.source !== 'public' && (guest.sentAt ? (
+              {hasPersonalLink(guest) && (guest.sentAt ? (
                 <IconButton size="small" aria-label={`Gửi lại cho ${guest.name}`} title="Gửi lại" onClick={() => send(guest)}>
                   <IoPaperPlaneOutline />
                 </IconButton>
@@ -361,7 +367,10 @@ function EditGuestDialog({ event, guest, groupOptions, onClose, onSaved }) {
             value={name}
             inputProps={{ maxLength: 100 }}
             onChange={e => setName(e.target.value)}
-            helperText={guest.source === 'public' ? 'Tên khách tự nhập khi xác nhận qua link chung.' : 'Link riêng giữ nguyên, thiệp sẽ ghi tên mới.'}
+            helperText={{
+              public: 'Tên khách tự nhập khi xác nhận qua link chung.',
+              desk: 'Khách được thêm lúc đón khách tại tiệc.',
+            }[guest.source] ?? 'Link riêng giữ nguyên, thiệp sẽ ghi tên mới.'}
           />
           <GroupPicker value={group} onChange={setGroup} options={groupOptions} />
         </DialogContent>

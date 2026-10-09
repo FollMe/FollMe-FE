@@ -60,6 +60,10 @@ export default function PrivacyPolicy() {
           <li>
             <b>Màn hình lời chúc tại tiệc</b> hiện tên và lời chúc của khách cho mọi người trong tiệc.
           </li>
+          <li>
+            <b>Người đón khách</b> mà chủ thiệp gửi link đón khách xem được tên, nhóm, câu trả lời có đến hay không và số
+            người đi cùng của từng khách, để đánh dấu khách đã đến. Không thấy email, lời nhắn hay lời chúc.
+          </li>
         </ul>
 
         <h2>Dịch vụ chúng mình dùng</h2>
@@ -80,7 +84,8 @@ export default function PrivacyPolicy() {
         <h2>Lưu bao lâu, xoá thế nào</h2>
         <ul>
           <li>
-            <b>Xoá thiệp:</b> link riêng, link chung và màn hình lời chúc ngừng hoạt động ngay, ảnh bị xoá ngay. Danh sách
+            <b>Xoá thiệp:</b> link riêng, link chung, màn hình lời chúc và trang đón khách ngừng hoạt động ngay, ảnh bị
+            xoá ngay. Danh sách
             khách, câu trả lời và lời chúc được giữ thêm 30 ngày để khôi phục nếu bạn xoá nhầm, sau đó bị xoá hẳn.
           </li>
           <li><b>Xoá một khách:</b> link của khách ngừng hoạt động ngay, dữ liệu của khách bị xoá hẳn sau 30 ngày.</li>

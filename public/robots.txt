@@ -1,4 +1,5 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-# Venue screen links carry a secret key
+# Venue screen and reception desk links carry a secret key
 Disallow: /man-hinh/
+Disallow: /don-khach/

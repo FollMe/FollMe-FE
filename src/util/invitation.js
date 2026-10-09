@@ -79,13 +79,27 @@ export const invitationApi = {
     `api/events/${eventId}/screen/${key}${since ? `?since=${encodeURIComponent(since)}` : ''}`,
     { quiet: Boolean(since) },
   ),
+  deskKey: (eventId, rotate = false) => request.post(`api/events/${eventId}/desk-key`, { rotate }),
+  // The desk page says itself when its link is wrong or offline
+  desk: (eventId, key, poll = false) => request.get(`api/events/${eventId}/desk/${key}${poll ? '?poll=1' : ''}`, { quiet: true }),
+  setArrival: (eventId, key, guestId, payload) => request.put(`api/events/${eventId}/desk/${key}/guests/${guestId}`, payload),
+  addWalkIn: (eventId, key, payload) => request.post(`api/events/${eventId}/desk/${key}/guests`, payload),
+  removeWalkIn: (eventId, key, guestId) => request.del(`api/events/${eventId}/desk/${key}/guests/${guestId}`),
 };
 
 export const MAX_PHOTOS = 12;
 
+/**
+ * Invited by the host with a personal link to send. Not someone who
+ * answered on the public link, nor a walk-in added at the reception desk.
+ */
+export function hasPersonalLink(guest) {
+  return guest.source !== 'public' && guest.source !== 'desk';
+}
+
 /** Got their personal link but has not answered yet. */
 export function awaitsAnswer(guest) {
-  return guest.source !== 'public' && Boolean(guest.sentAt) && !guest.rsvp;
+  return hasPersonalLink(guest) && Boolean(guest.sentAt) && !guest.rsvp;
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -105,9 +119,12 @@ export function isGoneError(err) {
   return err?.name === 'SERVER_ERROR' && (err.status === 404 || err.status === 400);
 }
 
-/** Who answered what and how many are coming (live, as the host edits). */
+/** Who answered what, how many are coming and how many came (live, as the host edits). */
 export function summarizeGuests(guests) {
-  const summary = { invited: guests.length, sent: 0, opened: 0, attending: 0, maybe: 0, declined: 0, pending: 0, headcount: 0 };
+  const summary = {
+    invited: guests.length, sent: 0, opened: 0, attending: 0, maybe: 0, declined: 0, pending: 0, headcount: 0,
+    arrived: 0, arrivedPeople: 0,
+  };
   for (const guest of guests) {
     if (guest.sentAt) {
       summary.sent += 1;
@@ -118,11 +135,16 @@ export function summarizeGuests(guests) {
     const status = guest.rsvp?.status;
     if (status in RSVP_LABELS) {
       summary[status] += 1;
-    } else {
+    } else if (guest.source !== 'desk') {
+      // Walk-ins added at the desk were never asked
       summary.pending += 1;
     }
     if (status === 'attending') {
       summary.headcount += guest.rsvp.count || 1;
+    }
+    if (guest.arrivedAt) {
+      summary.arrived += 1;
+      summary.arrivedPeople += guest.arrivedCount || 1;
     }
   }
   return summary;
@@ -199,6 +221,11 @@ export function wishesUrl(eventId) {
 
 export function screenUrl(eventId, key) {
   return `${window.location.origin}/man-hinh/${eventId}/${key}`;
+}
+
+/** The reception desk page, for whoever welcomes guests at the party. */
+export function deskUrl(eventId, key) {
+  return `${window.location.origin}/don-khach/${eventId}/${key}`;
 }
 
 export function personalInvitationUrl(guestId) {

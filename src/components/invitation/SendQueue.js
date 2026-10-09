@@ -10,7 +10,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { toast } from 'react-toastify';
 import { IoPaperPlaneOutline, IoCopyOutline, IoCreateOutline, IoSparkles } from 'react-icons/io5';
-import { invitationApi, personalInvitationUrl, reminderQueue } from 'util/invitation';
+import { hasPersonalLink, invitationApi, personalInvitationUrl, reminderQueue } from 'util/invitation';
 import { LINK_TOKEN, NAME_TOKEN, canShareText, inviteMessage, sendInvite } from 'util/inviteMessage';
 import { track } from 'util/analytics';
 import styles from './SendQueue.module.scss';
@@ -21,7 +21,7 @@ export const QUEUE_MODES = {
     noun: 'lời mời',
     title: 'Gửi thiệp lần lượt',
     to: 'Gửi cho',
-    pick: guests => guests.filter(g => g.source !== 'public' && !g.sentAt),
+    pick: guests => guests.filter(g => hasPersonalLink(g) && !g.sentAt),
     mark: { sent: true },
     track: 'invite_sent',
     allDone: 'Tất cả khách đã được gửi thiệp',
