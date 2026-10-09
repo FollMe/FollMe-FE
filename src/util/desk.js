@@ -112,6 +112,16 @@ export function cacheDesk(eventId, data) {
   }
 }
 
+/** Forgets the list and what waits: the link no longer works (changed, or the event deleted). */
+export function forgetDesk(eventId) {
+  try {
+    localStorage.removeItem(pendingKey(eventId));
+    localStorage.removeItem(cacheKey(eventId));
+  } catch (err) {
+    // Nothing stored
+  }
+}
+
 /** The list as this phone has it: the server's, with changes still waiting on top. */
 export function applyPending(guests, pending) {
   return guests.map(guest => {

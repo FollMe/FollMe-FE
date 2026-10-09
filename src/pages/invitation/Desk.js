@@ -15,8 +15,8 @@ import OvalLoading from 'components/loading/OvalLoading';
 import GroupPicker from 'components/invitation/GroupPicker';
 import { eventHeadline, invitationApi, isGoneError } from 'util/invitation';
 import {
-  DESK_TABS, MAX_PARTY, applyPending, cacheDesk, deskGuests, deskSummary, loadCachedDesk, loadPending, partySize, rsvpHint,
-  savePending, tablesWithRoom,
+  DESK_TABS, MAX_PARTY, applyPending, cacheDesk, deskGuests, deskSummary, forgetDesk, loadCachedDesk, loadPending, partySize,
+  rsvpHint, savePending, tablesWithRoom,
 } from 'util/desk';
 import { groupPresets } from 'util/guestList';
 import { DEFAULT_SEATS, seatingPlan, tableLabel } from 'util/seating';
@@ -227,6 +227,10 @@ export default function Desk() {
       }
     } catch (err) {
       if (isGoneError(err)) {
+        // The guest list does not stay on a helper's phone after the link stops working
+        forgetDesk(eventId);
+        pendingRef.current = {};
+        setPending({});
         setStatus('gone');
         return;
       }
