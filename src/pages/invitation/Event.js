@@ -120,7 +120,7 @@ function ScreenPanel({ event, onEnablePublicLink }) {
 
   const url = key && screenUrl(event._id, key);
   return (
-    <section className={clsx(styles.panel, styles.screenPanel)}>
+    <section id="man-hinh" className={clsx(styles.panel, styles.screenPanel)}>
       <div className={styles.screenIcon} aria-hidden><IoTvOutline /></div>
       <div className={styles.shareText}>
         <h2>Màn hình lời chúc tại tiệc</h2>
@@ -202,7 +202,7 @@ function DeskPanel({ event, summary }) {
   }
 
   return (
-    <section className={clsx(styles.panel, styles.screenPanel)}>
+    <section id="don-khach" className={clsx(styles.panel, styles.screenPanel)}>
       <div className={styles.screenIcon} aria-hidden><IoPeopleOutline /></div>
       <div className={styles.shareText}>
         <h2>
@@ -239,56 +239,59 @@ function DeskPanel({ event, summary }) {
   );
 }
 
-/** The seating plan in short, and the way in. */
-function SeatingPanel({ event }) {
+/**
+ * The wedding-day tools at a glance, near the top of the page: each tile
+ * says where it stands and leads to its own page or to its panel below.
+ * After the party the gift ledger comes first.
+ */
+function DayTools({ event, summary, status }) {
   const plan = seatingPlan(event.guests ?? [], event.seatsPerTable ?? DEFAULT_SEATS);
+  const seating = {
+    key: 'seating',
+    to: `/events/${event._id}/xep-ban`,
+    icon: <IoGridOutline />,
+    title: 'Xếp bàn',
+    note: plan.tables.length === 0 ? 'Chưa xếp'
+      : `${plan.tables.length} bàn${plan.waiting > 0 ? ` · ${plan.waiting} người chưa có bàn` : ', đủ chỗ'}`,
+  };
+  const desk = {
+    key: 'desk',
+    href: '#don-khach',
+    icon: <IoPeopleOutline />,
+    title: 'Đón khách',
+    note: summary.arrived > 0 ? `${summary.arrivedPeople} người đã đến` : 'Link cho bàn tiếp tân',
+  };
+  const screen = {
+    key: 'screen',
+    href: '#man-hinh',
+    icon: <IoTvOutline />,
+    title: 'Màn hình lời chúc',
+    note: `${(event.wishes ?? []).length} lời chúc`,
+  };
+  const ledger = {
+    key: 'ledger',
+    to: `/events/${event._id}/so-mung`,
+    icon: <IoWalletOutline />,
+    title: 'Sổ mừng',
+    note: summary.gifts > 0 ? `${formatVnd(summary.giftTotal)} · ${summary.gifts} người` : 'Ghi sau tiệc',
+  };
+  const tiles = status === 'happened' ? [ledger, desk, seating, screen] : [seating, desk, screen, ledger];
   return (
-    <section className={clsx(styles.panel, styles.screenPanel)}>
-      <div className={styles.screenIcon} aria-hidden><IoGridOutline /></div>
-      <div className={styles.shareText}>
-        <h2>
-          Xếp bàn
-          {plan.tables.length > 0 && <span className={styles.headCount}>{plan.tables.length} bàn</span>}
-        </h2>
-        <p>
-          {plan.tables.length > 0
-            ? `${plan.seated} người đã có chỗ${plan.waiting > 0 ? `, ${plan.waiting} người chưa có bàn` : ''}. `
-            : 'Xếp khách vào từng bàn, mỗi nhóm ngồi riêng, có nút tự xếp theo số chỗ mỗi bàn. '}
-          Ngày cưới, người đón khách và thiệp của khách sẽ hiện số bàn.
-        </p>
-        <div className={styles.shareActions}>
-          <Button component={Link} to={`/events/${event._id}/xep-ban`} variant="contained" size="small" startIcon={<IoGridOutline />}>
-            {plan.tables.length > 0 ? 'Sửa xếp bàn' : 'Xếp bàn'}
-          </Button>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/** The gift ledger in short, and the way in. Only the host sees it. */
-function LedgerPanel({ event, summary }) {
-  return (
-    <section className={clsx(styles.panel, styles.screenPanel)}>
-      <div className={styles.screenIcon} aria-hidden><IoWalletOutline /></div>
-      <div className={styles.shareText}>
-        <h2>
-          Sổ mừng
-          {summary.gifts > 0 && <span className={styles.headCount}>{summary.gifts} người mừng</span>}
-        </h2>
-        {summary.gifts > 0 ? (
-          <p className={styles.ledgerTotal}>{formatVnd(summary.giftTotal)}</p>
-        ) : (
-          <p>
-            Sau tiệc, mở phong bì và ghi lại ai mừng bao nhiêu: tìm tên, gõ "500k" hay "1tr2" là xong. Có tổng theo nhà
-            trai, nhà gái, tải về Excel để giữ. Chỉ bạn xem được.
-          </p>
-        )}
-        <div className={styles.shareActions}>
-          <Button component={Link} to={`/events/${event._id}/so-mung`} variant="contained" size="small" startIcon={<IoWalletOutline />}>
-            {summary.gifts > 0 ? 'Mở sổ mừng' : 'Ghi sổ mừng'}
-          </Button>
-        </div>
+    <section className={styles.tools} aria-labelledby="day-tools">
+      <h2 id="day-tools">{isCoupleEvent(event.type) ? 'Ngày cưới' : 'Ngày tiệc'}</h2>
+      <div className={styles.toolGrid}>
+        {tiles.map(tile => {
+          const inner = (
+            <>
+              <span className={styles.toolIcon} aria-hidden>{tile.icon}</span>
+              <strong>{tile.title}</strong>
+              <span className={styles.toolNote}>{tile.note}</span>
+            </>
+          );
+          return tile.to
+            ? <Link key={tile.key} to={tile.to} className={styles.tool}>{inner}</Link>
+            : <a key={tile.key} href={tile.href} className={styles.tool}>{inner}</a>;
+        })}
       </div>
     </section>
   );
@@ -581,8 +584,7 @@ export default function Event() {
         ))}
       </div>
 
-      {/* After the party, the envelopes come first */}
-      {status === 'happened' && <LedgerPanel event={event} summary={summary} />}
+      <DayTools event={event} summary={summary} status={status} />
 
       <section className={clsx(styles.panel, styles.share)}>
         {event.allowPublicLink ? (
@@ -726,11 +728,7 @@ export default function Event() {
 
       <ScreenPanel event={event} onEnablePublicLink={enablePublicLink} />
 
-      <SeatingPanel event={event} />
-
       <DeskPanel event={event} summary={summary} />
-
-      {status !== 'happened' && <LedgerPanel event={event} summary={summary} />}
 
       <section className={clsx(styles.panel, styles.dangerZone)}>
         <div>
