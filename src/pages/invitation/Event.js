@@ -29,7 +29,9 @@ import {
   MAX_PHOTOS, RSVP_LABELS, deskUrl, eventHeadline, groupSummary, hasPersonalLink, invitationApi, isCoupleEvent,
   personalInvitationUrl, publicInvitationUrl, reminderQueue, screenUrl, summarizeGuests, thankQueue,
 } from 'util/invitation';
-import { defaultReminder, defaultTemplate, defaultThanks, loadTemplate, saveTemplate } from 'util/inviteMessage';
+import {
+  deadlineText, defaultReminder, defaultTemplate, defaultThanks, loadTemplate, saveTemplate,
+} from 'util/inviteMessage';
 import { downloadCsv } from 'util/csv';
 import { formatVnd } from 'util/gifts';
 import { DEFAULT_SEATS, seatingPlan, tableLabel } from 'util/seating';
@@ -251,7 +253,10 @@ function DayTools({ event, summary, status }) {
     to: `/events/${event._id}/xep-ban`,
     icon: <IoGridOutline />,
     title: 'Xếp bàn',
-    note: plan.tables.length === 0 ? 'Chưa xếp'
+    note: plan.tables.length === 0
+      ? (summary.headcount > 0
+        ? `Dự kiến ~${Math.ceil(summary.headcount / (event.seatsPerTable ?? DEFAULT_SEATS))} bàn`
+        : 'Chưa xếp')
       : `${plan.tables.length} bàn${plan.waiting > 0 ? ` · ${plan.waiting} người chưa có bàn` : ', đủ chỗ'}`,
   };
   const desk = {
@@ -653,6 +658,7 @@ export default function Event() {
             <IoNotificationsOutline aria-hidden />
             <div>
               <strong>{toRemind} khách chưa trả lời</strong>
+              {event.rsvpBy && <span className={styles.deadline}>{deadlineText(event.rsvpBy)}</span>}
               <button type="button" className={styles.linkButton} onClick={() => setEditingMode('remind')}>
                 Sửa lời nhắc
               </button>

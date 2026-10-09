@@ -1,4 +1,7 @@
-import { defaultReminder, defaultTemplate, defaultThanks, inviteMessage, inviteWhen, loadTemplate, saveTemplate } from './inviteMessage';
+import {
+  daysToAnswer, deadlineText, defaultReminder, defaultTemplate, defaultThanks, inviteMessage, inviteWhen, loadTemplate, saveTemplate,
+  shortDay,
+} from './inviteMessage';
 
 const wedding = {
   type: 'wedding', groomName: 'Đức', brideName: 'Hạnh', title: 'Lễ thành hôn', startAt: '2027-01-16T04:00:00Z',
@@ -67,5 +70,41 @@ describe('defaultThanks', () => {
     saveTemplate('e1', null, 'thank');
     expect(loadTemplate('e1', 'thank')).toBeNull();
     expect(loadTemplate('e1', 'invite')).toBe('Mời');
+  });
+});
+
+describe('answer-by date', () => {
+  // Saturday 09/01/2027, end of the day in Vietnam
+  const rsvpBy = '2027-01-09T16:59:59.999Z';
+  const at = iso => new Date(iso).getTime();
+
+  it('counts days by the calendar in Vietnam', () => {
+    expect(shortDay(rsvpBy)).toBe('thứ Bảy, 09/01');
+    expect(daysToAnswer(rsvpBy, at('2027-01-06T03:00:00Z'))).toBe(3);
+    // 23:30 on the 8th in Vietnam is still the day before
+    expect(daysToAnswer(rsvpBy, at('2027-01-08T16:30:00Z'))).toBe(1);
+    expect(daysToAnswer(rsvpBy, at('2027-01-08T17:30:00Z'))).toBe(0);
+    expect(daysToAnswer(rsvpBy, at('2027-01-09T17:30:00Z'))).toBe(-1);
+  });
+
+  it('says where it stands', () => {
+    expect(deadlineText(rsvpBy, at('2027-01-06T03:00:00Z'))).toBe('Hạn trả lời thứ Bảy, 09/01, còn 3 ngày');
+    expect(deadlineText(rsvpBy, at('2027-01-08T03:00:00Z'))).toBe('Hạn trả lời là ngày mai');
+    expect(deadlineText(rsvpBy, at('2027-01-09T03:00:00Z'))).toBe('Hạn trả lời là hôm nay');
+    expect(deadlineText(rsvpBy, at('2027-01-10T03:00:00Z'))).toBe('Đã qua hạn trả lời thứ Bảy, 09/01');
+  });
+
+  it('goes into the invitation and the reminder until it passes', () => {
+    const before = at('2027-01-02T03:00:00Z');
+    expect(defaultTemplate({ ...wedding, rsvpBy }, before)).toBe(
+      'Trân trọng kính mời {tên} tới dự lễ thành hôn của Đức & Hạnh vào 11:00 thứ Bảy, 16/01/2027.\n'
+      + 'Mong {tên} xác nhận tham dự trước thứ Bảy, 09/01.\n'
+      + 'Thiệp mời dành riêng cho {tên}: {link}',
+    );
+    expect(defaultReminder({ ...wedding, rsvpBy }, before))
+      .toMatch(/Mong \{tên\} xác nhận tham dự trên thiệp mời trước thứ Bảy, 09\/01 để việc đón tiếp/);
+    const after = at('2027-01-11T03:00:00Z');
+    expect(defaultTemplate({ ...wedding, rsvpBy }, after)).toBe(defaultTemplate(wedding));
+    expect(defaultReminder({ ...wedding, rsvpBy }, after)).toBe(defaultReminder(wedding));
   });
 });

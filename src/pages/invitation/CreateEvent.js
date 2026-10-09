@@ -4,7 +4,8 @@ import clsx from 'clsx';
 import { TextField } from '@mui/material';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
-import { DateTimeField, LocalizationProvider } from '@mui/x-date-pickers';
+import { DateField, DateTimeField, LocalizationProvider } from '@mui/x-date-pickers';
+import Button from '@mui/material/Button';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { toast } from 'react-toastify';
@@ -65,6 +66,8 @@ function CreateEventForm() {
       // Weddings get the music box and the scratch-off date by default
       music: isCoupleEvent(initialType) ? 'canon' : 'none',
       scratchDate: isCoupleEvent(initialType),
+      // Answer by (a day in Vietnam), or null
+      rsvpBy: null,
       gifts: [],
     };
   });
@@ -112,6 +115,7 @@ function CreateEventForm() {
           allowPublicLink: Boolean(invitation.allowPublicLink),
           music: invitation.music ?? (isCoupleEvent(invitation.type) ? 'canon' : 'none'),
           scratchDate: invitation.scratchDate ?? isCoupleEvent(invitation.type),
+          rsvpBy: invitation.rsvpBy ? dayjs(vnWallClock(invitation.rsvpBy)) : null,
           gifts: invitation.gifts ?? [],
         });
         setPhotos(invitation.photos ?? []);
@@ -151,6 +155,11 @@ function CreateEventForm() {
     if (!form.startAt?.isValid()) {
       next.startAt = 'Thời gian không hợp lệ';
     }
+    if (form.rsvpBy && !form.rsvpBy.isValid()) {
+      next.rsvpBy = 'Ngày không hợp lệ';
+    } else if (form.rsvpBy && form.startAt?.isValid() && form.rsvpBy.isAfter(form.startAt, 'day')) {
+      next.rsvpBy = 'Hạn xác nhận phải trước ngày tiệc';
+    }
     if (!form.gifts.every(isGiftComplete)) {
       next.gifts = true;
     }
@@ -187,6 +196,8 @@ function CreateEventForm() {
       allowPublicLink: form.allowPublicLink,
       music: form.music,
       scratchDate: form.scratchDate,
+      // The end of that day in Vietnam
+      rsvpBy: form.rsvpBy ? fromVnWallClock(form.rsvpBy.endOf('day').toDate()).toISOString() : null,
       gifts: normalizeGifts(form.gifts, couple).map(g => ({ ...g, accountName: g.accountName.trim() })),
     };
     try {
@@ -397,6 +408,29 @@ function CreateEventForm() {
               existing={invitedNames}
               label={isEditing ? 'Mời thêm khách' : 'Khách mời riêng (không bắt buộc)'}
             />
+            <div className={styles.deadline}>
+              <DateField
+                fullWidth
+                label="Hạn xác nhận tham dự (không bắt buộc)"
+                format="DD/MM/YYYY"
+                value={form.rsvpBy}
+                onChange={value => set({ rsvpBy: value })}
+                slotProps={{
+                  textField: {
+                    error: Boolean(errors.rsvpBy),
+                    helperText: errors.rsvpBy ?? 'Thiệp và lời nhắc sẽ ghi "Vui lòng trả lời trước …". Hết hạn khách vẫn trả lời được.',
+                  },
+                }}
+              />
+              <div className={styles.deadlineActions}>
+                {form.startAt?.isValid() && (
+                  <Button size="small" onClick={() => set({ rsvpBy: form.startAt.subtract(7, 'day').startOf('day') })}>
+                    1 tuần trước tiệc
+                  </Button>
+                )}
+                {form.rsvpBy && <Button size="small" onClick={() => set({ rsvpBy: null })}>Bỏ hạn</Button>}
+              </div>
+            </div>
           </fieldset>
 
           <div className={styles.submit}>

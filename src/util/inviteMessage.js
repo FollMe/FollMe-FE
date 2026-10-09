@@ -13,25 +13,60 @@ export function inviteWhen(startAt) {
   return `${dayjs(at).format('HH:mm')} ${WEEKDAYS[at.getDay()]}, ${dayjs(at).format('DD/MM/YYYY')}`;
 }
 
+/** "thứ Bảy, 09/01": a day in Vietnam, for the answer-by date. */
+export function shortDay(date) {
+  const at = vnWallClock(date);
+  return `${WEEKDAYS[at.getDay()]}, ${dayjs(at).format('DD/MM')}`;
+}
+
+/** Days left to answer by `rsvpBy` (0 = today, -1 = yesterday), by the calendar in Vietnam. */
+export function daysToAnswer(rsvpBy, now = Date.now()) {
+  const day = date => {
+    const at = vnWallClock(date);
+    return Date.UTC(at.getFullYear(), at.getMonth(), at.getDate());
+  };
+  return Math.round((day(rsvpBy) - day(now)) / 86400000);
+}
+
+/** Where the answer-by date stands, for the reminder bar. */
+export function deadlineText(rsvpBy, now = Date.now()) {
+  const days = daysToAnswer(rsvpBy, now);
+  if (days < 0) {
+    return `Đã qua hạn trả lời ${shortDay(rsvpBy)}`;
+  }
+  if (days <= 1) {
+    return `Hạn trả lời là ${days === 0 ? 'hôm nay' : 'ngày mai'}`;
+  }
+  return `Hạn trả lời ${shortDay(rsvpBy)}, còn ${days} ngày`;
+}
+
+/** The answer-by date to mention, or null when there is none or it has passed. */
+function openDeadline(event, now) {
+  return event.rsvpBy && daysToAnswer(event.rsvpBy, now) >= 0 ? shortDay(event.rsvpBy) : null;
+}
+
 /** The message sent with each personal link, before names are filled in. */
-export function defaultTemplate(event) {
+export function defaultTemplate(event, now = Date.now()) {
   const headline = eventHeadline(event);
   const what = {
     wedding: `lễ thành hôn của ${headline}`,
     engagement: `lễ ăn hỏi của ${headline}`,
   }[event.type] ?? headline;
+  const by = openDeadline(event, now);
   return `Trân trọng kính mời ${NAME_TOKEN} tới dự ${what} vào ${inviteWhen(event.startAt)}.\n`
+    + (by ? `Mong ${NAME_TOKEN} xác nhận tham dự trước ${by}.\n` : '')
     + `Thiệp mời dành riêng cho ${NAME_TOKEN}: ${LINK_TOKEN}`;
 }
 
 /** The nudge for guests who got their link but have not answered yet. */
-export function defaultReminder(event) {
+export function defaultReminder(event, now = Date.now()) {
   const when = inviteWhen(event.startAt);
+  const by = openDeadline(event, now);
   const what = { wedding: 'lễ thành hôn', engagement: 'lễ ăn hỏi' }[event.type];
   const first = isCoupleEvent(event.type) && event.groomName && event.brideName
     ? `${eventHeadline(event)} rất mong được đón ${NAME_TOKEN} tới dự ${what} vào ${when}.`
     : `Rất mong được đón ${NAME_TOKEN} tới dự ${event.title} vào ${when}.`;
-  return `${first}\nMong ${NAME_TOKEN} xác nhận tham dự trên thiệp mời để việc đón tiếp được chu đáo hơn: ${LINK_TOKEN}`;
+  return `${first}\nMong ${NAME_TOKEN} xác nhận tham dự trên thiệp mời${by ? ` trước ${by}` : ''} để việc đón tiếp được chu đáo hơn: ${LINK_TOKEN}`;
 }
 
 /**

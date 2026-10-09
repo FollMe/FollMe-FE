@@ -29,6 +29,7 @@ import { burst } from 'util/confetti';
 import { MusicBox, canPlayMusic } from 'util/musicBox';
 import { cldUrl } from 'util/photos';
 import { tableLabel } from 'util/seating';
+import { daysToAnswer, shortDay } from 'util/inviteMessage';
 import styles from './InvitationView.module.scss';
 
 const WEEKDAYS = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
@@ -447,6 +448,17 @@ function CoverDate({ date }) {
   );
 }
 
+/** Why to answer, and by when if the host set a date. */
+function answerHint(event) {
+  if (!event.rsvpBy) {
+    return 'Một câu trả lời nhỏ giúp gia chủ chuẩn bị chu đáo hơn.';
+  }
+  const day = shortDay(event.rsvpBy);
+  return daysToAnswer(event.rsvpBy) >= 0
+    ? `Vui lòng trả lời trước ${day} để gia chủ chuẩn bị chu đáo hơn.`
+    : `Đã qua hạn trả lời (${day}). Bạn vẫn trả lời được, gia chủ sẽ cố gắng sắp xếp.`;
+}
+
 function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
   const existing = guest?.rsvp;
   const [status, setStatus] = useState(existing?.status ?? 'attending');
@@ -511,7 +523,7 @@ function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
   return (
     <div className={styles.card}>
       <h2 className={styles.h2}>Bạn sẽ đến chứ?</h2>
-      <p className={styles.cardSub}>Một câu trả lời nhỏ giúp gia chủ chuẩn bị chu đáo hơn.</p>
+      <p className={styles.cardSub}>{answerHint(event)}</p>
       <form className={styles.form} onSubmit={submit}>
         {isPublic && !guest?._id && (
           <TextField size="small" label="Tên của bạn" value={name} inputProps={{ maxLength: 50 }} onChange={e => setName(e.target.value)} />
