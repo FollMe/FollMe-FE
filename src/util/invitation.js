@@ -116,6 +116,15 @@ export function reminderQueue(guests, now = Date.now()) {
   return [...due.filter(g => !g.remindedAt), ...due.filter(g => g.remindedAt)];
 }
 
+/**
+ * Who to thank after the party: guests with a personal link who came,
+ * said they would, or sent a gift, and were not thanked yet.
+ */
+export function thankQueue(guests) {
+  return guests.filter(g => hasPersonalLink(g) && !g.thankedAt
+    && (g.arrivedAt || g.gift || g.rsvp?.status === 'attending'));
+}
+
 /** The link itself is wrong or gone (not a passing server or network error). */
 export function isGoneError(err) {
   return err?.name === 'SERVER_ERROR' && (err.status === 404 || err.status === 400);

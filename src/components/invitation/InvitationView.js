@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
 import {
   IoNavigateOutline, IoSend, IoCheckmarkCircle, IoChevronDown, IoMailOpenOutline,
-  IoCreateOutline, IoLocationOutline, IoGiftOutline,
+  IoCreateOutline, IoLocationOutline, IoGiftOutline, IoImagesOutline,
 } from 'react-icons/io5';
 import Reveal from 'components/Reveal';
 import Envelope from './Envelope';
@@ -36,6 +36,14 @@ const INTRO = {
   wedding: 'tới dự lễ thành hôn của',
   engagement: 'tới dự lễ ăn hỏi của',
 };
+
+// After the party the card thanks the guest (the host's thank-you links here)
+const THANKS = {
+  wedding: 'đã chung vui trong lễ thành hôn của',
+  engagement: 'đã chung vui trong lễ ăn hỏi của',
+};
+// Until then the party is on: guests are asked for a wish
+const LIVE_MS = 8 * 60 * 60 * 1000;
 
 const PETAL_COLORS = {
   blush: '#e8a3b0',
@@ -155,6 +163,8 @@ export default function InvitationView({
 }) {
   const startAt = useMemo(() => new Date(event.startAt), [event.startAt]);
   const countdown = useCountdown(startAt);
+  const isOver = !countdown;
+  const isLive = isOver && Date.now() - startAt.getTime() < LIVE_MS;
   // Shown in Vietnam time, where the event is, also to guests abroad: the
   // calendar button says Asia/Ho_Chi_Minh, so its times must be Vietnam's.
   const shownAt = useMemo(() => vnWallClock(event.startAt), [event.startAt]);
@@ -172,7 +182,8 @@ export default function InvitationView({
   // Weddings get the music box and the scratch-off date unless the host
   // turned them off; other events only if turned on.
   const withMusic = !embedded && (event.music ? event.music !== 'none' : isCoupleEvent(event.type));
-  const withScratch = !embedded && (event.scratchDate ?? isCoupleEvent(event.type));
+  // Nothing to reveal once the day has come
+  const withScratch = !embedded && !isOver && (event.scratchDate ?? isCoupleEvent(event.type));
   const music = useMusic(withMusic);
   const dateKey = dayjs(shownAt).format('YYYY-MM-DD');
   const photos = event.photos ?? [];
@@ -232,12 +243,25 @@ export default function InvitationView({
               />
             </figure>
           )}
-          <p className={styles.kicker}>{couple ? 'Save the date' : 'Thư mời'}</p>
-          <p className={styles.invite}>
-            Trân trọng kính mời <strong>{recipient === 'Bạn' ? 'bạn' : recipient}</strong>
-            <br />
-            {INTRO[event.type] ?? 'tới dự'}
-          </p>
+          {isOver ? (
+            <>
+              <p className={styles.kicker}>{couple ? 'Thank you' : 'Lời cảm ơn'}</p>
+              <p className={styles.invite}>
+                Cảm ơn <strong>{recipient === 'Bạn' ? 'bạn' : recipient}</strong>
+                <br />
+                {THANKS[event.type] ?? 'đã tới dự'}
+              </p>
+            </>
+          ) : (
+            <>
+              <p className={styles.kicker}>{couple ? 'Save the date' : 'Thư mời'}</p>
+              <p className={styles.invite}>
+                Trân trọng kính mời <strong>{recipient === 'Bạn' ? 'bạn' : recipient}</strong>
+                <br />
+                {INTRO[event.type] ?? 'tới dự'}
+              </p>
+            </>
+          )}
           {couple ? (
             <h1 className={styles.couple}>
               <span className={clsx(styles.name, styles.shimmer)}>{event.groomName}</span>
@@ -310,7 +334,9 @@ export default function InvitationView({
               ))}
             </div>
           ) : (
-            <p className={styles.over}>Ngày vui đã qua. Cảm ơn bạn đã ghé thăm!</p>
+            <p className={styles.over}>
+              {isLive ? 'Tiệc đang diễn ra. Gửi lời chúc ở cuối thiệp nhé!' : 'Ngày vui đã qua. Cảm ơn bạn đã ghé thăm!'}
+            </p>
           )}
         </Reveal>
       </section>
@@ -386,7 +412,12 @@ export default function InvitationView({
       {isOpen && !embedded && (
         <nav className={styles.dock} aria-label="Đi nhanh">
           {countdown && <a href="#xac-nhan"><IoMailOpenOutline /> Xác nhận</a>}
-          <a href="#dia-diem"><IoLocationOutline /> Chỉ đường</a>
+          {/* After the party: the photos instead of the way there */}
+          {isOver && !isLive && photos.length > 1 ? (
+            <a href="#album"><IoImagesOutline /> Ảnh</a>
+          ) : (
+            (!isOver || isLive) && <a href="#dia-diem"><IoLocationOutline /> Chỉ đường</a>
+          )}
           {event.gifts?.length > 0 && <a href="#mung-cuoi"><IoGiftOutline /> {couple ? 'Mừng cưới' : 'Quà mừng'}</a>}
           <a href="#loi-chuc"><IoCreateOutline /> Lời chúc</a>
         </nav>

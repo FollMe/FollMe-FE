@@ -1,4 +1,4 @@
-import { defaultReminder, defaultTemplate, inviteMessage, inviteWhen } from './inviteMessage';
+import { defaultReminder, defaultTemplate, defaultThanks, inviteMessage, inviteWhen, loadTemplate, saveTemplate } from './inviteMessage';
 
 const wedding = {
   type: 'wedding', groomName: 'Đức', brideName: 'Hạnh', title: 'Lễ thành hôn', startAt: '2027-01-16T04:00:00Z',
@@ -45,5 +45,27 @@ describe('inviteMessage', () => {
 
   it('leaves names with $ patterns intact', () => {
     expect(inviteMessage('Mời {tên}', 'A $& B', 'u')).toBe('Mời A $& B\nu');
+  });
+});
+
+describe('defaultThanks', () => {
+  it('thanks the guest and points to the photos when there are some', () => {
+    expect(defaultThanks({ ...wedding, photos: [{ url: 'x' }] })).toBe(
+      'Đức & Hạnh xin cảm ơn {tên} đã chung vui cùng chúng mình trong ngày cưới.\n'
+      + 'Ảnh và lời chúc của mọi người ở đây nhé: {link}',
+    );
+    expect(defaultThanks(wedding)).toMatch(/\nLời chúc của mọi người ở đây nhé: \{link\}$/);
+    expect(defaultThanks({ ...wedding, type: 'birthday', title: 'Sinh nhật Vy' }))
+      .toMatch(/^Cảm ơn \{tên\} đã chung vui cùng chúng mình tại Sinh nhật Vy\./);
+  });
+
+  it('keeps each kind of message apart', () => {
+    saveTemplate('e1', 'Mời', 'invite');
+    saveTemplate('e1', 'Nhắc', 'remind');
+    saveTemplate('e1', 'Cảm ơn', 'thank');
+    expect([loadTemplate('e1', 'invite'), loadTemplate('e1', 'remind'), loadTemplate('e1', 'thank')]).toEqual(['Mời', 'Nhắc', 'Cảm ơn']);
+    saveTemplate('e1', null, 'thank');
+    expect(loadTemplate('e1', 'thank')).toBeNull();
+    expect(loadTemplate('e1', 'invite')).toBe('Mời');
   });
 });

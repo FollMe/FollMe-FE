@@ -1,5 +1,5 @@
 import { filterGuests } from './GuestList';
-import { groupSummary, reminderQueue, summarizeGuests } from 'util/invitation';
+import { groupSummary, reminderQueue, summarizeGuests, thankQueue } from 'util/invitation';
 
 const guests = [
   { _id: '1', name: 'Cô Ba', source: 'host', sentAt: '2026-10-01', viewed: 2, rsvp: { status: 'attending', count: 2 } },
@@ -124,5 +124,22 @@ describe('groups', () => {
       ['Nhà gái', 1, 0, 0],
       ['', 1, 1, 1],
     ]);
+  });
+});
+
+describe('thankQueue', () => {
+  it('thanks who came, said they would or sent a gift, once, by personal link', () => {
+    const party = [
+      { _id: 'a', source: 'host', arrivedAt: 'x' },
+      { _id: 'b', source: 'host', rsvp: { status: 'attending', count: 2 } },
+      { _id: 'c', source: 'host', gift: { amount: 500000 } },
+      { _id: 'd', source: 'host', rsvp: { status: 'declined', count: 0 } },
+      { _id: 'e', source: 'host', arrivedAt: 'x', thankedAt: 'y' },
+      { _id: 'f', source: 'desk', arrivedAt: 'x' },
+      { _id: 'g', source: 'public', rsvp: { status: 'attending', count: 1 } },
+      { _id: 'h', source: 'ledger', gift: { amount: 1 } },
+      { _id: 'i' },
+    ];
+    expect(ids(thankQueue(party))).toEqual(['a', 'b', 'c']);
   });
 });
