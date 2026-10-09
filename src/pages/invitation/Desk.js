@@ -244,35 +244,48 @@ export default function Desk() {
   }, [eventId, key]);
 
   /**
-   * Sends the check-ins waiting, oldest first. Stops at the first one the
-   * network loses (tried again later); one the server refuses is dropped.
+   * Sends the check-ins waiting, oldest first, and any made while sending.
+   * Stops at the first one that cannot get through (no signal, a server
+   * error, too many requests): it stays and is tried again later. Only one
+   * the server refuses for good (guest deleted, link changed) is dropped.
    */
   const flush = useCallback(async () => {
     if (flushing.current) {
       return;
     }
     flushing.current = true;
+    let reachable = true;
     try {
-      let sentAll = true;
-      for (const [guestId, op] of Object.entries(pendingRef.current)) {
+      // Each change is tried once per run; a newer one for the same guest is a new try
+      const tried = new Map();
+      for (;;) {
+        const next = Object.entries(pendingRef.current).find(([id, op]) => tried.get(id) !== op.at);
+        if (!next) {
+          break;
+        }
+        const [guestId, op] = next;
+        tried.set(guestId, op.at);
+        const same = () => pendingRef.current[guestId]?.at === op.at;
         try {
           const saved = await invitationApi.setArrival(eventId, key, guestId, { arrived: op.arrived, count: op.count, table: op.table });
           // A newer change made meanwhile stays waiting, and shown
-          if (pendingRef.current[guestId]?.at === op.at) {
+          if (same()) {
             updatePending(({ [guestId]: done, ...rest }) => rest);
             replace(saved);
           }
         } catch (err) {
-          if (err?.name === 'SERVER_ERROR') {
-            updatePending(({ [guestId]: refused, ...rest }) => rest);
+          if (isGoneError(err)) {
+            if (same()) {
+              updatePending(({ [guestId]: refused, ...rest }) => rest);
+            }
             load(true);
           } else {
-            sentAll = false;
+            reachable = false;
             break;
           }
         }
       }
-      setOffline(!sentAll);
+      setOffline(!reachable);
     } finally {
       flushing.current = false;
     }
