@@ -238,6 +238,25 @@
   }
 }
 
+/* On the day: where the guest sits */
+.coverSeat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 18px 0 0;
+  padding: 8px 18px;
+  border: 1px solid var(--inv-accent);
+  border-radius: 999px;
+  color: var(--inv-ink);
+  font-size: 1.5rem;
+
+  strong {
+    color: var(--inv-accent-text);
+    font-family: var(--inv-title);
+    font-size: 2rem;
+  }
+}
+
 /* The scratch-off foil sits where the date is */
 .coverScratch {
   margin-top: 28px;

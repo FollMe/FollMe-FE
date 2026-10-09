@@ -16,6 +16,7 @@ import GroupPicker from 'components/invitation/GroupPicker';
 import { eventHeadline, invitationApi, isGoneError } from 'util/invitation';
 import { DESK_TABS, MAX_PARTY, deskGuests, deskSummary, mergeDesk, partySize, rsvpHint } from 'util/desk';
 import { groupPresets } from 'util/guestList';
+import { tableLabel } from 'util/seating';
 import { vnWallClock } from 'util/date';
 import { setPageMeta } from 'util/meta';
 import { track } from 'util/analytics';
@@ -93,6 +94,7 @@ function GuestRow({ guest, busy, onArrive, onCount, onUndo }) {
         <strong>
           {arrived && <IoCheckmarkCircle className={styles.tick} aria-hidden />}
           {guest.name}
+          {guest.table && <span className={styles.table}>{tableLabel(guest.table)}</span>}
         </strong>
         <span>
           {[
