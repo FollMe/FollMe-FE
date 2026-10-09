@@ -1,5 +1,6 @@
 import {
   applyPending, cacheDesk, deskGuests, deskSummary, loadCachedDesk, loadPending, partySize, rsvpHint, savePending,
+  tablesWithRoom,
 } from './desk';
 
 const guests = [
@@ -88,5 +89,29 @@ describe('check-ins waiting for the network', () => {
     cacheDesk('e1', { event: { _id: 'e1' }, guests: list });
     expect(loadCachedDesk('e1').guests).toHaveLength(3);
     expect(loadCachedDesk('e2')).toBeNull();
+  });
+});
+
+describe('tables at the desk', () => {
+  it('applies a table chosen while waiting, keeps the count', () => {
+    const list = [{ _id: '1', name: 'A', arrivedAt: 'x', arrivedCount: 2, table: '3' }];
+    expect(applyPending(list, { 1: { arrived: true, table: '5', at: 'y' } })).toEqual([
+      { _id: '1', name: 'A', arrivedAt: 'x', arrivedCount: 2, table: '5' },
+    ]);
+    expect(applyPending(list, { 1: { arrived: true, table: '', at: 'y' } })).toEqual([
+      { _id: '1', name: 'A', arrivedAt: 'x', arrivedCount: 2 },
+    ]);
+  });
+
+  it('offers tables with room, the guest\'s group first', () => {
+    const plan = { tables: [
+      { table: '1', group: 'Nhà trai', free: 1 },
+      { table: '2', group: 'Nhà gái', free: 4 },
+      { table: '3', group: 'Nhà trai', free: 3 },
+      { table: '4', group: '', free: 6 },
+    ] };
+    expect(tablesWithRoom(plan, 2, 'Nhà trai').map(t => t.table)).toEqual(['3', '2', '4']);
+    expect(tablesWithRoom(plan, 5).map(t => t.table)).toEqual(['4']);
+    expect(tablesWithRoom(plan, 9)).toEqual([]);
   });
 });
