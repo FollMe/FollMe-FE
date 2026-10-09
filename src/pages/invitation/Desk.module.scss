@@ -230,6 +230,18 @@
   color: var(--success-text);
 }
 
+/* Where to take them */
+.table {
+  flex: none;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--brand-fill);
+  color: var(--on-brand, #fff);
+  font-size: 1.25rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .tick {
   flex: none;
   font-size: 2rem;

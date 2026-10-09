@@ -1,0 +1,337 @@
+/* The seating plan: counters, the guests still waiting for a seat, then a
+   card per table. */
+
+.page {
+  max-width: 960px;
+  padding-bottom: 48px;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+
+  div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 14px 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    text-align: center;
+  }
+
+  strong {
+    font-size: 2.6rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.15;
+  }
+
+  span {
+    color: var(--text-2);
+    font-size: 1.25rem;
+  }
+
+  .waiting strong {
+    color: var(--warning-text);
+  }
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.seats {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 1.4rem;
+
+  > span {
+    margin-right: 6px;
+    color: var(--text-2);
+  }
+
+  button {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 1.8rem;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+  }
+
+  output {
+    min-width: 72px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+  }
+}
+
+.hint {
+  margin: 12px 0 0;
+  color: var(--text-2);
+  font-size: 1.3rem;
+}
+
+.unseated {
+  margin-top: 20px;
+  padding: 16px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+
+  h2 {
+    margin: 0 0 10px;
+    font-size: 1.7rem;
+  }
+}
+
+.groupRow + .groupRow {
+  margin-top: 12px;
+}
+
+.groupRow h3 {
+  margin: 0 0 6px;
+  color: var(--text-2);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.people {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  button {
+    min-height: 36px;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    font-size: 1.4rem;
+    cursor: pointer;
+
+    span {
+      color: var(--text-2);
+    }
+  }
+}
+
+.tables {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.table {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+
+  header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  h2 {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: 1.9rem;
+  }
+
+  ul {
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li button {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    padding: 6px 0;
+    border: none;
+    border-top: 1px solid var(--border);
+    background: none;
+    color: var(--text);
+    font: inherit;
+    font-size: 1.4rem;
+    text-align: left;
+    cursor: pointer;
+  }
+}
+
+.count {
+  color: var(--text-2);
+  font-size: 1.35rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.tableGroup {
+  margin: 2px 0 0;
+  color: var(--brand-text);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.need {
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.over {
+  border-color: var(--danger);
+
+  .count {
+    color: var(--danger);
+  }
+}
+
+.overNote {
+  margin: 6px 0 0;
+  color: var(--danger);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.empty {
+  margin-top: 24px;
+  color: var(--text-2);
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.dialogSub {
+  margin: 0;
+  padding: 0 24px;
+  color: var(--text-2);
+  font-size: 1.35rem;
+}
+
+.dialogText {
+  margin: 0 0 12px;
+  color: var(--text-2);
+  font-size: 1.4rem;
+}
+
+.choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+
+  button {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    strong {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 1.5rem;
+    }
+
+    span {
+      color: var(--text-2);
+      font-size: 1.2rem;
+    }
+  }
+
+  .on {
+    border-color: var(--brand);
+    background: var(--brand-soft);
+  }
+
+  .full span {
+    color: var(--danger);
+  }
+
+  .fresh {
+    border-style: dashed;
+  }
+}
+
+.named {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.previewList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 0;
+    border-top: 1px solid var(--border);
+    font-size: 1.35rem;
+  }
+
+  strong {
+    font-size: 1.5rem;
+  }
+}
+
+.previewGroup {
+  color: var(--brand-text);
+  font-weight: 600;
+}
+
+@media (max-width: 420px) {
+  .summary strong {
+    font-size: 2.2rem;
+  }
+
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

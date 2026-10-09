@@ -15,7 +15,7 @@ import dayjs from 'dayjs';
 import {
   IoTimeOutline, IoLocationOutline, IoCopyOutline, IoCheckmark, IoEyeOutline, IoCreateOutline, IoShareSocialOutline,
   IoEyeOffOutline, IoSparkles, IoDownloadOutline, IoTvOutline, IoRefresh, IoPersonAddOutline, IoPaperPlaneOutline,
-  IoNotificationsOutline, IoTrashOutline, IoPeopleOutline, IoWalletOutline, IoHeartOutline,
+  IoNotificationsOutline, IoTrashOutline, IoPeopleOutline, IoWalletOutline, IoHeartOutline, IoGridOutline,
 } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
 import ArticleHeader from 'components/article/ArticleHeader';
@@ -32,6 +32,7 @@ import {
 import { defaultReminder, defaultTemplate, defaultThanks, loadTemplate, saveTemplate } from 'util/inviteMessage';
 import { downloadCsv } from 'util/csv';
 import { formatVnd } from 'util/gifts';
+import { DEFAULT_SEATS, seatingPlan, tableLabel } from 'util/seating';
 import { groupPresets, parseGuestList } from 'util/guestList';
 import { vnWallClock } from 'util/date';
 import { track } from 'util/analytics';
@@ -72,12 +73,13 @@ const SOURCES = { public: 'Link chung', desk: 'Thêm tại tiệc', ledger: 'Th�
 export function guestRows(guests) {
   return [
     [
-      'Tên', 'Nhóm', 'Trả lời', 'Số người', 'Lời nhắn', 'Đã đến', 'Số người đến', 'Tiền mừng', 'Ghi chú mừng', 'Nguồn',
+      'Tên', 'Nhóm', 'Bàn', 'Trả lời', 'Số người', 'Lời nhắn', 'Đã đến', 'Số người đến', 'Tiền mừng', 'Ghi chú mừng', 'Nguồn',
       'Đã gửi', 'Đã nhắc', 'Đã cảm ơn', 'Lượt mở', 'Email', 'Link riêng',
     ],
     ...guests.map(g => [
       g.name,
       g.group ?? '',
+      g.table ? tableLabel(g.table) : '',
       g.rsvp ? RSVP_LABELS[g.rsvp.status] : (hasPersonalLink(g) ? 'Chưa trả lời' : ''),
       g.rsvp?.status === 'attending' || g.rsvp?.status === 'maybe' ? g.rsvp.count || 1 : '',
       g.rsvp?.note ?? '',
@@ -231,6 +233,33 @@ function DeskPanel({ event, summary }) {
           {url && <Button variant="outlined" size="small" startIcon={<IoShareSocialOutline />} onClick={share}>Gửi link</Button>}
           {url && <CopyButton text={url} variant="button" label="Copy link" />}
           {url && <Button size="small" startIcon={<IoRefresh />} onClick={rotate}>Đổi link</Button>}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** The seating plan in short, and the way in. */
+function SeatingPanel({ event }) {
+  const plan = seatingPlan(event.guests ?? [], event.seatsPerTable ?? DEFAULT_SEATS);
+  return (
+    <section className={clsx(styles.panel, styles.screenPanel)}>
+      <div className={styles.screenIcon} aria-hidden><IoGridOutline /></div>
+      <div className={styles.shareText}>
+        <h2>
+          Xếp bàn
+          {plan.tables.length > 0 && <span className={styles.headCount}>{plan.tables.length} bàn</span>}
+        </h2>
+        <p>
+          {plan.tables.length > 0
+            ? `${plan.seated} người đã có chỗ${plan.waiting > 0 ? `, ${plan.waiting} người chưa có bàn` : ''}. `
+            : 'Xếp khách vào từng bàn, mỗi nhóm ngồi riêng, có nút tự xếp theo số chỗ mỗi bàn. '}
+          Ngày cưới, người đón khách và thiệp của khách sẽ hiện số bàn.
+        </p>
+        <div className={styles.shareActions}>
+          <Button component={Link} to={`/events/${event._id}/xep-ban`} variant="contained" size="small" startIcon={<IoGridOutline />}>
+            {plan.tables.length > 0 ? 'Sửa xếp bàn' : 'Xếp bàn'}
+          </Button>
         </div>
       </div>
     </section>
@@ -696,6 +725,8 @@ export default function Event() {
       </section>
 
       <ScreenPanel event={event} onEnablePublicLink={enablePublicLink} />
+
+      <SeatingPanel event={event} />
 
       <DeskPanel event={event} summary={summary} />
 

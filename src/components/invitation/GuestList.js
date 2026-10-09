@@ -20,6 +20,7 @@ import { RSVP_LABELS, awaitsAnswer, hasPersonalLink, invitationApi, personalInvi
 import { inviteMessage, sendInvite } from 'util/inviteMessage';
 import { normalizeText } from 'util/search';
 import GroupPicker from './GroupPicker';
+import { MAX_TABLE_NAME, tableLabel } from 'util/seating';
 import { track } from 'util/analytics';
 import styles from './GuestList.module.scss';
 
@@ -236,6 +237,7 @@ export default function GuestList({ event, guests, template, reminderTemplate, t
                 <strong>{guest.name}</strong>
                 <div className={styles.tags}>
                   {guest.group && <span className={clsx(styles.tag, styles.group)}>{guest.group}</span>}
+                  {guest.table && <span className={clsx(styles.tag, styles.group)}>{tableLabel(guest.table)}</span>}
                   {guest.source === 'public' && <span className={styles.tag}>Qua link chung</span>}
                   {guest.source === 'desk' && <span className={styles.tag}>Thêm tại tiệc</span>}
                   {guest.source === 'ledger' && <span className={styles.tag}>Thêm từ sổ mừng</span>}
@@ -329,7 +331,7 @@ export default function GuestList({ event, guests, template, reminderTemplate, t
           </MenuItem>
         )}
         <MenuItem onClick={() => { setEditing(menuGuest); setMenu(null); }}>
-          <ListItemIcon><IoCreateOutline /></ListItemIcon>Sửa tên, nhóm
+          <ListItemIcon><IoCreateOutline /></ListItemIcon>Sửa tên, nhóm, bàn
         </MenuItem>
         <MenuItem onClick={() => { remove(menuGuest); setMenu(null); }} className={styles.danger}>
           <ListItemIcon><IoTrashOutline /></ListItemIcon>Xoá khách
@@ -355,6 +357,7 @@ export default function GuestList({ event, guests, template, reminderTemplate, t
 function EditGuestDialog({ event, guest, groupOptions, onClose, onSaved }) {
   const [name, setName] = useState(guest.name);
   const [group, setGroup] = useState(guest.group ?? '');
+  const [table, setTable] = useState(guest.table ?? '');
   const [isSaving, setIsSaving] = useState(false);
   const clean = name.replace(/\s+/g, ' ').trim();
 
@@ -366,6 +369,9 @@ function EditGuestDialog({ event, guest, groupOptions, onClose, onSaved }) {
     }
     if (group !== (guest.group ?? '')) {
       change.group = group;
+    }
+    if (table.trim() !== (guest.table ?? '')) {
+      change.table = table.trim();
     }
     if (!Object.keys(change).length) {
       onClose();
@@ -398,6 +404,14 @@ function EditGuestDialog({ event, guest, groupOptions, onClose, onSaved }) {
             }[guest.source] ?? 'Link riêng giữ nguyên, thiệp sẽ ghi tên mới.'}
           />
           <GroupPicker value={group} onChange={setGroup} options={groupOptions} />
+          <TextField
+            label="Bàn"
+            placeholder="12, VIP..."
+            value={table}
+            inputProps={{ maxLength: MAX_TABLE_NAME }}
+            onChange={e => setTable(e.target.value)}
+            helperText="Để trống nếu chưa xếp. Xếp cả danh sách ở trang Xếp bàn."
+          />
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={onClose}>Huỷ</Button>

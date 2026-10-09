@@ -28,6 +28,7 @@ import { vnWallClock } from 'util/date';
 import { burst } from 'util/confetti';
 import { MusicBox, canPlayMusic } from 'util/musicBox';
 import { cldUrl } from 'util/photos';
+import { tableLabel } from 'util/seating';
 import styles from './InvitationView.module.scss';
 
 const WEEKDAYS = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
@@ -44,6 +45,8 @@ const THANKS = {
 };
 // Until then the party is on: guests are asked for a wish
 const LIVE_MS = 8 * 60 * 60 * 1000;
+// A guest's table shows on their card from a little before the party
+const SEAT_BEFORE_MS = 3 * 60 * 60 * 1000;
 
 const PETAL_COLORS = {
   blush: '#e8a3b0',
@@ -165,6 +168,8 @@ export default function InvitationView({
   const countdown = useCountdown(startAt);
   const isOver = !countdown;
   const isLive = isOver && Date.now() - startAt.getTime() < LIVE_MS;
+  const showSeat = Boolean(guest?.table) && startAt.getTime() - Date.now() < SEAT_BEFORE_MS
+    && Date.now() - startAt.getTime() < LIVE_MS;
   // Shown in Vietnam time, where the event is, also to guests abroad: the
   // calendar button says Asia/Ho_Chi_Minh, so its times must be Vietnam's.
   const shownAt = useMemo(() => vnWallClock(event.startAt), [event.startAt]);
@@ -283,6 +288,11 @@ export default function InvitationView({
             </ScratchReveal>
           ) : (
             <CoverDate date={shownAt} />
+          )}
+          {showSeat && (
+            <p className={styles.coverSeat}>
+              Mời {recipient === 'Bạn' ? 'bạn' : recipient} ngồi <strong>{tableLabel(guest.table)}</strong>
+            </p>
           )}
           <a href="#ngay" className={styles.scrollCue} aria-label="Xem tiếp">
             <IoChevronDown />
