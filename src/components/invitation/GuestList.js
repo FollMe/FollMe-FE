@@ -21,6 +21,7 @@ import { inviteMessage, sendInvite } from 'util/inviteMessage';
 import { normalizeText } from 'util/search';
 import GroupPicker from './GroupPicker';
 import { MAX_TABLE_NAME, tableLabel } from 'util/seating';
+import { isNewAnswer } from 'util/whatsNew';
 import { track } from 'util/analytics';
 import styles from './GuestList.module.scss';
 
@@ -54,7 +55,7 @@ export function filterGuests(guests, filter, query, group = null) {
  * not answered, and a thank-you after the party; `onChange` gets an updater. `groupOptions` are the groups
  * offered when editing a guest.
  */
-export default function GuestList({ event, guests, template, reminderTemplate, thankTemplate, groupOptions = [], onChange }) {
+export default function GuestList({ event, guests, template, reminderTemplate, thankTemplate, since, groupOptions = [], onChange }) {
   const [filter, setFilter] = useState('all');
   const [group, setGroup] = useState(null);
   const [query, setQuery] = useState('');
@@ -236,6 +237,7 @@ export default function GuestList({ event, guests, template, reminderTemplate, t
               <div className={styles.who}>
                 <strong>{guest.name}</strong>
                 <div className={styles.tags}>
+                  {isNewAnswer(guest, since) && <span className={clsx(styles.tag, styles.new)}>Trả lời mới</span>}
                   {guest.group && <span className={clsx(styles.tag, styles.group)}>{guest.group}</span>}
                   {guest.table && <span className={clsx(styles.tag, styles.group)}>{tableLabel(guest.table)}</span>}
                   {guest.source === 'public' && <span className={styles.tag}>Qua link chung</span>}

@@ -201,3 +201,9 @@
     color: var(--danger);
   }
 }
+
+/* Answered since the host's last visit */
+.new {
+  background: var(--brand-fill);
+  color: var(--on-brand, #fff);
+}
