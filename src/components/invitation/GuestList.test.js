@@ -29,7 +29,42 @@ describe('summarizeGuests', () => {
   it('counts sent, opened, answers and headcount', () => {
     expect(summarizeGuests(guests)).toEqual({
       invited: 4, sent: 2, opened: 2, attending: 1, maybe: 1, declined: 1, pending: 1, headcount: 2,
+      arrived: 0, arrivedPeople: 0,
     });
+  });
+
+  it('counts who came; a walk-in is never waited on for an answer', () => {
+    const party = [
+      { ...guests[0], arrivedAt: '2027-01-16T04:05:00Z', arrivedCount: 3 },
+      guests[1],
+      { _id: '5', name: 'Bác Năm', source: 'desk', viewed: 0, arrivedAt: '2027-01-16T04:10:00Z' },
+    ];
+    expect(summarizeGuests(party)).toMatchObject({ invited: 3, pending: 1, arrived: 2, arrivedPeople: 4 });
+  });
+});
+
+describe('walk-ins and arrivals in the host list', () => {
+  const party = [
+    ...guests,
+    { _id: '5', name: 'Bác Năm', source: 'desk', viewed: 0, arrivedAt: '2027-01-16T04:10:00Z', arrivedCount: 2 },
+    { ...guests[0], _id: '6', arrivedAt: '2027-01-16T04:05:00Z', arrivedCount: 1 },
+  ];
+
+  it('has nothing to send or remind for a walk-in', () => {
+    expect(ids(filterGuests(party, 'unsent', ''))).toEqual(['2']);
+    expect(ids(filterGuests(party, 'pending', ''))).toEqual(['2']);
+    expect(ids(filterGuests(party, 'arrived', ''))).toEqual(['5', '6']);
+    const { hasPersonalLink } = require('util/invitation');
+    expect(party.filter(hasPersonalLink).map(g => g._id)).toEqual(['1', '2', '4', '6']);
+  });
+
+  it('counts arrivals per group', () => {
+    const rows = groupSummary([
+      { _id: 'a', group: 'Nhà trai', arrivedAt: 'x', arrivedCount: 3 },
+      { _id: 'b', group: 'Nhà trai' },
+      { _id: 'c', source: 'desk', arrivedAt: 'x' },
+    ]);
+    expect(rows.map(r => [r.group, r.arrived, r.arrivedPeople, r.pending])).toEqual([['Nhà trai', 1, 3, 2], ['', 1, 1, 0]]);
   });
 });
 

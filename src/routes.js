@@ -35,6 +35,7 @@ const ChooseDate = lazy(() => import("pages/wedding/ChooseDate"));
 const PublicInvitation = lazy(() => import("pages/invitation/PublicInvitation"));
 const DemoInvitation = lazy(() => import("pages/invitation/DemoInvitation"));
 const LiveScreen = lazy(() => import("pages/invitation/LiveScreen"));
+const Desk = lazy(() => import("pages/invitation/Desk"));
 
 const withSuspense = (element) => (
   <Suspense fallback={<OvalLoading />}>{element}</Suspense>
@@ -55,6 +56,8 @@ export default function Router() {
         // The wishes wall shown on a TV at the party
         { path: '/man-hinh/mau', element: withSuspense(<LiveScreen demo />) },
         { path: '/man-hinh/:eventId/:key', element: withSuspense(<LiveScreen />) },
+        // The reception desk, on the phones of whoever welcomes guests
+        { path: '/don-khach/:eventId/:key', element: withSuspense(<Desk />) },
       ]
     },
     {

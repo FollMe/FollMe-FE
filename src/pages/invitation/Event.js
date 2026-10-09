@@ -15,7 +15,7 @@ import dayjs from 'dayjs';
 import {
   IoTimeOutline, IoLocationOutline, IoCopyOutline, IoCheckmark, IoEyeOutline, IoCreateOutline, IoShareSocialOutline,
   IoEyeOffOutline, IoSparkles, IoDownloadOutline, IoTvOutline, IoRefresh, IoPersonAddOutline, IoPaperPlaneOutline,
-  IoNotificationsOutline, IoTrashOutline,
+  IoNotificationsOutline, IoTrashOutline, IoPeopleOutline,
 } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
 import ArticleHeader from 'components/article/ArticleHeader';
@@ -26,8 +26,8 @@ import GuestList from 'components/invitation/GuestList';
 import GroupPicker from 'components/invitation/GroupPicker';
 import SendQueue, { TemplateEditor } from 'components/invitation/SendQueue';
 import {
-  MAX_PHOTOS, RSVP_LABELS, eventHeadline, groupSummary, invitationApi, isCoupleEvent, personalInvitationUrl,
-  publicInvitationUrl, reminderQueue, screenUrl, summarizeGuests,
+  MAX_PHOTOS, RSVP_LABELS, deskUrl, eventHeadline, groupSummary, hasPersonalLink, invitationApi, isCoupleEvent,
+  personalInvitationUrl, publicInvitationUrl, reminderQueue, screenUrl, summarizeGuests,
 } from 'util/invitation';
 import { defaultReminder, defaultTemplate, loadTemplate, saveTemplate } from 'util/inviteMessage';
 import { downloadCsv } from 'util/csv';
@@ -65,22 +65,29 @@ function CopyButton({ text, label = 'Copy link', variant = 'icon' }) {
   );
 }
 
+const SOURCES = { public: 'Link chung', desk: 'Thêm tại tiệc' };
+
 /** The guest list as spreadsheet rows, for seating plans and thank-you notes. */
 export function guestRows(guests) {
   return [
-    ['Tên', 'Nhóm', 'Trả lời', 'Số người', 'Lời nhắn', 'Nguồn', 'Đã gửi', 'Đã nhắc', 'Lượt mở', 'Email', 'Link riêng'],
+    [
+      'Tên', 'Nhóm', 'Trả lời', 'Số người', 'Lời nhắn', 'Đã đến', 'Số người đến', 'Nguồn', 'Đã gửi', 'Đã nhắc', 'Lượt mở',
+      'Email', 'Link riêng',
+    ],
     ...guests.map(g => [
       g.name,
       g.group ?? '',
-      g.rsvp ? RSVP_LABELS[g.rsvp.status] : 'Chưa trả lời',
+      g.rsvp ? RSVP_LABELS[g.rsvp.status] : (g.source === 'desk' ? '' : 'Chưa trả lời'),
       g.rsvp?.status === 'attending' || g.rsvp?.status === 'maybe' ? g.rsvp.count || 1 : '',
       g.rsvp?.note ?? '',
-      g.source === 'public' ? 'Link chung' : 'Mời riêng',
+      g.arrivedAt ? dayjs(vnWallClock(g.arrivedAt)).format('HH:mm DD/MM/YYYY') : '',
+      g.arrivedAt ? g.arrivedCount || 1 : '',
+      SOURCES[g.source] ?? 'Mời riêng',
       g.sentAt ? 'Đã gửi' : '',
       g.remindedAt ? 'Đã nhắc' : '',
       g.viewed ?? 0,
       g.mail ?? '',
-      g.source === 'public' ? '' : personalInvitationUrl(g._id),
+      hasPersonalLink(g) ? personalInvitationUrl(g._id) : '',
     ]),
   ];
 }
@@ -148,6 +155,84 @@ function ScreenPanel({ event, onEnablePublicLink }) {
   );
 }
 
+/**
+ * Link of the reception desk, for whoever welcomes guests at the party: they
+ * check guests in on their own phone, the host sees who came.
+ */
+function DeskPanel({ event, summary }) {
+  const [key, setKey] = useState(null);
+
+  useEffect(() => {
+    invitationApi.deskKey(event._id).then(res => setKey(res.key)).catch(() => setKey(null));
+  }, [event._id]);
+
+  async function rotate() {
+    if (!window.confirm('Tạo link mới? Ai đang mở link cũ sẽ không đánh dấu khách được nữa.')) {
+      return;
+    }
+    try {
+      const res = await invitationApi.deskKey(event._id, true);
+      setKey(res.key);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const url = key && deskUrl(event._id, key);
+
+  async function share() {
+    const text = `Link đón khách tiệc ${eventHeadline(event)}: tìm tên khách, bấm "Đã đến".`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: 'Đón khách', text, url });
+      } else {
+        await navigator.clipboard.writeText(`${text}\n${url}`);
+        toast.success('Đã copy link đón khách');
+      }
+      track('desk_shared');
+    } catch (err) {
+      // Closed the share sheet
+    }
+  }
+
+  return (
+    <section className={clsx(styles.panel, styles.screenPanel)}>
+      <div className={styles.screenIcon} aria-hidden><IoPeopleOutline /></div>
+      <div className={styles.shareText}>
+        <h2>
+          Đón khách tại tiệc
+          {summary.arrived > 0 && <span className={styles.headCount}>{summary.arrivedPeople} người đã đến</span>}
+        </h2>
+        <p>
+          Người đứng bàn tiếp tân mở link này trên điện thoại: tìm tên khách (gõ không dấu cũng được), bấm "Đã đến" và
+          ghi số người đi cùng. Nhiều người mở cùng lúc được, không cần tài khoản. Ai đã đến hiện ngay trong danh sách khách.
+        </p>
+        <p className={styles.muted}>Link có tên và nhóm của khách, chỉ gửi cho người nhà hoặc người bạn tin cậy.</p>
+        {url && <code className={styles.url}>{url}</code>}
+        <div className={styles.shareActions}>
+          {url && (
+            <Button
+              component="a"
+              href={url}
+              target="_blank"
+              rel="noreferrer"
+              variant="contained"
+              size="small"
+              startIcon={<IoPeopleOutline />}
+              onClick={() => track('desk_opened')}
+            >
+              Mở trang đón khách
+            </Button>
+          )}
+          {url && <Button variant="outlined" size="small" startIcon={<IoShareSocialOutline />} onClick={share}>Gửi link</Button>}
+          {url && <CopyButton text={url} variant="button" label="Copy link" />}
+          {url && <Button size="small" startIcon={<IoRefresh />} onClick={rotate}>Đổi link</Button>}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /** The groups offered for guests: the usual ones, then the host's own. */
 function groupOptions(event) {
   return [...new Set([...groupPresets(event.type), ...(event.guests ?? []).map(g => g.group).filter(Boolean)])];
@@ -159,6 +244,7 @@ function GroupTable({ guests }) {
   if (rows.length < 2 && !rows[0]?.group) {
     return null;
   }
+  const anyArrived = rows.some(row => row.arrived > 0);
   return (
     <div className={styles.groupTable}>
       <table>
@@ -168,6 +254,7 @@ function GroupTable({ guests }) {
             <th>Khách</th>
             <th>Trả lời</th>
             <th><abbr title="Số người dự kiến đến">Dự kiến</abbr></th>
+            {anyArrived && <th><abbr title="Số người đã đến tiệc">Đã đến</abbr></th>}
           </tr>
         </thead>
         <tbody>
@@ -175,8 +262,9 @@ function GroupTable({ guests }) {
             <tr key={row.group}>
               <td>{row.group || 'Chưa xếp nhóm'}</td>
               <td>{row.invited}</td>
-              <td>{row.invited - row.pending}</td>
+              <td>{row.attending + row.maybe + row.declined}</td>
               <td><strong>{row.headcount}</strong></td>
+              {anyArrived && <td><strong>{row.arrivedPeople}</strong></td>}
             </tr>
           ))}
         </tbody>
@@ -259,7 +347,7 @@ function DeleteEventDialog({ event, onClose }) {
       <DialogTitle>Xoá thiệp này?</DialogTitle>
       <DialogContent>
         <p className={styles.dialogText}>
-          Link riêng của khách, link chung và màn hình lời chúc sẽ không mở được nữa, ảnh bị xoá ngay.
+          Link riêng của khách, link chung, màn hình lời chúc và trang đón khách sẽ không mở được nữa, ảnh bị xoá ngay.
         </p>
         {losses.length > 0 && (
           <p className={styles.dialogText}>Sẽ mất: {losses.join(', ')}.</p>
@@ -349,13 +437,13 @@ export default function Event() {
   const publicUrl = publicInvitationUrl(event._id);
   const guests = event.guests ?? [];
   const summary = summarizeGuests(guests);
-  const unsent = guests.filter(g => g.source !== 'public' && !g.sentAt).length;
+  const unsent = guests.filter(g => hasPersonalLink(g) && !g.sentAt).length;
   const toRemind = status === 'upcoming' ? reminderQueue(guests).length : 0;
   const templates = {
     invite: customTemplates.invite ?? defaultTemplate(event),
     remind: customTemplates.remind ?? defaultReminder(event),
   };
-  const firstPersonal = guests.find(g => g.source !== 'public');
+  const firstPersonal = guests.find(hasPersonalLink);
   const previewUrl = event.allowPublicLink ? `/e/${event._id}` : firstPersonal && `/invitations/${firstPersonal._id}`;
 
   async function share() {
@@ -418,7 +506,8 @@ export default function Event() {
           ['Chưa chắc', summary.maybe],
           ['Không đến', summary.declined],
           ['Dự kiến số người', summary.headcount],
-        ].map(([label, value]) => (
+          summary.arrived > 0 && ['Người đã đến', summary.arrivedPeople],
+        ].filter(Boolean).map(([label, value]) => (
           <div key={label} className={styles.stat}>
             <strong>{value ?? 0}</strong>
             <span>{label}</span>
@@ -554,6 +643,8 @@ export default function Event() {
       </section>
 
       <ScreenPanel event={event} onEnablePublicLink={enablePublicLink} />
+
+      <DeskPanel event={event} summary={summary} />
 
       <section className={clsx(styles.panel, styles.dangerZone)}>
         <div>
