@@ -14,7 +14,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { toast } from 'react-toastify';
 import {
   IoPaperPlaneOutline, IoEllipsisHorizontal, IoCopyOutline, IoEyeOutline, IoCreateOutline, IoCheckmarkDoneOutline,
-  IoArrowUndoOutline, IoTrashOutline, IoSearch, IoNotificationsOutline,
+  IoArrowUndoOutline, IoTrashOutline, IoSearch, IoNotificationsOutline, IoHeartOutline,
 } from 'react-icons/io5';
 import { RSVP_LABELS, awaitsAnswer, hasPersonalLink, invitationApi, personalInvitationUrl } from 'util/invitation';
 import { inviteMessage, sendInvite } from 'util/inviteMessage';
@@ -49,11 +49,11 @@ export function filterGuests(guests, filter, query, group = null) {
 
 /**
  * The host's guest list: who got their link, opened it, and answered.
- * Each personal link can be sent from here, and a reminder to whoever has
- * not answered; `onChange` gets an updater. `groupOptions` are the groups
+ * Each personal link can be sent from here, a reminder to whoever has
+ * not answered, and a thank-you after the party; `onChange` gets an updater. `groupOptions` are the groups
  * offered when editing a guest.
  */
-export default function GuestList({ event, guests, template, reminderTemplate, groupOptions = [], onChange }) {
+export default function GuestList({ event, guests, template, reminderTemplate, thankTemplate, groupOptions = [], onChange }) {
   const [filter, setFilter] = useState('all');
   const [group, setGroup] = useState(null);
   const [query, setQuery] = useState('');
@@ -119,6 +119,20 @@ export default function GuestList({ event, guests, template, reminderTemplate, g
     }
   }
 
+  async function thank(guest) {
+    const text = inviteMessage(thankTemplate, guest.name, personalInvitationUrl(guest._id));
+    try {
+      const how = await sendInvite(text);
+      track('thanks_sent', { how });
+      if (how === 'copied') {
+        toast.success(`Đã copy lời cảm ơn cho ${guest.name}. Dán vào Zalo hoặc Messenger để gửi.`);
+      }
+      await mark(guest, { thanked: true });
+    } catch (err) {
+      // Closed the share sheet without sending
+    }
+  }
+
   async function remove(guest) {
     if (!window.confirm(`Xoá ${guest.name} khỏi danh sách? Link riêng của khách này sẽ không mở được nữa.`)) {
       return;
@@ -142,7 +156,9 @@ export default function GuestList({ event, guests, template, reminderTemplate, g
 
   const menuGuest = menu?.guest;
   const personal = menuGuest && hasPersonalLink(menuGuest);
-  const canRemind = menuGuest && awaitsAnswer(menuGuest) && new Date(event.startAt) > new Date();
+  const isOver = new Date(event.startAt) <= new Date();
+  const canRemind = menuGuest && awaitsAnswer(menuGuest) && !isOver;
+  const canThank = personal && isOver && Boolean(thankTemplate);
 
   return (
     <div className={styles.list}>
@@ -242,6 +258,7 @@ export default function GuestList({ event, guests, template, reminderTemplate, g
                       {guest.rsvp.status !== 'declined' && guest.rsvp.count > 1 ? ` · ${guest.rsvp.count} người` : ''}
                     </span>
                   )}
+                  {guest.thankedAt && <span className={clsx(styles.tag, styles.sent)}>Đã cảm ơn</span>}
                   {guest.arrivedAt && (
                     <span className={clsx(styles.tag, styles.arrived)}>
                       Đã đến{(guest.arrivedCount || 1) > 1 ? ` · ${guest.arrivedCount} người` : ''}
@@ -287,6 +304,12 @@ export default function GuestList({ event, guests, template, reminderTemplate, g
           <MenuItem onClick={() => { remind(menuGuest); setMenu(null); }}>
             <ListItemIcon><IoNotificationsOutline /></ListItemIcon>
             {menuGuest.remindedAt ? 'Nhắc trả lời lần nữa' : 'Nhắc trả lời'}
+          </MenuItem>
+        )}
+        {canThank && (
+          <MenuItem onClick={() => { thank(menuGuest); setMenu(null); }}>
+            <ListItemIcon><IoHeartOutline /></ListItemIcon>
+            {menuGuest.thankedAt ? 'Gửi lời cảm ơn lần nữa' : 'Gửi lời cảm ơn'}
           </MenuItem>
         )}
         {personal && (

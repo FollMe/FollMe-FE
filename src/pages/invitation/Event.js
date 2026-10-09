@@ -15,7 +15,7 @@ import dayjs from 'dayjs';
 import {
   IoTimeOutline, IoLocationOutline, IoCopyOutline, IoCheckmark, IoEyeOutline, IoCreateOutline, IoShareSocialOutline,
   IoEyeOffOutline, IoSparkles, IoDownloadOutline, IoTvOutline, IoRefresh, IoPersonAddOutline, IoPaperPlaneOutline,
-  IoNotificationsOutline, IoTrashOutline, IoPeopleOutline, IoWalletOutline,
+  IoNotificationsOutline, IoTrashOutline, IoPeopleOutline, IoWalletOutline, IoHeartOutline,
 } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
 import ArticleHeader from 'components/article/ArticleHeader';
@@ -27,9 +27,9 @@ import GroupPicker from 'components/invitation/GroupPicker';
 import SendQueue, { TemplateEditor } from 'components/invitation/SendQueue';
 import {
   MAX_PHOTOS, RSVP_LABELS, deskUrl, eventHeadline, groupSummary, hasPersonalLink, invitationApi, isCoupleEvent,
-  personalInvitationUrl, publicInvitationUrl, reminderQueue, screenUrl, summarizeGuests,
+  personalInvitationUrl, publicInvitationUrl, reminderQueue, screenUrl, summarizeGuests, thankQueue,
 } from 'util/invitation';
-import { defaultReminder, defaultTemplate, loadTemplate, saveTemplate } from 'util/inviteMessage';
+import { defaultReminder, defaultTemplate, defaultThanks, loadTemplate, saveTemplate } from 'util/inviteMessage';
 import { downloadCsv } from 'util/csv';
 import { formatVnd } from 'util/gifts';
 import { groupPresets, parseGuestList } from 'util/guestList';
@@ -73,7 +73,7 @@ export function guestRows(guests) {
   return [
     [
       'Tên', 'Nhóm', 'Trả lời', 'Số người', 'Lời nhắn', 'Đã đến', 'Số người đến', 'Tiền mừng', 'Ghi chú mừng', 'Nguồn',
-      'Đã gửi', 'Đã nhắc', 'Lượt mở', 'Email', 'Link riêng',
+      'Đã gửi', 'Đã nhắc', 'Đã cảm ơn', 'Lượt mở', 'Email', 'Link riêng',
     ],
     ...guests.map(g => [
       g.name,
@@ -88,6 +88,7 @@ export function guestRows(guests) {
       SOURCES[g.source] ?? 'Mời riêng',
       g.sentAt ? 'Đã gửi' : '',
       g.remindedAt ? 'Đã nhắc' : '',
+      g.thankedAt ? 'Đã cảm ơn' : '',
       g.viewed ?? 0,
       g.mail ?? '',
       hasPersonalLink(g) ? personalInvitationUrl(g._id) : '',
@@ -365,6 +366,7 @@ function DeleteEventDialog({ event, onClose }) {
       await invitationApi.remove(event._id);
       saveTemplate(event._id, null, 'invite');
       saveTemplate(event._id, null, 'remind');
+      saveTemplate(event._id, null, 'thank');
       track('event_deleted', { guests: summary.invited });
       toast.success(`Đã xoá thiệp "${event.title}"`);
       navigate('/events', { replace: true });
@@ -404,13 +406,14 @@ export default function Event() {
   const [event, setEvent] = useState(null);
   const [isAddingGuests, setIsAddingGuests] = useState(false);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
-  // 'invite' or 'remind' while sending one by one / editing that message
+  // 'invite', 'remind' or 'thank' while sending one by one / editing that message
   const [queueMode, setQueueMode] = useState(null);
   const [editingMode, setEditingMode] = useState(null);
   // The host's own messages; the defaults follow the event's details
   const [customTemplates, setCustomTemplates] = useState(() => ({
     invite: loadTemplate(eventId, 'invite'),
     remind: loadTemplate(eventId, 'remind'),
+    thank: loadTemplate(eventId, 'thank'),
   }));
 
   const setGuests = useCallback(update => setEvent(e => ({ ...e, guests: update(e.guests ?? []) })), []);
@@ -468,11 +471,14 @@ export default function Event() {
   const publicUrl = publicInvitationUrl(event._id);
   const guests = event.guests ?? [];
   const summary = summarizeGuests(guests);
-  const unsent = guests.filter(g => hasPersonalLink(g) && !g.sentAt).length;
+  // Before the party: invite and nudge. After it: thank.
+  const unsent = status === 'upcoming' ? guests.filter(g => hasPersonalLink(g) && !g.sentAt).length : 0;
   const toRemind = status === 'upcoming' ? reminderQueue(guests).length : 0;
+  const toThank = status === 'happened' ? thankQueue(guests).length : 0;
   const templates = {
     invite: customTemplates.invite ?? defaultTemplate(event),
     remind: customTemplates.remind ?? defaultReminder(event),
+    thank: customTemplates.thank ?? defaultThanks(event),
   };
   const firstPersonal = guests.find(hasPersonalLink);
   const previewUrl = event.allowPublicLink ? `/e/${event._id}` : firstPersonal && `/invitations/${firstPersonal._id}`;
@@ -623,12 +629,25 @@ export default function Event() {
             <Button variant="contained" size="small" onClick={() => setQueueMode('remind')}>Nhắc lần lượt</Button>
           </div>
         )}
+        {toThank > 0 && (
+          <div className={styles.sendBar}>
+            <IoHeartOutline aria-hidden />
+            <div>
+              <strong>{toThank} khách chưa được cảm ơn</strong>
+              <button type="button" className={styles.linkButton} onClick={() => setEditingMode('thank')}>
+                Sửa lời cảm ơn
+              </button>
+            </div>
+            <Button variant="contained" size="small" onClick={() => setQueueMode('thank')}>Cảm ơn lần lượt</Button>
+          </div>
+        )}
         <GroupTable guests={guests} />
         <GuestList
           event={event}
           guests={guests}
           template={templates.invite}
           reminderTemplate={templates.remind}
+          thankTemplate={templates.thank}
           groupOptions={groupOptions(event)}
           onChange={setGuests}
         />
@@ -707,7 +726,7 @@ export default function Event() {
 
       {editingMode && (
         <Dialog open onClose={() => setEditingMode(null)} fullWidth maxWidth="sm">
-          <DialogTitle>{editingMode === 'remind' ? 'Lời nhắc gửi kèm link' : 'Lời mời gửi kèm link'}</DialogTitle>
+          <DialogTitle>{{ remind: 'Lời nhắc', thank: 'Lời cảm ơn' }[editingMode] ?? 'Lời mời'} gửi kèm link</DialogTitle>
           <DialogContent sx={{ pt: '8px !important' }}>
             <TemplateEditor
               mode={editingMode}

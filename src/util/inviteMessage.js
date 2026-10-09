@@ -34,14 +34,28 @@ export function defaultReminder(event) {
   return `${first}\nMong ${NAME_TOKEN} xác nhận tham dự trên thiệp mời để việc đón tiếp được chu đáo hơn: ${LINK_TOKEN}`;
 }
 
+/**
+ * The thank-you after the party, for guests who came or sent a gift. Their
+ * card then thanks them too, with the album and everyone's wishes.
+ */
+export function defaultThanks(event) {
+  const what = { wedding: 'ngày cưới', engagement: 'lễ ăn hỏi' }[event.type];
+  const first = isCoupleEvent(event.type) && event.groomName && event.brideName
+    ? `${eventHeadline(event)} xin cảm ơn ${NAME_TOKEN} đã chung vui cùng chúng mình trong ${what}.`
+    : `Cảm ơn ${NAME_TOKEN} đã chung vui cùng chúng mình tại ${event.title}.`;
+  const keepsake = (event.photos ?? []).length > 0 ? 'Ảnh và lời chúc của mọi người' : 'Lời chúc của mọi người';
+  return `${first}\n${keepsake} ở đây nhé: ${LINK_TOKEN}`;
+}
+
 /** The template for one guest. A template without {link} gets it at the end. */
 export function inviteMessage(template, name, url) {
   const text = template.split(NAME_TOKEN).join(name);
   return text.includes(LINK_TOKEN) ? text.split(LINK_TOKEN).join(url) : `${text.trimEnd()}\n${url}`;
 }
 
-// `kind` is 'invite' (the invitation) or 'remind' (the nudge to answer)
-const storageKey = (eventId, kind) => `follme.${kind === 'remind' ? 'remind' : 'invite'}Template.${eventId}`;
+// `kind` is 'invite' (the invitation), 'remind' (the nudge to answer) or
+// 'thank' (the thank-you after the party)
+const storageKey = (eventId, kind) => `follme.${{ remind: 'remind', thank: 'thank' }[kind] ?? 'invite'}Template.${eventId}`;
 
 export function loadTemplate(eventId, kind = 'invite') {
   try {

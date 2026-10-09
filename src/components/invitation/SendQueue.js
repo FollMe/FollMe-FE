@@ -10,7 +10,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { toast } from 'react-toastify';
 import { IoPaperPlaneOutline, IoCopyOutline, IoCreateOutline, IoSparkles } from 'react-icons/io5';
-import { hasPersonalLink, invitationApi, personalInvitationUrl, reminderQueue } from 'util/invitation';
+import { hasPersonalLink, invitationApi, personalInvitationUrl, reminderQueue, thankQueue } from 'util/invitation';
 import { LINK_TOKEN, NAME_TOKEN, canShareText, inviteMessage, sendInvite } from 'util/inviteMessage';
 import { track } from 'util/analytics';
 import styles from './SendQueue.module.scss';
@@ -39,6 +39,17 @@ export const QUEUE_MODES = {
     done: n => `Xong! Đã nhắc ${n} khách`,
     next: 'Khi khách trả lời trên thiệp, câu trả lời hiện ngay trong danh sách khách.',
   },
+  thank: {
+    noun: 'lời cảm ơn',
+    title: 'Gửi lời cảm ơn',
+    to: 'Cảm ơn',
+    pick: thankQueue,
+    mark: { thanked: true },
+    track: 'thanks_sent',
+    allDone: 'Đã cảm ơn hết khách đã đến và khách gửi quà',
+    done: n => `Xong! Đã gửi ${n} lời cảm ơn`,
+    next: 'Mở link, khách thấy lời cảm ơn trên thiệp cùng album ảnh và lời chúc của mọi người.',
+  },
 };
 
 /** Edits the message sent with each personal link. */
@@ -63,7 +74,7 @@ export function TemplateEditor({ value, onChange, onReset, mode = 'invite' }) {
 /**
  * Sends the personal links one after another: on a phone, one tap opens
  * the share sheet (Zalo, Messenger) with the message for that guest, and
- * the next guest comes up once it is sent. `mode` is 'invite' or 'remind'.
+ * the next guest comes up once it is sent. `mode` is 'invite', 'remind' or 'thank'.
  */
 export default function SendQueue({ event, guests, mode = 'invite', template, onTemplateChange, onTemplateReset, onSent, onClose }) {
   const config = QUEUE_MODES[mode];
