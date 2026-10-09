@@ -1,0 +1,243 @@
+/* A sheet to print: black on white in any theme, A4, the toolbar left off
+   paper. On screen it shows as the page it will print. */
+
+@page {
+  size: A4;
+  margin: 12mm;
+}
+
+.page {
+  min-height: 100vh;
+  padding: 16px;
+  background: var(--bg);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  max-width: 210mm;
+  margin: 0 auto 16px;
+}
+
+.views {
+  display: flex;
+  gap: 6px;
+  margin-right: auto;
+
+  button {
+    min-height: 36px;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-2);
+    font: inherit;
+    font-size: 1.35rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .on {
+    border-color: var(--brand);
+    background: var(--brand-fill);
+    color: var(--on-brand, #fff);
+  }
+}
+
+.tip {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--text-2);
+  font-size: 1.3rem;
+}
+
+.sheet {
+  max-width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  padding: 14mm 12mm;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
+  background: #fff;
+  color: #1a1a1a;
+  font-family: var(--font-sans);
+
+  header {
+    margin-bottom: 8mm;
+    text-align: center;
+  }
+
+  h1 {
+    margin: 2px 0 4px;
+    color: #1a1a1a;
+    font-family: var(--font-serif);
+    font-size: 30pt;
+    line-height: 1.15;
+  }
+}
+
+.kicker {
+  margin: 0;
+  color: #7a1a18;
+  font-size: 11pt;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.meta {
+  margin: 0;
+  color: #444;
+  font-size: 11pt;
+}
+
+.empty {
+  color: #444;
+  font-size: 13pt;
+  text-align: center;
+}
+
+/* By name: two columns of name ..... Bàn 5 */
+.columns {
+  column-count: 2;
+  column-gap: 10mm;
+}
+
+.letter {
+  break-inside: avoid-column;
+  margin-bottom: 4mm;
+
+  h2 {
+    margin: 0 0 1mm;
+    padding-bottom: 1mm;
+    border-bottom: 1.5px solid #1a1a1a;
+    color: #7a1a18;
+    font-size: 14pt;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: flex;
+    align-items: baseline;
+    gap: 2mm;
+    padding: 1.2mm 0;
+    font-size: 13pt;
+    break-inside: avoid;
+  }
+
+  strong {
+    flex: none;
+    font-size: 13pt;
+  }
+}
+
+.name {
+  flex: none;
+  max-width: 70%;
+}
+
+.dots {
+  flex: 1;
+  min-width: 4mm;
+  border-bottom: 1px dotted #888;
+}
+
+/* By table: a card per table */
+.tables {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5mm;
+}
+
+.table {
+  padding: 3mm 4mm;
+  border: 1.5px solid #1a1a1a;
+  border-radius: 3mm;
+  break-inside: avoid;
+
+  h2 {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 2mm;
+    margin: 0 0 2mm;
+    font-family: var(--font-serif);
+    font-size: 15pt;
+
+    span {
+      color: #444;
+      font-family: var(--font-sans);
+      font-size: 10pt;
+      font-weight: 600;
+    }
+  }
+
+  ol {
+    margin: 0;
+    padding-left: 5mm;
+    font-size: 11pt;
+  }
+
+  li span {
+    color: #444;
+  }
+}
+
+.message {
+  max-width: 420px;
+  margin: 80px auto;
+  padding: 0 16px;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 8px;
+  }
+
+  .sheet {
+    min-height: 0;
+    padding: 16px 12px;
+  }
+
+  .columns {
+    column-count: 1;
+  }
+
+  .tables {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media print {
+  .page {
+    min-height: 0;
+    padding: 0;
+    background: #fff;
+  }
+
+  .toolbar {
+    display: none;
+  }
+
+  .sheet {
+    max-width: none;
+    min-height: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+
+  .columns {
+    column-count: 2;
+  }
+
+  .tables {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

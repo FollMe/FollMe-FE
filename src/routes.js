@@ -24,6 +24,7 @@ const InvitationList = lazy(() => import("pages/invitation/InvitationList"));
 const Event = lazy(() => import("pages/invitation/Event"));
 const Ledger = lazy(() => import("pages/invitation/Ledger"));
 const Seating = lazy(() => import("pages/invitation/Seating"));
+const SeatingSheet = lazy(() => import("pages/invitation/SeatingSheet"));
 const CreateEvent = lazy(() => import("pages/invitation/CreateEvent"));
 const FortuneHome = lazy(() => import("pages/fortune/FortuneHome"));
 const Numerology = lazy(() => import("pages/fortune/Numerology"));
@@ -60,6 +61,8 @@ export default function Router() {
         { path: '/man-hinh/:eventId/:key', element: withSuspense(<LiveScreen />) },
         // The reception desk, on the phones of whoever welcomes guests
         { path: '/don-khach/:eventId/:key', element: withSuspense(<Desk />) },
+        // The seating plan to print (the host's; no site header on paper)
+        { path: '/events/:eventId/xep-ban/in', element: withSuspense(<SeatingSheet />) },
       ]
     },
     {

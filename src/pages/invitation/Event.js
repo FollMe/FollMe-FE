@@ -16,6 +16,7 @@ import {
   IoTimeOutline, IoLocationOutline, IoCopyOutline, IoCheckmark, IoEyeOutline, IoCreateOutline, IoShareSocialOutline,
   IoEyeOffOutline, IoSparkles, IoDownloadOutline, IoTvOutline, IoRefresh, IoPersonAddOutline, IoPaperPlaneOutline,
   IoNotificationsOutline, IoTrashOutline, IoPeopleOutline, IoWalletOutline, IoHeartOutline, IoGridOutline,
+  IoNewspaperOutline, IoClose,
 } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
 import ArticleHeader from 'components/article/ArticleHeader';
@@ -34,6 +35,7 @@ import {
 } from 'util/inviteMessage';
 import { downloadCsv } from 'util/csv';
 import { formatVnd } from 'util/gifts';
+import { ago, loadSeen, newsText, saveSeen, whatsNew } from 'util/whatsNew';
 import { DEFAULT_SEATS, seatingPlan, tableLabel } from 'util/seating';
 import { groupPresets, parseGuestList } from 'util/guestList';
 import { vnWallClock } from 'util/date';
@@ -302,6 +304,29 @@ function DayTools({ event, summary, status }) {
   );
 }
 
+/** What came in since the host last looked: a line, and the first few names. */
+function News({ event, since, onClose }) {
+  const news = whatsNew(event, since);
+  const text = newsText(news);
+  if (!text) {
+    return null;
+  }
+  const names = news.answers.slice(0, 3).map(g => `${g.name}: ${RSVP_LABELS[g.rsvp.status].toLowerCase()}`
+    + (g.rsvp.status !== 'declined' && g.rsvp.count > 1 ? ` (${g.rsvp.count} người)` : ''));
+  return (
+    <div className={styles.news} role="status">
+      <IoNewspaperOutline aria-hidden />
+      <div>
+        <strong>Từ lần trước bạn xem ({ago(since)}): {text}</strong>
+        {names.length > 0 && (
+          <p>{names.join(' · ')}{news.answers.length > names.length ? ` và ${news.answers.length - names.length} khách khác` : ''}</p>
+        )}
+      </div>
+      <button type="button" className={styles.iconButton} aria-label="Đóng" onClick={onClose}><IoClose /></button>
+    </div>
+  );
+}
+
 /** The groups offered for guests: the usual ones, then the host's own. */
 function groupOptions(event) {
   return [...new Set([...groupPresets(event.type), ...(event.guests ?? []).map(g => g.group).filter(Boolean)])];
@@ -453,6 +478,16 @@ export default function Event() {
     thank: loadTemplate(eventId, 'thank'),
   }));
 
+  // The host's previous visit on this device: what came in since is news
+  const [since] = useState(() => loadSeen(eventId));
+  const [newsClosed, setNewsClosed] = useState(false);
+  const loaded = Boolean(event);
+  useEffect(() => {
+    if (loaded) {
+      saveSeen(eventId);
+    }
+  }, [eventId, loaded]);
+
   const setGuests = useCallback(update => setEvent(e => ({ ...e, guests: update(e.guests ?? []) })), []);
 
   function changeTemplate(mode, next) {
@@ -571,6 +606,8 @@ export default function Event() {
         </div>
       )}
 
+      {!justCreated && !newsClosed && <News event={event} since={since} onClose={() => setNewsClosed(true)} />}
+
       <div className={styles.stats}>
         {[
           ['Khách mời', summary.invited],
@@ -685,6 +722,7 @@ export default function Event() {
           template={templates.invite}
           reminderTemplate={templates.remind}
           thankTemplate={templates.thank}
+          since={since}
           groupOptions={groupOptions(event)}
           onChange={setGuests}
         />

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import clsx from 'clsx';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -10,7 +10,7 @@ import TextField from '@mui/material/TextField';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
-import { IoAdd, IoRemove, IoSparklesOutline, IoDownloadOutline } from 'react-icons/io5';
+import { IoAdd, IoRemove, IoSparklesOutline, IoDownloadOutline, IoPrintOutline } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
 import ArticleHeader from 'components/article/ArticleHeader';
 import { eventHeadline, invitationApi } from 'util/invitation';
@@ -325,6 +325,11 @@ export default function Seating() {
       )}
 
       <div className={styles.actions}>
+        {plan.tables.length > 0 && (
+          <Button component={Link} to={`/events/${eventId}/xep-ban/in`} variant="outlined" startIcon={<IoPrintOutline />}>
+            In bảng tra bàn
+          </Button>
+        )}
         {plan.tables.length > 0 && (
           <Button
             startIcon={<IoDownloadOutline />}
