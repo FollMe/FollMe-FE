@@ -1,5 +1,5 @@
 import {
-  applyPending, cacheDesk, deskGuests, deskSummary, loadCachedDesk, loadPending, partySize, rsvpHint, savePending,
+  applyPending, cacheDesk, deskGuests, deskSummary, forgetDesk, loadCachedDesk, loadPending, partySize, rsvpHint, savePending,
   tablesWithRoom,
 } from './desk';
 
@@ -89,6 +89,9 @@ describe('check-ins waiting for the network', () => {
     cacheDesk('e1', { event: { _id: 'e1' }, guests: list });
     expect(loadCachedDesk('e1').guests).toHaveLength(3);
     expect(loadCachedDesk('e2')).toBeNull();
+    savePending('e1', { 1: { arrived: true, at: 'x' } });
+    forgetDesk('e1');
+    expect([loadPending('e1'), loadCachedDesk('e1')]).toEqual([{}, null]);
   });
 });
 
