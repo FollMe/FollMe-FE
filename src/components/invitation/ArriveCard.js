@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import QRCode from 'react-qr-code';
 import { IoCheckmarkCircle } from 'react-icons/io5';
-import { invitationApi } from 'util/invitation';
+import { invitationApi, personalInvitationUrl } from 'util/invitation';
 import { vnWallClock } from 'util/date';
 import { burst } from 'util/confetti';
 import { track } from 'util/analytics';
@@ -25,6 +26,8 @@ export function selfCheckInOpen(startAt, now = Date.now()) {
 export default function ArriveCard({ guest, onGuestChange }) {
   const [arrival, setArrival] = useState(guest.arrivedAt ? { arrivedAt: guest.arrivedAt, table: guest.table } : null);
   const [isSending, setIsSending] = useState(false);
+  // Their own QR, for the desk to scan instead
+  const [showCode, setShowCode] = useState(false);
   const card = useCardText();
   const t = card.arrive;
   const name = guest.name || '';
@@ -65,6 +68,15 @@ export default function ArriveCard({ guest, onGuestChange }) {
       <button type="button" className={styles.button} onClick={arrive} disabled={isSending}>
         {isSending ? t.sending : t.button}
       </button>
+      <button type="button" className={styles.codeToggle} aria-expanded={showCode} onClick={() => setShowCode(v => !v)}>
+        {showCode ? t.hideCode : t.showCode}
+      </button>
+      {showCode && (
+        <figure className={styles.code}>
+          <QRCode value={personalInvitationUrl(guest._id)} size={184} level="M" bgColor="#ffffff" fgColor="#1c1917" title={t.codeLabel(guest.name)} />
+          <figcaption>{t.codeHint}</figcaption>
+        </figure>
+      )}
     </div>
   );
 }

@@ -79,6 +79,23 @@
   font-size: 1.35rem;
 }
 
+/* Search and, beside it, scanning QR codes (paper invitations, phones) */
+.searchRow {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+
+  > label {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.scan {
+  flex: none;
+  white-space: nowrap;
+}
+
 /* The buses: a row each, one tap when it pulls up */
 .buses {
   display: flex;
