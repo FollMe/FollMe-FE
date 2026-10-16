@@ -22,6 +22,7 @@ import OvalLoading from 'components/loading/OvalLoading';
 import ArticleHeader from 'components/article/ArticleHeader';
 import InvitationStatusTag from 'components/invitation/InvitationStatusTag';
 import SaveTheDate from 'components/invitation/SaveTheDate';
+import DuplicateEventDialog from 'components/invitation/DuplicateEventDialog';
 import PhotoManager from 'components/invitation/PhotoManager';
 import GuestListInput, { guestListError } from 'components/invitation/GuestListInput';
 import GuestList from 'components/invitation/GuestList';
@@ -488,7 +489,7 @@ function DeleteEventDialog({ event, onClose }) {
       <DialogTitle>Xoá thiệp này?</DialogTitle>
       <DialogContent>
         <p className={styles.dialogText}>
-          Link riêng của khách, link chung, màn hình lời chúc và trang đón khách sẽ không mở được nữa, ảnh bị xoá ngay.
+          Link riêng của khách, link chung, màn hình lời chúc và trang đón khách sẽ không mở được nữa, ảnh bị xoá ngay (trừ ảnh còn dùng ở thiệp khác của bạn).
         </p>
         {losses.length > 0 && (
           <p className={styles.dialogText}>Sẽ mất: {losses.join(', ')}.</p>
@@ -506,7 +507,13 @@ function DeleteEventDialog({ event, onClose }) {
   );
 }
 
+/** A fresh page per event: moving to a copy starts over, its own news and messages. */
 export default function Event() {
+  const { eventId } = useParams();
+  return <EventPage key={eventId} />;
+}
+
+function EventPage() {
   const navigate = useNavigate();
   const { eventId } = useParams();
   const [searchParams] = useSearchParams();
@@ -515,6 +522,7 @@ export default function Event() {
   const [isAddingGuests, setIsAddingGuests] = useState(false);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [isMakingPicture, setIsMakingPicture] = useState(false);
+  const [isDuplicating, setIsDuplicating] = useState(false);
   // 'invite', 'remind' or 'thank' while sending one by one / editing that message
   const [queueMode, setQueueMode] = useState(null);
   const [editingMode, setEditingMode] = useState(null);
@@ -849,10 +857,23 @@ export default function Event() {
 
       <DeskPanel event={event} summary={summary} />
 
+      <section className={clsx(styles.panel, styles.copyPanel)}>
+        <div>
+          <h2>Thiệp cho lễ khác</h2>
+          <p className={styles.muted}>
+            Nhà gái làm lễ vu quy, hay thêm tiệc báo hỷ ở quê? Tạo thiệp mới cùng mẫu, ảnh và tài khoản mừng, chỉ cần đổi tên,
+            giờ và địa điểm.
+          </p>
+        </div>
+        <Button variant="outlined" size="small" startIcon={<IoCopyOutline />} onClick={() => setIsDuplicating(true)}>
+          Tạo thiệp cho lễ khác
+        </Button>
+      </section>
+
       <section className={clsx(styles.panel, styles.dangerZone)}>
         <div>
           <h2>Xoá thiệp</h2>
-          <p className={styles.muted}>Khách sẽ không mở được thiệp nữa. Ảnh bị xoá ngay, danh sách khách và lời chúc bị xoá hẳn sau 30 ngày.</p>
+          <p className={styles.muted}>Khách sẽ không mở được thiệp nữa. Ảnh bị xoá ngay (trừ ảnh còn dùng ở thiệp khác của bạn), danh sách khách và lời chúc bị xoá hẳn sau 30 ngày.</p>
         </div>
         <Button color="error" variant="outlined" size="small" startIcon={<IoTrashOutline />} onClick={() => setIsConfirmingDelete(true)}>
           Xoá thiệp
@@ -891,6 +912,7 @@ export default function Event() {
 
       {isConfirmingDelete && <DeleteEventDialog event={event} onClose={() => setIsConfirmingDelete(false)} />}
       {isMakingPicture && <SaveTheDate event={event} onClose={() => setIsMakingPicture(false)} />}
+      {isDuplicating && <DuplicateEventDialog event={event} onClose={() => setIsDuplicating(false)} />}
 
       {isAddingGuests && (
         <AddGuestsDialog event={event} onClose={() => setIsAddingGuests(false)} onAdded={onGuestsAdded} />

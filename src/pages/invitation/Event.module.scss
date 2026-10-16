@@ -458,6 +458,24 @@
   font-weight: 500;
 }
 
+.copyPanel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+
+  h2 {
+    margin: 0 0 4px;
+    font-size: 1.8rem;
+  }
+
+  p {
+    max-width: 560px;
+    margin: 0;
+  }
+}
+
 .dangerZone {
   display: flex;
   flex-wrap: wrap;
