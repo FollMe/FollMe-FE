@@ -15,12 +15,13 @@ import dayjs from 'dayjs';
 import {
   IoTimeOutline, IoLocationOutline, IoCopyOutline, IoCheckmark, IoEyeOutline, IoCreateOutline, IoShareSocialOutline,
   IoEyeOffOutline, IoSparkles, IoDownloadOutline, IoTvOutline, IoRefresh, IoPersonAddOutline, IoPaperPlaneOutline,
-  IoNotificationsOutline, IoTrashOutline, IoPeopleOutline, IoWalletOutline, IoReceiptOutline, IoPrintOutline, IoListOutline, IoChevronForward, IoHeartOutline, IoGridOutline,
+  IoNotificationsOutline, IoTrashOutline, IoPeopleOutline, IoWalletOutline, IoReceiptOutline, IoPrintOutline, IoListOutline, IoChevronForward, IoImageOutline, IoHeartOutline, IoGridOutline,
   IoNewspaperOutline, IoClose,
 } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
 import ArticleHeader from 'components/article/ArticleHeader';
 import InvitationStatusTag from 'components/invitation/InvitationStatusTag';
+import SaveTheDate from 'components/invitation/SaveTheDate';
 import PhotoManager from 'components/invitation/PhotoManager';
 import GuestListInput, { guestListError } from 'components/invitation/GuestListInput';
 import GuestList from 'components/invitation/GuestList';
@@ -513,6 +514,7 @@ export default function Event() {
   const [event, setEvent] = useState(null);
   const [isAddingGuests, setIsAddingGuests] = useState(false);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [isMakingPicture, setIsMakingPicture] = useState(false);
   // 'invite', 'remind' or 'thank' while sending one by one / editing that message
   const [queueMode, setQueueMode] = useState(null);
   const [editingMode, setEditingMode] = useState(null);
@@ -698,6 +700,11 @@ export default function Event() {
               <div className={styles.shareActions}>
                 <CopyButton text={publicUrl} variant="button" label="Copy link" />
                 <Button variant="contained" size="small" startIcon={<IoShareSocialOutline />} onClick={share}>Chia sẻ</Button>
+                {status === 'upcoming' && (
+                  <Button size="small" startIcon={<IoImageOutline />} onClick={() => setIsMakingPicture(true)}>
+                    Ảnh save the date
+                  </Button>
+                )}
               </div>
             </div>
           </>
@@ -705,7 +712,14 @@ export default function Event() {
           <div className={styles.shareText}>
             <h2>Link chung đang tắt</h2>
             <p>Chỉ khách có link riêng mới xem được thiệp. Bật link chung để gửi vào nhóm chat.</p>
-            <Button variant="contained" size="small" onClick={enablePublicLink}>Bật link chung</Button>
+            <div className={styles.shareActions}>
+              <Button variant="contained" size="small" onClick={enablePublicLink}>Bật link chung</Button>
+              {status === 'upcoming' && (
+                <Button size="small" startIcon={<IoImageOutline />} onClick={() => setIsMakingPicture(true)}>
+                  Ảnh save the date
+                </Button>
+              )}
+            </div>
           </div>
         )}
       </section>
@@ -876,6 +890,7 @@ export default function Event() {
       )}
 
       {isConfirmingDelete && <DeleteEventDialog event={event} onClose={() => setIsConfirmingDelete(false)} />}
+      {isMakingPicture && <SaveTheDate event={event} onClose={() => setIsMakingPicture(false)} />}
 
       {isAddingGuests && (
         <AddGuestsDialog event={event} onClose={() => setIsAddingGuests(false)} onAdded={onGuestsAdded} />
