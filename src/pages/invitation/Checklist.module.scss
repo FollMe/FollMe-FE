@@ -1,0 +1,295 @@
+/* Việc cần làm: the countdown and progress on top, then the tasks by
+   when they are due. Phone first. */
+
+.page {
+  max-width: 720px;
+  padding-bottom: 48px;
+}
+
+.hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin-top: 8px;
+  padding: 18px 20px;
+  border-radius: var(--radius-lg);
+  background: var(--brand-fill);
+  color: var(--on-brand);
+
+  > div:first-child {
+    display: flex;
+    flex-direction: column;
+
+    strong {
+      font-family: var(--font-serif);
+      font-size: 3rem;
+      line-height: 1.15;
+    }
+
+    span {
+      font-size: 1.35rem;
+    }
+  }
+}
+
+.progress {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 180px;
+  max-width: 280px;
+  font-size: 1.35rem;
+
+  b {
+    font-size: 1.8rem;
+  }
+}
+
+.bar {
+  height: 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--on-brand) 28%, transparent);
+  overflow: hidden;
+
+  i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--on-brand);
+    transition: width 0.4s var(--ease);
+  }
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
+  padding: 24px 16px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  color: var(--text-2);
+  font-size: 1.5rem;
+  text-align: center;
+
+  p {
+    max-width: 460px;
+    margin: 0;
+    line-height: 1.6;
+  }
+}
+
+.section {
+  margin-top: 22px;
+
+  h2 {
+    margin: 0 0 4px;
+    font-size: 1.6rem;
+
+    span {
+      margin-left: 4px;
+      color: var(--text-3);
+      font-weight: 500;
+    }
+  }
+}
+
+.lateTitle {
+  color: var(--warning-text);
+}
+
+.tasks {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.task {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+}
+
+.check {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-left: -6px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--on-brand);
+  cursor: pointer;
+
+  // The visible circle inside a larger tap target
+  &::before {
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--border-strong);
+    border-radius: 50%;
+    background: var(--surface);
+    transition: background 0.15s var(--ease), border-color 0.15s var(--ease);
+  }
+
+  svg {
+    position: relative;
+    font-size: 1.6rem;
+  }
+
+  &:hover::before {
+    border-color: var(--brand);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: -4px;
+    border-radius: 50%;
+  }
+
+  &[aria-checked='true']::before {
+    border-color: var(--success);
+    background: var(--success);
+  }
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  min-height: 56px;
+  justify-content: center;
+  padding: 8px 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  strong {
+    font-size: 1.55rem;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  span {
+    color: var(--text-2);
+    font-size: 1.3rem;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+}
+
+.late {
+  color: var(--warning-text) !important;
+  font-weight: 600;
+}
+
+.done .body strong {
+  color: var(--text-2);
+  text-decoration: line-through;
+  text-decoration-color: var(--text-3);
+}
+
+.go {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+  min-height: 36px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--brand-text);
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    border-color: var(--brand);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+}
+
+.allDone {
+  margin: 20px 0 0;
+  color: var(--success-text);
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.doneToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: 1.6rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  span {
+    color: var(--text-3);
+    font-weight: 500;
+  }
+
+  svg {
+    transition: transform 0.2s var(--ease);
+  }
+}
+
+.flip {
+  transform: rotate(180deg);
+}
+
+.add {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.addLabel {
+  flex: 1 1 220px;
+}
+
+.addDue {
+  flex: 0 0 160px;
+}
+
+@media (max-width: 420px) {
+  .hero > div:first-child strong {
+    font-size: 2.6rem;
+  }
+
+  .go {
+    padding: 4px 8px;
+    font-size: 1.2rem;
+  }
+}

@@ -72,6 +72,9 @@ export const invitationApi = {
   addExpense: (eventId, payload) => request.post(`api/events/${eventId}/expenses`, payload),
   updateExpense: (eventId, expenseId, payload) => request.put(`api/events/${eventId}/expenses/${expenseId}`, payload),
   removeExpense: (eventId, expenseId) => request.del(`api/events/${eventId}/expenses/${expenseId}`),
+  addTasks: (eventId, items) => request.post(`api/events/${eventId}/checklist`, { items }),
+  updateTask: (eventId, taskId, payload) => request.put(`api/events/${eventId}/checklist/${taskId}`, payload),
+  removeTask: (eventId, taskId) => request.del(`api/events/${eventId}/checklist/${taskId}`),
   addPhoto: (eventId, blob) => {
     const form = new FormData();
     form.append('photo', blob, 'photo.jpg');

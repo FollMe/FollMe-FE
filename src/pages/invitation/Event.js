@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import Button from '@mui/material/Button';
@@ -15,7 +15,7 @@ import dayjs from 'dayjs';
 import {
   IoTimeOutline, IoLocationOutline, IoCopyOutline, IoCheckmark, IoEyeOutline, IoCreateOutline, IoShareSocialOutline,
   IoEyeOffOutline, IoSparkles, IoDownloadOutline, IoTvOutline, IoRefresh, IoPersonAddOutline, IoPaperPlaneOutline,
-  IoNotificationsOutline, IoTrashOutline, IoPeopleOutline, IoWalletOutline, IoReceiptOutline, IoPrintOutline, IoHeartOutline, IoGridOutline,
+  IoNotificationsOutline, IoTrashOutline, IoPeopleOutline, IoWalletOutline, IoReceiptOutline, IoPrintOutline, IoListOutline, IoChevronForward, IoHeartOutline, IoGridOutline,
   IoNewspaperOutline, IoClose,
 } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
@@ -36,6 +36,7 @@ import {
 import { downloadCsv } from 'util/csv';
 import { formatVnd, shortVnd } from 'util/gifts';
 import { budgetSummary } from 'util/budget';
+import { dueText, nextTask } from 'util/checklist';
 import { ago, loadSeen, newsText, saveSeen, whatsNew } from 'util/whatsNew';
 import { DEFAULT_SEATS, seatingPlan, tableLabel } from 'util/seating';
 import { groupPresets, parseGuestList } from 'util/guestList';
@@ -315,6 +316,39 @@ function DayTools({ event, summary, status }) {
   );
 }
 
+/**
+ * The checklist in a line: the next task and how far along it is. Before
+ * the day, an invitation to make one when there is none.
+ */
+function NextTask({ event, isUpcoming }) {
+  const tasks = event.checklist ?? [];
+  const to = `/events/${event._id}/viec-can-lam`;
+  if (!tasks.length) {
+    return isUpcoming ? (
+      <Link to={to} className={styles.nextTask}>
+        <IoListOutline aria-hidden />
+        <span>
+          <strong>Lập danh sách việc cần làm</strong>
+          Từ đặt nhà hàng tới cảm ơn khách, hạn theo ngày tiệc
+        </span>
+        <IoChevronForward aria-hidden />
+      </Link>
+    ) : null;
+  }
+  const next = nextTask(tasks);
+  const done = tasks.filter(t => t.done).length;
+  return (
+    <Link to={to} className={styles.nextTask}>
+      <IoListOutline aria-hidden />
+      <span>
+        <strong>{next ? `Việc tiếp theo: ${next.label}` : 'Đã xong hết việc cần làm'}</strong>
+        {done}/{tasks.length} việc đã xong{next?.due ? ` · ${dueText(next.due)}` : ''}
+      </span>
+      <IoChevronForward aria-hidden />
+    </Link>
+  );
+}
+
 /** What came in since the host last looked: a line, and the first few names. */
 function News({ event, since, onClose }) {
   const news = whatsNew(event, since);
@@ -499,6 +533,14 @@ export default function Event() {
     }
   }, [eventId, loaded]);
 
+  // Shortcuts from other pages ("#don-khach") land on their panel
+  const { hash } = useLocation();
+  useEffect(() => {
+    if (loaded && hash) {
+      document.getElementById(hash.slice(1))?.scrollIntoView({ block: 'start' });
+    }
+  }, [loaded, hash]);
+
   const setGuests = useCallback(update => setEvent(e => ({ ...e, guests: update(e.guests ?? []) })), []);
 
   function changeTemplate(mode, next) {
@@ -637,6 +679,7 @@ export default function Event() {
         ))}
       </div>
 
+      <NextTask event={event} isUpcoming={status === 'upcoming'} />
       <DayTools event={event} summary={summary} status={status} />
 
       <section className={clsx(styles.panel, styles.share)}>
@@ -668,7 +711,7 @@ export default function Event() {
       </section>
 
 
-      <section className={styles.panel}>
+      <section id="khach-moi" className={styles.panel}>
         <div className={styles.panelHead}>
           <h2>Khách mời <span className={styles.headCount}>{guests.length}</span></h2>
           <div className={styles.panelTools}>
