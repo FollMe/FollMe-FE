@@ -5,6 +5,7 @@ import { Lightbox } from './PhotoAlbum';
 import { invitationApi } from 'util/invitation';
 import { cldUrl, shrinkPhoto } from 'util/photos';
 import { track } from 'util/analytics';
+import { useCardText } from './CardLang';
 import styles from './GuestPhotos.module.scss';
 
 // From a little before the party to a month after (the server checks too)
@@ -24,6 +25,7 @@ export function guestPhotosOpen(startAt, now = Date.now()) {
  * theirs, shrunk on the phone first, and can remove them.
  */
 export default function GuestPhotos({ event, guest, headingClassName }) {
+  const t = useCardText().photos;
   const [photos, setPhotos] = useState(event.guestPhotos ?? []);
   const [progress, setProgress] = useState(null);
   const [openAt, setOpenAt] = useState(null);
@@ -40,7 +42,7 @@ export default function GuestPhotos({ event, guest, headingClassName }) {
   async function send(files) {
     const list = [...files].slice(0, Math.max(left, 0));
     if (files.length > list.length) {
-      toast.info(`Mỗi người gửi tối đa ${MAX_GUEST_PHOTOS_EACH} ảnh, gửi ${list.length} ảnh đầu nhé.`);
+      toast.info(t.tooMany(MAX_GUEST_PHOTOS_EACH, list.length));
     }
     let sent = 0;
     for (let i = 0; i < list.length; i++) {
@@ -52,7 +54,7 @@ export default function GuestPhotos({ event, guest, headingClassName }) {
         sent += 1;
       } catch (err) {
         if (err?.name !== 'SERVER_ERROR') {
-          toast.error('Không đọc được một ảnh, thử chọn ảnh JPG hoặc PNG nhé.');
+          toast.error(t.unreadable);
         }
         if (err?.status === 400) {
           // Over the limit or out of time: the rest would fail the same way
@@ -63,12 +65,12 @@ export default function GuestPhotos({ event, guest, headingClassName }) {
     setProgress(null);
     if (sent) {
       track('guest_photos_sent', { count: sent });
-      toast.success(sent > 1 ? `Đã gửi ${sent} ảnh. Cảm ơn bạn!` : 'Đã gửi ảnh. Cảm ơn bạn!');
+      toast.success(t.sent(sent));
     }
   }
 
   async function remove(photo) {
-    if (!window.confirm('Xoá ảnh này khỏi album?')) {
+    if (!window.confirm(t.confirmRemove)) {
       return;
     }
     try {
@@ -82,11 +84,9 @@ export default function GuestPhotos({ event, guest, headingClassName }) {
 
   return (
     <div className={styles.box}>
-      <h2 className={headingClassName}>Ảnh từ khách</h2>
+      <h2 className={headingClassName}>{t.title}</h2>
       <p className={styles.sub}>
-        {photos.length
-          ? `${photos.length} khoảnh khắc mọi người đã chụp`
-          : 'Bạn chụp được tấm nào đẹp? Gửi lên để cô dâu chú rể và mọi người cùng xem.'}
+        {photos.length ? t.count(photos.length) : t.empty}
       </p>
       {canSend && (
         <div className={styles.send}>
@@ -109,24 +109,24 @@ export default function GuestPhotos({ event, guest, headingClassName }) {
           >
             <IoCameraOutline aria-hidden />
             {progress
-              ? `Đang gửi ${progress.done + 1}/${progress.total}…`
-              : left <= 0 ? `Bạn đã gửi đủ ${MAX_GUEST_PHOTOS_EACH} ảnh` : 'Gửi ảnh bạn chụp'}
+              ? t.sending(progress.done + 1, progress.total)
+              : left <= 0 ? t.full(MAX_GUEST_PHOTOS_EACH) : t.send}
           </button>
         </div>
       )}
       {open && !guest?._id && (
-        <p className={styles.hint}>Xác nhận tham dự ở trên (nhập tên) là gửi được ảnh nhé.</p>
+        <p className={styles.hint}>{t.answerFirst}</p>
       )}
       {photos.length > 0 && (
         <ul className={styles.grid}>
           {photos.map((photo, i) => (
             <li key={photo._id}>
-              <button type="button" className={styles.thumb} onClick={() => setOpenAt(i)} aria-label={`Xem ảnh của ${photo.name || 'khách'}`}>
+              <button type="button" className={styles.thumb} onClick={() => setOpenAt(i)} aria-label={t.view(photo.name)}>
                 <img src={cldUrl(photo.url, 'w_400,h_400,c_fill,g_auto')} alt="" loading="lazy" decoding="async" />
               </button>
               <span className={styles.by}>{photo.name}</span>
               {photo.mine && (
-                <button type="button" className={styles.remove} onClick={() => remove(photo)} aria-label="Xoá ảnh của bạn">
+                <button type="button" className={styles.remove} onClick={() => remove(photo)} aria-label={t.remove}>
                   <IoTrashOutline />
                 </button>
               )}

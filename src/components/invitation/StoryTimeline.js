@@ -1,10 +1,12 @@
+import { useCardText } from './CardLang';
 import styles from './StoryTimeline.module.scss';
 
 /** "Chuyện chúng mình": the couple's moments, down a line, in their order. */
 export default function StoryTimeline({ story, headingClassName }) {
+  const t = useCardText();
   return (
     <div className={styles.story}>
-      <h2 className={headingClassName}>Chuyện chúng mình</h2>
+      <h2 className={headingClassName}>{t.story}</h2>
       <ol className={styles.line}>
         {story.map((item, i) => (
           // eslint-disable-next-line react/no-array-index-key

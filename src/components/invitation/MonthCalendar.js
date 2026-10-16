@@ -1,9 +1,9 @@
+import { useCardText } from './CardLang';
 import styles from './MonthCalendar.module.scss';
-
-const HEAD = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
 
 /** The month of the event with its day circled, like a printed invitation. */
 export default function MonthCalendar({ date }) {
+  const t = useCardText();
   const year = date.getFullYear();
   const month = date.getMonth();
   const first = new Date(year, month, 1);
@@ -13,14 +13,14 @@ export default function MonthCalendar({ date }) {
 
   return (
     <div className={styles.calendar}>
-      <div className={styles.title}>Tháng {month + 1} · {year}</div>
+      <div className={styles.title}>{t.monthTitle(month, year)}</div>
       {/* A picture of the month: read out as one sentence, not 35 numbers */}
       <div
         className={styles.grid}
         role="img"
-        aria-label={`Lịch tháng ${month + 1} năm ${year}, khoanh tròn ngày ${date.getDate()}`}
+        aria-label={t.monthLabel(month, year, date.getDate())}
       >
-        {HEAD.map(h => <span key={h} className={styles.head}>{h}</span>)}
+        {t.weekHead.map(h => <span key={h} className={styles.head}>{h}</span>)}
         {cells.map((d, i) => (
           <span key={i} className={d === date.getDate() ? styles.day + ' ' + styles.marked : styles.day}>
             {d}

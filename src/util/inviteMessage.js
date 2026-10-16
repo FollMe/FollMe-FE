@@ -3,6 +3,7 @@ import { vnWallClock } from './date';
 import { eventHeadline, isCoupleEvent } from './invitation';
 import { programText } from './program';
 import { tableLabel } from './seating';
+import { cardText, shortDayEn } from './cardText';
 
 export const NAME_TOKEN = '{tên}';
 export const LINK_TOKEN = '{link}';
@@ -14,6 +15,11 @@ const WEEKDAYS = ['Chủ Nhật', 'thứ Hai', 'thứ Ba', 'thứ Tư', 'thứ N
 export function inviteWhen(startAt) {
   const at = vnWallClock(startAt);
   return `${dayjs(at).format('HH:mm')} ${WEEKDAYS[at.getDay()]}, ${dayjs(at).format('DD/MM/YYYY')}`;
+}
+
+/** "6:00 PM, Saturday 16 January 2027" in Vietnam time, for English messages. */
+export function inviteWhenEn(startAt) {
+  return dayjs(vnWallClock(startAt)).format('h:mm A, dddd D MMMM YYYY');
 }
 
 /** "thứ Bảy, 09/01": a day in Vietnam, for the answer-by date. */
@@ -102,37 +108,97 @@ export function defaultDayOf(event) {
     + `Chỉ đường và thiệp của ${NAME_TOKEN}: ${LINK_TOKEN}`;
 }
 
+// The same four messages in English, for guests whose card is in English
+// (foreign friends, family abroad). Names, place and title stay as written.
+const coupleOf = event => isCoupleEvent(event.type) && event.groomName && event.brideName;
+
+/** The English answer-by date to mention, or null when there is none or it has passed. */
+function openDeadlineEn(event, now) {
+  return event.rsvpBy && daysToAnswer(event.rsvpBy, now) >= 0 ? shortDayEn(event.rsvpBy) : null;
+}
+
+export function defaultTemplateEn(event, now = Date.now()) {
+  const headline = eventHeadline(event);
+  const what = { wedding: `the wedding of ${headline}`, engagement: `the engagement ceremony of ${headline}` }[event.type] ?? headline;
+  const by = openDeadlineEn(event, now);
+  return `Dear ${NAME_TOKEN},\nYou are warmly invited to ${what} at ${inviteWhenEn(event.startAt)} (Vietnam time), ${event.location}.\n`
+    + (by ? `Please let us know if you can come by ${by}.\n` : '')
+    + `Your invitation: ${LINK_TOKEN}`;
+}
+
+export function defaultReminderEn(event, now = Date.now()) {
+  const by = openDeadlineEn(event, now);
+  const what = { wedding: 'wedding', engagement: 'engagement ceremony' }[event.type];
+  const first = coupleOf(event)
+    ? `${eventHeadline(event)} would love to see you, ${NAME_TOKEN}, at their ${what} at ${inviteWhenEn(event.startAt)} (Vietnam time).`
+    : `We would love to see you, ${NAME_TOKEN}, at ${event.title} at ${inviteWhenEn(event.startAt)} (Vietnam time).`;
+  return `${first}\nPlease answer on your invitation${by ? ` by ${by}` : ''} so we can prepare for you: ${LINK_TOKEN}`;
+}
+
+export function defaultThanksEn(event) {
+  const what = { wedding: 'our wedding', engagement: 'our engagement' }[event.type];
+  const first = coupleOf(event)
+    ? `${eventHeadline(event)}: thank you, ${NAME_TOKEN}, for celebrating ${what} with us.`
+    : `Thank you, ${NAME_TOKEN}, for joining us at ${event.title}.`;
+  const keepsake = (event.photos ?? []).length > 0 ? "Photos and everyone's wishes" : "Everyone's wishes";
+  return `${first}\n${keepsake} are here: ${LINK_TOKEN}`;
+}
+
+export function defaultDayOfEn(event) {
+  const what = { wedding: 'the wedding', engagement: 'the engagement ceremony' }[event.type];
+  const first = coupleOf(event)
+    ? `${eventHeadline(event)} look forward to seeing you, ${NAME_TOKEN}, at ${what} at ${inviteWhenEn(event.startAt)} (Vietnam time), ${event.location}.`
+    : `See you, ${NAME_TOKEN}, at ${event.title} at ${inviteWhenEn(event.startAt)} (Vietnam time), ${event.location}.`;
+  return `${first}\n`
+    + `Your seat: ${TABLE_TOKEN}.\n`
+    + `Directions and your invitation: ${LINK_TOKEN}`;
+}
+
+/** The default message of a kind ('invite', 'remind', 'dayof', 'thank') in a language. */
+export function defaultMessage(event, kind, lang = 'vi') {
+  const make = lang === 'en'
+    ? { invite: defaultTemplateEn, remind: defaultReminderEn, dayof: defaultDayOfEn, thank: defaultThanksEn }
+    : { invite: defaultTemplate, remind: defaultReminder, dayof: defaultDayOf, thank: defaultThanks };
+  return (make[kind] ?? make.invite)(event);
+}
+
+/** Whether a guest gets their messages and card in English. */
+export function isEnglishGuest(guest) {
+  return guest?.lang === 'en';
+}
+
 /**
  * The template for one guest. A template without {link} gets it at the end.
- * {bàn} is their table; a line with it is left out when they have none.
+ * {bàn} is their table ("Table 5" in English); a line with it is left out when they have none.
  */
-export function inviteMessage(template, name, url, { table } = {}) {
+export function inviteMessage(template, name, url, { table, lang } = {}) {
   const withTable = template.split('\n')
     .filter(line => !line.includes(TABLE_TOKEN) || table)
     .join('\n')
-    .split(TABLE_TOKEN).join(table ? tableLabel(table) : '');
+    .split(TABLE_TOKEN).join(table ? (lang === 'en' ? cardText('en').table(table) : tableLabel(table)) : '');
   const text = withTable.split(NAME_TOKEN).join(name);
   return text.includes(LINK_TOKEN) ? text.split(LINK_TOKEN).join(url) : `${text.trimEnd()}\n${url}`;
 }
 
 // `kind` is 'invite' (the invitation), 'remind' (the nudge to answer),
-// 'dayof' (the time, way and table, the day before) or 'thank' (after the party)
-const storageKey = (eventId, kind) => `follme.${{ remind: 'remind', dayof: 'dayof', thank: 'thank' }[kind] ?? 'invite'}Template.${eventId}`;
+// 'dayof' (the time, way and table, the day before) or 'thank' (after the party);
+// English ones are kept apart
+const storageKey = (eventId, kind, lang) => `follme.${{ remind: 'remind', dayof: 'dayof', thank: 'thank' }[kind] ?? 'invite'}Template${lang === 'en' ? 'En' : ''}.${eventId}`;
 
-export function loadTemplate(eventId, kind = 'invite') {
+export function loadTemplate(eventId, kind = 'invite', lang = 'vi') {
   try {
-    return localStorage.getItem(storageKey(eventId, kind));
+    return localStorage.getItem(storageKey(eventId, kind, lang));
   } catch (err) {
     return null;
   }
 }
 
-export function saveTemplate(eventId, template, kind = 'invite') {
+export function saveTemplate(eventId, template, kind = 'invite', lang = 'vi') {
   try {
     if (template) {
-      localStorage.setItem(storageKey(eventId, kind), template);
+      localStorage.setItem(storageKey(eventId, kind, lang), template);
     } else {
-      localStorage.removeItem(storageKey(eventId, kind));
+      localStorage.removeItem(storageKey(eventId, kind, lang));
     }
   } catch (err) {
     // Kept for this visit only

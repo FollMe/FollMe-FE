@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import Button from '@mui/material/Button';
+import { cardText, urlCardLang } from 'util/cardText';
 import styles from './InvitationLoading.module.scss';
 
 /**
@@ -8,13 +9,12 @@ import styles from './InvitationLoading.module.scss';
  */
 export default function InvitationUnavailable({ reason, isPublic, onRetry }) {
   const offline = reason === 'offline';
-  let title = 'Không mở được thiệp';
-  let text = 'Kiểm tra kết nối mạng rồi thử lại nhé.';
+  const t = cardText(urlCardLang()).unavailable;
+  let title = t.offlineTitle;
+  let text = t.offlineText;
   if (!offline) {
-    title = isPublic ? 'Link chung không còn mở' : 'Thiệp mời không còn hiệu lực';
-    text = isPublic
-      ? 'Gia chủ đã tắt link chung của thiệp này. Bạn nhắn người gửi để xin link mới nhé.'
-      : 'Có thể gia chủ đã cập nhật danh sách khách. Bạn nhắn người gửi để xin link mới nhé.';
+    title = isPublic ? t.publicTitle : t.missingTitle;
+    text = isPublic ? t.publicText : t.missingText;
   }
   return (
     <div className={styles.wrap} role="alert">
@@ -22,8 +22,8 @@ export default function InvitationUnavailable({ reason, isPublic, onRetry }) {
       <h1 className={styles.title}>{title}</h1>
       <p className={styles.message}>{text}</p>
       <div className={styles.actions}>
-        {offline && <Button variant="contained" onClick={onRetry}>Thử lại</Button>}
-        <Button component={Link} to="/cuoi-hoi">Về FollMe</Button>
+        {offline && <Button variant="contained" onClick={onRetry}>{t.retry}</Button>}
+        <Button component={Link} to="/cuoi-hoi">{t.home}</Button>
       </div>
     </div>
   );

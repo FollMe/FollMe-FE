@@ -34,7 +34,7 @@ import {
   personalInvitationUrl, publicInvitationUrl, reminderQueue, screenUrl, summarizeGuests, thankQueue, vegetarianOf,
 } from 'util/invitation';
 import {
-  daysToAnswer, deadlineText, defaultDayOf, defaultReminder, defaultTemplate, defaultThanks, loadTemplate, saveTemplate,
+  daysToAnswer, deadlineText, defaultDayOf, defaultMessage, defaultReminder, defaultTemplate, defaultThanks, isEnglishGuest, loadTemplate, saveTemplate,
 } from 'util/inviteMessage';
 import { downloadCsv } from 'util/csv';
 import { formatVnd, shortVnd } from 'util/gifts';
@@ -801,6 +801,10 @@ function EventPage() {
     dayof: loadTemplate(eventId, 'dayof'),
     thank: loadTemplate(eventId, 'thank'),
   }));
+  // The same, for guests whose card is in English
+  const [customTemplatesEn, setCustomTemplatesEn] = useState(() => Object.fromEntries(
+    ['invite', 'remind', 'dayof', 'thank'].map(kind => [kind, loadTemplate(eventId, kind, 'en')]),
+  ));
 
   // The host's previous visit on this device: what came in since is news
   const [since] = useState(() => loadSeen(eventId));
@@ -822,9 +826,9 @@ function EventPage() {
 
   const setGuests = useCallback(update => setEvent(e => ({ ...e, guests: update(e.guests ?? []) })), []);
 
-  function changeTemplate(mode, next) {
-    setCustomTemplates(t => ({ ...t, [mode]: next }));
-    saveTemplate(eventId, next, mode);
+  function changeTemplate(mode, next, lang = 'vi') {
+    (lang === 'en' ? setCustomTemplatesEn : setCustomTemplates)(t => ({ ...t, [mode]: next }));
+    saveTemplate(eventId, next, mode, lang);
   }
 
   const load = useCallback(() => invitationApi.hostGet(eventId)
@@ -887,6 +891,10 @@ function EventPage() {
     dayof: customTemplates.dayof ?? defaultDayOf(event),
     thank: customTemplates.thank ?? defaultThanks(event),
   };
+  const templatesEn = Object.fromEntries(
+    ['invite', 'remind', 'dayof', 'thank'].map(kind => [kind, customTemplatesEn[kind] ?? defaultMessage(event, kind, 'en')]),
+  );
+  const englishGuests = guests.filter(isEnglishGuest).length;
   const firstPersonal = guests.find(hasPersonalLink);
   const previewUrl = event.allowPublicLink ? `/e/${event._id}` : firstPersonal && `/invitations/${firstPersonal._id}`;
 
@@ -981,6 +989,7 @@ function EventPage() {
               <code className={styles.url}>{publicUrl}</code>
               <div className={styles.shareActions}>
                 <CopyButton text={publicUrl} variant="button" label="Copy link" />
+                <CopyButton text={`${publicUrl}?lang=en`} variant="button" label="Link tiếng Anh" />
                 <Button variant="contained" size="small" startIcon={<IoShareSocialOutline />} onClick={share}>Chia sẻ</Button>
                 {status === 'upcoming' && (
                   <Button size="small" startIcon={<IoImageOutline />} onClick={() => setIsMakingPicture(true)}>
@@ -1090,6 +1099,7 @@ function EventPage() {
           reminderTemplate={templates.remind}
           dayOfTemplate={templates.dayof}
           thankTemplate={templates.thank}
+          englishTemplates={templatesEn}
           since={since}
           groupOptions={groupOptions(event)}
           onChange={setGuests}
@@ -1188,6 +1198,9 @@ function EventPage() {
           template={templates[queueMode]}
           onTemplateChange={next => changeTemplate(queueMode, next)}
           onTemplateReset={() => changeTemplate(queueMode, null)}
+          templateEn={templatesEn[queueMode]}
+          onTemplateEnChange={next => changeTemplate(queueMode, next, 'en')}
+          onTemplateEnReset={() => changeTemplate(queueMode, null, 'en')}
           onSent={guest => setGuests(list => list.map(g => (g._id === guest._id ? guest : g)))}
           onClose={() => setQueueMode(null)}
         />
@@ -1203,6 +1216,18 @@ function EventPage() {
               onChange={next => changeTemplate(editingMode, next)}
               onReset={() => changeTemplate(editingMode, null)}
             />
+            {englishGuests > 0 && (
+              <>
+                <p className={styles.templateNote}>{englishGuests} khách nhận thiệp tiếng Anh sẽ nhận bản này:</p>
+                <TemplateEditor
+                  mode={editingMode}
+                  lang="en"
+                  value={templatesEn[editingMode]}
+                  onChange={next => changeTemplate(editingMode, next, 'en')}
+                  onReset={() => changeTemplate(editingMode, null, 'en')}
+                />
+              </>
+            )}
           </DialogContent>
           <DialogActions sx={{ px: 3, pb: 2 }}>
             <Button variant="contained" onClick={() => setEditingMode(null)}>Xong</Button>

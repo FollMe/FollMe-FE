@@ -8,12 +8,14 @@ import { googleCalendarUrl, icsFile, openIcs } from 'util/calendar';
 import { isAwayFromVietnam } from 'util/date';
 import { programMoment, programText } from 'util/program';
 import { track } from 'util/analytics';
+import { useCardText } from './CardLang';
 
 // Calendars get a three-hour slot for the party
 const DURATION_MS = 3 * 60 * 60 * 1000;
 
 /** "Lưu vào lịch": Google Calendar, or an .ics for iPhone and Outlook. */
 export default function AddToCalendar({ event }) {
+  const t = useCardText().calendar;
   const [anchor, setAnchor] = useState(null);
   const program = event.program ?? [];
   const start = new Date(event.startAt);
@@ -23,12 +25,12 @@ export default function AddToCalendar({ event }) {
   const url = window.location.href.split('#')[0];
   const info = { title: event.title, start, end, location: event.location };
   const details = [
-    program.length > 0 && `Chương trình${isAwayFromVietnam() ? ' (giờ Việt Nam)' : ''}: ${programText(program)}`,
-    `Thiệp mời: ${url}`,
+    program.length > 0 && `${t.program(isAwayFromVietnam())}: ${programText(program)}`,
+    `${t.card}: ${url}`,
   ].filter(Boolean).join('\n');
 
   function saveIcs() {
-    openIcs('thiep-moi.ics', icsFile({
+    openIcs(t.file, icsFile({
       ...info,
       uid: `${event._id ?? 'demo'}@follme`,
       description: details,
@@ -47,7 +49,7 @@ export default function AddToCalendar({ event }) {
         aria-expanded={Boolean(anchor)}
         onClick={e => setAnchor(e.currentTarget)}
       >
-        Lưu vào lịch
+        {t.button}
       </Button>
       <Menu anchorEl={anchor} open={Boolean(anchor)} onClose={() => setAnchor(null)}>
         <MenuItem
@@ -63,7 +65,7 @@ export default function AddToCalendar({ event }) {
           <ListItemIcon><IoLogoGoogle /></ListItemIcon>Google Calendar
         </MenuItem>
         <MenuItem onClick={saveIcs}>
-          <ListItemIcon><IoLogoApple /></ListItemIcon>Lịch iPhone, Outlook
+          <ListItemIcon><IoLogoApple /></ListItemIcon>{t.other}
         </MenuItem>
       </Menu>
     </>

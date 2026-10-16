@@ -1,5 +1,6 @@
 import {
-  daysToAnswer, deadlineText, defaultDayOf, defaultReminder, defaultTemplate, defaultThanks, inviteMessage, inviteWhen, loadTemplate,
+  daysToAnswer, deadlineText, defaultDayOf, defaultDayOfEn, defaultMessage, defaultReminder, defaultReminderEn, defaultTemplate,
+  defaultTemplateEn, defaultThanks, defaultThanksEn, inviteMessage, inviteWhen, inviteWhenEn, isEnglishGuest, loadTemplate,
   saveTemplate, shortDay,
 } from './inviteMessage';
 import { dayOfQueue, seatFinderOpen } from './invitation';
@@ -160,5 +161,42 @@ describe('seat finder window', () => {
     expect(seatFinderOpen(start, at(-6))).toBe(true);
     expect(seatFinderOpen(start, at(11.9))).toBe(true);
     expect(seatFinderOpen(start, at(12.1))).toBe(false);
+  });
+});
+
+describe('English messages', () => {
+  const englishWedding = { ...wedding, location: 'Riverside Palace, TP.HCM' };
+
+  it('reads the time in Vietnam, in English', () => {
+    expect(inviteWhenEn('2027-01-16T11:00:00Z')).toBe('6:00 PM, Saturday 16 January 2027');
+  });
+
+  it('invites, reminds, tells the day and thanks in English', () => {
+    expect(defaultTemplateEn(englishWedding, Date.parse('2027-01-01T00:00:00Z'))).toBe(
+      'Dear {tên},\nYou are warmly invited to the wedding of Đức & Hạnh at 11:00 AM, Saturday 16 January 2027 (Vietnam time), '
+      + 'Riverside Palace, TP.HCM.\nYour invitation: {link}',
+    );
+    expect(defaultTemplateEn({ ...englishWedding, rsvpBy: '2027-01-09T16:59:00Z' }, Date.parse('2027-01-01T00:00:00Z')))
+      .toContain('Please let us know if you can come by Saturday, 9 January.\n');
+    expect(defaultReminderEn(englishWedding)).toMatch(/^Đức & Hạnh would love to see you, \{tên\}, at their wedding at 11:00 AM/);
+    expect(defaultThanksEn(englishWedding)).toBe("Đức & Hạnh: thank you, {tên}, for celebrating our wedding with us.\nEveryone's wishes are here: {link}");
+    expect(defaultDayOfEn(englishWedding)).toContain('Your seat: {bàn}.\n');
+    expect(defaultMessage(englishWedding, 'thank', 'en')).toBe(defaultThanksEn(englishWedding));
+    expect(defaultMessage(englishWedding, 'thank')).toBe(defaultThanks(englishWedding));
+  });
+
+  it('names the table in English', () => {
+    expect(inviteMessage('Your seat: {bàn}.\nSee you!', 'John', 'https://x/1', { table: '5', lang: 'en' }))
+      .toBe('Your seat: Table 5.\nSee you!\nhttps://x/1');
+    expect(inviteMessage('Chỗ ngồi: {bàn}.', 'Cô Ba', 'https://x/1', { table: '5' })).toBe('Chỗ ngồi: Bàn 5.\nhttps://x/1');
+  });
+
+  it('keeps the English messages apart from the Vietnamese ones', () => {
+    localStorage.clear();
+    saveTemplate('e1', 'Hello {tên}', 'invite', 'en');
+    expect(loadTemplate('e1', 'invite', 'en')).toBe('Hello {tên}');
+    expect(loadTemplate('e1', 'invite')).toBeNull();
+    expect(isEnglishGuest({ lang: 'en' })).toBe(true);
+    expect(isEnglishGuest({})).toBe(false);
   });
 });

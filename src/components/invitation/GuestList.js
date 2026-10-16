@@ -14,10 +14,10 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { toast } from 'react-toastify';
 import {
   IoPaperPlaneOutline, IoEllipsisHorizontal, IoCopyOutline, IoEyeOutline, IoCreateOutline, IoCheckmarkDoneOutline,
-  IoArrowUndoOutline, IoTrashOutline, IoSearch, IoNotificationsOutline, IoHeartOutline, IoNavigateOutline,
+  IoArrowUndoOutline, IoTrashOutline, IoSearch, IoNotificationsOutline, IoHeartOutline, IoNavigateOutline, IoLanguageOutline,
 } from 'react-icons/io5';
 import { RSVP_LABELS, awaitsAnswer, hasPersonalLink, invitationApi, personalInvitationUrl, vegetarianOf } from 'util/invitation';
-import { inviteMessage, sendInvite } from 'util/inviteMessage';
+import { inviteMessage, isEnglishGuest, sendInvite } from 'util/inviteMessage';
 import { normalizeText } from 'util/search';
 import GroupPicker from './GroupPicker';
 import { MAX_TABLE_NAME, tableLabel } from 'util/seating';
@@ -53,9 +53,12 @@ export function filterGuests(guests, filter, query, group = null) {
  * The host's guest list: who got their link, opened it, and answered.
  * Each personal link can be sent from here, a reminder to whoever has
  * not answered, and a thank-you after the party; `onChange` gets an updater. `groupOptions` are the groups
- * offered when editing a guest.
+ * offered when editing a guest. Guests whose card is in English get
+ * `englishTemplates` ({ invite, remind, dayof, thank }) instead.
  */
-export default function GuestList({ event, guests, template, reminderTemplate, dayOfTemplate, thankTemplate, since, groupOptions = [], onChange }) {
+export default function GuestList({
+  event, guests, template, reminderTemplate, dayOfTemplate, thankTemplate, englishTemplates, since, groupOptions = [], onChange,
+}) {
   const [filter, setFilter] = useState('all');
   const [group, setGroup] = useState(null);
   const [query, setQuery] = useState('');
@@ -93,8 +96,14 @@ export default function GuestList({ event, guests, template, reminderTemplate, d
     }
   }
 
+  // A guest's message from the template of that kind, in English for English guests
+  function messageFor(guest, kind, fallback) {
+    const english = isEnglishGuest(guest) ? englishTemplates?.[kind] : null;
+    return inviteMessage(english || fallback, guest.name, personalInvitationUrl(guest._id), { table: guest.table, lang: english ? 'en' : 'vi' });
+  }
+
   async function send(guest) {
-    const text = inviteMessage(template, guest.name, personalInvitationUrl(guest._id));
+    const text = messageFor(guest, 'invite', template);
     try {
       const how = await sendInvite(text);
       track('invite_sent', { how, again: Boolean(guest.sentAt) });
@@ -108,7 +117,7 @@ export default function GuestList({ event, guests, template, reminderTemplate, d
   }
 
   async function remind(guest) {
-    const text = inviteMessage(reminderTemplate, guest.name, personalInvitationUrl(guest._id));
+    const text = messageFor(guest, 'remind', reminderTemplate);
     try {
       const how = await sendInvite(text);
       track('reminder_sent', { how });
@@ -122,7 +131,7 @@ export default function GuestList({ event, guests, template, reminderTemplate, d
   }
 
   async function sendDayOf(guest) {
-    const text = inviteMessage(dayOfTemplate, guest.name, personalInvitationUrl(guest._id), { table: guest.table });
+    const text = messageFor(guest, 'dayof', dayOfTemplate);
     try {
       const how = await sendInvite(text);
       track('dayof_sent', { how });
@@ -136,7 +145,7 @@ export default function GuestList({ event, guests, template, reminderTemplate, d
   }
 
   async function thank(guest) {
-    const text = inviteMessage(thankTemplate, guest.name, personalInvitationUrl(guest._id));
+    const text = messageFor(guest, 'thank', thankTemplate);
     try {
       const how = await sendInvite(text);
       track('thanks_sent', { how });
@@ -255,6 +264,7 @@ export default function GuestList({ event, guests, template, reminderTemplate, d
                   {isNewAnswer(guest, since) && <span className={clsx(styles.tag, styles.new)}>Trả lời mới</span>}
                   {guest.group && <span className={clsx(styles.tag, styles.group)}>{guest.group}</span>}
                   {guest.table && <span className={clsx(styles.tag, styles.group)}>{tableLabel(guest.table)}</span>}
+                  {isEnglishGuest(guest) && <span className={clsx(styles.tag, styles.group)}>Thiệp tiếng Anh</span>}
                   {guest.source === 'public' && <span className={styles.tag}>Qua link chung</span>}
                   {guest.source === 'desk' && <span className={styles.tag}>Thêm tại tiệc</span>}
                   {guest.source === 'ledger' && <span className={styles.tag}>Thêm từ sổ mừng</span>}
@@ -356,6 +366,12 @@ export default function GuestList({ event, guests, template, reminderTemplate, d
           <MenuItem onClick={() => { mark(menuGuest, { sent: !menuGuest.sentAt }); setMenu(null); }}>
             <ListItemIcon>{menuGuest.sentAt ? <IoArrowUndoOutline /> : <IoCheckmarkDoneOutline />}</ListItemIcon>
             {menuGuest.sentAt ? 'Đánh dấu chưa gửi' : 'Đánh dấu đã gửi'}
+          </MenuItem>
+        )}
+        {personal && (
+          <MenuItem onClick={() => { mark(menuGuest, { lang: isEnglishGuest(menuGuest) ? 'vi' : 'en' }); setMenu(null); }}>
+            <ListItemIcon><IoLanguageOutline /></ListItemIcon>
+            {isEnglishGuest(menuGuest) ? 'Đổi về thiệp tiếng Việt' : 'Thiệp tiếng Anh cho khách này'}
           </MenuItem>
         )}
         <MenuItem onClick={() => { setEditing(menuGuest); setMenu(null); }}>

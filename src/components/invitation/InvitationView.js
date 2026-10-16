@@ -24,32 +24,22 @@ import SeatFinder from './SeatFinder';
 import GuestPhotos, { guestPhotosOpen } from './GuestPhotos';
 import ArriveCard, { selfCheckInOpen } from './ArriveCard';
 import StoryTimeline from './StoryTimeline';
+import { CardLangProvider, LangSwitch, useCardText } from './CardLang';
 import { getAlmanac, lunarMonthLabel } from 'util/fortune';
 import {
-  RSVP_LABELS, eventHeadline, invitationApi, isCoupleEvent, rememberOpened, savePublicGuest, seatFinderOpen, wasOpened,
+  eventHeadline, invitationApi, isCoupleEvent, rememberOpened, savePublicGuest, seatFinderOpen, wasOpened,
 } from 'util/invitation';
 import { track } from 'util/analytics';
-import { vnWallClock } from 'util/date';
+import { isAwayFromVietnam, vnWallClock } from 'util/date';
 import { burst } from 'util/confetti';
 import { MusicBox, canPlayMusic } from 'util/musicBox';
 import { cldUrl } from 'util/photos';
-import { tableLabel } from 'util/seating';
-import { daysToAnswer, shortDay } from 'util/inviteMessage';
+import { daysToAnswer } from 'util/inviteMessage';
 import { MAX_SONG } from 'util/songs';
+import { cardText, initialCardLang, saveCardLang } from 'util/cardText';
 import styles from './InvitationView.module.scss';
 
-const WEEKDAYS = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
-
-const INTRO = {
-  wedding: 'tới dự lễ thành hôn của',
-  engagement: 'tới dự lễ ăn hỏi của',
-};
-
-// After the party the card thanks the guest (the host's thank-you links here)
-const THANKS = {
-  wedding: 'đã chung vui trong lễ thành hôn của',
-  engagement: 'đã chung vui trong lễ ăn hỏi của',
-};
+// After the party the card thanks the guest (the host's thank-you links here).
 // Until then the party is on: guests are asked for a wish
 const LIVE_MS = 8 * 60 * 60 * 1000;
 // A guest's table shows on their card from a little before the party
@@ -171,8 +161,13 @@ function Ornament({ glyph = '✦' }) {
  * - `embedded` skips the envelope and fixed overlays (editor preview).
  */
 export default function InvitationView({
-  event, guest, wishes: initialWishes = [], isPublic, onGuestChange, demo = false, embedded = false,
+  event, guest, wishes: initialWishes = [], isPublic, onGuestChange, demo = false, embedded = false, lang: fixedLang,
 }) {
+  // Vietnamese or English: what this browser chose, the link's ?lang=, or
+  // what the host set for this guest. Previews show the language asked for.
+  const [chosenLang, setChosenLang] = useState(() => fixedLang ?? (embedded ? 'vi' : initialCardLang({ eventId: event._id, guest })));
+  const lang = fixedLang ?? chosenLang;
+  const t = cardText(lang);
   const startAt = useMemo(() => new Date(event.startAt), [event.startAt]);
   const countdown = useCountdown(startAt);
   const isOver = !countdown;
@@ -192,7 +187,8 @@ export default function InvitationView({
   const theme = event.theme || 'minimal';
   const couple = isCoupleEvent(event.type) && event.groomName && event.brideName;
   // On the public link, the name they gave when answering
-  const recipient = guest?.name || 'Bạn';
+  const guestName = guest?.name || '';
+  const coverText = t.cover({ name: guestName, type: event.type, isOver });
   // Weddings get the music box and the scratch-off date unless the host
   // turned them off; other events only if turned on.
   const withMusic = !embedded && (event.music ? event.music !== 'none' : isCoupleEvent(event.type));
@@ -201,7 +197,31 @@ export default function InvitationView({
   const music = useMusic(withMusic);
   const dateKey = dayjs(shownAt).format('YYYY-MM-DD');
   const photos = event.photos ?? [];
-  const cover = photos[0];
+  const coverPhoto = photos[0];
+  const message = lang === 'en' && event.messageEn ? event.messageEn : event.message;
+
+  // Screen readers, translation and the tab title follow the card's language
+  useEffect(() => {
+    if (embedded) {
+      return undefined;
+    }
+    const root = document.documentElement;
+    const previous = { lang: root.lang, title: document.title };
+    root.lang = lang;
+    if (lang === 'en') {
+      document.title = `${t.pageTitle(eventHeadline(event))} | FollMe`;
+    }
+    return () => {
+      root.lang = previous.lang;
+      document.title = previous.title;
+    };
+  }, [embedded, lang, t, event]);
+
+  const switchLang = useCallback(next => {
+    setChosenLang(next);
+    saveCardLang(event._id, next);
+    track('card_language', { lang: next, demo });
+  }, [event._id, demo]);
 
   useEffect(() => {
     setWishes(initialWishes);
@@ -232,11 +252,13 @@ export default function InvitationView({
   }, [theme, demo]);
 
   return (
-    <div className={clsx(styles.page, styles[theme], embedded && styles.embedded, isOpen && styles.opened)}>
+    <CardLangProvider value={lang}>
+    <div className={clsx(styles.page, styles[theme], embedded && styles.embedded, isOpen && styles.opened)} lang={lang}>
+      {!embedded && !fixedLang && <LangSwitch lang={lang} onChange={switchLang} />}
       {!isOpen && (
         <Envelope
           theme={theme}
-          recipient={recipient}
+          recipient={guestName || t.recipient('')}
           headline={eventHeadline(event)}
           withMusic={withMusic && canPlayMusic()}
           onOpenStart={music.play}
@@ -248,34 +270,21 @@ export default function InvitationView({
       {/* ---------- Cover ---------- */}
       <section className={styles.cover}>
         <div className={styles.coverFrame}>
-          {cover && (
+          {coverPhoto && (
             <figure className={styles.coverPhoto}>
               <img
-                src={cldUrl(cover.url, 'w_600,h_750,c_fill,g_faces')}
-                alt={couple ? `${event.groomName} và ${event.brideName}` : ''}
+                src={cldUrl(coverPhoto.url, 'w_600,h_750,c_fill,g_faces')}
+                alt={couple ? t.coupleAlt(event.groomName, event.brideName) : ''}
                 fetchpriority="high"
               />
             </figure>
           )}
-          {isOver ? (
-            <>
-              <p className={styles.kicker}>{couple ? 'Thank you' : 'Lời cảm ơn'}</p>
-              <p className={styles.invite}>
-                Cảm ơn <strong>{recipient === 'Bạn' ? 'bạn' : recipient}</strong>
-                <br />
-                {THANKS[event.type] ?? 'đã tới dự'}
-              </p>
-            </>
-          ) : (
-            <>
-              <p className={styles.kicker}>{couple ? 'Save the date' : 'Thư mời'}</p>
-              <p className={styles.invite}>
-                Trân trọng kính mời <strong>{recipient === 'Bạn' ? 'bạn' : recipient}</strong>
-                <br />
-                {INTRO[event.type] ?? 'tới dự'}
-              </p>
-            </>
-          )}
+          <p className={styles.kicker}>{t.kicker({ couple, isOver })}</p>
+          <p className={styles.invite}>
+            {coverText.lead}{coverText.who && <strong>{coverText.who}</strong>}{coverText.tail}
+            <br />
+            {coverText.line}
+          </p>
           {couple ? (
             <h1 className={styles.couple}>
               <span className={clsx(styles.name, styles.shimmer)}>{event.groomName}</span>
@@ -285,11 +294,12 @@ export default function InvitationView({
           ) : (
             <h1 className={clsx(styles.title, styles.shimmer)}>{event.title}</h1>
           )}
-          {!cover && <div className={styles.seal} aria-hidden>{couple ? '囍' : '✦'}</div>}
+          {!coverPhoto && <div className={styles.seal} aria-hidden>{couple ? '囍' : '✦'}</div>}
           {withScratch ? (
             <ScratchReveal
               className={styles.coverScratch}
-              label={couple ? 'Cào để xem ngày cưới' : 'Cào để xem ngày'}
+              label={t.scratch(couple)}
+              keyHint={t.scratchKey}
               foil={FOILS[theme]}
               onReveal={onDateRevealed}
             >
@@ -300,10 +310,10 @@ export default function InvitationView({
           )}
           {showSeat && (
             <p className={styles.coverSeat}>
-              Mời {recipient === 'Bạn' ? 'bạn' : recipient} ngồi <strong>{tableLabel(guest.table)}</strong>
+              {t.seatLead(guestName)}<strong>{t.table(guest.table)}</strong>
             </p>
           )}
-          <a href="#ngay" className={styles.scrollCue} aria-label="Xem tiếp">
+          <a href="#ngay" className={styles.scrollCue} aria-label={t.scrollCue}>
             <IoChevronDown />
           </a>
         </div>
@@ -323,10 +333,10 @@ export default function InvitationView({
         </section>
       )}
 
-      {event.message && (
+      {message && (
         <Reveal className={styles.messageBlock}>
           <Ornament />
-          <p className={styles.message}>{event.message}</p>
+          <p className={styles.message} lang={message === event.messageEn ? 'en' : 'vi'}>{message}</p>
           <Ornament />
         </Reveal>
       )}
@@ -344,7 +354,7 @@ export default function InvitationView({
       {photos.length > 1 && (
         <section id="album" className={styles.section}>
           <Reveal>
-            <PhotoAlbum photos={photos} title={couple ? 'Khoảnh khắc' : 'Hình ảnh'} demo={demo} />
+            <PhotoAlbum photos={photos} title={t.album(couple)} demo={demo} />
           </Reveal>
         </section>
       )}
@@ -352,32 +362,26 @@ export default function InvitationView({
       {/* ---------- When ---------- */}
       <section id="ngay" className={styles.section}>
         <Reveal>
-          <h2 className={styles.h2}>Ngày chung vui</h2>
-          <p className={styles.when}>
-            {WEEKDAYS[shownAt.getDay()]} · {dayjs(shownAt).format('HH:mm')}
-          </p>
-          {lunar && (
-            <p className={styles.lunar}>
-              Tức ngày {lunar.lunar.day} {lunarMonthLabel(lunar.lunar)} năm {lunar.yearName}
-            </p>
-          )}
+          <h2 className={styles.h2}>{t.whenTitle}</h2>
+          <p className={styles.when}>{t.when(shownAt, !embedded && isAwayFromVietnam())}</p>
+          {lunar && <p className={styles.lunar}>{t.lunar(lunar, lunarMonthLabel(lunar.lunar))}</p>}
         </Reveal>
         <Reveal delay={100}>
           <MonthCalendar date={shownAt} />
         </Reveal>
         <Reveal delay={150}>
           {countdown ? (
-            <div className={styles.countdown} aria-label="Đếm ngược">
-              {[['days', 'Ngày'], ['hours', 'Giờ'], ['minutes', 'Phút'], ['seconds', 'Giây']].map(([key, label]) => (
+            <div className={styles.countdown} aria-label={t.countdown}>
+              {['days', 'hours', 'minutes', 'seconds'].map(key => (
                 <div key={key}>
                   <strong>{String(countdown[key]).padStart(2, '0')}</strong>
-                  <span>{label}</span>
+                  <span>{t.units[key]}</span>
                 </div>
               ))}
             </div>
           ) : (
             <p className={styles.over}>
-              {isLive ? 'Tiệc đang diễn ra. Gửi lời chúc ở cuối thiệp nhé!' : 'Ngày vui đã qua. Cảm ơn bạn đã ghé thăm!'}
+              {isLive ? t.liveNow : t.passed}
             </p>
           )}
         </Reveal>
@@ -391,13 +395,13 @@ export default function InvitationView({
       {/* ---------- Where ---------- */}
       <section id="dia-diem" className={styles.section}>
         <Reveal>
-          <h2 className={styles.h2}>Địa điểm</h2>
+          <h2 className={styles.h2}>{t.whereTitle}</h2>
           <p className={styles.place}>{event.location}</p>
         </Reveal>
         {!embedded && (
           <Reveal delay={100} className={styles.map}>
             <iframe
-              title="Bản đồ"
+              title={t.map}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               src={`https://maps.google.com/maps?q=${encodeURIComponent(event.location)}&z=15&output=embed`}
@@ -406,7 +410,7 @@ export default function InvitationView({
         )}
         <Reveal delay={150} className={styles.whereActions}>
           <Button href={mapsUrl(event)} target="_blank" rel="noreferrer" variant="outlined" startIcon={<IoNavigateOutline />}>
-            Chỉ đường
+            {t.directions}
           </Button>
           <AddToCalendar event={event} />
         </Reveal>
@@ -453,33 +457,34 @@ export default function InvitationView({
 
       <footer className={styles.footer}>
         <Ornament glyph={couple ? '囍' : '✦'} />
-        <p className={styles.thanks}>{couple ? 'Rất hân hạnh được đón tiếp!' : 'Hẹn gặp bạn!'}</p>
+        <p className={styles.thanks}>{t.footer(couple)}</p>
         <div className={styles.made}>
-          <span>Thiệp được làm miễn phí trên FollMe</span>
+          <span>{t.madeWith}</span>
           <Link to="/cuoi-hoi?ref=invitation" onClick={() => track('invitation_footer_cta', { demo })}>
-            {demo ? 'Tạo thiệp của bạn' : 'Tạo thiệp như thế này'} →
+            {t.makeOne(demo)} →
           </Link>
         </div>
       </footer>
 
       {/* ---------- Quick actions ---------- */}
       {isOpen && !embedded && (
-        <nav className={styles.dock} aria-label="Đi nhanh">
-          {countdown && <a href="#xac-nhan"><IoMailOpenOutline /> Xác nhận</a>}
+        <nav className={styles.dock} aria-label={t.dock.label}>
+          {countdown && <a href="#xac-nhan"><IoMailOpenOutline /> {t.dock.rsvp}</a>}
           {/* After the party: the photos instead of the way there */}
           {isOver && !isLive && photos.length > 1 ? (
-            <a href="#album"><IoImagesOutline /> Ảnh</a>
+            <a href="#album"><IoImagesOutline /> {t.dock.photos}</a>
           ) : (
-            (!isOver || isLive) && <a href="#dia-diem"><IoLocationOutline /> Chỉ đường</a>
+            (!isOver || isLive) && <a href="#dia-diem"><IoLocationOutline /> {t.dock.directions}</a>
           )}
-          {event.gifts?.length > 0 && <a href="#mung-cuoi"><IoGiftOutline /> {couple ? 'Mừng cưới' : 'Quà mừng'}</a>}
-          <a href="#loi-chuc"><IoCreateOutline /> Lời chúc</a>
+          {event.gifts?.length > 0 && <a href="#mung-cuoi"><IoGiftOutline /> {t.dock.gift(couple)}</a>}
+          <a href="#loi-chuc"><IoCreateOutline /> {t.dock.wishes}</a>
         </nav>
       )}
 
       {isOpen && withMusic && canPlayMusic() && <MusicToggle isPlaying={music.isPlaying} onToggle={music.toggle} />}
 
     </div>
+    </CardLangProvider>
   );
 }
 
@@ -492,17 +497,16 @@ function CoverDate({ date }) {
 }
 
 /** Why to answer, and by when if the host set a date. */
-function answerHint(event) {
+function answerHint(event, r) {
   if (!event.rsvpBy) {
-    return 'Một câu trả lời nhỏ giúp gia chủ chuẩn bị chu đáo hơn.';
+    return r.hint;
   }
-  const day = shortDay(event.rsvpBy);
-  return daysToAnswer(event.rsvpBy) >= 0
-    ? `Vui lòng trả lời trước ${day} để gia chủ chuẩn bị chu đáo hơn.`
-    : `Đã qua hạn trả lời (${day}). Bạn vẫn trả lời được, gia chủ sẽ cố gắng sắp xếp.`;
+  const day = r.day(event.rsvpBy);
+  return daysToAnswer(event.rsvpBy) >= 0 ? r.hintBy(day) : r.hintLate(day);
 }
 
 function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
+  const r = useCardText().rsvp;
   const existing = guest?.rsvp;
   const [status, setStatus] = useState(existing?.status ?? 'attending');
   const [count, setCount] = useState(existing?.count || 1);
@@ -522,7 +526,7 @@ function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
   async function submit(e) {
     e.preventDefault();
     if (isPublic && !guest?._id && !name.trim()) {
-      toast.error('Vui lòng cho biết tên của bạn');
+      toast.error(r.nameNeeded);
       return;
     }
     setIsSending(true);
@@ -554,9 +558,7 @@ function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
       if (status === 'attending') {
         burst();
       }
-      toast.success(demo
-        ? 'Thiệp mẫu: câu trả lời không được gửi đi. Tạo thiệp của bạn để dùng thật nhé!'
-        : (status === 'declined' ? 'Đã gửi. Tiếc quá, hẹn bạn dịp khác!' : 'Đã xác nhận. Hẹn gặp bạn nhé!'));
+      toast.success(demo ? r.demoSent : (status === 'declined' ? r.sentDeclined : r.sentAttending));
       setAnswered(res.rsvp);
       setIsEditing(false);
     } catch (err) {
@@ -569,51 +571,51 @@ function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
   if (!isEditing && current) {
     return (
       <div className={styles.card}>
-        <h2 className={styles.h2}>Xác nhận tham dự</h2>
+        <h2 className={styles.h2}>{r.answeredTitle}</h2>
         <p className={styles.answered}>
-          <IoCheckmarkCircle /> Bạn đã trả lời: <strong>{RSVP_LABELS[current.status]}</strong>
+          <IoCheckmarkCircle /> {r.answered} <strong>{r.labels[current.status]}</strong>
           {current.status !== 'declined' && (current.count > 1 || current.vegetarian > 0)
-            ? ` (${[current.count > 1 && `${current.count} người`, current.vegetarian > 0 && `${current.vegetarian} ăn chay`].filter(Boolean).join(', ')})`
+            ? ` (${[current.count > 1 && r.people(current.count), current.vegetarian > 0 && r.vegetarian(current.vegetarian)].filter(Boolean).join(', ')})`
             : ''}
         </p>
         {current.song && current.status !== 'declined' && (
-          <p className={styles.songChosen}><IoMusicalNotes aria-hidden /> Bài bạn muốn nghe: <strong>{current.song}</strong></p>
+          <p className={styles.songChosen}><IoMusicalNotes aria-hidden /> {r.song} <strong>{current.song}</strong></p>
         )}
-        <Button size="small" className={styles.textButton} onClick={() => setIsEditing(true)}>Đổi câu trả lời</Button>
+        <Button size="small" className={styles.textButton} onClick={() => setIsEditing(true)}>{r.change}</Button>
       </div>
     );
   }
 
   return (
     <div className={styles.card}>
-      <h2 className={styles.h2}>Bạn sẽ đến chứ?</h2>
-      <p className={styles.cardSub}>{answerHint(event)}</p>
+      <h2 className={styles.h2}>{r.title}</h2>
+      <p className={styles.cardSub}>{answerHint(event, r)}</p>
       <form className={styles.form} onSubmit={submit}>
         {isPublic && !guest?._id && (
-          <TextField size="small" label="Tên của bạn" value={name} inputProps={{ maxLength: 50 }} onChange={e => setName(e.target.value)} />
+          <TextField size="small" label={r.yourName} value={name} inputProps={{ maxLength: 50 }} onChange={e => setName(e.target.value)} />
         )}
-        <div className={styles.choices} role="radiogroup" aria-label="Bạn sẽ đến chứ?">
-          {[['attending', '🥂', 'Chắc chắn rồi'], ['maybe', '🤔', 'Chưa chắc'], ['declined', '💌', 'Tiếc quá']].map(([value, icon, label]) => (
+        <div className={styles.choices} role="radiogroup" aria-label={r.title}>
+          {[['attending', '🥂'], ['maybe', '🤔'], ['declined', '💌']].map(([value, icon]) => (
             <button
               type="button"
               key={value}
               role="radio"
               aria-checked={status === value}
-              aria-label={RSVP_LABELS[value]}
+              aria-label={r.labels[value]}
               className={clsx(styles.choice, status === value && styles.chosen)}
               onClick={() => setStatus(value)}
             >
               <span aria-hidden>{icon}</span>
-              {label}
+              {r.choices[value]}
             </button>
           ))}
         </div>
         {status !== 'declined' && (
           <div className={styles.counter}>
-            <span>Đi mấy người?</span>
+            <span>{r.howMany}</span>
             <button
               type="button"
-              aria-label="Bớt một người"
+              aria-label={r.fewer}
               onClick={() => {
                 const next = Math.max(1, Number(count) - 1);
                 setCount(next);
@@ -623,15 +625,15 @@ function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
               −
             </button>
             <strong aria-live="polite">{count}</strong>
-            <button type="button" aria-label="Thêm một người" onClick={() => setCount(c => Math.min(20, Number(c) + 1))}>+</button>
+            <button type="button" aria-label={r.more} onClick={() => setCount(c => Math.min(20, Number(c) + 1))}>+</button>
           </div>
         )}
         {status !== 'declined' && (askVegetarian ? (
           <div className={styles.counter}>
-            <span>Trong đó ăn chay</span>
-            <button type="button" aria-label="Bớt một người ăn chay" onClick={() => setVegetarian(v => Math.max(0, v - 1))}>−</button>
+            <span>{r.vegetarianCount}</span>
+            <button type="button" aria-label={r.fewerVegetarian} onClick={() => setVegetarian(v => Math.max(0, v - 1))}>−</button>
             <strong aria-live="polite">{vegetarian}</strong>
-            <button type="button" aria-label="Thêm một người ăn chay" onClick={() => setVegetarian(v => Math.min(Number(count) || 1, v + 1))}>+</button>
+            <button type="button" aria-label={r.moreVegetarian} onClick={() => setVegetarian(v => Math.min(Number(count) || 1, v + 1))}>+</button>
           </div>
         ) : (
           <button
@@ -642,27 +644,28 @@ function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
               setVegetarian(1);
             }}
           >
-            Có người ăn chay?
+            {r.askVegetarian}
           </button>
         ))}
         {status !== 'declined' && (
           <TextField
             size="small"
-            label="Muốn nghe bài gì ở tiệc? (không bắt buộc)"
-            placeholder="VD: Ngày đầu tiên – Đức Phúc"
+            label={r.songLabel}
+            placeholder={r.songPlaceholder}
             value={song}
             inputProps={{ maxLength: MAX_SONG }}
             onChange={e => setSong(e.target.value)}
           />
         )}
-        <TextField size="small" label="Nhắn gia chủ (không bắt buộc)" value={note} inputProps={{ maxLength: 300 }} onChange={e => setNote(e.target.value)} />
-        <LoadingButton type="submit" variant="contained" size="large" loading={isSending}>Gửi xác nhận</LoadingButton>
+        <TextField size="small" label={r.note} value={note} inputProps={{ maxLength: 300 }} onChange={e => setNote(e.target.value)} />
+        <LoadingButton type="submit" variant="contained" size="large" loading={isSending}>{r.send}</LoadingButton>
       </form>
     </div>
   );
 }
 
 function WishesWall({ event, guest, isPublic, wishes, onPosted, demo }) {
+  const w = useCardText().wishes;
   const [message, setMessage] = useState('');
   const [name, setName] = useState(guest?.name ?? '');
   const [isSending, setIsSending] = useState(false);
@@ -679,7 +682,7 @@ function WishesWall({ event, guest, isPublic, wishes, onPosted, demo }) {
       return;
     }
     if ((isPublic || demo) && !name.trim()) {
-      toast.error('Vui lòng cho biết tên của bạn');
+      toast.error(w.nameNeeded);
       return;
     }
     setIsSending(true);
@@ -704,30 +707,30 @@ function WishesWall({ event, guest, isPublic, wishes, onPosted, demo }) {
 
   return (
     <div>
-      <h2 className={styles.h2}>Sổ lưu bút</h2>
-      <p className={styles.cardSub}>Để lại một lời chúc, gia chủ sẽ đọc được ngay.</p>
+      <h2 className={styles.h2}>{w.title}</h2>
+      <p className={styles.cardSub}>{w.sub}</p>
       <form className={clsx(styles.card, styles.form)} onSubmit={submit}>
         {(isPublic || demo) && (
-          <TextField size="small" label="Tên của bạn" value={name} inputProps={{ maxLength: 50 }} onChange={e => setName(e.target.value)} />
+          <TextField size="small" label={w.yourName} value={name} inputProps={{ maxLength: 50 }} onChange={e => setName(e.target.value)} />
         )}
         <TextField
           multiline
           minRows={2}
-          label="Lời chúc"
+          label={w.label}
           value={message}
           inputProps={{ maxLength: 500 }}
           onChange={e => setMessage(e.target.value)}
         />
         <LoadingButton type="submit" variant="contained" loading={isSending} startIcon={<IoSend />} disabled={!message.trim()}>
-          Gửi lời chúc
+          {w.send}
         </LoadingButton>
       </form>
       {wishes.length > 0 && (
         <ul className={styles.wishes}>
-          {wishes.map((w, i) => (
-            <li key={w._id} style={{ '--tilt': `${((i * 37) % 7) - 3}deg` }}>
-              <p>{w.message}</p>
-              <span>— {w.name}</span>
+          {wishes.map((wish, i) => (
+            <li key={wish._id} style={{ '--tilt': `${((i * 37) % 7) - 3}deg` }}>
+              <p>{wish.message}</p>
+              <span>— {wish.name}</span>
             </li>
           ))}
         </ul>

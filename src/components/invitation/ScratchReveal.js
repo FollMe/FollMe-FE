@@ -74,7 +74,7 @@ function clearedShare(canvas) {
  * Scratch with a finger or the mouse; Enter or Space reveals at once.
  * Screen readers read the children as usual.
  */
-export default function ScratchReveal({ children, label, foil = 'gold', onReveal, className }) {
+export default function ScratchReveal({ children, label, keyHint = 'Nhấn Enter để xem ngay', foil = 'gold', onReveal, className }) {
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
   const last = useRef(null);
@@ -145,7 +145,7 @@ export default function ScratchReveal({ children, label, foil = 'gold', onReveal
       className={clsx(styles.wrap, styles[state], className)}
       role={state === 'revealed' ? undefined : 'button'}
       tabIndex={state === 'revealed' ? undefined : 0}
-      aria-label={state === 'revealed' ? undefined : `${label}. Nhấn Enter để xem ngay`}
+      aria-label={state === 'revealed' ? undefined : `${label}. ${keyHint}`}
       onKeyDown={e => {
         if (state !== 'revealed' && (e.key === 'Enter' || e.key === ' ')) {
           e.preventDefault();

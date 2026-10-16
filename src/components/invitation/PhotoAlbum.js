@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { IoChevronBack, IoChevronForward, IoClose } from 'react-icons/io5';
 import { cldUrl } from 'util/photos';
 import { track } from 'util/analytics';
+import { useCardText } from './CardLang';
 import styles from './PhotoAlbum.module.scss';
 
 // Cloudinary crops per tile shape, keeping faces in frame
@@ -26,6 +27,7 @@ export function tileShape(index, count) {
 
 /** The album; a tap opens the photo full screen. */
 export default function PhotoAlbum({ photos, title = 'Khoảnh khắc', demo }) {
+  const t = useCardText().photos;
   const [openAt, setOpenAt] = useState(null);
 
   return (
@@ -43,7 +45,7 @@ export default function PhotoAlbum({ photos, title = 'Khoảnh khắc', demo }) 
                   setOpenAt(i);
                   track('album_photo_opened', { demo });
                 }}
-                aria-label={`Xem ảnh ${i + 1} trên ${photos.length}`}
+                aria-label={t.viewAt(i + 1, photos.length)}
               >
                 <img
                   src={cldUrl(photo.url, CROPS[shape])}
@@ -72,6 +74,7 @@ const SWIPE_PX = 50;
  * close. Rendered into <body> so no transformed ancestor clips it.
  */
 export function Lightbox({ photos, index, onIndex, onClose }) {
+  const t = useCardText().photos;
   const closeRef = useRef(null);
   const start = useRef(null);
   // A swipe that ends off the photo must not count as a tap to close
@@ -121,7 +124,7 @@ export function Lightbox({ photos, index, onIndex, onClose }) {
       className={styles.lightbox}
       role="dialog"
       aria-modal="true"
-      aria-label={`Ảnh ${index + 1} trên ${count}`}
+      aria-label={t.at(index + 1, count)}
       onPointerDown={e => {
         start.current = { x: e.clientX, y: e.clientY };
       }}
@@ -157,18 +160,18 @@ export function Lightbox({ photos, index, onIndex, onClose }) {
       <div className={styles.bar}>
         <span className={styles.counter}>
           {index + 1} / {count}
-          {photo.name && <span className={styles.caption}> · Ảnh của {photo.name}</span>}
+          {photo.name && <span className={styles.caption}> · {t.by(photo.name)}</span>}
         </span>
-        <button ref={closeRef} type="button" className={styles.round} onClick={onClose} aria-label="Đóng">
+        <button ref={closeRef} type="button" className={styles.round} onClick={onClose} aria-label={t.close}>
           <IoClose />
         </button>
       </div>
       {count > 1 && (
         <>
-          <button type="button" className={`${styles.round} ${styles.prev}`} onClick={() => go(-1)} aria-label="Ảnh trước">
+          <button type="button" className={`${styles.round} ${styles.prev}`} onClick={() => go(-1)} aria-label={t.prev}>
             <IoChevronBack />
           </button>
-          <button type="button" className={`${styles.round} ${styles.next}`} onClick={() => go(1)} aria-label="Ảnh sau">
+          <button type="button" className={`${styles.round} ${styles.next}`} onClick={() => go(1)} aria-label={t.next}>
             <IoChevronForward />
           </button>
         </>
