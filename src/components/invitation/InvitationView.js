@@ -7,7 +7,7 @@ import Button from '@mui/material/Button';
 import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
 import {
-  IoNavigateOutline, IoSend, IoCheckmarkCircle, IoChevronDown, IoMailOpenOutline,
+  IoNavigateOutline, IoSend, IoCheckmarkCircle, IoChevronDown, IoMailOpenOutline, IoMusicalNotes,
   IoCreateOutline, IoLocationOutline, IoGiftOutline, IoImagesOutline,
 } from 'react-icons/io5';
 import Reveal from 'components/Reveal';
@@ -32,6 +32,7 @@ import { MusicBox, canPlayMusic } from 'util/musicBox';
 import { cldUrl } from 'util/photos';
 import { tableLabel } from 'util/seating';
 import { daysToAnswer, shortDay } from 'util/inviteMessage';
+import { MAX_SONG } from 'util/songs';
 import styles from './InvitationView.module.scss';
 
 const WEEKDAYS = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
@@ -483,6 +484,7 @@ function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
   const [vegetarian, setVegetarian] = useState(existing?.vegetarian || 0);
   const [askVegetarian, setAskVegetarian] = useState((existing?.vegetarian || 0) > 0);
   const [note, setNote] = useState(existing?.note ?? '');
+  const [song, setSong] = useState(existing?.song ?? '');
   const [name, setName] = useState(guest?.name ?? '');
   const [isSending, setIsSending] = useState(false);
   const [isEditing, setIsEditing] = useState(!existing);
@@ -499,11 +501,22 @@ function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
     }
     setIsSending(true);
     const people = status === 'declined' ? 1 : Number(count) || 1;
-    const payload = { status, count: people, vegetarian: status === 'declined' ? 0 : Math.min(vegetarian, people), note };
+    const payload = {
+      status,
+      count: people,
+      vegetarian: status === 'declined' ? 0 : Math.min(vegetarian, people),
+      note,
+      song: status === 'declined' ? '' : song.trim(),
+    };
     try {
       let res;
       if (demo) {
-        res = { guestId: 'demo', rsvp: { ...payload, count: status === 'declined' ? 0 : payload.count, vegetarian: payload.vegetarian || undefined } };
+        res = {
+          guestId: 'demo',
+          rsvp: {
+            ...payload, count: status === 'declined' ? 0 : payload.count, vegetarian: payload.vegetarian || undefined, song: payload.song || undefined,
+          },
+        };
       } else if (guest?._id) {
         res = await invitationApi.rsvp(guest._id, payload);
       } else {
@@ -537,6 +550,9 @@ function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
             ? ` (${[current.count > 1 && `${current.count} người`, current.vegetarian > 0 && `${current.vegetarian} ăn chay`].filter(Boolean).join(', ')})`
             : ''}
         </p>
+        {current.song && current.status !== 'declined' && (
+          <p className={styles.songChosen}><IoMusicalNotes aria-hidden /> Bài bạn muốn nghe: <strong>{current.song}</strong></p>
+        )}
         <Button size="small" className={styles.textButton} onClick={() => setIsEditing(true)}>Đổi câu trả lời</Button>
       </div>
     );
@@ -603,6 +619,16 @@ function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
             Có người ăn chay?
           </button>
         ))}
+        {status !== 'declined' && (
+          <TextField
+            size="small"
+            label="Muốn nghe bài gì ở tiệc? (không bắt buộc)"
+            placeholder="VD: Ngày đầu tiên – Đức Phúc"
+            value={song}
+            inputProps={{ maxLength: MAX_SONG }}
+            onChange={e => setSong(e.target.value)}
+          />
+        )}
         <TextField size="small" label="Nhắn gia chủ (không bắt buộc)" value={note} inputProps={{ maxLength: 300 }} onChange={e => setNote(e.target.value)} />
         <LoadingButton type="submit" variant="contained" size="large" loading={isSending}>Gửi xác nhận</LoadingButton>
       </form>

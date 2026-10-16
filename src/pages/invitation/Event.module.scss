@@ -611,3 +611,24 @@
     font-size: 1.3rem;
   }
 }
+
+.songs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding-left: 24px;
+
+  li {
+    padding-left: 4px;
+  }
+
+  strong {
+    display: block;
+  }
+
+  span {
+    color: var(--text-3);
+    font-size: 1.3rem;
+  }
+}
