@@ -899,6 +899,11 @@ function EventPage() {
                 Tải Excel
               </Button>
             )}
+            {guests.some(hasPersonalLink) && (
+              <Button size="small" component={Link} to={`/events/${eventId}/tem-thiep/in`} startIcon={<IoPrintOutline />}>
+                In tem thiệp giấy
+              </Button>
+            )}
           </div>
         </div>
         {unsent > 0 && (

@@ -1,0 +1,267 @@
+/* Labels for paper invitations on A4 label sheets: cells fill the page with
+   no margins, as on the sheets sold in stationery shops. Paper colors in any
+   site theme; the invitation's accent as ink. */
+
+@page {
+  size: A4;
+  margin: 0;
+}
+
+.page {
+  --label-ink: #1f1a17;
+  --label-muted: #5b524c;
+
+  min-height: 100vh;
+  padding: 16px;
+  background: var(--bg);
+}
+
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 210mm;
+  margin: 0 auto 16px;
+
+  h1 {
+    margin: 4px 0 0;
+    font-size: 2.4rem;
+  }
+}
+
+.lead {
+  margin: 0;
+  color: var(--text-2);
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+
+  > :global(.MuiTextField-root) {
+    min-width: 200px;
+    flex: 1 1 200px;
+  }
+}
+
+.printRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+
+.tip {
+  margin: 0;
+  color: var(--text-3);
+  font-size: 1.3rem;
+}
+
+.empty {
+  max-width: 210mm;
+  margin: 24px auto;
+  color: var(--text-2);
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 64px 16px;
+  text-align: center;
+}
+
+/* ---------- Sheets ---------- */
+.sheets {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  overflow-x: auto;
+}
+
+.sheet {
+  display: grid;
+  flex: none;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  grid-template-rows: repeat(var(--rows), 1fr);
+  width: 210mm;
+  height: 297mm;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
+  background: #fff;
+  color: var(--label-ink);
+  font-family: var(--font-sans);
+  break-after: page;
+
+  &:last-child {
+    break-after: auto;
+  }
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  gap: 3mm;
+  min-width: 0;
+  min-height: 0;
+  padding: 4mm 5mm;
+  overflow: hidden;
+  outline: 0.2mm dashed #e3dbd2;
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1mm;
+  min-width: 0;
+}
+
+.kicker {
+  color: var(--label-accent);
+  font-size: 6pt;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.name {
+  display: -webkit-box;
+  overflow: hidden;
+  font-family: var(--font-serif, Georgia, serif);
+  font-weight: 700;
+  line-height: 1.2;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+
+  &.m {
+    font-size: 12pt;
+  }
+
+  &.s {
+    font-size: 10pt;
+  }
+
+  &.xs {
+    font-size: 8.5pt;
+  }
+}
+
+.event {
+  overflow: hidden;
+  color: var(--label-muted);
+  font-size: 6.5pt;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.qr {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8mm;
+
+  svg {
+    width: 22mm;
+    height: 22mm;
+  }
+
+  span {
+    color: var(--label-muted);
+    font-size: 5.5pt;
+    white-space: nowrap;
+  }
+}
+
+/* Cards 105 × 74 mm: room for bigger type and code */
+.big {
+  gap: 5mm;
+  padding: 8mm;
+
+  .kicker {
+    font-size: 8pt;
+    letter-spacing: 0.1em;
+  }
+
+  .name {
+    &.m {
+      font-size: 17pt;
+    }
+
+    &.s {
+      font-size: 14pt;
+    }
+
+    &.xs {
+      font-size: 11pt;
+    }
+  }
+
+  .event {
+    font-size: 8pt;
+    white-space: normal;
+  }
+
+  .qr {
+    svg {
+      width: 32mm;
+      height: 32mm;
+    }
+
+    span {
+      font-size: 7pt;
+    }
+  }
+}
+
+/* A smaller preview on narrow screens; printing is always at full size */
+@media screen and (max-width: 860px) {
+  .sheet {
+    zoom: 0.7;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .sheet {
+    zoom: 0.44;
+  }
+}
+
+@media print {
+  :global(html),
+  :global(body) {
+    background: #fff !important;
+  }
+
+  .page {
+    min-height: 0;
+    padding: 0;
+    background: #fff;
+  }
+
+  .toolbar {
+    display: none;
+  }
+
+  .sheets {
+    display: block;
+    overflow: visible;
+  }
+
+  .sheet {
+    box-shadow: none;
+  }
+
+  .cell {
+    outline: none;
+  }
+}
