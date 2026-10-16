@@ -15,7 +15,7 @@ import dayjs from 'dayjs';
 import {
   IoTimeOutline, IoLocationOutline, IoCopyOutline, IoCheckmark, IoEyeOutline, IoCreateOutline, IoShareSocialOutline,
   IoEyeOffOutline, IoSparkles, IoDownloadOutline, IoTvOutline, IoRefresh, IoPersonAddOutline, IoPaperPlaneOutline,
-  IoNotificationsOutline, IoTrashOutline, IoPeopleOutline, IoWalletOutline, IoReceiptOutline, IoHeartOutline, IoGridOutline,
+  IoNotificationsOutline, IoTrashOutline, IoPeopleOutline, IoWalletOutline, IoReceiptOutline, IoPrintOutline, IoHeartOutline, IoGridOutline,
   IoNewspaperOutline, IoClose,
 } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
@@ -742,7 +742,14 @@ export default function Event() {
       <section className={styles.panel}>
         <div className={styles.panelHead}>
           <h2>Sổ lưu bút</h2>
-          <span>{event.wishes?.length ?? 0} lời chúc</span>
+          <div className={styles.panelTools}>
+            <span>{event.wishes?.length ?? 0} lời chúc</span>
+            {event.wishes?.length > 0 && (
+              <Button size="small" component={Link} to={`/events/${event._id}/loi-chuc/in`} startIcon={<IoPrintOutline />}>
+                In sổ lưu bút
+              </Button>
+            )}
+          </div>
         </div>
         {(event.wishes ?? []).length === 0 ? (
           <p className={styles.muted}>Chưa có lời chúc nào.</p>
