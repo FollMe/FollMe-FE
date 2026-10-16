@@ -22,6 +22,7 @@ import PhotoAlbum from './PhotoAlbum';
 import ProgramTimeline from './ProgramTimeline';
 import SeatFinder from './SeatFinder';
 import GuestPhotos, { guestPhotosOpen } from './GuestPhotos';
+import ArriveCard, { selfCheckInOpen } from './ArriveCard';
 import { getAlmanac, lunarMonthLabel } from 'util/fortune';
 import {
   RSVP_LABELS, eventHeadline, invitationApi, isCoupleEvent, rememberOpened, savePublicGuest, seatFinderOpen, wasOpened,
@@ -306,6 +307,13 @@ export default function InvitationView({
           </a>
         </div>
       </section>
+
+      {/* At the door: the guest checks themselves in */}
+      {!demo && !embedded && guest?._id && selfCheckInOpen(event.startAt) && (
+        <section id="da-den" className={styles.section}>
+          <ArriveCard guest={guest} onGuestChange={onGuestChange} />
+        </section>
+      )}
 
       {/* On the day, the shared link finds a seat by name (when there is a seating plan) */}
       {isPublic && !demo && !embedded && !showSeat && seatFinderOpen(event.startAt) && (

@@ -1,0 +1,65 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 22px 20px;
+  border: 1px solid var(--inv-line);
+  border-radius: 20px;
+  background: var(--inv-paper);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+
+.icon {
+  color: var(--inv-accent);
+  font-size: 4rem;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--inv-title);
+  font-size: 2.8rem;
+  font-style: italic;
+  font-weight: 600;
+}
+
+.text {
+  margin: 0;
+  color: var(--inv-muted);
+
+  strong {
+    color: var(--inv-accent-text);
+    font-family: var(--inv-title);
+    font-size: 2.4rem;
+  }
+}
+
+.small {
+  margin: 0;
+  color: var(--inv-muted);
+  font-size: 1.3rem;
+}
+
+.button {
+  min-height: 52px;
+  margin-top: 6px;
+  padding: 12px 32px;
+  border: none;
+  border-radius: 999px;
+  background: var(--inv-accent-fill);
+  color: var(--inv-accent-ink);
+  font: inherit;
+  font-size: 1.7rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: default;
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--inv-accent);
+    outline-offset: 3px;
+  }
+}
