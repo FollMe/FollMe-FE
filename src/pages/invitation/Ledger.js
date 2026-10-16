@@ -10,15 +10,17 @@ import TextField from '@mui/material/TextField';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
-import { IoSearch, IoCloseCircle, IoPersonAddOutline, IoDownloadOutline, IoLockClosedOutline } from 'react-icons/io5';
+import { IoSearch, IoCloseCircle, IoPersonAddOutline, IoDownloadOutline, IoLockClosedOutline, IoPhonePortraitOutline } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
 import ArticleHeader from 'components/article/ArticleHeader';
 import GroupPicker from 'components/invitation/GroupPicker';
+import { SIDE_LABELS } from 'components/invitation/GiftAccountsField';
 import { eventHeadline, invitationApi } from 'util/invitation';
 import {
-  LEDGER_TABS, MAX_GIFT_NOTE, QUICK_AMOUNTS, QUICK_NOTES, formatVnd, giftSummary, ledgerGuests, ledgerRows, parseAmount,
-  shortVnd,
+  LEDGER_TABS, MAX_GIFT_NOTE, QUICK_AMOUNTS, QUICK_NOTES, formatVnd, giftClaims, giftSummary, ledgerGuests, ledgerRows,
+  parseAmount, shortVnd,
 } from 'util/gifts';
+import { ago } from 'util/whatsNew';
 import { groupPresets } from 'util/guestList';
 import { downloadCsv } from 'util/csv';
 import { vnWallClock } from 'util/date';
@@ -40,8 +42,10 @@ function giftText(gift) {
 function GiftDialog({ guest, initialName = '', groups, onClose, onSave, onRemove }) {
   const [name, setName] = useState(initialName);
   const [group, setGroup] = useState('');
-  const [amountText, setAmountText] = useState(guest?.gift?.amount ? formatVnd(guest.gift.amount).replace(' đ', '') : '');
-  const [note, setNote] = useState(guest?.gift?.note ?? '');
+  // A guest who said they sent one by transfer: what they said, to check against the bank
+  const startAmount = guest?.gift?.amount ?? guest?.giftClaim?.amount;
+  const [amountText, setAmountText] = useState(startAmount ? formatVnd(startAmount).replace(' đ', '') : '');
+  const [note, setNote] = useState(guest?.gift?.note ?? (guest?.giftClaim ? 'Chuyển khoản' : ''));
   const [isSaving, setIsSaving] = useState(false);
   const amount = parseAmount(amountText);
   const unreadable = amountText.trim() !== '' && amount === null;
@@ -192,6 +196,7 @@ export default function Ledger() {
   const guests = useMemo(() => event?.guests ?? [], [event]);
   const setGuests = useCallback(update => setEvent(e => ({ ...e, guests: update(e.guests ?? []) })), []);
   const summary = useMemo(() => giftSummary(guests), [guests]);
+  const claims = useMemo(() => giftClaims(guests), [guests]);
   const shownGuests = useMemo(() => ledgerGuests(guests, { tab, query, group }), [guests, tab, query, group]);
   const tabCounts = useMemo(
     () => Object.fromEntries(LEDGER_TABS.map(([k, , test]) => [k, guests.filter(test).length])),
@@ -280,6 +285,45 @@ export default function Ledger() {
             ))}
           </tbody>
         </table>
+      )}
+
+      {claims.length > 0 && (
+        <section className={styles.claims} aria-labelledby="claims-title">
+          <h2 id="claims-title">
+            <IoPhonePortraitOutline aria-hidden /> Khách báo đã chuyển khoản <span>{claims.length}</span>
+          </h2>
+          <p>Khách bấm “Mình đã chuyển khoản rồi” trên thiệp. Đối chiếu với tài khoản ngân hàng rồi ghi vào sổ.</p>
+          <ul>
+            {claims.map(g => (
+              <li key={g._id}>
+                <span className={styles.claimText}>
+                  <strong>{g.name}</strong>
+                  <span>
+                    {[
+                      g.giftClaim.amount ? formatVnd(g.giftClaim.amount) : 'Không ghi số tiền',
+                      SIDE_LABELS[g.giftClaim.side],
+                      ago(g.giftClaim.at),
+                    ].filter(Boolean).join(' · ')}
+                  </span>
+                </span>
+                {g.giftClaim.amount ? (
+                  <Button
+                    size="small"
+                    variant="contained"
+                    onClick={() => save(g, { gift: { amount: g.giftClaim.amount, note: 'Chuyển khoản' } })}
+                    aria-label={`Ghi ${formatVnd(g.giftClaim.amount)} của ${g.name} vào sổ`}
+                  >
+                    Ghi vào sổ
+                  </Button>
+                ) : (
+                  <Button size="small" variant="outlined" onClick={() => setEditing(g)} aria-label={`Ghi số tiền của ${g.name}`}>
+                    Ghi số tiền
+                  </Button>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
       <p className={styles.private}>

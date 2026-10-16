@@ -48,7 +48,7 @@ export default function InvitationCard() {
       event={event}
       guest={guest}
       wishes={wishes}
-      onGuestChange={next => setData(d => ({ ...d, rsvp: next.rsvp }))}
+      onGuestChange={next => setData(d => ({ ...d, rsvp: next.rsvp, giftClaim: next.giftClaim }))}
     />
   );
 }

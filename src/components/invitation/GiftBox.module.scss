@@ -263,3 +263,151 @@
     animation: none;
   }
 }
+
+/* ---------- "Mình đã chuyển khoản rồi" ---------- */
+.claimButton {
+  min-height: 44px;
+  margin-top: 14px;
+  padding: 8px 18px;
+  border: 1px solid var(--inv-accent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--inv-accent);
+  font: inherit;
+  font-size: 1.45rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--inv-soft);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--inv-accent);
+    outline-offset: 2px;
+  }
+}
+
+.claimForm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--inv-line);
+  text-align: left;
+
+  label {
+    font-size: 1.35rem;
+    font-weight: 600;
+  }
+
+  input {
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 1px solid var(--inv-line);
+    border-radius: 12px;
+    background: var(--inv-paper);
+    color: var(--inv-ink);
+    font: inherit;
+    font-size: 1.6rem;
+
+    &:focus-visible {
+      outline: 2px solid var(--inv-accent);
+      outline-offset: 1px;
+    }
+  }
+}
+
+.claimChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  button {
+    min-height: 36px;
+    padding: 4px 12px;
+    border: 1px solid var(--inv-line);
+    border-radius: 999px;
+    background: var(--inv-paper);
+    color: var(--inv-ink);
+    font: inherit;
+    font-size: 1.35rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &[aria-pressed='true'] {
+      border-color: var(--inv-accent);
+      background: var(--inv-accent-fill);
+      color: var(--inv-accent-ink);
+    }
+  }
+}
+
+.claimHelp {
+  color: var(--inv-muted);
+  font-size: 1.25rem;
+}
+
+.claimError {
+  color: var(--inv-accent);
+  font-weight: 600;
+}
+
+.claimActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.claimSend {
+  min-height: 44px;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 999px;
+  background: var(--inv-accent-fill);
+  color: var(--inv-accent-ink);
+  font: inherit;
+  font-size: 1.45rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+}
+
+.undo {
+  min-height: 36px;
+  padding: 4px 8px;
+  border: none;
+  background: none;
+  color: var(--inv-muted);
+  font: inherit;
+  font-size: 1.3rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.claimed {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--inv-soft);
+  font-size: 1.35rem;
+  text-align: left;
+
+  svg {
+    flex: none;
+    color: var(--inv-accent);
+    font-size: 2rem;
+  }
+
+  span {
+    flex: 1;
+  }
+}

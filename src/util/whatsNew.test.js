@@ -6,7 +6,8 @@ const event = {
     { _id: '1', name: 'Cô Ba', rsvp: { status: 'attending', count: 2, respondedAt: '2027-01-06T08:00:00Z' } },
     { _id: '2', name: 'Chú Tư', rsvp: { status: 'declined', count: 0, respondedAt: '2027-01-07T08:00:00Z' } },
     { _id: '3', name: 'Bác Hai', rsvp: { status: 'attending', count: 1, respondedAt: '2027-01-04T08:00:00Z' } },
-    { _id: '4', name: 'Anh Tuấn' },
+    { _id: '4', name: 'Anh Tuấn', giftClaim: { amount: 500000, at: '2027-01-06T12:00:00Z' } },
+    { _id: '5', name: 'Chị Hà', giftClaim: { at: '2027-01-02T12:00:00Z' } },
   ],
   wishes: [
     { _id: 'w1', createdAt: '2027-01-06T09:00:00Z' },
@@ -19,17 +20,18 @@ describe('whatsNew', () => {
     const news = whatsNew(event, since);
     expect(news.answers.map(g => g.name)).toEqual(['Chú Tư', 'Cô Ba']);
     expect(news.wishes.map(w => w._id)).toEqual(['w1']);
-    expect(newsText(news)).toBe('2 khách trả lời (1 sẽ đến, 1 không đến) · 1 lời chúc mới');
+    expect(news.gifts.map(g => g.name)).toEqual(['Anh Tuấn']);
+    expect(newsText(news)).toBe('2 khách trả lời (1 sẽ đến, 1 không đến) · 1 lời chúc mới · 1 khách báo đã gửi quà mừng');
   });
 
   it('shows nothing on a first visit', () => {
-    expect(whatsNew(event, null)).toEqual({ answers: [], wishes: [] });
+    expect(whatsNew(event, null)).toEqual({ answers: [], wishes: [], gifts: [] });
     expect(newsText({ answers: [], wishes: [] })).toBe('');
     expect(isNewAnswer(event.guests[0], null)).toBe(false);
   });
 
   it('marks a new answer', () => {
-    expect(event.guests.map(g => isNewAnswer(g, since))).toEqual([true, true, false, false]);
+    expect(event.guests.map(g => isNewAnswer(g, since))).toEqual([true, true, false, false, false]);
   });
 });
 

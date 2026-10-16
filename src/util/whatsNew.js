@@ -26,20 +26,21 @@ export function isNewAnswer(guest, since) {
   return Boolean(since) && after(guest.rsvp?.respondedAt, since);
 }
 
-/** Answers (newest first) and wishes that came in after `since`; nothing without one. */
+/** Answers (newest first), wishes and gifts guests said they sent, after `since`; nothing without one. */
 export function whatsNew(event, since) {
   if (!since) {
-    return { answers: [], wishes: [] };
+    return { answers: [], wishes: [], gifts: [] };
   }
   const answers = (event.guests ?? [])
     .filter(g => isNewAnswer(g, since))
     .sort((a, b) => new Date(b.rsvp.respondedAt) - new Date(a.rsvp.respondedAt));
   const wishes = (event.wishes ?? []).filter(w => after(w.createdAt, since));
-  return { answers, wishes };
+  const gifts = (event.guests ?? []).filter(g => after(g.giftClaim?.at, since));
+  return { answers, wishes, gifts };
 }
 
 /** "3 khách trả lời (2 sẽ đến, 1 không đến) · 1 lời chúc mới", or '' when nothing is new. */
-export function newsText({ answers, wishes }) {
+export function newsText({ answers, wishes, gifts = [] }) {
   const parts = [];
   if (answers.length) {
     const by = status => answers.filter(g => g.rsvp.status === status).length;
@@ -52,6 +53,9 @@ export function newsText({ answers, wishes }) {
   }
   if (wishes.length) {
     parts.push(`${wishes.length} lời chúc mới`);
+  }
+  if (gifts.length) {
+    parts.push(`${gifts.length} khách báo đã gửi quà mừng`);
   }
   return parts.join(' · ');
 }

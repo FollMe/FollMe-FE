@@ -1,4 +1,4 @@
-import { formatVnd, giftSummary, ledgerGuests, ledgerRows, parseAmount, shortVnd } from './gifts';
+import { formatVnd, giftClaims, giftSummary, ledgerGuests, ledgerRows, parseAmount, shortVnd } from './gifts';
 
 describe('parseAmount', () => {
   it.each([
@@ -89,5 +89,17 @@ describe('ledgerRows', () => {
     expect(rows.slice(1, -1).map(r => r[0])).toEqual(['Chú Tư', 'Cô Út', 'Chị Lan']);
     expect(rows[3]).toEqual(['Chị Lan', '', 500000, 'Chuyển khoản', 'Có, 2 người', '2027-01-17']);
     expect(rows[rows.length - 1]).toEqual(['Tổng', '3 người mừng', 1500000, '', '', '']);
+  });
+});
+
+describe('giftClaims', () => {
+  it('lists who said they sent one and is not in the ledger yet, latest first', () => {
+    const guests = [
+      { _id: '1', giftClaim: { amount: 500000, at: '2027-01-10T10:00:00Z' } },
+      { _id: '2', giftClaim: { at: '2027-01-11T10:00:00Z' } },
+      { _id: '3', giftClaim: { amount: 1000000, at: '2027-01-12T10:00:00Z' }, gift: { amount: 1000000, at: '2027-01-12T11:00:00Z' } },
+      { _id: '4' },
+    ];
+    expect(giftClaims(guests).map(g => g._id)).toEqual(['2', '1']);
   });
 });

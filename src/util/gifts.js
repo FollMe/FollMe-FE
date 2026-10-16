@@ -145,3 +145,13 @@ export function ledgerRows(guests, formatTime) {
     ['Tổng', `${summary.count} người mừng`, summary.total, '', '', ''],
   ];
 }
+
+/**
+ * Guests who said on their card they sent a gift by transfer and are not in
+ * the ledger yet, latest first: the host checks the bank and records them.
+ */
+export function giftClaims(guests) {
+  return guests
+    .filter(g => g.giftClaim && !g.gift)
+    .sort((a, b) => new Date(b.giftClaim.at) - new Date(a.giftClaim.at));
+}
