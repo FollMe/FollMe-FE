@@ -20,9 +20,10 @@ import AddToCalendar from './AddToCalendar';
 import ScratchReveal from './ScratchReveal';
 import PhotoAlbum from './PhotoAlbum';
 import ProgramTimeline from './ProgramTimeline';
+import SeatFinder from './SeatFinder';
 import { getAlmanac, lunarMonthLabel } from 'util/fortune';
 import {
-  RSVP_LABELS, eventHeadline, invitationApi, isCoupleEvent, rememberOpened, savePublicGuest, wasOpened,
+  RSVP_LABELS, eventHeadline, invitationApi, isCoupleEvent, rememberOpened, savePublicGuest, seatFinderOpen, wasOpened,
 } from 'util/invitation';
 import { track } from 'util/analytics';
 import { vnWallClock } from 'util/date';
@@ -303,6 +304,13 @@ export default function InvitationView({
           </a>
         </div>
       </section>
+
+      {/* On the day, the shared link finds a seat by name (when there is a seating plan) */}
+      {isPublic && !demo && !embedded && !showSeat && seatFinderOpen(event.startAt) && (
+        <section id="tim-ban" className={styles.section}>
+          <SeatFinder eventId={event._id} headingClassName={styles.h2} />
+        </section>
+      )}
 
       {event.message && (
         <Reveal className={styles.messageBlock}>

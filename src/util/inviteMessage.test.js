@@ -2,7 +2,7 @@ import {
   daysToAnswer, deadlineText, defaultDayOf, defaultReminder, defaultTemplate, defaultThanks, inviteMessage, inviteWhen, loadTemplate,
   saveTemplate, shortDay,
 } from './inviteMessage';
-import { dayOfQueue } from './invitation';
+import { dayOfQueue, seatFinderOpen } from './invitation';
 
 const wedding = {
   type: 'wedding', groomName: 'Đức', brideName: 'Hạnh', title: 'Lễ thành hôn', startAt: '2027-01-16T04:00:00Z',
@@ -148,5 +148,17 @@ describe('the message for the day', () => {
       { _id: '5', rsvp: { status: 'attending' }, source: 'public' },
     ];
     expect(dayOfQueue(guests).map(g => g._id)).toEqual(['1']);
+  });
+});
+
+describe('seat finder window', () => {
+  const start = '2027-01-16T04:00:00Z';
+  const at = hours => new Date(start).getTime() + hours * 3600000;
+
+  it('opens 6 hours before the party and closes 12 hours after', () => {
+    expect(seatFinderOpen(start, at(-7))).toBe(false);
+    expect(seatFinderOpen(start, at(-6))).toBe(true);
+    expect(seatFinderOpen(start, at(11.9))).toBe(true);
+    expect(seatFinderOpen(start, at(12.1))).toBe(false);
   });
 });

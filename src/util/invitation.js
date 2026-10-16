@@ -58,6 +58,7 @@ export const invitationApi = {
   getPublic: (eventId, opts) => request.get(`api/events/${eventId}/public`, opts),
   rsvp: (guestId, payload) => request.put(`api/invitations/${guestId}/rsvp`, payload),
   claimGift: (guestId, payload) => request.put(`api/invitations/${guestId}/gift`, payload),
+  findSeat: (eventId, q) => request.get(`api/events/${eventId}/public/seat?q=${encodeURIComponent(q)}`, { quiet: true }),
   withdrawGiftClaim: (guestId) => request.del(`api/invitations/${guestId}/gift`),
   rsvpPublic: (eventId, payload) => request.post(`api/events/${eventId}/public/rsvp`, payload),
   wish: (guestId, payload) => request.post(`api/invitations/${guestId}/wishes`, payload),
@@ -277,6 +278,16 @@ export function deskUrl(eventId, key) {
 /** The host's link for someone to manage the event with them. */
 export function cohostUrl(eventId, key) {
   return `${window.location.origin}/cung-quan-ly/${eventId}/${key}`;
+}
+
+// "Bạn ngồi bàn nào?" on the shared link: from a little before the party to its end
+const SEAT_FINDER_BEFORE_MS = 6 * 60 * 60 * 1000;
+const SEAT_FINDER_AFTER_MS = 12 * 60 * 60 * 1000;
+
+/** Whether the shared link offers to find a seat now (the server checks too). */
+export function seatFinderOpen(startAt, now = Date.now()) {
+  const start = new Date(startAt).getTime();
+  return now >= start - SEAT_FINDER_BEFORE_MS && now <= start + SEAT_FINDER_AFTER_MS;
 }
 
 /** People who can manage an event besides its host. */
