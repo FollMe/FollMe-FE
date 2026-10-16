@@ -18,12 +18,14 @@ import InvitationView from 'components/invitation/InvitationView';
 import GiftAccountsField, { isGiftComplete, normalizeGifts } from 'components/invitation/GiftAccountsField';
 import GuestListInput, { guestListError } from 'components/invitation/GuestListInput';
 import PhotoManager from 'components/invitation/PhotoManager';
+import ProgramField, { programError, toRows } from 'components/invitation/ProgramField';
 import OvalLoading from 'components/loading/OvalLoading';
 import {
   DEFAULT_MESSAGES, EVENT_TYPES, THEMES, invitationApi, isCoupleEvent, suggestTitle,
 } from 'util/invitation';
 import { track } from 'util/analytics';
 import { parseGuestList } from 'util/guestList';
+import { isProgramTime, tidyProgram } from 'util/program';
 import { fromVnWallClock, isAwayFromVietnam, vnWallClock } from 'util/date';
 import styles from "./CreateEvent.module.scss";
 import previewStyles from "components/invitation/ThemePreview.module.scss";
@@ -69,6 +71,8 @@ function CreateEventForm() {
       // Answer by (a day in Vietnam), or null
       rsvpBy: null,
       gifts: [],
+      // Rows of the program of the day ({ id, time, label })
+      program: [],
     };
   });
   // Managed on the event page; shown here in the preview only
@@ -117,6 +121,7 @@ function CreateEventForm() {
           scratchDate: invitation.scratchDate ?? isCoupleEvent(invitation.type),
           rsvpBy: invitation.rsvpBy ? dayjs(vnWallClock(invitation.rsvpBy)) : null,
           gifts: invitation.gifts ?? [],
+          program: toRows(invitation.program),
         });
         setPhotos(invitation.photos ?? []);
         setInvitedNames((invitation.guests ?? []).map(g => g.name));
@@ -160,6 +165,9 @@ function CreateEventForm() {
     } else if (form.rsvpBy && form.startAt?.isValid() && form.rsvpBy.isAfter(form.startAt, 'day')) {
       next.rsvpBy = 'Hạn xác nhận phải trước ngày tiệc';
     }
+    if (programError(form.program)) {
+      next.program = true;
+    }
     if (!form.gifts.every(isGiftComplete)) {
       next.gifts = true;
     }
@@ -199,6 +207,7 @@ function CreateEventForm() {
       // The end of that day in Vietnam
       rsvpBy: form.rsvpBy ? fromVnWallClock(form.rsvpBy.endOf('day').toDate()).toISOString() : null,
       gifts: normalizeGifts(form.gifts, couple).map(g => ({ ...g, accountName: g.accountName.trim() })),
+      program: tidyProgram(form.program),
     };
     try {
       if (isEditing) {
@@ -248,6 +257,7 @@ function CreateEventForm() {
     location: form.location || 'Địa điểm tổ chức',
     message: form.message,
     gifts: normalizeGifts(form.gifts, couple).filter(isGiftComplete),
+    program: tidyProgram(form.program).filter(item => isProgramTime(item.time)),
     photos,
   };
 
@@ -322,6 +332,17 @@ function CreateEventForm() {
             <TextField fullWidth label="Địa điểm" value={form.location} inputProps={{ maxLength: 300 }} onChange={e => set({ location: e.target.value })} error={Boolean(errors.location)} helperText={errors.location ?? 'Ví dụ: Trung tâm tiệc cưới ABC, 123 Lê Lợi, Quận 1'} />
             <TextField fullWidth label="Link Google Maps (không bắt buộc)" value={form.mapLocation} inputProps={{ maxLength: 1000 }} onChange={e => set({ mapLocation: e.target.value })} helperText="Để trống thì khách sẽ được chỉ đường theo địa chỉ ở trên." />
             <TextField fullWidth multiline minRows={3} label="Lời mời" value={form.message} inputProps={{ maxLength: 1000 }} onChange={e => set({ message: e.target.value })} />
+          </fieldset>
+
+          <fieldset className={styles.group}>
+            <legend>Chương trình (không bắt buộc)</legend>
+            <ProgramField
+              value={form.program}
+              onChange={program => set({ program })}
+              type={form.type}
+              startTime={form.startAt?.isValid() ? form.startAt.format('HH:mm') : null}
+              showErrors={Boolean(errors.program)}
+            />
           </fieldset>
 
           <fieldset className={styles.group}>

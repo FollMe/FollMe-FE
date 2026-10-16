@@ -1,0 +1,96 @@
+/* Uses the invitation's theme tokens (--inv-*), set by InvitationView */
+.timeline {
+  position: relative;
+  width: min(100%, 360px);
+  margin: 28px auto 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+
+  li {
+    position: relative;
+    display: grid;
+    grid-template-columns: 64px 22px 1fr;
+    align-items: baseline;
+    padding: 10px 0;
+    transition: opacity 0.4s var(--ease);
+
+    // The line between the dots
+    &:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: calc(10px + 1.2em);
+      bottom: calc(-10px + 0.6em);
+      left: calc(64px + 10px);
+      width: 1px;
+      background: var(--inv-line);
+    }
+  }
+
+  time {
+    font-family: var(--inv-title);
+    font-size: 2.2rem;
+    font-weight: 600;
+    line-height: 1;
+    font-variant-numeric: lining-nums tabular-nums;
+    text-align: right;
+    padding-right: 4px;
+  }
+}
+
+.dot {
+  justify-self: center;
+  width: 9px;
+  height: 9px;
+  border: 1px solid var(--inv-accent);
+  border-radius: 50%;
+  background: var(--inv-paper);
+  transform: translateY(-1px);
+}
+
+.label {
+  font-size: 1.6rem;
+  line-height: 1.4;
+
+  em {
+    display: block;
+    margin-top: 2px;
+    color: var(--inv-accent-text);
+    font-size: 1.15rem;
+    font-style: normal;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+}
+
+.done {
+  color: var(--inv-muted);
+}
+
+.now {
+  .dot {
+    width: 13px;
+    height: 13px;
+    border: 0;
+    background: var(--inv-accent);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--inv-accent) 55%, transparent);
+    animation: pulse 2s ease-out infinite;
+  }
+
+  .label {
+    font-weight: 700;
+  }
+}
+
+@keyframes pulse {
+  to {
+    box-shadow: 0 0 0 12px transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .now .dot {
+    animation: none;
+  }
+}

@@ -11,6 +11,14 @@
   color: var(--text);
 }
 
+.program {
+  --program-accent: var(--brand);
+
+  margin-top: 6px;
+  color: var(--text-2);
+  font-size: 1.4rem;
+}
+
 .head {
   display: flex;
   align-items: center;

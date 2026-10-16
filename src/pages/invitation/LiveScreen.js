@@ -5,12 +5,14 @@ import QRCode from 'react-qr-code';
 import dayjs from 'dayjs';
 import { IoExpandOutline, IoContractOutline } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
+import ProgramNow from 'components/invitation/ProgramNow';
 import { eventHeadline, invitationApi, isCoupleEvent, isGoneError, wishesUrl } from 'util/invitation';
 import { DEMO_WISHES, demoEvent } from 'util/demoInvitation';
 import { vnWallClock } from 'util/date';
 import { cldUrl } from 'util/photos';
 import { burst } from 'util/confetti';
 import { setPageMeta } from 'util/meta';
+import { programMoment } from 'util/program';
 import styles from './LiveScreen.module.scss';
 
 const POLL_MS = 5000;
@@ -339,6 +341,13 @@ export default function LiveScreen({ demo = false }) {
       </aside>
 
       <main className={styles.stage}>
+        <ProgramNow
+          className={styles.program}
+          program={event.program}
+          startAt={event.startAt}
+          // The sample shows the party under way
+          at={demo && event.program?.length > 1 ? programMoment(event.program[1].time, event.startAt) + 5 * 60000 : undefined}
+        />
         <p className={styles.count}>
           <strong>{wishes.length}</strong> lời chúc
         </p>

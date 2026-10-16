@@ -1,0 +1,49 @@
+/* Colors come from the page: currentColor and an --accent the page may set */
+.now {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3em 1em;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.current {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  font-weight: 700;
+
+  i {
+    flex: none;
+    width: 0.6em;
+    height: 0.6em;
+    border-radius: 50%;
+    background: var(--program-accent, currentColor);
+    animation: blink 1.6s ease-in-out infinite;
+  }
+}
+
+.tag {
+  font-size: 0.72em;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.next {
+  strong {
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .current i {
+    animation: none;
+  }
+}

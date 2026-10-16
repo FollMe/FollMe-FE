@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import { vnWallClock } from './date';
 import { eventHeadline, isCoupleEvent } from './invitation';
+import { programText } from './program';
 
 export const NAME_TOKEN = '{tên}';
 export const LINK_TOKEN = '{link}';
@@ -54,6 +55,7 @@ export function defaultTemplate(event, now = Date.now()) {
   }[event.type] ?? headline;
   const by = openDeadline(event, now);
   return `Trân trọng kính mời ${NAME_TOKEN} tới dự ${what} vào ${inviteWhen(event.startAt)}.\n`
+    + (event.program?.length ? `${programText(event.program)}.\n` : '')
     + (by ? `Mong ${NAME_TOKEN} xác nhận tham dự trước ${by}.\n` : '')
     + `Thiệp mời dành riêng cho ${NAME_TOKEN}: ${LINK_TOKEN}`;
 }

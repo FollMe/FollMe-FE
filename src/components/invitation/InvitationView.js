@@ -19,6 +19,7 @@ import GiftBox from './GiftBox';
 import AddToCalendar from './AddToCalendar';
 import ScratchReveal from './ScratchReveal';
 import PhotoAlbum from './PhotoAlbum';
+import ProgramTimeline from './ProgramTimeline';
 import { getAlmanac, lunarMonthLabel } from 'util/fortune';
 import {
   RSVP_LABELS, eventHeadline, invitationApi, isCoupleEvent, rememberOpened, savePublicGuest, wasOpened,
@@ -350,6 +351,11 @@ export default function InvitationView({
             </p>
           )}
         </Reveal>
+        {event.program?.length > 0 && (!isOver || isLive) && (
+          <Reveal delay={200}>
+            <ProgramTimeline program={event.program} startAt={event.startAt} />
+          </Reveal>
+        )}
       </section>
 
       {/* ---------- Where ---------- */}

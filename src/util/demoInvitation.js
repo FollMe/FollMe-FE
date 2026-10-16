@@ -23,6 +23,11 @@ export function demoEvent(theme = 'blush') {
     mapLocation: '',
     message: 'Sau 5 năm thương nhau, tụi mình quyết định về chung một nhà.\nRất mong có bạn trong ngày vui này!',
     allowPublicLink: true,
+    program: [
+      { time: '11:00', label: 'Đón khách' },
+      { time: '11:30', label: 'Làm lễ thành hôn' },
+      { time: '12:00', label: 'Khai tiệc' },
+    ],
     // Shown as a sample: the QR code does not encode these accounts
     gifts: [
       { side: 'groom', bankBin: '970436', accountNumber: '0000000000', accountName: toAccountName(`Nguyễn Văn ${couple.groomName}`) },
