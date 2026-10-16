@@ -16,7 +16,7 @@ import {
   IoTimeOutline, IoLocationOutline, IoCopyOutline, IoCheckmark, IoEyeOutline, IoCreateOutline, IoShareSocialOutline,
   IoEyeOffOutline, IoSparkles, IoDownloadOutline, IoTvOutline, IoRefresh, IoPersonAddOutline, IoPaperPlaneOutline,
   IoNotificationsOutline, IoTrashOutline, IoPeopleOutline, IoWalletOutline, IoReceiptOutline, IoPrintOutline, IoListOutline, IoChevronForward, IoImageOutline, IoHeartOutline, IoGridOutline,
-  IoNewspaperOutline, IoClose, IoPeopleCircleOutline, IoExitOutline,
+  IoNewspaperOutline, IoClose, IoPeopleCircleOutline, IoExitOutline, IoGiftOutline,
 } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
 import Avatar from 'components/Avatar';
@@ -440,7 +440,16 @@ function DayTools({ event, summary, status }) {
       ? `Chi ${shortVnd(spent)}${summary.giftTotal > 0 ? ` · mừng ${shortVnd(summary.giftTotal)}` : ''}`
       : 'Chi phí, tiền cọc',
   };
-  const tiles = status === 'happened' ? [ledger, budget, desk, seating, screen] : [seating, desk, screen, ledger, budget];
+  const draw = {
+    key: 'draw',
+    to: `/events/${event._id}/quay-so`,
+    icon: <IoGiftOutline />,
+    title: 'Quay số may mắn',
+    note: 'Chiếu lên màn hình lúc giao lưu',
+  };
+  const tiles = status === 'happened'
+    ? [ledger, budget, desk, seating, screen, draw]
+    : [seating, desk, screen, draw, ledger, budget];
   return (
     <section className={styles.tools} aria-labelledby="day-tools">
       <h2 id="day-tools">{isCoupleEvent(event.type) ? 'Ngày cưới' : 'Ngày tiệc'}</h2>
