@@ -1,0 +1,273 @@
+/* The guestbook on paper: a cover, then the wishes in two columns. Paper
+   colors whatever the site theme; the invitation's accent as ink. */
+
+@page {
+  size: A4;
+  margin: 14mm 12mm;
+}
+
+.page {
+  --book-ink: #1f1a17;
+  --book-muted: #5b524c;
+  --book-line: #d9cfc4;
+
+  min-height: 100vh;
+  padding: 16px;
+  background: var(--bg);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  max-width: 210mm;
+  margin: 0 auto 16px;
+}
+
+.toggle {
+  margin-right: auto !important;
+  color: var(--text-2);
+}
+
+.tip {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--text-2);
+  font-size: 1.3rem;
+}
+
+.book {
+  max-width: 210mm;
+  margin: 0 auto;
+  padding: 16mm 14mm;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
+  background: #fffdf9;
+  color: var(--book-ink);
+  font-family: var(--font-sans);
+}
+
+/* ---------- Cover ---------- */
+.cover {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 250mm;
+  text-align: center;
+  break-after: page;
+}
+
+.kicker {
+  margin: 0 0 10mm;
+  color: var(--book-accent);
+  font-size: 12pt;
+  font-weight: 700;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+}
+
+.photo {
+  width: 92mm;
+  height: 115mm;
+  border-radius: 999px 999px 6mm 6mm;
+  object-fit: cover;
+  box-shadow: 0 0 0 1.5mm #fffdf9, 0 0 0 1.9mm var(--book-accent);
+}
+
+.seal {
+  display: grid;
+  place-items: center;
+  width: 46mm;
+  height: 46mm;
+  border: 1px solid var(--book-accent);
+  border-radius: 50%;
+  color: var(--book-accent);
+  font-family: var(--font-serif);
+  font-size: 30mm;
+  line-height: 1;
+}
+
+.names {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10mm 0 4mm;
+  font-family: var(--font-serif);
+  font-size: 40pt;
+  font-style: italic;
+  font-weight: 600;
+  line-height: 1.05;
+
+  span {
+    margin: 1mm 0;
+    color: var(--book-accent);
+    font-size: 26pt;
+  }
+}
+
+.when {
+  margin: 0;
+  color: var(--book-accent);
+  font-family: var(--font-serif);
+  font-size: 16pt;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  font-variant-numeric: lining-nums;
+}
+
+.where {
+  max-width: 120mm;
+  margin: 3mm 0 0;
+  color: var(--book-muted);
+  font-size: 11pt;
+}
+
+.count {
+  margin: 14mm 0 0;
+  padding-top: 5mm;
+  border-top: 1px solid var(--book-line);
+  color: var(--book-muted);
+  font-family: var(--font-serif);
+  font-size: 14pt;
+  font-style: italic;
+}
+
+/* ---------- Wishes ---------- */
+.wishes {
+  column-count: 2;
+  column-gap: 8mm;
+}
+
+.wish {
+  margin: 0 0 6mm;
+  padding: 0 0 5mm;
+  border-bottom: 1px solid var(--book-line);
+  break-inside: avoid;
+
+  blockquote {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: 13pt;
+    line-height: 1.5;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+
+    // In the flow, not positioned: a mark above the box can land on the page before
+    &::before {
+      content: '“';
+      display: block;
+      height: 5mm;
+      color: var(--book-accent);
+      font-size: 28pt;
+      line-height: 1;
+    }
+  }
+
+  figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1mm 4mm;
+    margin-top: 2.5mm;
+    font-size: 10pt;
+  }
+
+  strong {
+    color: var(--book-accent);
+  }
+
+  span {
+    color: var(--book-muted);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.end {
+  margin-top: 10mm;
+  text-align: center;
+  break-inside: avoid;
+
+  span {
+    color: var(--book-accent);
+    font-family: var(--font-serif);
+    font-size: 22pt;
+  }
+
+  p {
+    margin: 2mm 0 0;
+    color: var(--book-muted);
+    font-family: var(--font-serif);
+    font-size: 13pt;
+    font-style: italic;
+  }
+}
+
+.message {
+  max-width: 420px;
+  margin: 80px auto;
+  padding: 0 16px;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 8px;
+  }
+
+  .book {
+    padding: 20px 16px;
+  }
+
+  .cover {
+    min-height: 0;
+    padding: 24px 0 32px;
+  }
+
+  .photo {
+    width: 60vw;
+    height: 75vw;
+  }
+
+  .names {
+    font-size: 30pt;
+  }
+
+  .wishes {
+    column-count: 1;
+  }
+}
+
+@media print {
+  // Some browsers print the site's paper color around the book otherwise
+  :global(html),
+  :global(body) {
+    background: #fff !important;
+  }
+
+  .page {
+    min-height: 0;
+    padding: 0;
+    background: #fff;
+  }
+
+  .toolbar {
+    display: none;
+  }
+
+  .book {
+    max-width: none;
+    padding: 0;
+    box-shadow: none;
+    background: #fff;
+  }
+
+  .cover {
+    min-height: 260mm;
+  }
+
+  .wishes {
+    column-count: 2;
+  }
+}

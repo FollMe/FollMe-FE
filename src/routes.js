@@ -26,6 +26,7 @@ const Ledger = lazy(() => import("pages/invitation/Ledger"));
 const Budget = lazy(() => import("pages/invitation/Budget"));
 const Seating = lazy(() => import("pages/invitation/Seating"));
 const SeatingSheet = lazy(() => import("pages/invitation/SeatingSheet"));
+const GuestbookSheet = lazy(() => import("pages/invitation/GuestbookSheet"));
 const CreateEvent = lazy(() => import("pages/invitation/CreateEvent"));
 const FortuneHome = lazy(() => import("pages/fortune/FortuneHome"));
 const Numerology = lazy(() => import("pages/fortune/Numerology"));
@@ -64,6 +65,8 @@ export default function Router() {
         { path: '/don-khach/:eventId/:key', element: withSuspense(<Desk />) },
         // The seating plan to print (the host's; no site header on paper)
         { path: '/events/:eventId/xep-ban/in', element: withSuspense(<SeatingSheet />) },
+        // The guestbook to print or keep as a PDF
+        { path: '/events/:eventId/loi-chuc/in', element: withSuspense(<GuestbookSheet />) },
       ]
     },
     {
