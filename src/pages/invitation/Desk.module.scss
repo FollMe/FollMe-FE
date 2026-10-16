@@ -79,6 +79,104 @@
   font-size: 1.35rem;
 }
 
+/* The buses: a row each, one tap when it pulls up */
+.buses {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.bus {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px 8px 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 12px);
+  background: var(--surface);
+}
+
+.busShown {
+  border-color: var(--brand);
+  box-shadow: inset 0 0 0 1px var(--brand);
+}
+
+.busName {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 4px 6px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  > svg {
+    flex: none;
+    font-size: 2.2rem;
+    color: var(--brand-text);
+  }
+
+  span {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  strong {
+    font-size: 1.5rem;
+  }
+
+  small {
+    color: var(--text-2);
+    font-size: 1.25rem;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+}
+
+.busDone {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-2);
+  font-size: 1.3rem;
+  font-weight: 600;
+
+  svg {
+    color: var(--success, var(--brand-text));
+  }
+}
+
+.busNote {
+  margin: 0 0 8px;
+  color: var(--text-2);
+  font-size: 1.4rem;
+}
+
+.busList {
+  max-height: 40vh;
+  margin: 0 0 12px;
+  padding-left: 20px;
+  overflow-y: auto;
+  font-size: 1.45rem;
+
+  span {
+    color: var(--text-2);
+  }
+}
+
 .offline {
   display: flex;
   align-items: center;
