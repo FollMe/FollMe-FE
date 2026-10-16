@@ -117,11 +117,14 @@ export default function InvitationList() {
               <Button variant="text" onClick={() => navigate("/events/create")}>Tạo thiệp đầu tiên →</Button>
             </div>
           ) : (
-            <div className="card-grid stagger">
-              {invitations.map(invitation =>
-                <InvitationItem key={invitation._id} invitation={invitation} />
-              )}
-            </div>
+            <>
+              <h2 className="sr-only">Danh sách thiệp</h2>
+              <div className="card-grid stagger">
+                {invitations.map(invitation =>
+                  <InvitationItem key={invitation._id} invitation={invitation} />
+                )}
+              </div>
+            </>
           )
         }
         {
