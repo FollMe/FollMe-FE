@@ -30,7 +30,7 @@ import GroupPicker from 'components/invitation/GroupPicker';
 import SendQueue, { TemplateEditor } from 'components/invitation/SendQueue';
 import {
   MAX_PHOTOS, RSVP_LABELS, deskUrl, eventHeadline, groupSummary, hasPersonalLink, invitationApi, isCoupleEvent,
-  personalInvitationUrl, publicInvitationUrl, reminderQueue, screenUrl, summarizeGuests, thankQueue,
+  personalInvitationUrl, publicInvitationUrl, reminderQueue, screenUrl, summarizeGuests, thankQueue, vegetarianOf,
 } from 'util/invitation';
 import {
   deadlineText, defaultReminder, defaultTemplate, defaultThanks, loadTemplate, saveTemplate,
@@ -81,7 +81,7 @@ const SOURCES = { public: 'Link chung', desk: 'Thêm tại tiệc', ledger: 'Th�
 export function guestRows(guests) {
   return [
     [
-      'Tên', 'Nhóm', 'Bàn', 'Trả lời', 'Số người', 'Lời nhắn', 'Đã đến', 'Số người đến', 'Tiền mừng', 'Ghi chú mừng', 'Nguồn',
+      'Tên', 'Nhóm', 'Bàn', 'Trả lời', 'Số người', 'Ăn chay', 'Lời nhắn', 'Đã đến', 'Số người đến', 'Tiền mừng', 'Ghi chú mừng', 'Nguồn',
       'Đã gửi', 'Đã nhắc', 'Đã cảm ơn', 'Lượt mở', 'Email', 'Link riêng',
     ],
     ...guests.map(g => [
@@ -90,6 +90,7 @@ export function guestRows(guests) {
       g.table ? tableLabel(g.table) : '',
       g.rsvp ? RSVP_LABELS[g.rsvp.status] : (hasPersonalLink(g) ? 'Chưa trả lời' : ''),
       g.rsvp?.status === 'attending' || g.rsvp?.status === 'maybe' ? g.rsvp.count || 1 : '',
+      vegetarianOf(g) || '',
       g.rsvp?.note ?? '',
       g.arrivedAt ? dayjs(vnWallClock(g.arrivedAt)).format('HH:mm DD/MM/YYYY') : '',
       g.arrivedAt ? g.arrivedCount || 1 : '',
@@ -680,6 +681,7 @@ function EventPage() {
           ['Chưa chắc', summary.maybe],
           ['Không đến', summary.declined],
           ['Dự kiến số người', summary.headcount],
+          summary.vegetarian > 0 && ['Suất chay', summary.vegetarian],
           summary.arrived > 0 && ['Người đã đến', summary.arrivedPeople],
         ].filter(Boolean).map(([label, value]) => (
           <div key={label} className={styles.stat}>

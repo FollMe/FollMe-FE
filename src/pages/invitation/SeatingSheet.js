@@ -117,13 +117,14 @@ export default function SeatingSheet() {
               <section key={t.table} className={styles.table}>
                 <h2>
                   {tableLabel(t.table)}
-                  <span>{t.people} người</span>
+                  <span>{t.people} người{t.vegetarian > 0 && ` · ${t.vegetarian} chay`}</span>
                 </h2>
                 <ol>
                   {t.guests.map(g => (
                     <li key={g.id}>
                       {g.name}
                       {g.people > 1 && <span> · {g.people} người</span>}
+                      {g.vegetarian > 0 && <span> · {g.vegetarian} chay</span>}
                     </li>
                   ))}
                 </ol>

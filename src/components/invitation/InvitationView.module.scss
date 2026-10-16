@@ -577,6 +577,20 @@
   transform: translateY(-2px);
 }
 
+.askVegetarian {
+  align-self: center;
+  padding: 4px 0;
+  border: none;
+  background: none;
+  color: var(--inv-accent-text);
+  font: inherit;
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
 .counter {
   display: flex;
   align-items: center;

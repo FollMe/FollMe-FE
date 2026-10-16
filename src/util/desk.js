@@ -15,9 +15,13 @@ export function rsvpHint(guest) {
   if (guest.source === 'desk') {
     return 'Thêm tại tiệc';
   }
-  const { status, count } = guest.rsvp ?? {};
+  const { status, count, vegetarian } = guest.rsvp ?? {};
   if (status === 'attending') {
-    return count > 1 ? `Báo đến · ${count} người` : 'Báo đến';
+    return [
+      'Báo đến',
+      count > 1 && `${count} người`,
+      vegetarian > 0 && `${vegetarian} ăn chay`,
+    ].filter(Boolean).join(' · ');
   }
   if (status === 'maybe') {
     return 'Chưa chắc đến';
