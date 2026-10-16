@@ -1,0 +1,417 @@
+/* Thu chi: the total on top, gifts and the planned budget beside it, then
+   each expense. Phone first, like the gift ledger. */
+
+.page {
+  max-width: 720px;
+  padding-bottom: 48px;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 18px 20px;
+  border-radius: var(--radius-lg);
+  background: var(--brand-fill);
+  color: var(--on-brand);
+
+  > span {
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+
+  > strong {
+    font-family: var(--font-serif);
+    font-size: 3.4rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+  }
+
+  p {
+    margin: 0;
+    font-size: 1.35rem;
+    line-height: 1.5;
+  }
+
+  b {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.bar {
+  height: 8px;
+  margin: 4px 0 2px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--on-brand) 28%, transparent);
+  overflow: hidden;
+
+  i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--on-brand);
+    transition: width 0.4s var(--ease);
+  }
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.15s var(--ease);
+
+  &:hover {
+    border-color: var(--brand);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+
+  span {
+    color: var(--text-2);
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  strong {
+    font-size: 1.75rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.3;
+  }
+
+  small {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--brand-text);
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+}
+
+.balance {
+  margin: 12px 0 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: 1.4rem;
+  line-height: 1.5;
+}
+
+.even {
+  color: var(--success-text);
+  font-weight: 600;
+}
+
+.short {
+  color: var(--warning-text);
+  font-weight: 600;
+}
+
+.breakdown {
+  margin-top: 20px;
+
+  h2 {
+    margin: 0 0 8px;
+    font-size: 1.6rem;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: grid;
+    grid-template-columns: minmax(0, 11em) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    font-size: 1.35rem;
+  }
+
+  strong {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+
+  i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--gold);
+  }
+}
+
+.private {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 16px 0 0;
+  color: var(--text-2);
+  font-size: 1.3rem;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 24px 16px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  color: var(--text-2);
+  font-size: 1.5rem;
+  text-align: center;
+
+  p {
+    max-width: 440px;
+    margin: 0;
+    line-height: 1.6;
+  }
+}
+
+.chips {
+  display: flex;
+  gap: 6px;
+  margin: 16px -4px 4px;
+  padding: 0 4px 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  button {
+    flex: none;
+    min-height: 36px;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-2);
+    font: inherit;
+    font-size: 1.35rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+
+    span {
+      margin-left: 2px;
+      color: var(--text-3);
+      font-weight: 500;
+    }
+  }
+
+  .on {
+    border-color: var(--brand);
+    background: var(--brand-fill);
+    color: var(--on-brand);
+
+    span {
+      color: inherit;
+    }
+  }
+}
+
+.none {
+  margin: 16px 0;
+  color: var(--text-2);
+  font-size: 1.4rem;
+}
+
+.rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 64px;
+  padding: 10px 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+}
+
+.icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--border);
+  font-size: 2rem;
+}
+
+.what {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+
+  strong {
+    font-size: 1.55rem;
+    font-weight: 650;
+    overflow-wrap: anywhere;
+  }
+
+  span {
+    color: var(--text-2);
+    font-size: 1.3rem;
+  }
+}
+
+.breakdown .what {
+  flex-direction: row;
+  gap: 6px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  span {
+    color: inherit;
+    font-size: inherit;
+  }
+}
+
+.money {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+
+  strong {
+    font-size: 1.5rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  span {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+}
+
+.paid {
+  color: var(--success-text);
+}
+
+.deposit {
+  color: var(--warning-text);
+}
+
+.unpaid,
+.unpriced {
+  color: var(--text-2);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+/* Dialog */
+.option {
+  display: inline-block;
+  width: 1.6em;
+}
+
+.parsed {
+  color: var(--success-text) !important;
+  font-weight: 600;
+}
+
+.quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+
+  button {
+    min-height: 34px;
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-2);
+    font: inherit;
+    font-size: 1.35rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .on {
+    border-color: var(--brand);
+    background: var(--brand-fill);
+    color: var(--on-brand);
+  }
+}
+
+@media (max-width: 420px) {
+  .hero > strong {
+    font-size: 2.8rem;
+  }
+
+  .breakdown li {
+    grid-template-columns: minmax(0, 1fr) auto;
+
+    .track {
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+  }
+}
