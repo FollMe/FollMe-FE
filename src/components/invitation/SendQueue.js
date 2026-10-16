@@ -11,7 +11,8 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { toast } from 'react-toastify';
 import { IoPaperPlaneOutline, IoCopyOutline, IoCreateOutline, IoSparkles } from 'react-icons/io5';
 import { dayOfQueue, hasPersonalLink, invitationApi, personalInvitationUrl, reminderQueue, thankQueue } from 'util/invitation';
-import { LINK_TOKEN, NAME_TOKEN, TABLE_TOKEN, canShareText, inviteMessage, isEnglishGuest, sendInvite } from 'util/inviteMessage';
+import { LINK_TOKEN, NAME_TOKEN, SHUTTLE_TOKEN, TABLE_TOKEN, canShareText, inviteMessage, isEnglishGuest, sendInvite } from 'util/inviteMessage';
+import { guestShuttle, shuttleText } from 'util/shuttles';
 import { track } from 'util/analytics';
 import styles from './SendQueue.module.scss';
 
@@ -76,7 +77,7 @@ export function TemplateEditor({ value, onChange, onReset, mode = 'invite', lang
         value={value}
         onChange={e => onChange(e.target.value)}
         helperText={`${NAME_TOKEN} là tên khách, ${LINK_TOKEN} là link thiệp riêng của họ.`
-          + (mode === 'dayof' ? ` ${TABLE_TOKEN} là bàn của khách; khách chưa có bàn thì dòng đó được bỏ.` : '')}
+          + (mode === 'dayof' ? ` ${TABLE_TOKEN} là bàn, ${SHUTTLE_TOKEN} là chuyến xe của khách; khách chưa có thì dòng đó được bỏ.` : '')}
       />
       <Button size="small" onClick={onReset}>Dùng {noun}{lang === 'en' ? ' tiếng Anh' : ''} mặc định</Button>
     </div>
@@ -105,7 +106,9 @@ export default function SendQueue({
   const share = canShareText();
   const english = isEnglishGuest(guest) && Boolean(templateEn);
   const text = guest
-    ? inviteMessage(english ? templateEn : template, guest.name, personalInvitationUrl(guest._id), { table: guest.table, lang: english ? 'en' : 'vi' })
+    ? inviteMessage(english ? templateEn : template, guest.name, personalInvitationUrl(guest._id), {
+      table: guest.table, shuttle: shuttleText(guestShuttle(event, guest), english ? 'en' : 'vi'), lang: english ? 'en' : 'vi',
+    })
     : '';
 
   // A guest removed meanwhile is skipped

@@ -18,6 +18,7 @@ import {
 } from 'react-icons/io5';
 import { RSVP_LABELS, awaitsAnswer, hasPersonalLink, invitationApi, personalInvitationUrl, vegetarianOf } from 'util/invitation';
 import { inviteMessage, isEnglishGuest, sendInvite } from 'util/inviteMessage';
+import { guestShuttle, shuttleText } from 'util/shuttles';
 import { normalizeText } from 'util/search';
 import GroupPicker from './GroupPicker';
 import { MAX_TABLE_NAME, tableLabel } from 'util/seating';
@@ -99,7 +100,10 @@ export default function GuestList({
   // A guest's message from the template of that kind, in English for English guests
   function messageFor(guest, kind, fallback) {
     const english = isEnglishGuest(guest) ? englishTemplates?.[kind] : null;
-    return inviteMessage(english || fallback, guest.name, personalInvitationUrl(guest._id), { table: guest.table, lang: english ? 'en' : 'vi' });
+    const lang = english ? 'en' : 'vi';
+    return inviteMessage(english || fallback, guest.name, personalInvitationUrl(guest._id), {
+      table: guest.table, shuttle: shuttleText(guestShuttle(event, guest), lang), lang,
+    });
   }
 
   async function send(guest) {
@@ -265,6 +269,7 @@ export default function GuestList({
                   {guest.group && <span className={clsx(styles.tag, styles.group)}>{guest.group}</span>}
                   {guest.table && <span className={clsx(styles.tag, styles.group)}>{tableLabel(guest.table)}</span>}
                   {isEnglishGuest(guest) && <span className={clsx(styles.tag, styles.group)}>Thiệp tiếng Anh</span>}
+                  {guestShuttle(event, guest) && <span className={clsx(styles.tag, styles.group)}>Đi {guestShuttle(event, guest).label}</span>}
                   {guest.source === 'public' && <span className={styles.tag}>Qua link chung</span>}
                   {guest.source === 'desk' && <span className={styles.tag}>Thêm tại tiệc</span>}
                   {guest.source === 'ledger' && <span className={styles.tag}>Thêm từ sổ mừng</span>}

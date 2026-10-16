@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
 import {
   IoNavigateOutline, IoSend, IoCheckmarkCircle, IoChevronDown, IoMailOpenOutline, IoMusicalNotes,
-  IoCreateOutline, IoLocationOutline, IoGiftOutline, IoImagesOutline,
+  IoCreateOutline, IoLocationOutline, IoGiftOutline, IoImagesOutline, IoBusOutline,
 } from 'react-icons/io5';
 import Reveal from 'components/Reveal';
 import Envelope from './Envelope';
@@ -37,6 +37,7 @@ import { cldUrl } from 'util/photos';
 import { daysToAnswer } from 'util/inviteMessage';
 import { MAX_SONG } from 'util/songs';
 import { cardText, initialCardLang, saveCardLang } from 'util/cardText';
+import { guestShuttle, seatsLeft, shuttleWhen } from 'util/shuttles';
 import styles from './InvitationView.module.scss';
 
 // After the party the card thanks the guest (the host's thank-you links here).
@@ -515,6 +516,13 @@ function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
   const [askVegetarian, setAskVegetarian] = useState((existing?.vegetarian || 0) > 0);
   const [note, setNote] = useState(existing?.note ?? '');
   const [song, setSong] = useState(existing?.song ?? '');
+  // The bus they take, if the hosts laid some on; seats are counted from
+  // the answer the card loaded with (theirs is in the bus's count)
+  const shuttles = event.shuttles ?? [];
+  const [loaded] = useState(() => ({ rsvp: existing }));
+  const [shuttle, setShuttle] = useState(() => (guestShuttle(event, guest) ? existing.shuttle : ''));
+  const chosenBus = shuttles.find(s => String(s._id) === shuttle);
+  const busShort = status === 'attending' && chosenBus ? seatsLeft(chosenBus, loaded) < (Number(count) || 1) : false;
   const [name, setName] = useState(guest?.name ?? '');
   const [isSending, setIsSending] = useState(false);
   const [isEditing, setIsEditing] = useState(!existing);
@@ -537,6 +545,7 @@ function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
       vegetarian: status === 'declined' ? 0 : Math.min(vegetarian, people),
       note,
       song: status === 'declined' ? '' : song.trim(),
+      shuttle: status === 'attending' ? shuttle : '',
     };
     try {
       let res;
@@ -544,7 +553,11 @@ function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
         res = {
           guestId: 'demo',
           rsvp: {
-            ...payload, count: status === 'declined' ? 0 : payload.count, vegetarian: payload.vegetarian || undefined, song: payload.song || undefined,
+            ...payload,
+            count: status === 'declined' ? 0 : payload.count,
+            vegetarian: payload.vegetarian || undefined,
+            song: payload.song || undefined,
+            shuttle: payload.shuttle || undefined,
           },
         };
       } else if (guest?._id) {
@@ -581,6 +594,12 @@ function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
         {current.song && current.status !== 'declined' && (
           <p className={styles.songChosen}><IoMusicalNotes aria-hidden /> {r.song} <strong>{current.song}</strong></p>
         )}
+        {(() => {
+          const bus = guestShuttle(event, { rsvp: current });
+          return bus && (
+            <p className={styles.songChosen}><IoBusOutline aria-hidden /> {r.onBus} <strong>{bus.label}</strong> · {shuttleWhen(bus)}</p>
+          );
+        })()}
         <Button size="small" className={styles.textButton} onClick={() => setIsEditing(true)}>{r.change}</Button>
       </div>
     );
@@ -647,6 +666,38 @@ function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
             {r.askVegetarian}
           </button>
         ))}
+        {status === 'attending' && shuttles.length > 0 && (
+          <fieldset className={styles.shuttles}>
+            <legend>{r.shuttleTitle}</legend>
+            <label className={clsx(styles.shuttle, !shuttle && styles.shuttleOn)}>
+              <input type="radio" name="shuttle" value="" checked={!shuttle} onChange={() => setShuttle('')} />
+              <span className={styles.shuttleText}><strong>{r.ownWay}</strong></span>
+            </label>
+            {shuttles.map(s => {
+              const id = String(s._id);
+              const left = seatsLeft(s, loaded);
+              const full = left < (Number(count) || 1);
+              return (
+                <label key={id} className={clsx(styles.shuttle, shuttle === id && styles.shuttleOn, full && shuttle !== id && styles.full)}>
+                  <input
+                    type="radio"
+                    name="shuttle"
+                    value={id}
+                    checked={shuttle === id}
+                    disabled={full && shuttle !== id}
+                    onChange={() => setShuttle(id)}
+                  />
+                  <span className={styles.shuttleText}>
+                    <strong>{s.label}</strong>
+                    <small>{shuttleWhen(s)}</small>
+                  </span>
+                  <em>{left === 0 ? r.busFull : r.seatsLeft(left)}</em>
+                </label>
+              );
+            })}
+            {busShort && <p className={styles.shuttleWarn} role="alert">{r.notEnough(seatsLeft(chosenBus, loaded))}</p>}
+          </fieldset>
+        )}
         {status !== 'declined' && (
           <TextField
             size="small"
@@ -658,7 +709,7 @@ function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
           />
         )}
         <TextField size="small" label={r.note} value={note} inputProps={{ maxLength: 300 }} onChange={e => setNote(e.target.value)} />
-        <LoadingButton type="submit" variant="contained" size="large" loading={isSending}>{r.send}</LoadingButton>
+        <LoadingButton type="submit" variant="contained" size="large" loading={isSending} disabled={busShort}>{r.send}</LoadingButton>
       </form>
     </div>
   );

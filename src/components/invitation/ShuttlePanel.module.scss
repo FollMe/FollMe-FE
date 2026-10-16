@@ -1,0 +1,112 @@
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin-bottom: 12px;
+
+  h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+  }
+}
+
+.count {
+  margin-left: 6px;
+  color: var(--text-2);
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.buses {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bus {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.busHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  > svg {
+    flex: none;
+    font-size: 2.2rem;
+    color: var(--brand-text);
+  }
+
+  div {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  strong {
+    font-size: 1.5rem;
+  }
+
+  div span {
+    color: var(--text-2);
+    font-size: 1.3rem;
+  }
+}
+
+.seats {
+  flex: none;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+
+  small {
+    color: var(--text-2);
+    font-size: 1.25rem;
+  }
+}
+
+.meter {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-2);
+
+  span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--brand-fill);
+  }
+}
+
+.riders {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding-left: 22px;
+  font-size: 1.4rem;
+
+  span {
+    color: var(--text-2);
+  }
+}
+
+.empty {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 1.35rem;
+}

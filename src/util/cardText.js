@@ -115,6 +115,12 @@ const vi = {
     demoSent: 'Thiệp mẫu: câu trả lời không được gửi đi. Tạo thiệp của bạn để dùng thật nhé!',
     sentDeclined: 'Đã gửi. Tiếc quá, hẹn bạn dịp khác!',
     sentAttending: 'Đã xác nhận. Hẹn gặp bạn nhé!',
+    shuttleTitle: 'Đi xe đưa đón?',
+    ownWay: 'Tự đi',
+    seatsLeft: n => `còn ${n} chỗ`,
+    busFull: 'Hết chỗ',
+    notEnough: n => `Xe này chỉ còn ${n} chỗ, chưa đủ cho cả nhóm. Chọn xe khác hoặc bớt người nhé.`,
+    onBus: 'Đi xe:',
   },
 
   // Wishes
@@ -323,6 +329,12 @@ const en = {
     demoSent: 'Sample card: your answer was not sent. Make your own card to use it for real!',
     sentDeclined: 'Sent. We will miss you!',
     sentAttending: 'Thank you! See you there!',
+    shuttleTitle: 'Taking the shuttle bus?',
+    ownWay: "I'll get there myself",
+    seatsLeft: n => (n === 1 ? '1 seat left' : `${n} seats left`),
+    busFull: 'Full',
+    notEnough: n => `This bus has ${n} seat${n === 1 ? '' : 's'} left, not enough for everyone. Pick another one or fewer people.`,
+    onBus: 'Your bus:',
   },
 
   wishes: {

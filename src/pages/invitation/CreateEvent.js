@@ -19,8 +19,10 @@ import GiftAccountsField, { isGiftComplete, normalizeGifts } from 'components/in
 import GuestListInput, { guestListError } from 'components/invitation/GuestListInput';
 import PhotoManager from 'components/invitation/PhotoManager';
 import ProgramField, { programError, toRows } from 'components/invitation/ProgramField';
+import ShuttleField from 'components/invitation/ShuttleField';
 import StoryField from 'components/invitation/StoryField';
 import { tidyStory, toStoryRows } from 'util/story';
+import { shuttleRowError, tidyShuttleRows, toShuttleRows } from 'util/shuttles';
 import OvalLoading from 'components/loading/OvalLoading';
 import {
   DEFAULT_MESSAGES, EVENT_TYPES, THEMES, invitationApi, isCoupleEvent, suggestTitle,
@@ -78,6 +80,8 @@ function CreateEventForm() {
       program: [],
       // The couple's story ({ id, when, title, text })
       story: [],
+      // Buses for guests ({ id, _id, label, time, from, seats })
+      shuttles: [],
     };
   });
   // Managed on the event page; shown here in the preview only
@@ -129,6 +133,7 @@ function CreateEventForm() {
           gifts: invitation.gifts ?? [],
           program: toRows(invitation.program),
           story: toStoryRows(invitation.story),
+          shuttles: toShuttleRows(invitation.shuttles),
         });
         setPhotos(invitation.photos ?? []);
         setInvitedNames((invitation.guests ?? []).map(g => g.name));
@@ -175,6 +180,9 @@ function CreateEventForm() {
     if (programError(form.program)) {
       next.program = true;
     }
+    if (form.shuttles.some(shuttleRowError)) {
+      next.shuttles = true;
+    }
     if (!form.gifts.every(isGiftComplete)) {
       next.gifts = true;
     }
@@ -218,6 +226,7 @@ function CreateEventForm() {
       program: tidyProgram(form.program),
       // Only weddings and engagements tell a story; others keep none
       story: couple ? tidyStory(form.story) : [],
+      shuttles: tidyShuttleRows(form.shuttles),
     };
     try {
       if (isEditing) {
@@ -269,6 +278,9 @@ function CreateEventForm() {
     gifts: normalizeGifts(form.gifts, couple).filter(isGiftComplete),
     program: tidyProgram(form.program).filter(item => isProgramTime(item.time)),
     story: couple ? tidyStory(form.story) : [],
+    // Buses as guests will see them, none taken yet
+    shuttles: tidyShuttleRows(form.shuttles.filter(row => !shuttleRowError(row)))
+      .map((bus, i) => ({ ...bus, _id: bus._id ?? `preview-${i}`, taken: 0 })),
     photos,
   };
 
@@ -365,6 +377,11 @@ function CreateEventForm() {
               startTime={form.startAt?.isValid() ? form.startAt.format('HH:mm') : null}
               showErrors={Boolean(errors.program)}
             />
+          </fieldset>
+
+          <fieldset className={styles.group}>
+            <legend>Xe đưa đón khách (không bắt buộc)</legend>
+            <ShuttleField value={form.shuttles} onChange={shuttles => set({ shuttles })} showErrors={Boolean(errors.shuttles)} />
           </fieldset>
 
           {couple && (
