@@ -16,9 +16,10 @@ import {
   IoTimeOutline, IoLocationOutline, IoCopyOutline, IoCheckmark, IoEyeOutline, IoCreateOutline, IoShareSocialOutline,
   IoEyeOffOutline, IoSparkles, IoDownloadOutline, IoTvOutline, IoRefresh, IoPersonAddOutline, IoPaperPlaneOutline,
   IoNotificationsOutline, IoTrashOutline, IoPeopleOutline, IoWalletOutline, IoReceiptOutline, IoPrintOutline, IoListOutline, IoChevronForward, IoImageOutline, IoHeartOutline, IoGridOutline,
-  IoNewspaperOutline, IoClose,
+  IoNewspaperOutline, IoClose, IoPeopleCircleOutline, IoExitOutline,
 } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
+import Avatar from 'components/Avatar';
 import ArticleHeader from 'components/article/ArticleHeader';
 import InvitationStatusTag from 'components/invitation/InvitationStatusTag';
 import SaveTheDate from 'components/invitation/SaveTheDate';
@@ -29,7 +30,7 @@ import GuestList from 'components/invitation/GuestList';
 import GroupPicker from 'components/invitation/GroupPicker';
 import SendQueue, { TemplateEditor } from 'components/invitation/SendQueue';
 import {
-  MAX_PHOTOS, RSVP_LABELS, deskUrl, eventHeadline, groupSummary, hasPersonalLink, invitationApi, isCoupleEvent,
+  MAX_COHOSTS, MAX_PHOTOS, RSVP_LABELS, cohostUrl, deskUrl, eventHeadline, groupSummary, hasPersonalLink, invitationApi, isCoupleEvent,
   personalInvitationUrl, publicInvitationUrl, reminderQueue, screenUrl, summarizeGuests, thankQueue, vegetarianOf,
 } from 'util/invitation';
 import {
@@ -45,6 +46,7 @@ import { groupPresets, parseGuestList } from 'util/guestList';
 import { vnWallClock } from 'util/date';
 import { track } from 'util/analytics';
 import { CONTACT_EMAIL } from 'config/constant';
+import { useUserInfo } from 'customHooks/useUserInfo';
 import styles from "./Event.module.scss";
 
 function CopyButton({ text, label = 'Copy link', variant = 'icon' }) {
@@ -243,6 +245,147 @@ function DeskPanel({ event, summary }) {
           {url && <CopyButton text={url} variant="button" label="Copy link" />}
           {url && <Button size="small" startIcon={<IoRefresh />} onClick={rotate}>Đổi link</Button>}
         </div>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Managing the event together: the host sends a link to the other half, a
+ * parent or whoever runs the party; signed in, they do everything but delete
+ * the event. A co-host sees who else manages it and can leave.
+ */
+function CohostPanel({ event, userId, onChange }) {
+  const navigate = useNavigate();
+  const [key, setKey] = useState(null);
+  const [busy, setBusy] = useState(null);
+  const cohosts = event.cohosts ?? [];
+  const isHost = event.isHost !== false;
+  const full = cohosts.length >= MAX_COHOSTS;
+
+  useEffect(() => {
+    if (isHost && !full) {
+      invitationApi.cohostKey(event._id).then(res => setKey(res.key)).catch(() => setKey(null));
+    }
+  }, [event._id, isHost, full]);
+
+  async function rotate() {
+    if (!window.confirm('Tạo link mới? Link cũ sẽ không dùng được nữa, người đang cùng quản lý vẫn giữ quyền.')) {
+      return;
+    }
+    try {
+      const res = await invitationApi.cohostKey(event._id, true);
+      setKey(res.key);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const url = key && !full && cohostUrl(event._id, key);
+
+  async function share() {
+    const text = `Mời bạn cùng quản lý thiệp ${eventHeadline(event)} trên FollMe: thêm khách, gửi thiệp, xem ai sẽ đến.`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: 'Cùng quản lý thiệp', text, url });
+      } else {
+        await navigator.clipboard.writeText(`${text}\n${url}`);
+        toast.success('Đã copy link mời cùng quản lý');
+      }
+      track('cohost_link_shared');
+    } catch (err) {
+      // Closed the share sheet
+    }
+  }
+
+  async function remove(person) {
+    const leaving = String(person._id) === String(userId);
+    const question = leaving
+      ? 'Rời khỏi thiệp này? Bạn sẽ không xem và sửa được thiệp nữa, trừ khi chủ thiệp gửi lại link.'
+      : `Bỏ quyền quản lý của ${person.name || 'người này'}? Họ sẽ không mở được trang quản lý thiệp nữa.`;
+    if (!window.confirm(question)) {
+      return;
+    }
+    setBusy(person._id);
+    try {
+      await invitationApi.removeCohost(event._id, person._id);
+      if (leaving) {
+        track('cohost_left');
+        toast.success(`Đã rời khỏi thiệp "${event.title}"`);
+        navigate('/events', { replace: true });
+        return;
+      }
+      track('cohost_removed');
+      onChange(cohosts.filter(c => String(c._id) !== String(person._id)));
+    } catch (err) {
+      console.log(err);
+    }
+    setBusy(null);
+  }
+
+  const people = [
+    event.host && typeof event.host === 'object' && { ...event.host, role: 'Chủ thiệp' },
+    ...cohosts.map(c => ({ ...c, role: 'Cùng quản lý' })),
+  ].filter(Boolean);
+  const hostName = event.host?.name || 'chủ thiệp';
+
+  return (
+    <section id="cung-quan-ly" className={clsx(styles.panel, styles.screenPanel)}>
+      <div className={styles.screenIcon} aria-hidden><IoPeopleCircleOutline /></div>
+      <div className={styles.shareText}>
+        <h2>
+          Cùng quản lý{' '}
+          <span className={styles.headCount}>{cohosts.length}/{MAX_COHOSTS}</span>
+        </h2>
+        {isHost ? (
+          <p>
+            Gửi link cho nửa kia, bố mẹ hay người lo tiệc: họ đăng nhập FollMe là cùng sửa thiệp, thêm khách và gửi thiệp,
+            xếp bàn, ghi sổ mừng. Chỉ bạn xoá được thiệp.
+          </p>
+        ) : (
+          <p>Bạn đang cùng quản lý thiệp này với {hostName}. Thay đổi của bạn, mọi người cùng quản lý đều thấy.</p>
+        )}
+        {people.length > 1 && (
+          <ul className={styles.people} aria-label="Người quản lý thiệp">
+            {people.map(person => {
+              const isMe = String(person._id) === String(userId);
+              const canRemove = person.role !== 'Chủ thiệp' && (isHost || isMe);
+              return (
+                <li key={person._id}>
+                  <Avatar src={person.avatar?.link} name={person.name} size={36} />
+                  <span className={styles.personName}>
+                    <strong>{person.name || 'Chưa đặt tên'}{isMe ? ' (bạn)' : ''}</strong>
+                    <span>{person.role}</span>
+                  </span>
+                  {canRemove && (
+                    <LoadingButton
+                      size="small"
+                      color={isMe ? 'inherit' : 'error'}
+                      loading={busy === person._id}
+                      startIcon={isMe ? <IoExitOutline /> : null}
+                      onClick={() => remove(person)}
+                      aria-label={isMe ? 'Rời khỏi thiệp' : `Bỏ quyền quản lý của ${person.name || 'người này'}`}
+                    >
+                      {isMe ? 'Rời khỏi' : 'Bỏ'}
+                    </LoadingButton>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+        {isHost && full && <p className={styles.muted}>Đã đủ {MAX_COHOSTS} người cùng quản lý. Bỏ bớt một người để mời thêm.</p>}
+        {url && (
+          <>
+            <p className={styles.muted}>Ai có link đều vào quản lý được, chỉ gửi cho người bạn tin cậy.</p>
+            <code className={styles.url}>{url}</code>
+            <div className={styles.shareActions}>
+              <Button variant="contained" size="small" startIcon={<IoShareSocialOutline />} onClick={share}>Gửi link</Button>
+              <CopyButton text={url} variant="button" label="Copy link" />
+              <Button size="small" startIcon={<IoRefresh />} onClick={rotate}>Đổi link</Button>
+            </div>
+          </>
+        )}
       </div>
     </section>
   );
@@ -516,6 +659,7 @@ export default function Event() {
 
 function EventPage() {
   const navigate = useNavigate();
+  const [userInfo] = useUserInfo();
   const { eventId } = useParams();
   const [searchParams] = useSearchParams();
   const justCreated = searchParams.get('created') === '1';
@@ -640,7 +784,8 @@ function EventPage() {
         meta={[
           <><IoTimeOutline /> {dayjs(vnWallClock(event.startAt)).format('HH:mm · DD/MM/YYYY')}</>,
           <><IoLocationOutline /> {event.location}</>,
-        ]}
+          event.isHost === false && <><IoPeopleCircleOutline /> Cùng quản lý với {event.host?.name || 'chủ thiệp'}</>,
+        ].filter(Boolean)}
         actions={
           <div className={styles.headActions}>
             <InvitationStatusTag status={status} />
@@ -859,6 +1004,8 @@ function EventPage() {
 
       <DeskPanel event={event} summary={summary} />
 
+      <CohostPanel event={event} userId={userInfo._id} onChange={cohosts => setEvent(e => ({ ...e, cohosts }))} />
+
       <section className={clsx(styles.panel, styles.copyPanel)}>
         <div>
           <h2>Thiệp cho lễ khác</h2>
@@ -872,15 +1019,17 @@ function EventPage() {
         </Button>
       </section>
 
-      <section className={clsx(styles.panel, styles.dangerZone)}>
-        <div>
-          <h2>Xoá thiệp</h2>
-          <p className={styles.muted}>Khách sẽ không mở được thiệp nữa. Ảnh bị xoá ngay (trừ ảnh còn dùng ở thiệp khác của bạn), danh sách khách và lời chúc bị xoá hẳn sau 30 ngày.</p>
-        </div>
-        <Button color="error" variant="outlined" size="small" startIcon={<IoTrashOutline />} onClick={() => setIsConfirmingDelete(true)}>
-          Xoá thiệp
-        </Button>
-      </section>
+      {event.isHost !== false && (
+        <section className={clsx(styles.panel, styles.dangerZone)}>
+          <div>
+            <h2>Xoá thiệp</h2>
+            <p className={styles.muted}>Khách sẽ không mở được thiệp nữa. Ảnh bị xoá ngay (trừ ảnh còn dùng ở thiệp khác của bạn), danh sách khách và lời chúc bị xoá hẳn sau 30 ngày.</p>
+          </div>
+          <Button color="error" variant="outlined" size="small" startIcon={<IoTrashOutline />} onClick={() => setIsConfirmingDelete(true)}>
+            Xoá thiệp
+          </Button>
+        </section>
+      )}
 
       {queueMode && (
         <SendQueue

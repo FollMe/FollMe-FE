@@ -89,6 +89,10 @@ export const invitationApi = {
     `api/events/${eventId}/screen/${key}${since ? `?since=${encodeURIComponent(since)}` : ''}`,
     { quiet: Boolean(since) },
   ),
+  cohostKey: (eventId, rotate = false) => request.post(`api/events/${eventId}/cohost-key`, { rotate }),
+  cohostInvite: (eventId, key) => request.get(`api/events/${eventId}/cohost-invite/${key}`, { quiet: true }),
+  joinCohost: (eventId, key) => request.post(`api/events/${eventId}/cohosts`, { key }),
+  removeCohost: (eventId, userId) => request.del(`api/events/${eventId}/cohosts/${userId}`),
   deskKey: (eventId, rotate = false) => request.post(`api/events/${eventId}/desk-key`, { rotate }),
   // The desk page says itself when its link is wrong or offline
   desk: (eventId, key, poll = false) => request.get(`api/events/${eventId}/desk/${key}${poll ? '?poll=1' : ''}`, { quiet: true }),
@@ -258,6 +262,20 @@ export function screenUrl(eventId, key) {
 /** The reception desk page, for whoever welcomes guests at the party. */
 export function deskUrl(eventId, key) {
   return `${window.location.origin}/don-khach/${eventId}/${key}`;
+}
+
+/** The host's link for someone to manage the event with them. */
+export function cohostUrl(eventId, key) {
+  return `${window.location.origin}/cung-quan-ly/${eventId}/${key}`;
+}
+
+/** People who can manage an event besides its host. */
+export const MAX_COHOSTS = 3;
+
+/** Whether `userId` created the event (an id, or the host as the host view has it). */
+export function isOwnEvent(event, userId) {
+  const host = event.host?._id ?? event.host;
+  return !host || !userId || String(host) === String(userId);
 }
 
 export function personalInvitationUrl(guestId) {
