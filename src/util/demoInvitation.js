@@ -35,6 +35,10 @@ export function demoEvent(theme = 'blush') {
       { when: 'Tết 2024', title: 'Ra mắt hai gia đình' },
       { when: 'Tháng 6/2026', title: 'Ngày cầu hôn', text: 'Trên bãi biển Quy Nhơn, có người đã gật đầu.' },
     ],
+    notes: [
+      { kind: 'dress', text: 'Tông màu pastel, nhẹ nhàng. Mong mọi người tránh mặc trắng nhé!' },
+      { kind: 'parking', text: 'Có hầm gửi xe máy và ô tô miễn phí ở tầng B1.' },
+    ],
     // Shown as a sample: the QR code does not encode these accounts
     gifts: [
       { side: 'groom', bankBin: '970436', accountNumber: '0000000000', accountName: toAccountName(`Nguyễn Văn ${couple.groomName}`) },

@@ -579,6 +579,49 @@
   transform: translateY(-2px);
 }
 
+/* "Lưu ý nhỏ": a card per note, icon on the left */
+.notes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 460px;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+
+  li {
+    display: flex;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid var(--inv-line);
+    border-radius: 16px;
+    background: var(--inv-paper);
+  }
+
+  > li > svg {
+    flex: none;
+    margin-top: 2px;
+    font-size: 2.2rem;
+    color: var(--inv-accent);
+  }
+
+  h3 {
+    margin: 0 0 2px;
+    color: var(--inv-ink);
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0;
+    color: var(--inv-muted);
+    font-size: 1.4rem;
+    line-height: 1.6;
+    white-space: pre-line;
+  }
+}
+
 /* The buses: one row each, the chosen one outlined */
 .shuttles {
   display: flex;

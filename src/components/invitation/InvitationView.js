@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import {
   IoNavigateOutline, IoSend, IoCheckmarkCircle, IoChevronDown, IoMailOpenOutline, IoMusicalNotes,
   IoCreateOutline, IoLocationOutline, IoGiftOutline, IoImagesOutline, IoBusOutline,
+  IoShirtOutline, IoCarOutline, IoHappyOutline, IoBedOutline, IoInformationCircleOutline,
 } from 'react-icons/io5';
 import Reveal from 'components/Reveal';
 import Envelope from './Envelope';
@@ -78,6 +79,11 @@ function mapsUrl(event) {
   }
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`;
 }
+
+// "Lưu ý nhỏ": an icon per topic
+const NOTE_ICONS = {
+  dress: IoShirtOutline, parking: IoCarOutline, kids: IoHappyOutline, stay: IoBedOutline,
+};
 
 // Foil of the scratch-off date and colors of the confetti, per theme
 const FOILS = { blush: 'rose', classic: 'gold', minimal: 'silver', night: 'gold', garden: 'gold' };
@@ -416,6 +422,30 @@ export default function InvitationView({
           <AddToCalendar event={event} />
         </Reveal>
       </section>
+
+      {/* ---------- Good to know ---------- */}
+      {event.notes?.length > 0 && (
+        <section id="luu-y" className={styles.section}>
+          <Reveal>
+            <h2 className={styles.h2}>{t.notesTitle}</h2>
+            <ul className={styles.notes}>
+              {event.notes.map((note, i) => {
+                const Icon = NOTE_ICONS[note.kind] ?? IoInformationCircleOutline;
+                return (
+                  // eslint-disable-next-line react/no-array-index-key
+                  <li key={`${note.kind}-${i}`}>
+                    <Icon aria-hidden />
+                    <div>
+                      <h3>{note.kind === 'other' ? note.title : t.noteKinds[note.kind]}</h3>
+                      <p>{note.text}</p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </Reveal>
+        </section>
+      )}
 
       {/* ---------- RSVP ---------- */}
       {countdown && (
