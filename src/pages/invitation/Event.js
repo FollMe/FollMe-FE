@@ -45,6 +45,7 @@ import { DEFAULT_SEATS, seatingPlan, tableLabel } from 'util/seating';
 import { groupPresets, parseGuestList } from 'util/guestList';
 import { vnWallClock } from 'util/date';
 import { track } from 'util/analytics';
+import { songListText, songRequests } from 'util/songs';
 import { CONTACT_EMAIL } from 'config/constant';
 import { useUserInfo } from 'customHooks/useUserInfo';
 import styles from "./Event.module.scss";
@@ -86,7 +87,7 @@ const SOURCES = { public: 'Link chung', desk: 'Thêm tại tiệc', ledger: 'Th�
 export function guestRows(guests) {
   return [
     [
-      'Tên', 'Nhóm', 'Bàn', 'Trả lời', 'Số người', 'Ăn chay', 'Lời nhắn', 'Đã đến', 'Số người đến', 'Tiền mừng', 'Ghi chú mừng', 'Nguồn',
+      'Tên', 'Nhóm', 'Bàn', 'Trả lời', 'Số người', 'Ăn chay', 'Lời nhắn', 'Bài hát', 'Đã đến', 'Số người đến', 'Tiền mừng', 'Ghi chú mừng', 'Nguồn',
       'Đã gửi', 'Đã nhắc', 'Đã nhắn lịch hẹn', 'Đã cảm ơn', 'Lượt mở', 'Email', 'Link riêng',
     ],
     ...guests.map(g => [
@@ -97,6 +98,7 @@ export function guestRows(guests) {
       g.rsvp?.status === 'attending' || g.rsvp?.status === 'maybe' ? g.rsvp.count || 1 : '',
       vegetarianOf(g) || '',
       g.rsvp?.note ?? '',
+      g.rsvp?.song ?? '',
       g.arrivedAt ? dayjs(vnWallClock(g.arrivedAt)).format('HH:mm DD/MM/YYYY') : '',
       g.arrivedAt ? g.arrivedCount || 1 : '',
       g.gift?.amount || '',
@@ -391,6 +393,35 @@ function CohostPanel({ event, userId, onChange }) {
           </>
         )}
       </div>
+    </section>
+  );
+}
+
+/** Songs guests asked for with their answer, to send to the band or DJ. */
+function SongsPanel({ event }) {
+  const requests = useMemo(() => songRequests(event.guests ?? []), [event.guests]);
+  if (!requests.length) {
+    return null;
+  }
+  return (
+    <section id="bai-hat" className={styles.panel}>
+      <div className={styles.panelHead}>
+        <h2>Bài hát khách muốn nghe <span className={styles.headCount}>{requests.length}</span></h2>
+        <div className={styles.panelTools}>
+          <CopyButton text={songListText(requests, eventHeadline(event))} variant="button" label="Copy gửi ban nhạc" />
+        </div>
+      </div>
+      <ol className={styles.songs}>
+        {requests.map(r => (
+          <li key={r.song}>
+            <strong>{r.song}</strong>
+            <span>
+              {r.guests.slice(0, 3).join(', ')}
+              {r.guests.length > 3 ? ` và ${r.guests.length - 3} khách khác` : ''}
+            </span>
+          </li>
+        ))}
+      </ol>
     </section>
   );
 }
@@ -1018,6 +1049,8 @@ function EventPage() {
           </ul>
         )}
       </section>
+
+      <SongsPanel event={event} />
 
       <section className={styles.panel}>
         <div className={styles.panelHead}>

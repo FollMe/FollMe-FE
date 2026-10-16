@@ -621,6 +621,25 @@
   }
 }
 
+.songChosen {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 4px 0;
+  color: var(--inv-muted);
+  font-size: 1.4rem;
+
+  svg {
+    color: var(--inv-accent);
+  }
+
+  strong {
+    color: var(--inv-ink);
+  }
+}
+
 .answered {
   display: flex;
   flex-wrap: wrap;

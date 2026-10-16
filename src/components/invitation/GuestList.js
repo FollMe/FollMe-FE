@@ -287,6 +287,9 @@ export default function GuestList({ event, guests, template, reminderTemplate, d
                   )}
                 </div>
                 {guest.rsvp?.note && <p className={styles.note}>“{guest.rsvp.note}”</p>}
+                {guest.rsvp?.song && guest.rsvp.status !== 'declined' && (
+                  <p className={styles.note}><span aria-hidden>♪ </span>Muốn nghe: {guest.rsvp.song}</p>
+                )}
               </div>
               {hasPersonalLink(guest) && (guest.sentAt ? (
                 <IconButton size="small" aria-label={`Gửi lại cho ${guest.name}`} title="Gửi lại" onClick={() => send(guest)}>
