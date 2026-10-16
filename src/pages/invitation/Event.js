@@ -15,7 +15,7 @@ import dayjs from 'dayjs';
 import {
   IoTimeOutline, IoLocationOutline, IoCopyOutline, IoCheckmark, IoEyeOutline, IoCreateOutline, IoShareSocialOutline,
   IoEyeOffOutline, IoSparkles, IoDownloadOutline, IoTvOutline, IoRefresh, IoPersonAddOutline, IoPaperPlaneOutline,
-  IoNotificationsOutline, IoTrashOutline, IoPeopleOutline, IoWalletOutline, IoHeartOutline, IoGridOutline,
+  IoNotificationsOutline, IoTrashOutline, IoPeopleOutline, IoWalletOutline, IoReceiptOutline, IoHeartOutline, IoGridOutline,
   IoNewspaperOutline, IoClose,
 } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
@@ -34,7 +34,8 @@ import {
   deadlineText, defaultReminder, defaultTemplate, defaultThanks, loadTemplate, saveTemplate,
 } from 'util/inviteMessage';
 import { downloadCsv } from 'util/csv';
-import { formatVnd } from 'util/gifts';
+import { formatVnd, shortVnd } from 'util/gifts';
+import { budgetSummary } from 'util/budget';
 import { ago, loadSeen, newsText, saveSeen, whatsNew } from 'util/whatsNew';
 import { DEFAULT_SEATS, seatingPlan, tableLabel } from 'util/seating';
 import { groupPresets, parseGuestList } from 'util/guestList';
@@ -282,7 +283,17 @@ function DayTools({ event, summary, status }) {
     title: 'Sổ mừng',
     note: summary.gifts > 0 ? `${formatVnd(summary.giftTotal)} · ${summary.gifts} người` : 'Ghi sau tiệc',
   };
-  const tiles = status === 'happened' ? [ledger, desk, seating, screen] : [seating, desk, screen, ledger];
+  const spent = budgetSummary(event.expenses ?? []).total;
+  const budget = {
+    key: 'budget',
+    to: `/events/${event._id}/thu-chi`,
+    icon: <IoReceiptOutline />,
+    title: 'Thu chi',
+    note: spent > 0
+      ? `Chi ${shortVnd(spent)}${summary.giftTotal > 0 ? ` · mừng ${shortVnd(summary.giftTotal)}` : ''}`
+      : 'Chi phí, tiền cọc',
+  };
+  const tiles = status === 'happened' ? [ledger, budget, desk, seating, screen] : [seating, desk, screen, ledger, budget];
   return (
     <section className={styles.tools} aria-labelledby="day-tools">
       <h2 id="day-tools">{isCoupleEvent(event.type) ? 'Ngày cưới' : 'Ngày tiệc'}</h2>

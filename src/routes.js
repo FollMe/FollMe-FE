@@ -23,6 +23,7 @@ const InvitationCard = lazy(() => import("pages/invitation/InvitationCard"));
 const InvitationList = lazy(() => import("pages/invitation/InvitationList"));
 const Event = lazy(() => import("pages/invitation/Event"));
 const Ledger = lazy(() => import("pages/invitation/Ledger"));
+const Budget = lazy(() => import("pages/invitation/Budget"));
 const Seating = lazy(() => import("pages/invitation/Seating"));
 const SeatingSheet = lazy(() => import("pages/invitation/SeatingSheet"));
 const CreateEvent = lazy(() => import("pages/invitation/CreateEvent"));
@@ -107,6 +108,7 @@ export default function Router() {
         { path: '/events/:eventId/edit', element: withSuspense(<CreateEvent key="edit" />) },
         { path: '/events/:eventId', element: withSuspense(<Event />) },
         { path: '/events/:eventId/so-mung', element: withSuspense(<Ledger />) },
+        { path: '/events/:eventId/thu-chi', element: withSuspense(<Budget />) },
         { path: '/events/:eventId/xep-ban', element: withSuspense(<Seating />) },
         { path: '/fortune/profiles', element: withSuspense(<FortuneProfiles />) },
       ]
