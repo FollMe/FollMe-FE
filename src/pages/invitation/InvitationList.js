@@ -95,7 +95,7 @@ export default function InvitationList() {
       <PageHeader
         eyebrow="Thiệp mời online"
         title="Thiệp của tôi"
-        description="Thiệp cưới và thiệp mời bạn đã tạo. Mở từng thiệp để xem ai sẽ đến, đọc lời chúc và lấy link gửi khách."
+        description="Thiệp cưới và thiệp mời bạn đã tạo hoặc cùng quản lý. Mở từng thiệp để xem ai sẽ đến, đọc lời chúc và lấy link gửi khách."
         actions={
           <Button variant="contained" size="large" startIcon={<IoAdd />} onClick={() => navigate("/events/create")}>
             Tạo thiệp

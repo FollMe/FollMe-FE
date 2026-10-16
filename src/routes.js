@@ -43,6 +43,7 @@ const PublicInvitation = lazy(() => import("pages/invitation/PublicInvitation"))
 const DemoInvitation = lazy(() => import("pages/invitation/DemoInvitation"));
 const LiveScreen = lazy(() => import("pages/invitation/LiveScreen"));
 const Desk = lazy(() => import("pages/invitation/Desk"));
+const JoinCohost = lazy(() => import("pages/invitation/JoinCohost"));
 
 const withSuspense = (element) => (
   <Suspense fallback={<OvalLoading />}>{element}</Suspense>
@@ -100,6 +101,8 @@ export default function Router() {
         { path: '/cuoi-hoi', element: withSuspense(<WeddingHub />) },
         { path: '/cuoi-hoi/chon-ngay', element: withSuspense(<ChooseDate />) },
         { path: '/cuoi-hoi/tien-mung', element: withSuspense(<GiftCalculator />) },
+        // The host's link to manage an event with them: open before signing in
+        { path: '/cung-quan-ly/:eventId/:key', element: withSuspense(<JoinCohost />) },
       ]
     },
 
