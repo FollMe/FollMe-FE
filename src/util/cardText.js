@@ -193,6 +193,10 @@ const vi = {
     text: 'Bấm để báo cô dâu chú rể và người đón khách, không cần xếp hàng ở bàn tiếp tân.',
     sending: 'Đang báo…',
     button: 'Mình đã đến',
+    showCode: 'Hoặc đưa mã cho người đón khách',
+    hideCode: 'Ẩn mã',
+    codeLabel: name => `Mã thiệp của ${name || 'bạn'}`,
+    codeHint: 'Người đón khách quét mã này là xong.',
   },
 
   // Seat finder
@@ -404,6 +408,10 @@ const en = {
     text: 'Tap to let the couple and the welcome desk know: no need to queue at the reception table.',
     sending: 'Sending…',
     button: "I'm here",
+    showCode: 'Or show your code at the welcome desk',
+    hideCode: 'Hide the code',
+    codeLabel: name => (name ? `${name}'s invitation code` : 'Your invitation code'),
+    codeHint: 'The welcome desk scans it and you are in.',
   },
 
   seat: {
