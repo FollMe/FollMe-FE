@@ -30,6 +30,7 @@ const SeatingSheet = lazy(() => import("pages/invitation/SeatingSheet"));
 const GuestbookSheet = lazy(() => import("pages/invitation/GuestbookSheet"));
 const LabelSheet = lazy(() => import("pages/invitation/LabelSheet"));
 const ShuttleSheet = lazy(() => import("pages/invitation/ShuttleSheet"));
+const MenuSheet = lazy(() => import("pages/invitation/MenuSheet"));
 const LuckyDraw = lazy(() => import("pages/invitation/LuckyDraw"));
 const CreateEvent = lazy(() => import("pages/invitation/CreateEvent"));
 const FortuneHome = lazy(() => import("pages/fortune/FortuneHome"));
@@ -80,6 +81,8 @@ export default function Router() {
         { path: '/events/:eventId/tem-thiep/in', element: withSuspense(<LabelSheet />) },
         // Who rides each bus, to tick off as guests get on
         { path: '/events/:eventId/xe/in', element: withSuspense(<ShuttleSheet />) },
+        // Menu cards for the tables
+        { path: '/events/:eventId/thuc-don/in', element: withSuspense(<MenuSheet />) },
         // The lucky draw, full screen on the projector at the party
         { path: '/events/:eventId/quay-so', element: withSuspense(<LuckyDraw />) },
       ]

@@ -15,7 +15,7 @@ import dayjs from 'dayjs';
 import {
   IoTimeOutline, IoLocationOutline, IoCopyOutline, IoCheckmark, IoEyeOutline, IoCreateOutline, IoShareSocialOutline,
   IoEyeOffOutline, IoSparkles, IoDownloadOutline, IoTvOutline, IoRefresh, IoPersonAddOutline, IoPaperPlaneOutline,
-  IoNotificationsOutline, IoTrashOutline, IoPeopleOutline, IoWalletOutline, IoReceiptOutline, IoPrintOutline, IoListOutline, IoChevronForward, IoImageOutline, IoHeartOutline, IoGridOutline,
+  IoNotificationsOutline, IoTrashOutline, IoPeopleOutline, IoWalletOutline, IoReceiptOutline, IoRestaurantOutline, IoPrintOutline, IoListOutline, IoChevronForward, IoImageOutline, IoHeartOutline, IoGridOutline,
   IoNewspaperOutline, IoClose, IoPeopleCircleOutline, IoExitOutline, IoGiftOutline, IoNavigateOutline,
 } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
@@ -565,9 +565,17 @@ function DayTools({ event, summary, status }) {
     title: 'Quay số may mắn',
     note: 'Chiếu lên màn hình lúc giao lưu',
   };
+  const dishes = (event.menu ?? []).length;
+  const menu = {
+    key: 'menu',
+    to: dishes ? `/events/${event._id}/thuc-don/in` : `/events/${event._id}/edit#thuc-don`,
+    icon: <IoRestaurantOutline />,
+    title: 'Thực đơn',
+    note: dishes ? `${dishes} món · In thẻ đặt bàn` : 'Thêm món, in thẻ đặt bàn',
+  };
   const tiles = status === 'happened'
     ? [ledger, budget, desk, seating, screen, draw]
-    : [seating, desk, screen, draw, ledger, budget];
+    : [seating, desk, screen, draw, menu, ledger, budget];
   return (
     <section className={styles.tools} aria-labelledby="day-tools">
       <h2 id="day-tools">{isCoupleEvent(event.type) ? 'Ngày cưới' : 'Ngày tiệc'}</h2>

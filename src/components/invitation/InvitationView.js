@@ -39,6 +39,7 @@ import { daysToAnswer } from 'util/inviteMessage';
 import { MAX_SONG } from 'util/songs';
 import { cardText, initialCardLang, saveCardLang } from 'util/cardText';
 import { guestShuttle, seatsLeft, shuttleWhen } from 'util/shuttles';
+import { menuOpen } from 'util/menu';
 import styles from './InvitationView.module.scss';
 
 // After the party the card thanks the guest (the host's thank-you links here).
@@ -422,6 +423,23 @@ export default function InvitationView({
           <AddToCalendar event={event} />
         </Reveal>
       </section>
+
+      {/* ---------- The menu, around the day ---------- */}
+      {event.menu?.length > 0 && (embedded || menuOpen(event.startAt)) && (
+        <section id="thuc-don" className={styles.section}>
+          <Reveal className={styles.menu}>
+            <h2 className={styles.h2}>{t.menuTitle}</h2>
+            <Ornament />
+            <ol>
+              {event.menu.map((dish, i) => (
+                // eslint-disable-next-line react/no-array-index-key
+                <li key={`${dish}-${i}`}>{dish}</li>
+              ))}
+            </ol>
+            <Ornament />
+          </Reveal>
+        </section>
+      )}
 
       {/* ---------- Good to know ---------- */}
       {event.notes?.length > 0 && (

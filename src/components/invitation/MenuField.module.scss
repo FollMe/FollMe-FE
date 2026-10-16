@@ -1,0 +1,45 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.start {
+  align-self: flex-start;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+.number {
+  flex: none;
+  width: 22px;
+  color: var(--text-2);
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-align: right;
+  margin-right: 4px;
+}
+
+.dish {
+  flex: 1;
+  min-width: 0;
+}
+
+.help {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 1.3rem;
+}
