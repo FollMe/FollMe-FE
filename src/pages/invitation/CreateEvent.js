@@ -19,6 +19,8 @@ import GiftAccountsField, { isGiftComplete, normalizeGifts } from 'components/in
 import GuestListInput, { guestListError } from 'components/invitation/GuestListInput';
 import PhotoManager from 'components/invitation/PhotoManager';
 import ProgramField, { programError, toRows } from 'components/invitation/ProgramField';
+import StoryField from 'components/invitation/StoryField';
+import { tidyStory, toStoryRows } from 'util/story';
 import OvalLoading from 'components/loading/OvalLoading';
 import {
   DEFAULT_MESSAGES, EVENT_TYPES, THEMES, invitationApi, isCoupleEvent, suggestTitle,
@@ -73,6 +75,8 @@ function CreateEventForm() {
       gifts: [],
       // Rows of the program of the day ({ id, time, label })
       program: [],
+      // The couple's story ({ id, when, title, text })
+      story: [],
     };
   });
   // Managed on the event page; shown here in the preview only
@@ -122,6 +126,7 @@ function CreateEventForm() {
           rsvpBy: invitation.rsvpBy ? dayjs(vnWallClock(invitation.rsvpBy)) : null,
           gifts: invitation.gifts ?? [],
           program: toRows(invitation.program),
+          story: toStoryRows(invitation.story),
         });
         setPhotos(invitation.photos ?? []);
         setInvitedNames((invitation.guests ?? []).map(g => g.name));
@@ -208,6 +213,8 @@ function CreateEventForm() {
       rsvpBy: form.rsvpBy ? fromVnWallClock(form.rsvpBy.endOf('day').toDate()).toISOString() : null,
       gifts: normalizeGifts(form.gifts, couple).map(g => ({ ...g, accountName: g.accountName.trim() })),
       program: tidyProgram(form.program),
+      // Only weddings and engagements tell a story; others keep none
+      story: couple ? tidyStory(form.story) : [],
     };
     try {
       if (isEditing) {
@@ -258,6 +265,7 @@ function CreateEventForm() {
     message: form.message,
     gifts: normalizeGifts(form.gifts, couple).filter(isGiftComplete),
     program: tidyProgram(form.program).filter(item => isProgramTime(item.time)),
+    story: couple ? tidyStory(form.story) : [],
     photos,
   };
 
@@ -344,6 +352,13 @@ function CreateEventForm() {
               showErrors={Boolean(errors.program)}
             />
           </fieldset>
+
+          {couple && (
+            <fieldset className={styles.group}>
+              <legend>Chuyện tình yêu (không bắt buộc)</legend>
+              <StoryField value={form.story} onChange={story => set({ story })} />
+            </fieldset>
+          )}
 
           <fieldset className={styles.group}>
             <legend>{couple ? 'Ảnh cưới' : 'Hình ảnh'} (không bắt buộc)</legend>
