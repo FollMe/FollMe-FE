@@ -1,0 +1,61 @@
+.hint {
+  margin: 0 0 12px;
+  color: var(--text-2);
+  font-size: 1.4rem;
+}
+
+.formats {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+
+  button {
+    min-height: 36px;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-2);
+    font: inherit;
+    font-size: 1.35rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .on {
+    border-color: var(--brand);
+    background: var(--brand-fill);
+    color: var(--on-brand);
+  }
+}
+
+.preview {
+  display: grid;
+  place-items: center;
+  margin: 0 auto;
+  border-radius: 14px;
+  background: var(--surface-2);
+  overflow: hidden;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}
+
+.story {
+  width: min(100%, 300px);
+  aspect-ratio: 9 / 16;
+}
+
+.square {
+  width: min(100%, 360px);
+  aspect-ratio: 1;
+}
+
+.drawing {
+  color: var(--text-2);
+  font-size: 1.4rem;
+}
