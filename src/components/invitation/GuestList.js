@@ -282,7 +282,7 @@ export default function GuestList({ event, guests, template, reminderTemplate, d
                   {guest.thankedAt && <span className={clsx(styles.tag, styles.sent)}>Đã cảm ơn</span>}
                   {guest.arrivedAt && (
                     <span className={clsx(styles.tag, styles.arrived)}>
-                      Đã đến{(guest.arrivedCount || 1) > 1 ? ` · ${guest.arrivedCount} người` : ''}
+                      {guest.arrivedBySelf ? 'Tự báo đến' : 'Đã đến'}{(guest.arrivedCount || 1) > 1 ? ` · ${guest.arrivedCount} người` : ''}
                     </span>
                   )}
                 </div>

@@ -58,6 +58,7 @@ export const invitationApi = {
   getPublic: (eventId, opts) => request.get(`api/events/${eventId}/public`, opts),
   rsvp: (guestId, payload) => request.put(`api/invitations/${guestId}/rsvp`, payload),
   claimGift: (guestId, payload) => request.put(`api/invitations/${guestId}/gift`, payload),
+  arrive: (guestId, payload) => request.put(`api/invitations/${guestId}/arrive`, payload),
   findSeat: (eventId, q) => request.get(`api/events/${eventId}/public/seat?q=${encodeURIComponent(q)}`, { quiet: true }),
   withdrawGiftClaim: (guestId) => request.del(`api/invitations/${guestId}/gift`),
   rsvpPublic: (eventId, payload) => request.post(`api/events/${eventId}/public/rsvp`, payload),

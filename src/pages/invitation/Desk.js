@@ -146,7 +146,9 @@ function GuestRow({ guest, busy, canSeat, onArrive, onCount, onUndo, onSeat }) {
         <span>
           {[
             guest.group,
-            arrived ? `Đến lúc ${dayjs(vnWallClock(guest.arrivedAt)).format('HH:mm')}` : rsvpHint(guest),
+            arrived
+              ? `${guest.arrivedBySelf ? 'Tự báo đến' : 'Đến'} lúc ${dayjs(vnWallClock(guest.arrivedAt)).format('HH:mm')}`
+              : rsvpHint(guest),
           ].filter(Boolean).join(' · ')}
         </span>
         {arrived && canSeat && !guest.table && (
