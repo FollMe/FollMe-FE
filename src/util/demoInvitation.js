@@ -29,6 +29,12 @@ export function demoEvent(theme = 'blush') {
       { time: '11:30', label: 'Làm lễ thành hôn' },
       { time: '12:00', label: 'Khai tiệc' },
     ],
+    story: [
+      { when: 'Mùa thu 2020', title: 'Lần đầu gặp nhau', text: 'Một buổi chiều mưa, hai đứa trú chung mái hiên quán cà phê nhỏ ở Đà Lạt.' },
+      { when: '14/02/2021', title: 'Ngày tỏ tình', text: 'Một bó hoa cúc hoạ mi và câu nói run run: "Mình thử thương nhau nhé?"' },
+      { when: 'Tết 2024', title: 'Ra mắt hai gia đình' },
+      { when: 'Tháng 6/2026', title: 'Ngày cầu hôn', text: 'Trên bãi biển Quy Nhơn, có người đã gật đầu.' },
+    ],
     // Shown as a sample: the QR code does not encode these accounts
     gifts: [
       { side: 'groom', bankBin: '970436', accountNumber: '0000000000', accountName: toAccountName(`Nguyễn Văn ${couple.groomName}`) },

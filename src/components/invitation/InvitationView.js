@@ -23,6 +23,7 @@ import ProgramTimeline from './ProgramTimeline';
 import SeatFinder from './SeatFinder';
 import GuestPhotos, { guestPhotosOpen } from './GuestPhotos';
 import ArriveCard, { selfCheckInOpen } from './ArriveCard';
+import StoryTimeline from './StoryTimeline';
 import { getAlmanac, lunarMonthLabel } from 'util/fortune';
 import {
   RSVP_LABELS, eventHeadline, invitationApi, isCoupleEvent, rememberOpened, savePublicGuest, seatFinderOpen, wasOpened,
@@ -328,6 +329,15 @@ export default function InvitationView({
           <p className={styles.message}>{event.message}</p>
           <Ornament />
         </Reveal>
+      )}
+
+      {/* ---------- The couple's story ---------- */}
+      {couple && event.story?.length > 0 && (
+        <section id="chuyen-tinh-yeu" className={styles.section}>
+          <Reveal>
+            <StoryTimeline story={event.story} headingClassName={styles.h2} />
+          </Reveal>
+        </section>
       )}
 
       {/* ---------- Album ---------- */}
