@@ -632,3 +632,39 @@
     font-size: 1.3rem;
   }
 }
+
+.guestPhotos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+  }
+}
+
+.photoBy {
+  overflow: hidden;
+  color: var(--text-2);
+  font-size: 1.25rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.photoTools {
+  display: flex;
+  gap: 4px;
+}

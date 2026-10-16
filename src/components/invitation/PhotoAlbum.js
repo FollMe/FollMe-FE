@@ -155,7 +155,10 @@ export function Lightbox({ photos, index, onIndex, onClose }) {
         draggable={false}
       />
       <div className={styles.bar}>
-        <span className={styles.counter}>{index + 1} / {count}</span>
+        <span className={styles.counter}>
+          {index + 1} / {count}
+          {photo.name && <span className={styles.caption}> · Ảnh của {photo.name}</span>}
+        </span>
         <button ref={closeRef} type="button" className={styles.round} onClick={onClose} aria-label="Đóng">
           <IoClose />
         </button>

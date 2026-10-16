@@ -86,6 +86,15 @@ export const invitationApi = {
     return request.post(`api/events/${eventId}/photos`, form, true);
   },
   removePhoto: (eventId, photoId) => request.del(`api/events/${eventId}/photos/${photoId}`),
+  addGuestPhoto: (guestId, blob) => {
+    const form = new FormData();
+    form.append('photo', blob, 'photo.jpg');
+    return request.post(`api/invitations/${guestId}/photos`, form, true);
+  },
+  removeGuestPhoto: (guestId, photoId) => request.del(`api/invitations/${guestId}/photos/${photoId}`),
+  hideGuestPhoto: (eventId, photoId) => request.put(`api/events/${eventId}/guest-photos/${photoId}/hide`),
+  showGuestPhoto: (eventId, photoId) => request.del(`api/events/${eventId}/guest-photos/${photoId}/hide`),
+  deleteGuestPhoto: (eventId, photoId) => request.del(`api/events/${eventId}/guest-photos/${photoId}`),
   orderPhotos: (eventId, order) => request.put(`api/events/${eventId}/photos/order`, { order }),
   screenKey: (eventId, rotate = false) => request.post(`api/events/${eventId}/screen-key`, { rotate }),
   screen: (eventId, key, since) => request.get(

@@ -21,6 +21,7 @@ import ScratchReveal from './ScratchReveal';
 import PhotoAlbum from './PhotoAlbum';
 import ProgramTimeline from './ProgramTimeline';
 import SeatFinder from './SeatFinder';
+import GuestPhotos, { guestPhotosOpen } from './GuestPhotos';
 import { getAlmanac, lunarMonthLabel } from 'util/fortune';
 import {
   RSVP_LABELS, eventHeadline, invitationApi, isCoupleEvent, rememberOpened, savePublicGuest, seatFinderOpen, wasOpened,
@@ -408,6 +409,13 @@ export default function InvitationView({
           <Reveal>
             <GiftBox event={event} guest={guest} demo={demo} onGuestChange={onGuestChange} />
           </Reveal>
+        </section>
+      )}
+
+      {/* ---------- Photos guests took ---------- */}
+      {!demo && !embedded && (event.guestPhotos?.length > 0 || guestPhotosOpen(event.startAt)) && (
+        <section id="anh-khach" className={styles.section}>
+          <GuestPhotos event={event} guest={guest} headingClassName={styles.h2} />
         </section>
       )}
 
