@@ -23,6 +23,15 @@ describe('defaultTemplate', () => {
     expect(defaultTemplate({ ...wedding, type: 'birthday', title: 'Sinh nhật Vy' }))
       .toMatch(/^Trân trọng kính mời \{tên\} tới dự Sinh nhật Vy vào/);
   });
+
+  it('carries the program of the day', () => {
+    const program = [{ time: '11:00', label: 'Đón khách' }, { time: '12:00', label: 'Khai tiệc' }];
+    expect(defaultTemplate({ ...wedding, program })).toBe(
+      'Trân trọng kính mời {tên} tới dự lễ thành hôn của Đức & Hạnh vào 11:00 thứ Bảy, 16/01/2027.\n'
+      + 'Đón khách 11:00 · Khai tiệc 12:00.\n'
+      + 'Thiệp mời dành riêng cho {tên}: {link}',
+    );
+  });
 });
 
 describe('defaultReminder', () => {

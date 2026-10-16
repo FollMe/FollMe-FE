@@ -12,6 +12,7 @@ import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
 import { IoSearch, IoCloseCircle, IoCheckmarkCircle, IoAdd, IoRemove, IoPersonAddOutline, IoCloudOfflineOutline } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
+import ProgramNow from 'components/invitation/ProgramNow';
 import GroupPicker from 'components/invitation/GroupPicker';
 import { eventHeadline, invitationApi, isGoneError } from 'util/invitation';
 import {
@@ -443,6 +444,7 @@ export default function Desk() {
         {summary.arrived}/{summary.guests} khách đã đến
         {summary.expected > 0 && ` · ${summary.expected} người báo sẽ đến`}
       </p>
+      <ProgramNow className={styles.program} program={event.program} startAt={event.startAt} />
 
       {(offline || waiting > 0) && (
         <p className={styles.offline} role="status">

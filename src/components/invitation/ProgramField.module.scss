@@ -1,0 +1,85 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.suggest {
+  align-self: flex-start;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+.time {
+  flex: none;
+  width: 118px;
+}
+
+/* Phones open their own time picker on a tap: the clock icon only takes
+   room that "05:30 PM" needs */
+@media (hover: none) {
+  .time input::-webkit-calendar-picker-indicator {
+    display: none;
+  }
+}
+
+.label {
+  flex: 1;
+  min-width: 0;
+}
+
+.more {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 36px;
+  padding: 6px 12px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-2);
+  font: inherit;
+  font-size: 1.35rem;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--brand);
+    color: var(--brand-text);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+}
+
+.error {
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--danger);
+}
+
+.help {
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--text-3);
+}

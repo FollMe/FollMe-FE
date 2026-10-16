@@ -225,6 +225,18 @@
   }
 }
 
+/* "Đang diễn ra: Khai tiệc · Tiếp theo 18:30 Cắt bánh", across from the count */
+.program {
+  --program-accent: var(--accent);
+
+  position: absolute;
+  top: 3vmin;
+  left: 4vmin;
+  max-width: calc(100% - 26vmin);
+  font-size: 2.2vmin;
+  color: var(--ink);
+}
+
 .spot {
   position: relative;
   display: flex;
