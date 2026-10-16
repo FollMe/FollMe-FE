@@ -20,9 +20,11 @@ import GuestListInput, { guestListError } from 'components/invitation/GuestListI
 import PhotoManager from 'components/invitation/PhotoManager';
 import ProgramField, { programError, toRows } from 'components/invitation/ProgramField';
 import ShuttleField from 'components/invitation/ShuttleField';
+import NotesField from 'components/invitation/NotesField';
 import StoryField from 'components/invitation/StoryField';
 import { tidyStory, toStoryRows } from 'util/story';
 import { shuttleRowError, tidyShuttleRows, toShuttleRows } from 'util/shuttles';
+import { tidyNotes, toNoteRows } from 'util/notes';
 import OvalLoading from 'components/loading/OvalLoading';
 import {
   DEFAULT_MESSAGES, EVENT_TYPES, THEMES, invitationApi, isCoupleEvent, suggestTitle,
@@ -82,6 +84,8 @@ function CreateEventForm() {
       story: [],
       // Buses for guests ({ id, _id, label, time, from, seats })
       shuttles: [],
+      // Notes for guests ({ id, kind, title, text })
+      notes: [],
     };
   });
   // Managed on the event page; shown here in the preview only
@@ -134,6 +138,7 @@ function CreateEventForm() {
           program: toRows(invitation.program),
           story: toStoryRows(invitation.story),
           shuttles: toShuttleRows(invitation.shuttles),
+          notes: toNoteRows(invitation.notes),
         });
         setPhotos(invitation.photos ?? []);
         setInvitedNames((invitation.guests ?? []).map(g => g.name));
@@ -227,6 +232,7 @@ function CreateEventForm() {
       // Only weddings and engagements tell a story; others keep none
       story: couple ? tidyStory(form.story) : [],
       shuttles: tidyShuttleRows(form.shuttles),
+      notes: tidyNotes(form.notes),
     };
     try {
       if (isEditing) {
@@ -281,6 +287,7 @@ function CreateEventForm() {
     // Buses as guests will see them, none taken yet
     shuttles: tidyShuttleRows(form.shuttles.filter(row => !shuttleRowError(row)))
       .map((bus, i) => ({ ...bus, _id: bus._id ?? `preview-${i}`, taken: 0 })),
+    notes: tidyNotes(form.notes),
     photos,
   };
 
@@ -377,6 +384,11 @@ function CreateEventForm() {
               startTime={form.startAt?.isValid() ? form.startAt.format('HH:mm') : null}
               showErrors={Boolean(errors.program)}
             />
+          </fieldset>
+
+          <fieldset className={styles.group}>
+            <legend>Lưu ý cho khách (không bắt buộc)</legend>
+            <NotesField value={form.notes} onChange={notes => set({ notes })} />
           </fieldset>
 
           <fieldset className={styles.group}>
