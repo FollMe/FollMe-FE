@@ -29,6 +29,7 @@ import GuestListInput, { guestListError } from 'components/invitation/GuestListI
 import GuestList from 'components/invitation/GuestList';
 import GroupPicker from 'components/invitation/GroupPicker';
 import SendQueue, { TemplateEditor } from 'components/invitation/SendQueue';
+import ShuttlePanel from 'components/invitation/ShuttlePanel';
 import {
   MAX_COHOSTS, MAX_PHOTOS, RSVP_LABELS, cohostUrl, dayOfQueue, deskUrl, eventHeadline, groupSummary, hasPersonalLink, invitationApi, isCoupleEvent,
   personalInvitationUrl, publicInvitationUrl, reminderQueue, screenUrl, summarizeGuests, thankQueue, vegetarianOf,
@@ -47,6 +48,7 @@ import { groupPresets, parseGuestList } from 'util/guestList';
 import { vnWallClock } from 'util/date';
 import { track } from 'util/analytics';
 import { songListText, songRequests } from 'util/songs';
+import { guestShuttle } from 'util/shuttles';
 import { CONTACT_EMAIL } from 'config/constant';
 import { useUserInfo } from 'customHooks/useUserInfo';
 import styles from "./Event.module.scss";
@@ -85,10 +87,10 @@ function CopyButton({ text, label = 'Copy link', variant = 'icon' }) {
 const SOURCES = { public: 'Link chung', desk: 'Thêm tại tiệc', ledger: 'Thêm từ sổ mừng' };
 
 /** The guest list as spreadsheet rows, for seating plans and thank-you notes. */
-export function guestRows(guests) {
+export function guestRows(guests, event) {
   return [
     [
-      'Tên', 'Nhóm', 'Bàn', 'Trả lời', 'Số người', 'Ăn chay', 'Lời nhắn', 'Bài hát', 'Đã đến', 'Số người đến', 'Tiền mừng', 'Ghi chú mừng', 'Nguồn',
+      'Tên', 'Nhóm', 'Bàn', 'Trả lời', 'Số người', 'Ăn chay', 'Lời nhắn', 'Bài hát', 'Xe đưa đón', 'Đã đến', 'Số người đến', 'Tiền mừng', 'Ghi chú mừng', 'Nguồn',
       'Đã gửi', 'Đã nhắc', 'Đã nhắn lịch hẹn', 'Đã cảm ơn', 'Lượt mở', 'Email', 'Link riêng',
     ],
     ...guests.map(g => [
@@ -100,6 +102,7 @@ export function guestRows(guests) {
       vegetarianOf(g) || '',
       g.rsvp?.note ?? '',
       g.rsvp?.song ?? '',
+      guestShuttle(event, g)?.label ?? '',
       g.arrivedAt ? dayjs(vnWallClock(g.arrivedAt)).format('HH:mm DD/MM/YYYY') : '',
       g.arrivedAt ? g.arrivedCount || 1 : '',
       g.gift?.amount || '',
@@ -1028,7 +1031,7 @@ function EventPage() {
                 size="small"
                 startIcon={<IoDownloadOutline />}
                 onClick={() => {
-                  downloadCsv(`khach-moi-${dayjs(vnWallClock(event.startAt)).format('YYYY-MM-DD')}.csv`, guestRows(guests));
+                  downloadCsv(`khach-moi-${dayjs(vnWallClock(event.startAt)).format('YYYY-MM-DD')}.csv`, guestRows(guests, event));
                   track('guests_exported');
                 }}
               >
@@ -1138,6 +1141,8 @@ function EventPage() {
           </ul>
         )}
       </section>
+
+      <ShuttlePanel event={event} guests={guests} className={styles.panel} />
 
       <SongsPanel event={event} />
 

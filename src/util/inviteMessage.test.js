@@ -4,6 +4,7 @@ import {
   saveTemplate, shortDay,
 } from './inviteMessage';
 import { dayOfQueue, seatFinderOpen } from './invitation';
+import { shuttleText } from './shuttles';
 
 const wedding = {
   type: 'wedding', groomName: 'Đức', brideName: 'Hạnh', title: 'Lễ thành hôn', startAt: '2027-01-16T04:00:00Z',
@@ -198,5 +199,25 @@ describe('English messages', () => {
     expect(loadTemplate('e1', 'invite')).toBeNull();
     expect(isEnglishGuest({ lang: 'en' })).toBe(true);
     expect(isEnglishGuest({})).toBe(false);
+  });
+});
+
+describe('the bus in messages', () => {
+  const bus = { _id: 'b1', label: 'Xe từ TP.HCM', time: '06:00', from: 'Ngã tư Hàng Xanh', seats: 45 };
+
+  it('the day-before message has a bus line when there are buses', () => {
+    expect(defaultDayOf(wedding)).not.toContain('{xe}');
+    expect(defaultDayOf({ ...wedding, shuttles: [bus] })).toContain('Xe đưa đón: {xe}.\n');
+    expect(defaultDayOfEn({ ...wedding, shuttles: [bus] })).toContain('Your bus: {xe}.\n');
+  });
+
+  it('fills the bus, or drops its line', () => {
+    const template = 'Chào {tên}.\nXe đưa đón: {xe}.\nThiệp: {link}';
+    expect(inviteMessage(template, 'Cô Ba', 'https://x/1', { shuttle: shuttleText(bus) }))
+      .toBe('Chào Cô Ba.\nXe đưa đón: Xe từ TP.HCM, 06:00 tại Ngã tư Hàng Xanh.\nThiệp: https://x/1');
+    expect(inviteMessage(template, 'Cô Ba', 'https://x/1', { shuttle: '' })).toBe('Chào Cô Ba.\nThiệp: https://x/1');
+    expect(shuttleText(bus, 'en')).toBe('Xe từ TP.HCM, 06:00 from Ngã tư Hàng Xanh');
+    expect(shuttleText({ label: 'Xe 2', time: '07:00' })).toBe('Xe 2, 07:00');
+    expect(shuttleText(null)).toBe('');
   });
 });

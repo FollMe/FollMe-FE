@@ -8,6 +8,7 @@ import { cardText, shortDayEn } from './cardText';
 export const NAME_TOKEN = '{tên}';
 export const LINK_TOKEN = '{link}';
 export const TABLE_TOKEN = '{bàn}';
+export const SHUTTLE_TOKEN = '{xe}';
 
 const WEEKDAYS = ['Chủ Nhật', 'thứ Hai', 'thứ Ba', 'thứ Tư', 'thứ Năm', 'thứ Sáu', 'thứ Bảy'];
 
@@ -104,6 +105,7 @@ export function defaultDayOf(event) {
     : `Hẹn gặp ${NAME_TOKEN} tại ${event.title} lúc ${inviteWhen(event.startAt)}, ở ${event.location}.`;
   return `${first}\n`
     + `Chỗ ngồi của ${NAME_TOKEN}: ${TABLE_TOKEN}.\n`
+    + (event.shuttles?.length ? `Xe đưa đón: ${SHUTTLE_TOKEN}.\n` : '')
     + (event.program?.length ? `${programText(event.program)}.\n` : '')
     + `Chỉ đường và thiệp của ${NAME_TOKEN}: ${LINK_TOKEN}`;
 }
@@ -151,6 +153,7 @@ export function defaultDayOfEn(event) {
     : `See you, ${NAME_TOKEN}, at ${event.title} at ${inviteWhenEn(event.startAt)} (Vietnam time), ${event.location}.`;
   return `${first}\n`
     + `Your seat: ${TABLE_TOKEN}.\n`
+    + (event.shuttles?.length ? `Your bus: ${SHUTTLE_TOKEN}.\n` : '')
     + `Directions and your invitation: ${LINK_TOKEN}`;
 }
 
@@ -169,13 +172,15 @@ export function isEnglishGuest(guest) {
 
 /**
  * The template for one guest. A template without {link} gets it at the end.
- * {bàn} is their table ("Table 5" in English); a line with it is left out when they have none.
+ * {bàn} is their table ("Table 5" in English) and {xe} their bus (as
+ * written by shuttleText); a line with one is left out when they have none.
  */
-export function inviteMessage(template, name, url, { table, lang } = {}) {
+export function inviteMessage(template, name, url, { table, shuttle, lang } = {}) {
   const withTable = template.split('\n')
-    .filter(line => !line.includes(TABLE_TOKEN) || table)
+    .filter(line => (!line.includes(TABLE_TOKEN) || table) && (!line.includes(SHUTTLE_TOKEN) || shuttle))
     .join('\n')
-    .split(TABLE_TOKEN).join(table ? (lang === 'en' ? cardText('en').table(table) : tableLabel(table)) : '');
+    .split(TABLE_TOKEN).join(table ? (lang === 'en' ? cardText('en').table(table) : tableLabel(table)) : '')
+    .split(SHUTTLE_TOKEN).join(shuttle ?? '');
   const text = withTable.split(NAME_TOKEN).join(name);
   return text.includes(LINK_TOKEN) ? text.split(LINK_TOKEN).join(url) : `${text.trimEnd()}\n${url}`;
 }

@@ -1,0 +1,65 @@
+/* One sheet per bus; on paper each starts a new page */
+.bus {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+
+  & + & {
+    break-before: page;
+  }
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12pt;
+
+  th {
+    padding: 2mm;
+    border-bottom: 1.5px solid #1a1a1a;
+    font-size: 10pt;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  td {
+    padding: 2.4mm 2mm;
+    border-bottom: 1px solid #ccc;
+    break-inside: avoid;
+  }
+
+  th:first-child,
+  td:first-child {
+    width: 8mm;
+    color: #444;
+  }
+
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 20mm;
+    text-align: center;
+  }
+
+  th:last-child,
+  td:last-child {
+    width: 24mm;
+    text-align: center;
+  }
+}
+
+.box {
+  display: inline-block;
+  width: 5mm;
+  height: 5mm;
+  border: 1.5px solid #1a1a1a;
+  border-radius: 1mm;
+}
+
+.foot {
+  margin: auto 0 0;
+  padding-top: 6mm;
+  color: #444;
+  font-size: 10pt;
+  text-align: center;
+}
