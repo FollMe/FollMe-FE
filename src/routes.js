@@ -29,6 +29,7 @@ const Seating = lazy(() => import("pages/invitation/Seating"));
 const SeatingSheet = lazy(() => import("pages/invitation/SeatingSheet"));
 const GuestbookSheet = lazy(() => import("pages/invitation/GuestbookSheet"));
 const LabelSheet = lazy(() => import("pages/invitation/LabelSheet"));
+const LuckyDraw = lazy(() => import("pages/invitation/LuckyDraw"));
 const CreateEvent = lazy(() => import("pages/invitation/CreateEvent"));
 const FortuneHome = lazy(() => import("pages/fortune/FortuneHome"));
 const Numerology = lazy(() => import("pages/fortune/Numerology"));
@@ -73,6 +74,8 @@ export default function Router() {
         { path: '/events/:eventId/loi-chuc/in', element: withSuspense(<GuestbookSheet />) },
         // Name and QR labels for paper invitations
         { path: '/events/:eventId/tem-thiep/in', element: withSuspense(<LabelSheet />) },
+        // The lucky draw, full screen on the projector at the party
+        { path: '/events/:eventId/quay-so', element: withSuspense(<LuckyDraw />) },
       ]
     },
     {

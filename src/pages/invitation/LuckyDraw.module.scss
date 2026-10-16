@@ -1,0 +1,399 @@
+/* The lucky draw on a projector: one big name in the middle. Sized in vmin
+   like the wishes screen, in the invitation's colors. */
+
+.screen {
+  --bg: #f7ecd8;
+  --paper: #fffaf0;
+  --ink: #5c1212;
+  --muted: #8a5a3c;
+  --accent: #a3201e;
+  --accent-ink: #ffffff;
+  --line: #e6cf9f;
+  --title: 'Cormorant Garamond', 'Lora', Georgia, serif;
+
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 45%, var(--paper), var(--bg) 70%);
+  color: var(--ink);
+}
+
+.blush {
+  --bg: #fbeef0;
+  --paper: #fffaf9;
+  --ink: #4a2730;
+  --muted: #8a6570;
+  --accent: #c45c74;
+  --line: #f1d3da;
+}
+
+.classic {
+  --bg: #f7ecd8;
+}
+
+.minimal {
+  --bg: #f5f4f1;
+  --paper: #ffffff;
+  --ink: #18181b;
+  --muted: #71717a;
+  --accent: #18181b;
+  --line: #e4e4e7;
+}
+
+.garden {
+  --bg: #eef2ea;
+  --paper: #fbfcf8;
+  --ink: #23362a;
+  --muted: #56685b;
+  --accent: #476847;
+  --line: #d3dfcf;
+}
+
+.night {
+  --bg: #0b1026;
+  --paper: #1a2450;
+  --ink: #f3ead7;
+  --muted: #c4bba9;
+  --accent: #d9b66b;
+  --accent-ink: #111734;
+  --line: #2a3462;
+}
+
+/* ---------- Top bar ---------- */
+.top {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 1.6vmin 2vmin;
+}
+
+.chrome {
+  color: var(--ink) !important;
+}
+
+.couple {
+  margin: 0;
+  font-family: var(--title);
+  font-size: max(2rem, 3.4vmin);
+  font-weight: 600;
+  text-align: center;
+
+  span {
+    color: var(--accent);
+    font-style: italic;
+  }
+}
+
+.topActions {
+  display: flex;
+  gap: 4px;
+}
+
+/* ---------- Stage ---------- */
+.stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.4vmin;
+  min-width: 0;
+  padding: 2vmin 4vmin 5vmin;
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  color: var(--accent);
+  font-size: max(1.4rem, 2.2vmin);
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.prize {
+  display: inline-flex;
+  align-items: center;
+  gap: 1vmin;
+  margin: 0;
+  padding: 0.8vmin 2.4vmin;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: max(1.8rem, 3.2vmin);
+  font-weight: 700;
+}
+
+.reel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2vmin;
+  width: min(92%, 120vmin);
+  min-height: 30vmin;
+  padding: 3vmin 4vmin;
+  border: 0.4vmin solid var(--line);
+  border-radius: 4vmin;
+  background: var(--paper);
+  box-shadow: 0 2vmin 6vmin rgba(0, 0, 0, 0.12);
+  transition: transform 0.4s cubic-bezier(0.2, 1.6, 0.4, 1), border-color 0.3s ease;
+}
+
+.name {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-family: var(--title);
+  font-size: max(4rem, 12vmin);
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+.long {
+  font-size: max(3rem, 8vmin);
+}
+
+.note {
+  color: var(--muted);
+  font-size: max(1.6rem, 3vmin);
+}
+
+.placeholder {
+  color: var(--muted);
+  font-family: var(--title);
+  font-size: max(3rem, 8vmin);
+}
+
+.spinning .name {
+  filter: blur(0.08vmin);
+  opacity: 0.85;
+}
+
+.won {
+  border-color: var(--accent);
+  transform: scale(1.04);
+
+  .name {
+    color: var(--accent);
+    animation: pop 0.6s cubic-bezier(0.2, 1.6, 0.4, 1);
+  }
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.7);
+  }
+}
+
+.drawButton {
+  min-width: 26vmin;
+  min-height: 48px;
+  padding: 1.6vmin 6vmin;
+  border: none;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: inherit;
+  font-size: max(2rem, 3.6vmin);
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 1vmin 3vmin rgba(0, 0, 0, 0.18);
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  &:focus-visible {
+    outline: 0.5vmin solid var(--ink);
+    outline-offset: 0.6vmin;
+  }
+}
+
+.hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: max(1.3rem, 1.8vmin);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- Winners ---------- */
+.winners {
+  display: flex;
+  flex-direction: column;
+  width: min(34vw, 420px);
+  min-height: 0;
+  margin: 0 2vmin 2vmin 0;
+  padding: 2vmin;
+  border: 1px solid var(--line);
+  border-radius: 2.4vmin;
+  background: var(--paper);
+
+  h2 {
+    margin: 0 0 1vmin;
+    font-size: max(1.6rem, 2.4vmin);
+
+    span {
+      color: var(--muted);
+      font-weight: 500;
+    }
+  }
+
+  ol {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8vmin;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    list-style: none;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.8vmin 1vmin;
+    border-bottom: 1px solid var(--line);
+  }
+}
+
+.winnerText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+
+  strong {
+    font-size: max(1.5rem, 2.2vmin);
+  }
+
+  span {
+    color: var(--muted);
+    font-size: max(1.2rem, 1.6vmin);
+  }
+}
+
+.remove {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 1.8rem;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--bg);
+    color: var(--ink);
+  }
+}
+
+/* ---------- Settings ---------- */
+.setup {
+  position: fixed;
+  left: 2vmin;
+  bottom: 2vmin;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: min(360px, calc(100vw - 32px));
+  max-height: calc(100vh - 90px);
+  padding: 16px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+}
+
+.setupHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  h2 {
+    margin: 0;
+    font-size: 1.7rem;
+  }
+}
+
+.setupHint {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 1.35rem;
+}
+
+.quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+
+  button {
+    min-height: 32px;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-2);
+    font: inherit;
+    font-size: 1.3rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &[aria-pressed='true'] {
+      border-color: var(--brand);
+      background: var(--brand-fill);
+      color: var(--on-brand);
+    }
+  }
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 64px 16px;
+  text-align: center;
+}
+
+/* ---------- Portrait screens and phones ---------- */
+@media (max-aspect-ratio: 1 / 1), (max-width: 720px) {
+  .screen {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    overflow-y: auto;
+  }
+
+  .couple {
+    display: none;
+  }
+
+  .winners {
+    width: auto;
+    max-height: 32vh;
+    margin: 0 16px 16px;
+  }
+}
