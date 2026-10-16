@@ -16,7 +16,7 @@ import {
   IoTimeOutline, IoLocationOutline, IoCopyOutline, IoCheckmark, IoEyeOutline, IoCreateOutline, IoShareSocialOutline,
   IoEyeOffOutline, IoSparkles, IoDownloadOutline, IoTvOutline, IoRefresh, IoPersonAddOutline, IoPaperPlaneOutline,
   IoNotificationsOutline, IoTrashOutline, IoPeopleOutline, IoWalletOutline, IoReceiptOutline, IoPrintOutline, IoListOutline, IoChevronForward, IoImageOutline, IoHeartOutline, IoGridOutline,
-  IoNewspaperOutline, IoClose, IoPeopleCircleOutline, IoExitOutline, IoGiftOutline,
+  IoNewspaperOutline, IoClose, IoPeopleCircleOutline, IoExitOutline, IoGiftOutline, IoNavigateOutline,
 } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
 import Avatar from 'components/Avatar';
@@ -30,11 +30,11 @@ import GuestList from 'components/invitation/GuestList';
 import GroupPicker from 'components/invitation/GroupPicker';
 import SendQueue, { TemplateEditor } from 'components/invitation/SendQueue';
 import {
-  MAX_COHOSTS, MAX_PHOTOS, RSVP_LABELS, cohostUrl, deskUrl, eventHeadline, groupSummary, hasPersonalLink, invitationApi, isCoupleEvent,
+  MAX_COHOSTS, MAX_PHOTOS, RSVP_LABELS, cohostUrl, dayOfQueue, deskUrl, eventHeadline, groupSummary, hasPersonalLink, invitationApi, isCoupleEvent,
   personalInvitationUrl, publicInvitationUrl, reminderQueue, screenUrl, summarizeGuests, thankQueue, vegetarianOf,
 } from 'util/invitation';
 import {
-  deadlineText, defaultReminder, defaultTemplate, defaultThanks, loadTemplate, saveTemplate,
+  daysToAnswer, deadlineText, defaultDayOf, defaultReminder, defaultTemplate, defaultThanks, loadTemplate, saveTemplate,
 } from 'util/inviteMessage';
 import { downloadCsv } from 'util/csv';
 import { formatVnd, shortVnd } from 'util/gifts';
@@ -48,6 +48,9 @@ import { track } from 'util/analytics';
 import { CONTACT_EMAIL } from 'config/constant';
 import { useUserInfo } from 'customHooks/useUserInfo';
 import styles from "./Event.module.scss";
+
+// Days before the party the message with the time, way and table is offered
+const DAY_OF_WINDOW = 7;
 
 function CopyButton({ text, label = 'Copy link', variant = 'icon' }) {
   const [copied, setCopied] = useState(false);
@@ -84,7 +87,7 @@ export function guestRows(guests) {
   return [
     [
       'Tên', 'Nhóm', 'Bàn', 'Trả lời', 'Số người', 'Ăn chay', 'Lời nhắn', 'Đã đến', 'Số người đến', 'Tiền mừng', 'Ghi chú mừng', 'Nguồn',
-      'Đã gửi', 'Đã nhắc', 'Đã cảm ơn', 'Lượt mở', 'Email', 'Link riêng',
+      'Đã gửi', 'Đã nhắc', 'Đã nhắn lịch hẹn', 'Đã cảm ơn', 'Lượt mở', 'Email', 'Link riêng',
     ],
     ...guests.map(g => [
       g.name,
@@ -101,6 +104,7 @@ export function guestRows(guests) {
       SOURCES[g.source] ?? 'Mời riêng',
       g.sentAt ? 'Đã gửi' : '',
       g.remindedAt ? 'Đã nhắc' : '',
+      g.dayOfAt ? 'Đã nhắn' : '',
       g.thankedAt ? 'Đã cảm ơn' : '',
       g.viewed ?? 0,
       g.mail ?? '',
@@ -684,6 +688,7 @@ function EventPage() {
   const [customTemplates, setCustomTemplates] = useState(() => ({
     invite: loadTemplate(eventId, 'invite'),
     remind: loadTemplate(eventId, 'remind'),
+    dayof: loadTemplate(eventId, 'dayof'),
     thank: loadTemplate(eventId, 'thank'),
   }));
 
@@ -763,10 +768,13 @@ function EventPage() {
   // Before the party: invite and nudge. After it: thank.
   const unsent = status === 'upcoming' ? guests.filter(g => hasPersonalLink(g) && !g.sentAt).length : 0;
   const toRemind = status === 'upcoming' ? reminderQueue(guests).length : 0;
+  // The week before: time, way and table for those who said yes
+  const toTellDay = status === 'upcoming' && daysToAnswer(event.startAt) <= DAY_OF_WINDOW ? dayOfQueue(guests).length : 0;
   const toThank = status === 'happened' ? thankQueue(guests).length : 0;
   const templates = {
     invite: customTemplates.invite ?? defaultTemplate(event),
     remind: customTemplates.remind ?? defaultReminder(event),
+    dayof: customTemplates.dayof ?? defaultDayOf(event),
     thank: customTemplates.thank ?? defaultThanks(event),
   };
   const firstPersonal = guests.find(hasPersonalLink);
@@ -940,6 +948,18 @@ function EventPage() {
             <Button variant="contained" size="small" onClick={() => setQueueMode('remind')}>Nhắc lần lượt</Button>
           </div>
         )}
+        {toTellDay > 0 && (
+          <div className={styles.sendBar}>
+            <IoNavigateOutline aria-hidden />
+            <div>
+              <strong>Nhắn {toTellDay} khách đã nhận lời: giờ, đường đi và số bàn</strong>
+              <button type="button" className={styles.linkButton} onClick={() => setEditingMode('dayof')}>
+                Sửa tin nhắn
+              </button>
+            </div>
+            <Button variant="contained" size="small" onClick={() => setQueueMode('dayof')}>Nhắn lần lượt</Button>
+          </div>
+        )}
         {toThank > 0 && (
           <div className={styles.sendBar}>
             <IoHeartOutline aria-hidden />
@@ -958,6 +978,7 @@ function EventPage() {
           guests={guests}
           template={templates.invite}
           reminderTemplate={templates.remind}
+          dayOfTemplate={templates.dayof}
           thankTemplate={templates.thank}
           since={since}
           groupOptions={groupOptions(event)}
@@ -1060,7 +1081,7 @@ function EventPage() {
 
       {editingMode && (
         <Dialog open onClose={() => setEditingMode(null)} fullWidth maxWidth="sm">
-          <DialogTitle>{{ remind: 'Lời nhắc', thank: 'Lời cảm ơn' }[editingMode] ?? 'Lời mời'} gửi kèm link</DialogTitle>
+          <DialogTitle>{{ remind: 'Lời nhắc', dayof: 'Tin nhắn lịch hẹn', thank: 'Lời cảm ơn' }[editingMode] ?? 'Lời mời'} gửi kèm link</DialogTitle>
           <DialogContent sx={{ pt: '8px !important' }}>
             <TemplateEditor
               mode={editingMode}

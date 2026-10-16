@@ -10,8 +10,8 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { toast } from 'react-toastify';
 import { IoPaperPlaneOutline, IoCopyOutline, IoCreateOutline, IoSparkles } from 'react-icons/io5';
-import { hasPersonalLink, invitationApi, personalInvitationUrl, reminderQueue, thankQueue } from 'util/invitation';
-import { LINK_TOKEN, NAME_TOKEN, canShareText, inviteMessage, sendInvite } from 'util/inviteMessage';
+import { dayOfQueue, hasPersonalLink, invitationApi, personalInvitationUrl, reminderQueue, thankQueue } from 'util/invitation';
+import { LINK_TOKEN, NAME_TOKEN, TABLE_TOKEN, canShareText, inviteMessage, sendInvite } from 'util/inviteMessage';
 import { track } from 'util/analytics';
 import styles from './SendQueue.module.scss';
 
@@ -39,6 +39,17 @@ export const QUEUE_MODES = {
     done: n => `Xong! Đã nhắc ${n} khách`,
     next: 'Khi khách trả lời trên thiệp, câu trả lời hiện ngay trong danh sách khách.',
   },
+  dayof: {
+    noun: 'tin nhắn',
+    title: 'Nhắn lịch hẹn ngày cưới',
+    to: 'Nhắn',
+    pick: dayOfQueue,
+    mark: { dayOf: true },
+    track: 'dayof_sent',
+    allDone: 'Khách nhận lời đều đã được nhắn lịch hẹn',
+    done: n => `Xong! Đã nhắn ${n} khách`,
+    next: 'Khách mở link thấy giờ, chỉ đường và số bàn của mình ngay trên thiệp.',
+  },
   thank: {
     noun: 'lời cảm ơn',
     title: 'Gửi lời cảm ơn',
@@ -64,7 +75,8 @@ export function TemplateEditor({ value, onChange, onReset, mode = 'invite' }) {
         label={noun[0].toUpperCase() + noun.slice(1)}
         value={value}
         onChange={e => onChange(e.target.value)}
-        helperText={`${NAME_TOKEN} là tên khách, ${LINK_TOKEN} là link thiệp riêng của họ.`}
+        helperText={`${NAME_TOKEN} là tên khách, ${LINK_TOKEN} là link thiệp riêng của họ.`
+          + (mode === 'dayof' ? ` ${TABLE_TOKEN} là bàn của khách; khách chưa có bàn thì dòng đó được bỏ.` : '')}
       />
       <Button size="small" onClick={onReset}>Dùng {noun} mặc định</Button>
     </div>
@@ -74,7 +86,7 @@ export function TemplateEditor({ value, onChange, onReset, mode = 'invite' }) {
 /**
  * Sends the personal links one after another: on a phone, one tap opens
  * the share sheet (Zalo, Messenger) with the message for that guest, and
- * the next guest comes up once it is sent. `mode` is 'invite', 'remind' or 'thank'.
+ * the next guest comes up once it is sent. `mode` is 'invite', 'remind', 'dayof' or 'thank'.
  */
 export default function SendQueue({ event, guests, mode = 'invite', template, onTemplateChange, onTemplateReset, onSent, onClose }) {
   const config = QUEUE_MODES[mode];
@@ -88,7 +100,7 @@ export default function SendQueue({ event, guests, mode = 'invite', template, on
   const guest = guests.find(g => g._id === queue[index]);
   const done = index >= queue.length;
   const share = canShareText();
-  const text = guest ? inviteMessage(template, guest.name, personalInvitationUrl(guest._id)) : '';
+  const text = guest ? inviteMessage(template, guest.name, personalInvitationUrl(guest._id), { table: guest.table }) : '';
 
   // A guest removed meanwhile is skipped
   if (!done && !guest) {
@@ -119,7 +131,11 @@ export default function SendQueue({ event, guests, mode = 'invite', template, on
         {config.title}
         {!done && <span>{index + 1}/{queue.length}</span>}
       </DialogTitle>
-      <LinearProgress variant="determinate" value={queue.length ? (Math.min(index, queue.length) / queue.length) * 100 : 100} />
+      <LinearProgress
+        variant="determinate"
+        value={queue.length ? (Math.min(index, queue.length) / queue.length) * 100 : 100}
+        aria-label={`Đã qua ${Math.min(index, queue.length)}/${queue.length} khách`}
+      />
       <DialogContent className={styles.content}>
         {done ? (
           <div className={styles.done}>

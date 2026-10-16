@@ -14,7 +14,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { toast } from 'react-toastify';
 import {
   IoPaperPlaneOutline, IoEllipsisHorizontal, IoCopyOutline, IoEyeOutline, IoCreateOutline, IoCheckmarkDoneOutline,
-  IoArrowUndoOutline, IoTrashOutline, IoSearch, IoNotificationsOutline, IoHeartOutline,
+  IoArrowUndoOutline, IoTrashOutline, IoSearch, IoNotificationsOutline, IoHeartOutline, IoNavigateOutline,
 } from 'react-icons/io5';
 import { RSVP_LABELS, awaitsAnswer, hasPersonalLink, invitationApi, personalInvitationUrl, vegetarianOf } from 'util/invitation';
 import { inviteMessage, sendInvite } from 'util/inviteMessage';
@@ -55,7 +55,7 @@ export function filterGuests(guests, filter, query, group = null) {
  * not answered, and a thank-you after the party; `onChange` gets an updater. `groupOptions` are the groups
  * offered when editing a guest.
  */
-export default function GuestList({ event, guests, template, reminderTemplate, thankTemplate, since, groupOptions = [], onChange }) {
+export default function GuestList({ event, guests, template, reminderTemplate, dayOfTemplate, thankTemplate, since, groupOptions = [], onChange }) {
   const [filter, setFilter] = useState('all');
   const [group, setGroup] = useState(null);
   const [query, setQuery] = useState('');
@@ -121,6 +121,20 @@ export default function GuestList({ event, guests, template, reminderTemplate, t
     }
   }
 
+  async function sendDayOf(guest) {
+    const text = inviteMessage(dayOfTemplate, guest.name, personalInvitationUrl(guest._id), { table: guest.table });
+    try {
+      const how = await sendInvite(text);
+      track('dayof_sent', { how });
+      if (how === 'copied') {
+        toast.success(`Đã copy tin nhắn cho ${guest.name}. Dán vào Zalo hoặc Messenger để gửi.`);
+      }
+      await mark(guest, { dayOf: true });
+    } catch (err) {
+      // Closed the share sheet without sending
+    }
+  }
+
   async function thank(guest) {
     const text = inviteMessage(thankTemplate, guest.name, personalInvitationUrl(guest._id));
     try {
@@ -161,6 +175,7 @@ export default function GuestList({ event, guests, template, reminderTemplate, t
   const isOver = new Date(event.startAt) <= new Date();
   const canRemind = menuGuest && awaitsAnswer(menuGuest) && !isOver;
   const canThank = personal && isOver && Boolean(thankTemplate);
+  const canDayOf = personal && !isOver && Boolean(dayOfTemplate) && menuGuest.rsvp?.status === 'attending';
 
   return (
     <div className={styles.list}>
@@ -263,6 +278,7 @@ export default function GuestList({ event, guests, template, reminderTemplate, t
                       {vegetarianOf(guest) > 0 ? ` · ${vegetarianOf(guest)} ăn chay` : ''}
                     </span>
                   )}
+                  {guest.dayOfAt && !guest.arrivedAt && <span className={clsx(styles.tag, styles.sent)}>Đã nhắn lịch hẹn</span>}
                   {guest.thankedAt && <span className={clsx(styles.tag, styles.sent)}>Đã cảm ơn</span>}
                   {guest.arrivedAt && (
                     <span className={clsx(styles.tag, styles.arrived)}>
@@ -309,6 +325,12 @@ export default function GuestList({ event, guests, template, reminderTemplate, t
           <MenuItem onClick={() => { remind(menuGuest); setMenu(null); }}>
             <ListItemIcon><IoNotificationsOutline /></ListItemIcon>
             {menuGuest.remindedAt ? 'Nhắc trả lời lần nữa' : 'Nhắc trả lời'}
+          </MenuItem>
+        )}
+        {canDayOf && (
+          <MenuItem onClick={() => { sendDayOf(menuGuest); setMenu(null); }}>
+            <ListItemIcon><IoNavigateOutline /></ListItemIcon>
+            {menuGuest.dayOfAt ? 'Nhắn lịch hẹn lần nữa' : 'Nhắn lịch hẹn, số bàn'}
           </MenuItem>
         )}
         {canThank && (

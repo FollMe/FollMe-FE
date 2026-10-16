@@ -131,6 +131,14 @@ export function reminderQueue(guests, now = Date.now()) {
 }
 
 /**
+ * Who gets the message for the day: said yes on their personal link, not
+ * told yet, not already there.
+ */
+export function dayOfQueue(guests) {
+  return guests.filter(g => hasPersonalLink(g) && g.rsvp?.status === 'attending' && !g.dayOfAt && !g.arrivedAt);
+}
+
+/**
  * Who to thank after the party: guests with a personal link who came,
  * said they would, or sent a gift, and were not thanked yet.
  */

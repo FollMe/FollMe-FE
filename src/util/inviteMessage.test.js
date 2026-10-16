@@ -1,7 +1,8 @@
 import {
-  daysToAnswer, deadlineText, defaultReminder, defaultTemplate, defaultThanks, inviteMessage, inviteWhen, loadTemplate, saveTemplate,
-  shortDay,
+  daysToAnswer, deadlineText, defaultDayOf, defaultReminder, defaultTemplate, defaultThanks, inviteMessage, inviteWhen, loadTemplate,
+  saveTemplate, shortDay,
 } from './inviteMessage';
+import { dayOfQueue } from './invitation';
 
 const wedding = {
   type: 'wedding', groomName: 'Đức', brideName: 'Hạnh', title: 'Lễ thành hôn', startAt: '2027-01-16T04:00:00Z',
@@ -115,5 +116,37 @@ describe('answer-by date', () => {
     const after = at('2027-01-11T03:00:00Z');
     expect(defaultTemplate({ ...wedding, rsvpBy }, after)).toBe(defaultTemplate(wedding));
     expect(defaultReminder({ ...wedding, rsvpBy }, after)).toBe(defaultReminder(wedding));
+  });
+});
+
+describe('the message for the day', () => {
+  const event = { ...wedding, location: 'Nhà hàng Hoa Sen', program: [{ time: '11:00', label: 'Đón khách' }, { time: '12:00', label: 'Khai tiệc' }] };
+
+  it('says when, where, the table and the program', () => {
+    const text = inviteMessage(defaultDayOf(event), 'Cô Ba', 'https://x/i/1', { table: '5' });
+    expect(text).toBe(
+      'Đức & Hạnh hẹn gặp Cô Ba tại lễ thành hôn lúc 11:00 thứ Bảy, 16/01/2027, ở Nhà hàng Hoa Sen.\n'
+      + 'Chỗ ngồi của Cô Ba: Bàn 5.\n'
+      + 'Đón khách 11:00 · Khai tiệc 12:00.\n'
+      + 'Chỉ đường và thiệp của Cô Ba: https://x/i/1',
+    );
+  });
+
+  it('leaves the table line out for a guest without one, keeps named tables', () => {
+    const text = inviteMessage(defaultDayOf(event), 'Tuấn', 'u');
+    expect(text).not.toContain('Chỗ ngồi');
+    expect(text.split('\n')).toHaveLength(3);
+    expect(inviteMessage('Bàn {bàn} nhé {tên}', 'An', 'u', { table: 'VIP' })).toBe('Bàn VIP nhé An\nu');
+  });
+
+  it('goes to guests who said yes, once, not those already there', () => {
+    const guests = [
+      { _id: '1', rsvp: { status: 'attending' } },
+      { _id: '2', rsvp: { status: 'attending' }, dayOfAt: '2027-01-14' },
+      { _id: '3', rsvp: { status: 'maybe' } },
+      { _id: '4', rsvp: { status: 'attending' }, arrivedAt: '2027-01-16' },
+      { _id: '5', rsvp: { status: 'attending' }, source: 'public' },
+    ];
+    expect(dayOfQueue(guests).map(g => g._id)).toEqual(['1']);
   });
 });

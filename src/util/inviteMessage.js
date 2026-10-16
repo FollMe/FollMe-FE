@@ -2,9 +2,11 @@ import dayjs from 'dayjs';
 import { vnWallClock } from './date';
 import { eventHeadline, isCoupleEvent } from './invitation';
 import { programText } from './program';
+import { tableLabel } from './seating';
 
 export const NAME_TOKEN = '{tên}';
 export const LINK_TOKEN = '{link}';
+export const TABLE_TOKEN = '{bàn}';
 
 const WEEKDAYS = ['Chủ Nhật', 'thứ Hai', 'thứ Ba', 'thứ Tư', 'thứ Năm', 'thứ Sáu', 'thứ Bảy'];
 
@@ -84,15 +86,38 @@ export function defaultThanks(event) {
   return `${first}\n${keepsake} ở đây nhé: ${LINK_TOKEN}`;
 }
 
-/** The template for one guest. A template without {link} gets it at the end. */
-export function inviteMessage(template, name, url) {
-  const text = template.split(NAME_TOKEN).join(name);
+/**
+ * The message for the day, a day or two before, to guests who said yes:
+ * when, where, their table (the {bàn} line goes for guests without one),
+ * and their card for the way there.
+ */
+export function defaultDayOf(event) {
+  const what = { wedding: 'lễ thành hôn', engagement: 'lễ ăn hỏi' }[event.type];
+  const first = isCoupleEvent(event.type) && event.groomName && event.brideName
+    ? `${eventHeadline(event)} hẹn gặp ${NAME_TOKEN} tại ${what} lúc ${inviteWhen(event.startAt)}, ở ${event.location}.`
+    : `Hẹn gặp ${NAME_TOKEN} tại ${event.title} lúc ${inviteWhen(event.startAt)}, ở ${event.location}.`;
+  return `${first}\n`
+    + `Chỗ ngồi của ${NAME_TOKEN}: ${TABLE_TOKEN}.\n`
+    + (event.program?.length ? `${programText(event.program)}.\n` : '')
+    + `Chỉ đường và thiệp của ${NAME_TOKEN}: ${LINK_TOKEN}`;
+}
+
+/**
+ * The template for one guest. A template without {link} gets it at the end.
+ * {bàn} is their table; a line with it is left out when they have none.
+ */
+export function inviteMessage(template, name, url, { table } = {}) {
+  const withTable = template.split('\n')
+    .filter(line => !line.includes(TABLE_TOKEN) || table)
+    .join('\n')
+    .split(TABLE_TOKEN).join(table ? tableLabel(table) : '');
+  const text = withTable.split(NAME_TOKEN).join(name);
   return text.includes(LINK_TOKEN) ? text.split(LINK_TOKEN).join(url) : `${text.trimEnd()}\n${url}`;
 }
 
-// `kind` is 'invite' (the invitation), 'remind' (the nudge to answer) or
-// 'thank' (the thank-you after the party)
-const storageKey = (eventId, kind) => `follme.${{ remind: 'remind', thank: 'thank' }[kind] ?? 'invite'}Template.${eventId}`;
+// `kind` is 'invite' (the invitation), 'remind' (the nudge to answer),
+// 'dayof' (the time, way and table, the day before) or 'thank' (after the party)
+const storageKey = (eventId, kind) => `follme.${{ remind: 'remind', dayof: 'dayof', thank: 'thank' }[kind] ?? 'invite'}Template.${eventId}`;
 
 export function loadTemplate(eventId, kind = 'invite') {
   try {
