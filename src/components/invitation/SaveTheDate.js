@@ -7,7 +7,7 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import QRCode from 'react-qr-code';
 import { IoDownloadOutline, IoShareSocialOutline } from 'react-icons/io5';
-import { eventHeadline, isCoupleEvent, publicInvitationUrl } from 'util/invitation';
+import { eventHeadline, isCoupleEvent, sharedInvitationUrl } from 'util/invitation';
 import { STORY_FORMATS, drawStory, storyFilename } from 'util/storyImage';
 import { cldUrl } from 'util/photos';
 import { track } from 'util/analytics';
@@ -128,7 +128,7 @@ export default function SaveTheDate({ event, onClose }) {
         </div>
         {/* Drawn for the canvas only */}
         <div ref={qrRef} hidden>
-          {event.allowPublicLink && <QRCode value={publicInvitationUrl(event._id)} size={256} level="M" />}
+          {event.allowPublicLink && <QRCode value={sharedInvitationUrl(event)} size={256} level="M" />}
         </div>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2, flexWrap: 'wrap', gap: 1 }}>

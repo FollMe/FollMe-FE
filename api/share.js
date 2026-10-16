@@ -90,7 +90,16 @@ async function resolveMeta(pathname, apiBase) {
   if (PAGES[pathname]) {
     return PAGES[pathname];
   }
-  let m = pathname.match(/^\/(invitations|e)\/([^/]+)$/);
+  let m = pathname.match(/^\/c\/([A-Za-z0-9-]{3,40})$/);
+  if (m && apiBase) {
+    // A short link (/c/minh-lan): the preview of the event it opens
+    const found = await getJson(`${apiBase}/api/slugs/${m[1].toLowerCase()}`);
+    if (!found || !ID_RE.test(found._id ?? '')) {
+      return null;
+    }
+    pathname = `/e/${found._id}`;
+  }
+  m = pathname.match(/^\/(invitations|e)\/([^/]+)$/);
   if (m && ID_RE.test(m[2]) && apiBase) {
     const path = m[1] === 'e' ? `api/events/${m[2]}/preview` : `api/invitations/${m[2]}/preview`;
     const data = await getJson(`${apiBase}/${path}`);
@@ -181,9 +190,9 @@ async function handler(req, res) {
   res.end(out);
 }
 
-/** Invitations name the guest and the couple: not for search results. */
+/** Invitations name the guest and the couple: not for search results (short links too). */
 function isPrivatePath(pathname) {
-  return /^\/(invitations|e)\//.test(pathname);
+  return /^\/(invitations|e|c)\//.test(pathname);
 }
 
 function absolute(image, origin) {

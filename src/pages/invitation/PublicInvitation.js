@@ -6,9 +6,13 @@ import InvitationView from 'components/invitation/InvitationView';
 import { eventHeadline, getPublicGuest, invitationApi, isGoneError, savePublicGuest } from 'util/invitation';
 import { setPageMeta } from 'util/meta';
 
-/** The shared link of an event (/e/:eventId), for group chats. */
-export default function PublicInvitation() {
-  const { eventId } = useParams();
+/**
+ * The shared link of an event (/e/:eventId), for group chats; `eventId`
+ * is given when it was opened by its short link (/c/minh-lan).
+ */
+export default function PublicInvitation({ eventId: givenId }) {
+  const params = useParams();
+  const eventId = givenId ?? params.eventId;
   const [data, setData] = useState(null);
   const [guest, setGuest] = useState(() => getPublicGuest(eventId));
   const [failed, setFailed] = useState(null);
