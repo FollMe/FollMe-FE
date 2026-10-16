@@ -65,6 +65,7 @@ function CreateEventForm() {
       location: '',
       mapLocation: '',
       message: DEFAULT_MESSAGES[initialType],
+      messageEn: '',
       theme: initialType === 'wedding' || initialType === 'engagement' ? 'blush' : 'minimal',
       allowPublicLink: true,
       // Weddings get the music box and the scratch-off date by default
@@ -119,6 +120,7 @@ function CreateEventForm() {
           location: invitation.location,
           mapLocation: invitation.mapLocation ?? '',
           message: invitation.message ?? '',
+          messageEn: invitation.messageEn ?? '',
           theme: invitation.theme ?? 'minimal',
           allowPublicLink: Boolean(invitation.allowPublicLink),
           music: invitation.music ?? (isCoupleEvent(invitation.type) ? 'canon' : 'none'),
@@ -206,6 +208,7 @@ function CreateEventForm() {
       location: form.location.trim(),
       mapLocation: form.mapLocation.trim(),
       message: form.message.trim(),
+      messageEn: form.messageEn.trim(),
       allowPublicLink: form.allowPublicLink,
       music: form.music,
       scratchDate: form.scratchDate,
@@ -340,6 +343,17 @@ function CreateEventForm() {
             <TextField fullWidth label="Địa điểm" value={form.location} inputProps={{ maxLength: 300 }} onChange={e => set({ location: e.target.value })} error={Boolean(errors.location)} helperText={errors.location ?? 'Ví dụ: Trung tâm tiệc cưới ABC, 123 Lê Lợi, Quận 1'} />
             <TextField fullWidth label="Link Google Maps (không bắt buộc)" value={form.mapLocation} inputProps={{ maxLength: 1000 }} onChange={e => set({ mapLocation: e.target.value })} helperText="Để trống thì khách sẽ được chỉ đường theo địa chỉ ở trên." />
             <TextField fullWidth multiline minRows={3} label="Lời mời" value={form.message} inputProps={{ maxLength: 1000 }} onChange={e => set({ message: e.target.value })} />
+            <TextField
+              fullWidth
+              multiline
+              minRows={2}
+              label="Lời mời tiếng Anh (không bắt buộc)"
+              placeholder="Together with our families, we joyfully invite you to celebrate our wedding."
+              value={form.messageEn}
+              inputProps={{ maxLength: 1000, lang: 'en' }}
+              onChange={e => set({ messageEn: e.target.value })}
+              helperText="Cho khách nước ngoài: thiệp có nút chuyển sang tiếng Anh, khách đọc thiệp tiếng Anh sẽ thấy lời mời này."
+            />
           </fieldset>
 
           <fieldset className={styles.group}>

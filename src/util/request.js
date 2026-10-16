@@ -1,6 +1,6 @@
 import { toast } from 'react-toastify';
 import jwt_decode from "jwt-decode";
-import handleError from './handleError';
+import handleError, { genericError } from './handleError';
 
 /** An error the API answered with; `status` tells a 404 from a 500. */
 function ServerError(message, status) {
@@ -38,7 +38,7 @@ async function post(url = '', data = {}, isHaveFile = false, method = 'POST') {
         return dataRes.data;
     } catch (err) {
         if (err.name !== 'SERVER_ERROR') {
-            toast.error("Xảy ra lỗi, vui lòng thử lại!");
+            toast.error(genericError());
         }
         throw err;
     }
@@ -70,7 +70,7 @@ async function get(url = '', { quiet = false } = {}) {
         return dataRes.data;
     } catch (err) {
         if (err.name !== 'SERVER_ERROR' && !quiet) {
-            toast.error("Xảy ra lỗi, vui lòng thử lại!");
+            toast.error(genericError());
         }
         throw err;
     }
@@ -106,7 +106,7 @@ async function send(method, url = '', data, { quiet = false } = {}) {
         return dataRes.data;
     } catch (err) {
         if (err.name !== 'SERVER_ERROR' && !quiet) {
-            toast.error("Xảy ra lỗi, vui lòng thử lại!");
+            toast.error(genericError());
         }
         throw err;
     }
@@ -121,7 +121,7 @@ async function authenticate(route, data) {
     const response = await post(route, data);
     const token = response.token;
     if (!token) {
-        toast.error("Xảy ra lỗi, vui lòng thử lại!");
+        toast.error(genericError());
         return null;
     }
 

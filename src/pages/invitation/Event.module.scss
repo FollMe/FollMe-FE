@@ -668,3 +668,10 @@
   display: flex;
   gap: 4px;
 }
+
+/* Above the English version of a message, in the edit dialog */
+.templateNote {
+  margin: 20px 0 8px;
+  color: var(--text-2);
+  font-size: 1.35rem;
+}

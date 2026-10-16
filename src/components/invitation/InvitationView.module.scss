@@ -188,6 +188,8 @@
   font-size: 1.5rem;
   line-height: 1.8;
   color: var(--inv-muted);
+  // No lone last word ("of") under a long English line
+  text-wrap: balance;
 
   strong {
     font-family: var(--font-hand);

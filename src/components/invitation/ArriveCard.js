@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import dayjs from 'dayjs';
 import { IoCheckmarkCircle } from 'react-icons/io5';
 import { invitationApi } from 'util/invitation';
-import { tableLabel } from 'util/seating';
 import { vnWallClock } from 'util/date';
 import { burst } from 'util/confetti';
 import { track } from 'util/analytics';
+import { useCardText } from './CardLang';
 import styles from './ArriveCard.module.scss';
 
 // From a little before the party to its end (the server checks too)
@@ -26,7 +25,9 @@ export function selfCheckInOpen(startAt, now = Date.now()) {
 export default function ArriveCard({ guest, onGuestChange }) {
   const [arrival, setArrival] = useState(guest.arrivedAt ? { arrivedAt: guest.arrivedAt, table: guest.table } : null);
   const [isSending, setIsSending] = useState(false);
-  const name = guest.name || 'bạn';
+  const card = useCardText();
+  const t = card.arrive;
+  const name = guest.name || '';
 
   async function arrive() {
     setIsSending(true);
@@ -47,22 +48,22 @@ export default function ArriveCard({ guest, onGuestChange }) {
     return (
       <div className={styles.card} role="status">
         <IoCheckmarkCircle className={styles.icon} aria-hidden />
-        <p className={styles.title}>Chào mừng {name}!</p>
+        <p className={styles.title}>{t.welcome(name)}</p>
         <p className={styles.text}>
           {arrival.table
-            ? <>Mời {name} ngồi <strong>{tableLabel(arrival.table)}</strong>.</>
-            : 'Người đón khách sẽ đưa bạn vào chỗ nhé.'}
+            ? <>{t.seatLead(name)}<strong>{card.table(arrival.table)}</strong>.</>
+            : t.noTable}
         </p>
-        <p className={styles.small}>Đã báo đến lúc {dayjs(vnWallClock(arrival.arrivedAt)).format('HH:mm')}</p>
+        <p className={styles.small}>{t.at(t.time(vnWallClock(arrival.arrivedAt)))}</p>
       </div>
     );
   }
   return (
     <div className={styles.card}>
-      <p className={styles.title}>Bạn đã tới nơi?</p>
-      <p className={styles.text}>Bấm để báo cô dâu chú rể và người đón khách, không cần xếp hàng ở bàn tiếp tân.</p>
+      <p className={styles.title}>{t.title}</p>
+      <p className={styles.text}>{t.text}</p>
       <button type="button" className={styles.button} onClick={arrive} disabled={isSending}>
-        {isSending ? 'Đang báo…' : 'Mình đã đến'}
+        {isSending ? t.sending : t.button}
       </button>
     </div>
   );

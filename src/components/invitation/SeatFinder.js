@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { IoSearch } from 'react-icons/io5';
 import { invitationApi } from 'util/invitation';
-import { tableLabel } from 'util/seating';
 import { track } from 'util/analytics';
+import { useCardText } from './CardLang';
 import styles from './SeatFinder.module.scss';
 
 /**
@@ -11,6 +11,8 @@ import styles from './SeatFinder.module.scss';
  * when the host made a seating plan.
  */
 export default function SeatFinder({ eventId, headingClassName }) {
+  const card = useCardText();
+  const t = card.seat;
   const [hasTables, setHasTables] = useState(false);
   const [query, setQuery] = useState('');
   const [result, setResult] = useState(null);
@@ -50,23 +52,23 @@ export default function SeatFinder({ eventId, headingClassName }) {
   }
   return (
     <div className={styles.finder}>
-      <h2 className={headingClassName}>Bạn ngồi bàn nào?</h2>
+      <h2 className={headingClassName}>{t.title}</h2>
       <label className={styles.search}>
         <IoSearch aria-hidden />
         <input
           type="search"
           value={query}
           onChange={e => setQuery(e.target.value)}
-          placeholder="Gõ tên của bạn, không dấu cũng được"
-          aria-label="Tên để tìm bàn"
+          placeholder={t.placeholder}
+          aria-label={t.label}
           autoComplete="off"
           enterKeyHint="search"
         />
       </label>
       <div className={styles.results} aria-live="polite">
-        {result?.failed && <p className={styles.note}>Chưa tra được, thử lại sau giây lát nhé.</p>}
+        {result?.failed && <p className={styles.note}>{t.failed}</p>}
         {result && !result.failed && result.matches.length === 0 && (
-          <p className={styles.note}>Không thấy tên “{result.q}”. Thử gõ tên khác, hoặc hỏi người đón khách ở cửa nhé.</p>
+          <p className={styles.note}>{t.none(result.q)}</p>
         )}
         {result?.matches?.length > 0 && (
           <ul>
@@ -74,8 +76,8 @@ export default function SeatFinder({ eventId, headingClassName }) {
               <li key={`${m.name}-${m.table}`}>
                 <span>{m.name}</span>
                 {m.table
-                  ? <strong>{tableLabel(m.table)}</strong>
-                  : <em>Chưa xếp bàn, hỏi người đón khách nhé</em>}
+                  ? <strong>{card.table(m.table)}</strong>
+                  : <em>{t.noTable}</em>}
               </li>
             ))}
           </ul>

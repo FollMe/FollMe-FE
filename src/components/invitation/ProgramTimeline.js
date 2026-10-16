@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { programState } from 'util/program';
+import { useCardText } from './CardLang';
 import styles from './ProgramTimeline.module.scss';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -23,10 +24,11 @@ export function useEventClock(startAt) {
  * is lit and the ones before it fade.
  */
 export default function ProgramTimeline({ program, startAt }) {
+  const t = useCardText();
   const now = useEventClock(startAt);
   const { current, isOver } = programState(program, startAt, now);
   return (
-    <ol className={styles.timeline} aria-label="Chương trình">
+    <ol className={styles.timeline} aria-label={t.program}>
       {program.map((item, i) => {
         const isNow = i === current;
         return (
@@ -39,7 +41,7 @@ export default function ProgramTimeline({ program, startAt }) {
             <span className={styles.dot} aria-hidden />
             <span className={styles.label}>
               {item.label}
-              {isNow && <em>Đang diễn ra</em>}
+              {isNow && <em>{t.programNow}</em>}
             </span>
           </li>
         );

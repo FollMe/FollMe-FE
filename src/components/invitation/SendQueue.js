@@ -11,7 +11,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { toast } from 'react-toastify';
 import { IoPaperPlaneOutline, IoCopyOutline, IoCreateOutline, IoSparkles } from 'react-icons/io5';
 import { dayOfQueue, hasPersonalLink, invitationApi, personalInvitationUrl, reminderQueue, thankQueue } from 'util/invitation';
-import { LINK_TOKEN, NAME_TOKEN, TABLE_TOKEN, canShareText, inviteMessage, sendInvite } from 'util/inviteMessage';
+import { LINK_TOKEN, NAME_TOKEN, TABLE_TOKEN, canShareText, inviteMessage, isEnglishGuest, sendInvite } from 'util/inviteMessage';
 import { track } from 'util/analytics';
 import styles from './SendQueue.module.scss';
 
@@ -63,8 +63,8 @@ export const QUEUE_MODES = {
   },
 };
 
-/** Edits the message sent with each personal link. */
-export function TemplateEditor({ value, onChange, onReset, mode = 'invite' }) {
+/** Edits the message sent with each personal link (`lang` 'en': the one for English guests). */
+export function TemplateEditor({ value, onChange, onReset, mode = 'invite', lang = 'vi' }) {
   const noun = QUEUE_MODES[mode].noun;
   return (
     <div className={styles.editor}>
@@ -72,13 +72,13 @@ export function TemplateEditor({ value, onChange, onReset, mode = 'invite' }) {
         multiline
         minRows={3}
         fullWidth
-        label={noun[0].toUpperCase() + noun.slice(1)}
+        label={`${noun[0].toUpperCase()}${noun.slice(1)}${lang === 'en' ? ' tiếng Anh' : ''}`}
         value={value}
         onChange={e => onChange(e.target.value)}
         helperText={`${NAME_TOKEN} là tên khách, ${LINK_TOKEN} là link thiệp riêng của họ.`
           + (mode === 'dayof' ? ` ${TABLE_TOKEN} là bàn của khách; khách chưa có bàn thì dòng đó được bỏ.` : '')}
       />
-      <Button size="small" onClick={onReset}>Dùng {noun} mặc định</Button>
+      <Button size="small" onClick={onReset}>Dùng {noun}{lang === 'en' ? ' tiếng Anh' : ''} mặc định</Button>
     </div>
   );
 }
@@ -87,8 +87,11 @@ export function TemplateEditor({ value, onChange, onReset, mode = 'invite' }) {
  * Sends the personal links one after another: on a phone, one tap opens
  * the share sheet (Zalo, Messenger) with the message for that guest, and
  * the next guest comes up once it is sent. `mode` is 'invite', 'remind', 'dayof' or 'thank'.
+ * Guests whose card is in English get `templateEn`.
  */
-export default function SendQueue({ event, guests, mode = 'invite', template, onTemplateChange, onTemplateReset, onSent, onClose }) {
+export default function SendQueue({
+  event, guests, mode = 'invite', template, onTemplateChange, onTemplateReset, templateEn, onTemplateEnChange, onTemplateEnReset, onSent, onClose,
+}) {
   const config = QUEUE_MODES[mode];
   // Who was still waiting when the queue opened, in list order
   const [queue] = useState(() => config.pick(guests).map(g => g._id));
@@ -100,7 +103,10 @@ export default function SendQueue({ event, guests, mode = 'invite', template, on
   const guest = guests.find(g => g._id === queue[index]);
   const done = index >= queue.length;
   const share = canShareText();
-  const text = guest ? inviteMessage(template, guest.name, personalInvitationUrl(guest._id), { table: guest.table }) : '';
+  const english = isEnglishGuest(guest) && Boolean(templateEn);
+  const text = guest
+    ? inviteMessage(english ? templateEn : template, guest.name, personalInvitationUrl(guest._id), { table: guest.table, lang: english ? 'en' : 'vi' })
+    : '';
 
   // A guest removed meanwhile is skipped
   if (!done && !guest) {
@@ -146,14 +152,19 @@ export default function SendQueue({ event, guests, mode = 'invite', template, on
         ) : guest && (
           <>
             <p className={styles.next}>{config.to}</p>
-            <h3 className={styles.name}>{guest.name}</h3>
+            <h3 className={styles.name}>
+              {guest.name}
+              {english && <span className={styles.lang}>Tiếng Anh</span>}
+            </h3>
             {isEditing ? (
-              <TemplateEditor mode={mode} value={template} onChange={onTemplateChange} onReset={onTemplateReset} />
+              english
+                ? <TemplateEditor mode={mode} lang="en" value={templateEn} onChange={onTemplateEnChange} onReset={onTemplateEnReset} />
+                : <TemplateEditor mode={mode} value={template} onChange={onTemplateChange} onReset={onTemplateReset} />
             ) : (
               <div className={styles.preview}>
                 {text}
                 <button type="button" className={styles.edit} onClick={() => setIsEditing(true)}>
-                  <IoCreateOutline /> Sửa {config.noun}
+                  <IoCreateOutline /> Sửa {config.noun}{english ? ' tiếng Anh' : ''}
                 </button>
               </div>
             )}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import clsx from 'clsx';
+import { useCardText } from './CardLang';
 import styles from './Envelope.module.scss';
 
 const OPEN_MS = 1750;
@@ -9,6 +10,7 @@ const OPEN_MS = 1750;
  * lifts the card out and then reveals the invitation (onOpened).
  */
 export default function Envelope({ theme, recipient, headline, withMusic, onOpenStart, onOpened }) {
+  const t = useCardText();
   const [state, setState] = useState('closed'); // closed | opening | gone
 
   // Keep the invitation behind the envelope from scrolling.
@@ -43,7 +45,7 @@ export default function Envelope({ theme, recipient, headline, withMusic, onOpen
   return (
     <div className={clsx(styles.stage, styles[theme], state === 'opening' && styles.opening)}>
       <div className={styles.to}>
-        <span>Gửi</span>
+        <span>{t.envelopeTo}</span>
         <strong>{recipient}</strong>
       </div>
 
@@ -51,7 +53,7 @@ export default function Envelope({ theme, recipient, headline, withMusic, onOpen
         <div className={styles.glow} aria-hidden="true" />
         <div className={styles.back} />
         <div className={styles.letter}>
-          <small>Trân trọng kính mời</small>
+          <small>{t.envelopeInvite}</small>
           <strong>{headline}</strong>
         </div>
         <div className={styles.front} />
@@ -65,15 +67,15 @@ export default function Envelope({ theme, recipient, headline, withMusic, onOpen
             setState('opening');
           }}
           disabled={state !== 'closed'}
-          aria-label="Mở thiệp"
+          aria-label={t.openCard}
         >
           <span>囍</span>
         </button>
       </div>
 
       <p className={styles.hint}>
-        Chạm vào con dấu để mở thiệp
-        {withMusic && <small>♪ Bật âm thanh để nghe nhạc</small>}
+        {t.openHint}
+        {withMusic && <small>{t.soundHint}</small>}
       </p>
     </div>
   );

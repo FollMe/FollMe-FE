@@ -5,11 +5,11 @@ import { toast } from 'react-toastify';
 import { IoCopyOutline, IoCheckmark, IoCheckmarkCircle } from 'react-icons/io5';
 import { bankByBin, vietQrPayload } from 'util/vietqr';
 import { invitationApi, isCoupleEvent } from 'util/invitation';
-import { formatVnd, parseAmount, shortVnd } from 'util/gifts';
+import { parseAmount } from 'util/gifts';
 import { track } from 'util/analytics';
+import { useCardText } from './CardLang';
 import styles from './GiftBox.module.scss';
 
-const SIDE_LABELS = { groom: 'Nhà trai', bride: 'Nhà gái', host: 'Gia chủ' };
 const CLAIM_AMOUNTS = [300_000, 500_000, 1_000_000, 2_000_000];
 
 /** "0123456789" -> "0123 4567 89", easier to read out or check. */
@@ -22,13 +22,14 @@ export function groupDigits(account = '') {
  * like, so it goes in the gift ledger without matching bank statements.
  */
 function GiftClaim({ guest, side, couple, onGuestChange }) {
+  const t = useCardText().gift;
   const [isOpen, setIsOpen] = useState(false);
   const [text, setText] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const amount = parseAmount(text);
   const unreadable = text.trim() !== '' && amount === null;
   const claim = guest.giftClaim;
-  const who = couple ? 'cô dâu chú rể' : 'gia chủ';
+  const who = t.who(couple);
 
   async function send(e) {
     e.preventDefault();
@@ -62,27 +63,25 @@ function GiftClaim({ guest, side, couple, onGuestChange }) {
     return (
       <div className={styles.claimed} role="status">
         <IoCheckmarkCircle aria-hidden />
-        <span>
-          Bạn đã báo gửi quà mừng{claim.amount ? ` ${formatVnd(claim.amount)}` : ''}. Cảm ơn bạn nhiều!
-        </span>
-        <button type="button" className={styles.undo} onClick={undo}>Huỷ</button>
+        <span>{t.claimed(claim.amount ? t.money(claim.amount) : '')}</span>
+        <button type="button" className={styles.undo} onClick={undo}>{t.undo}</button>
       </div>
     );
   }
   if (!isOpen) {
     return (
       <button type="button" className={styles.claimButton} onClick={() => setIsOpen(true)}>
-        Mình đã chuyển khoản rồi
+        {t.claim}
       </button>
     );
   }
   return (
     <form className={styles.claimForm} onSubmit={send}>
-      <label htmlFor="gift-claim-amount">Số tiền (không bắt buộc)</label>
-      <div className={styles.claimChips} role="group" aria-label="Số tiền gợi ý">
+      <label htmlFor="gift-claim-amount">{t.amount}</label>
+      <div className={styles.claimChips} role="group" aria-label={t.suggested}>
         {CLAIM_AMOUNTS.map(a => (
-          <button key={a} type="button" aria-pressed={amount === a} onClick={() => setText(formatVnd(a).replace(' đ', ''))}>
-            {shortVnd(a)}
+          <button key={a} type="button" aria-pressed={amount === a} onClick={() => setText(t.moneyInput(a))}>
+            {t.shortMoney(a)}
           </button>
         ))}
       </div>
@@ -90,20 +89,20 @@ function GiftClaim({ guest, side, couple, onGuestChange }) {
         id="gift-claim-amount"
         value={text}
         onChange={e => setText(e.target.value)}
-        placeholder="VD: 500k, 1tr2"
+        placeholder={t.placeholder}
         autoComplete="off"
         inputMode="text"
         aria-invalid={unreadable}
         aria-describedby="gift-claim-help"
       />
       <span id="gift-claim-help" className={clsx(styles.claimHelp, unreadable && styles.claimError)}>
-        {unreadable ? 'Chưa hiểu số tiền, thử 500k hoặc 1.000.000' : amount ? `= ${formatVnd(amount)}` : `Chỉ ${who} thấy, để ghi vào sổ mừng.`}
+        {unreadable ? t.unreadable : amount ? `= ${t.money(amount)}` : t.privateNote(who)}
       </span>
       <div className={styles.claimActions}>
         <button type="submit" className={styles.claimSend} disabled={isSaving || unreadable}>
-          {isSaving ? 'Đang gửi…' : `Báo cho ${who}`}
+          {isSaving ? t.sending : t.tell(who)}
         </button>
-        <button type="button" className={styles.undo} onClick={() => setIsOpen(false)}>Thôi</button>
+        <button type="button" className={styles.undo} onClick={() => setIsOpen(false)}>{t.cancel}</button>
       </div>
     </form>
   );
@@ -115,6 +114,7 @@ function GiftClaim({ guest, side, couple, onGuestChange }) {
  * In samples (`demo`) the code is not a real account.
  */
 export default function GiftBox({ event, guest, demo, onGuestChange }) {
+  const t = useCardText().gift;
   const gifts = event.gifts ?? [];
   const [isOpen, setIsOpen] = useState(false);
   const [side, setSide] = useState(gifts[0]?.side);
@@ -146,7 +146,7 @@ export default function GiftBox({ event, guest, demo, onGuestChange }) {
     try {
       await navigator.clipboard.writeText(gift.accountNumber);
       setCopied(true);
-      toast.success('Đã chép số tài khoản');
+      toast.success(t.copied);
       setTimeout(() => setCopied(false), 1600);
       track('gift_account_copied', { demo });
     } catch (err) {
@@ -156,12 +156,8 @@ export default function GiftBox({ event, guest, demo, onGuestChange }) {
 
   return (
     <div className={styles.gift}>
-      <h2 className={styles.title}>{couple ? 'Mừng cưới' : 'Gửi quà mừng'}</h2>
-      <p className={styles.sub}>
-        {couple
-          ? 'Thay cho phong bì, bạn có thể gửi quà mừng tới cô dâu chú rể qua mã QR.'
-          : 'Bạn có thể gửi quà mừng tới gia chủ qua mã QR.'}
-      </p>
+      <h2 className={styles.title}>{t.title(couple)}</h2>
+      <p className={styles.sub}>{t.sub(couple)}</p>
 
       <div className={clsx(styles.stage, isOpen && styles.open)}>
         {!isOpen ? (
@@ -172,15 +168,15 @@ export default function GiftBox({ event, guest, demo, onGuestChange }) {
               setIsOpen(true);
               track('gift_opened', { demo });
             }}
-            aria-label="Mở hộp mừng"
+            aria-label={t.open}
           >
             <span className={styles.medal} aria-hidden="true">{couple ? '囍' : '福'}</span>
-            <span className={styles.packetText}>Chạm để mở</span>
+            <span className={styles.packetText}>{t.tap}</span>
           </button>
         ) : (
           <div className={styles.card}>
             {gifts.length > 1 && (
-              <div className={styles.sides} role="tablist" aria-label="Gửi tới">
+              <div className={styles.sides} role="tablist" aria-label={t.sendTo}>
                 {gifts.map(g => (
                   <button
                     key={g.side}
@@ -190,7 +186,7 @@ export default function GiftBox({ event, guest, demo, onGuestChange }) {
                     className={clsx(styles.side, g.side === gift.side && styles.active)}
                     onClick={() => setSide(g.side)}
                   >
-                    {SIDE_LABELS[g.side] ?? g.side}
+                    {t.sides[g.side] ?? g.side}
                   </button>
                 ))}
               </div>
@@ -198,18 +194,16 @@ export default function GiftBox({ event, guest, demo, onGuestChange }) {
             <div className={styles.qr}>
               <QRCode value={payload} size={188} level="H" bgColor="#ffffff" fgColor="#1c1917" />
               <span className={styles.qrBadge} aria-hidden="true">{couple ? '囍' : '福'}</span>
-              {demo && <span className={styles.sample}>Mã mẫu</span>}
+              {demo && <span className={styles.sample}>{t.sample}</span>}
             </div>
-            <div className={styles.bank}>{bank?.name ?? `Ngân hàng ${gift.bankBin}`}</div>
-            <button type="button" className={styles.account} onClick={copyAccount} aria-label={`Chép số tài khoản ${gift.accountNumber}`}>
+            <div className={styles.bank}>{bank?.name ?? t.bank(gift.bankBin)}</div>
+            <button type="button" className={styles.account} onClick={copyAccount} aria-label={t.copy(gift.accountNumber)}>
               <span>{groupDigits(gift.accountNumber)}</span>
               {copied ? <IoCheckmark /> : <IoCopyOutline />}
             </button>
             {gift.accountName && <div className={styles.holder}>{gift.accountName}</div>}
             <p className={styles.hint}>
-              {demo
-                ? 'Đây là thiệp mẫu, mã QR chỉ để minh hoạ.'
-                : 'Mở app ngân hàng và quét mã, lời nhắn đã được điền sẵn.'}
+              {demo ? t.demoHint : t.hint}
             </p>
             {!demo && guest?._id && (
               <GiftClaim guest={guest} side={gifts.length > 1 ? gift.side : undefined} couple={couple} onGuestChange={onGuestChange} />
