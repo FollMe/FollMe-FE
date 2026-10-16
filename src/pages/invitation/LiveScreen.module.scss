@@ -541,3 +541,25 @@
     transform: none;
   }
 }
+
+/* A photo a guest sent, in the spotlight */
+.photoSpot {
+  align-items: center;
+
+  img {
+    flex: 1;
+    min-height: 0;
+    max-width: 100%;
+    border-radius: 2vmin;
+    object-fit: contain;
+    box-shadow: 0 2vmin 6vmin rgba(0, 0, 0, 0.25);
+  }
+
+  .newBadge {
+    align-self: center;
+  }
+
+  figcaption {
+    margin-top: 2vmin;
+  }
+}

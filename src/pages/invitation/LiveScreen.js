@@ -130,6 +130,12 @@ export default function LiveScreen({ demo = false }) {
   const wishesRef = useRef([]);
   const queue = useRef([]);
   const rotation = useRef(0);
+  // Guests' photos: the newest few, and those not yet in the spotlight
+  const photosRef = useRef([]);
+  const photoQueue = useRef([]);
+  const seenPhotos = useRef(new Set());
+  const photosLoaded = useRef(false);
+  const photoTurn = useRef(0);
   const spotTimer = useRef(null);
   const spotRef = useRef(null);
   const spotCard = useRef(null);
@@ -147,15 +153,29 @@ export default function LiveScreen({ demo = false }) {
       queue.current.shift();
     }
     const fresh = queue.current.shift();
+    const photos = photosRef.current;
+    // Skip queued photos the host hid before their turn
+    while (photoQueue.current.length && !photos.some(p => p._id === photoQueue.current[0]._id)) {
+      photoQueue.current.shift();
+    }
+    const freshPhoto = fresh ? null : photoQueue.current.shift();
     let next = null;
     if (fresh) {
       next = { wish: fresh, isNew: true };
+    } else if (freshPhoto) {
+      next = { photo: freshPhoto, isNew: true };
+    } else if (photos.length && (!list.length || rotation.current % 4 === 3)) {
+      // Every fourth turn, a photo guests sent
+      next = { photo: photos[photoTurn.current % photos.length], isNew: false };
+      photoTurn.current += 1;
+      rotation.current += 1;
     } else if (list.length) {
       next = { wish: list[rotation.current % list.length], isNew: false };
       rotation.current += 1;
     }
+    const isNew = Boolean(fresh || freshPhoto);
     setSpot(next);
-    spotTimer.current = setTimeout(advance, fresh ? NEW_SPOT_MS : SPOT_MS);
+    spotTimer.current = setTimeout(advance, isNew ? NEW_SPOT_MS : SPOT_MS);
   }, []);
 
   useEffect(() => () => clearTimeout(spotTimer.current), []);
@@ -170,8 +190,24 @@ export default function LiveScreen({ demo = false }) {
     // Oldest first, so a burst of wishes is shown in the order written
     queue.current.push(...[...added].reverse());
     const current = spotRef.current;
-    const currentGone = current && !list.some(w => w._id === current.wish._id);
+    const currentGone = current?.wish && !list.some(w => w._id === current.wish._id);
     if (currentGone || (added.length && !current?.isNew)) {
+      advance();
+    }
+  }, [advance]);
+
+  // Guests' photos come whole with each poll: new ones go in the spotlight
+  const receivePhotos = useCallback((list = []) => {
+    const seen = seenPhotos.current;
+    const fresh = photosLoaded.current ? list.filter(p => !seen.has(p._id)) : [];
+    list.forEach(p => seen.add(p._id));
+    photosLoaded.current = true;
+    photosRef.current = list;
+    // Oldest first
+    photoQueue.current.push(...[...fresh].reverse());
+    const current = spotRef.current;
+    const currentGone = current?.photo && !list.some(p => p._id === current.photo._id);
+    if (currentGone || (fresh.length && !current?.isNew)) {
       advance();
     }
   }, [advance]);
@@ -193,6 +229,7 @@ export default function LiveScreen({ demo = false }) {
           return;
         }
         cursor.current = res.cursor;
+        receivePhotos(res.photos);
         setEvent(res.event);
         setWishes(res.wishes);
         wishesRef.current = res.wishes;
@@ -202,7 +239,7 @@ export default function LiveScreen({ demo = false }) {
     return () => {
       isActive = false;
     };
-  }, [demo, eventId, key, searchParams]);
+  }, [demo, eventId, key, searchParams, receivePhotos]);
 
   // Start the spotlight once there is something to show
   useEffect(() => {
@@ -224,6 +261,7 @@ export default function LiveScreen({ demo = false }) {
         cursor.current = res.cursor;
         setOffline(false);
         receive(res.wishes);
+        receivePhotos(res.photos);
       } catch (err) {
         if (isGoneError(err)) {
           // The host made a new link: this one will not work again.
@@ -242,7 +280,7 @@ export default function LiveScreen({ demo = false }) {
       stopped = true;
       clearTimeout(timer);
     };
-  }, [event, demo, eventId, key, receive]);
+  }, [event, demo, eventId, key, receive, receivePhotos]);
 
   // The sample screen: a wish "arrives" now and then
   useEffect(() => {
@@ -289,7 +327,7 @@ export default function LiveScreen({ demo = false }) {
   }
 
   const wall = useMemo(
-    () => wishes.filter(w => w._id !== spot?.wish._id).slice(0, 24),
+    () => wishes.filter(w => w._id !== spot?.wish?._id).slice(0, 24),
     [wishes, spot],
   );
 
@@ -333,7 +371,7 @@ export default function LiveScreen({ demo = false }) {
             </div>
             <p>
               <strong>Quét mã</strong>
-              để gửi lời chúc lên màn hình
+              để gửi lời chúc và ảnh lên màn hình
             </p>
           </div>
         ) : (
@@ -352,7 +390,13 @@ export default function LiveScreen({ demo = false }) {
         <p className={styles.count}>
           <strong>{wishes.length}</strong> lời chúc
         </p>
-        {spot ? (
+        {spot?.photo ? (
+          <figure key={spot.photo._id} ref={spotCard} className={clsx(styles.spot, styles.photoSpot, spot.isNew && styles.isNew)}>
+            {spot.isNew && <span className={styles.newBadge}>Ảnh mới</span>}
+            <img src={cldUrl(spot.photo.url, 'w_1600,h_1100,c_limit')} alt="" />
+            <figcaption>— Ảnh của {spot.photo.name}</figcaption>
+          </figure>
+        ) : spot ? (
           <figure
             key={spot.wish._id}
             ref={spotCard}
