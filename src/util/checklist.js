@@ -17,6 +17,7 @@ export const TASK_LINKS = {
   guests: { label: 'Khách mời', to: id => `/events/${id}#khach-moi` },
   send: { label: 'Gửi thiệp', to: id => `/events/${id}#khach-moi` },
   remind: { label: 'Nhắc khách', to: id => `/events/${id}#khach-moi` },
+  dayof: { label: 'Nhắn khách', to: id => `/events/${id}#khach-moi` },
   program: { label: 'Sửa thiệp', to: id => `/events/${id}/edit` },
   photos: { label: 'Thêm ảnh', to: id => `/events/${id}/edit` },
   seating: { label: 'Xếp bàn', to: id => `/events/${id}/xep-ban` },
@@ -46,6 +47,7 @@ const STARTERS = {
     [-10, 'Chốt số bàn với nhà hàng', 'seating'],
     [-7, 'Xếp bàn cho khách', 'seating'],
     [-3, 'Gửi link đón khách cho người tiếp tân', 'desk'],
+    [-2, 'Nhắn khách giờ, đường đi và số bàn', 'dayof'],
     [-1, 'Thử màn hình lời chúc ở hội trường', 'screen'],
     [1, 'Ghi sổ mừng', 'ledger'],
     [3, 'Gửi lời cảm ơn khách', 'thanks'],
@@ -172,6 +174,10 @@ export function taskHint(task, event) {
       return event.expenses?.length ? `${event.expenses.length} khoản chi` : '';
     case 'ledger':
       return summary.gifts ? `${summary.gifts} người mừng` : '';
+    case 'dayof': {
+      const told = guests.filter(g => g.dayOfAt).length;
+      return told ? `Đã nhắn ${told} khách` : '';
+    }
     case 'thanks': {
       const thanked = guests.filter(g => g.thankedAt).length;
       return thanked ? `Đã cảm ơn ${thanked}` : '';
