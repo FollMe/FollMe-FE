@@ -55,6 +55,7 @@ const PETAL_COLORS = {
   classic: '#e0b04a',
   minimal: '#d4d4d8',
   night: '#d9b66b',
+  garden: '#9fb89a',
 };
 
 function useCountdown(startAt) {
@@ -83,12 +84,13 @@ function mapsUrl(event) {
 }
 
 // Foil of the scratch-off date and colors of the confetti, per theme
-const FOILS = { blush: 'rose', classic: 'gold', minimal: 'silver', night: 'gold' };
+const FOILS = { blush: 'rose', classic: 'gold', minimal: 'silver', night: 'gold', garden: 'gold' };
 const CONFETTI = {
   blush: ['#e8a3b0', '#f6e3b4', '#c45c74', '#ffffff', '#d9b66b'],
   classic: ['#a3201e', '#e0b04a', '#f3dc94', '#fff4e2'],
   minimal: ['#18181b', '#a1a1aa', '#e4e4e7', '#d4af37'],
   night: ['#d9b66b', '#f3ead7', '#8aa0ff', '#ffffff'],
+  garden: ['#5f7f5f', '#9fb89a', '#e8d9a8', '#ffffff', '#c9b27a'],
 };
 
 /**

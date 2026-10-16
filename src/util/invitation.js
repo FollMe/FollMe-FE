@@ -13,6 +13,7 @@ export const THEMES = [
   { value: 'classic', label: 'Đỏ son', hint: 'Truyền thống, trang trọng' },
   { value: 'minimal', label: 'Tối giản', hint: 'Trắng, thanh lịch' },
   { value: 'night', label: 'Đêm sao', hint: 'Xanh đêm, ánh vàng' },
+  { value: 'garden', label: 'Vườn xanh', hint: 'Xanh lá, tiệc ngoài trời' },
 ];
 
 export const DEFAULT_MESSAGES = {

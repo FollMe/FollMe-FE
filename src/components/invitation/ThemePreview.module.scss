@@ -27,6 +27,13 @@
   --p-accent: #d9b66b;
 }
 
+.theme_garden {
+  --p-bg: linear-gradient(180deg, #dfe8d8, #eef2ea);
+  --p-paper: #fbfcf8;
+  --p-ink: #23362a;
+  --p-accent: #5f7f5f;
+}
+
 .preview {
   padding: 24px 18px;
   border-radius: var(--radius-lg);
