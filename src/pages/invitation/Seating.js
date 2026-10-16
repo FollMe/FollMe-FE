@@ -276,7 +276,8 @@ export default function Seating() {
       </div>
       <p className={styles.hint}>
         Số chỗ theo câu trả lời của khách: báo đến 3 người thì cần 3 chỗ, chưa trả lời tính 1 chỗ, báo không đến thì
-        không cần chỗ. Ngày cưới, người đón khách và thiệp của khách sẽ hiện số bàn.
+        không cần chỗ. Ngày cưới, người đón khách và thiệp của khách sẽ hiện số bàn; ai mở link chung thì gõ tên là
+        thấy bàn của mình.
       </p>
 
       {unseatedByGroup.length > 0 && (
