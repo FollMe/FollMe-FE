@@ -397,7 +397,7 @@ export default function InvitationView({
       {event.gifts?.length > 0 && (
         <section id="mung-cuoi" className={styles.section}>
           <Reveal>
-            <GiftBox event={event} guest={guest} demo={demo} />
+            <GiftBox event={event} guest={guest} demo={demo} onGuestChange={onGuestChange} />
           </Reveal>
         </section>
       )}

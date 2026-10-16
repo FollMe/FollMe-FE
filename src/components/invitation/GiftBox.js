@@ -2,13 +2,15 @@ import { useMemo, useState } from 'react';
 import clsx from 'clsx';
 import QRCode from 'react-qr-code';
 import { toast } from 'react-toastify';
-import { IoCopyOutline, IoCheckmark } from 'react-icons/io5';
+import { IoCopyOutline, IoCheckmark, IoCheckmarkCircle } from 'react-icons/io5';
 import { bankByBin, vietQrPayload } from 'util/vietqr';
-import { isCoupleEvent } from 'util/invitation';
+import { invitationApi, isCoupleEvent } from 'util/invitation';
+import { formatVnd, parseAmount, shortVnd } from 'util/gifts';
 import { track } from 'util/analytics';
 import styles from './GiftBox.module.scss';
 
 const SIDE_LABELS = { groom: 'Nhà trai', bride: 'Nhà gái', host: 'Gia chủ' };
+const CLAIM_AMOUNTS = [300_000, 500_000, 1_000_000, 2_000_000];
 
 /** "0123456789" -> "0123 4567 89", easier to read out or check. */
 export function groupDigits(account = '') {
@@ -16,11 +18,103 @@ export function groupDigits(account = '') {
 }
 
 /**
+ * "Mình đã chuyển khoản rồi": the guest tells the hosts, the amount if they
+ * like, so it goes in the gift ledger without matching bank statements.
+ */
+function GiftClaim({ guest, side, couple, onGuestChange }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [text, setText] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const amount = parseAmount(text);
+  const unreadable = text.trim() !== '' && amount === null;
+  const claim = guest.giftClaim;
+  const who = couple ? 'cô dâu chú rể' : 'gia chủ';
+
+  async function send(e) {
+    e.preventDefault();
+    if (unreadable) {
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const res = await invitationApi.claimGift(guest._id, { amount: amount ?? undefined, side });
+      onGuestChange?.({ ...guest, giftClaim: res.giftClaim });
+      track('gift_claimed', { amount: Boolean(amount) });
+      setIsOpen(false);
+    } catch (err) {
+      // The request said what went wrong
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  async function undo() {
+    try {
+      await invitationApi.withdrawGiftClaim(guest._id);
+      onGuestChange?.({ ...guest, giftClaim: undefined });
+      setText('');
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  if (claim) {
+    return (
+      <div className={styles.claimed} role="status">
+        <IoCheckmarkCircle aria-hidden />
+        <span>
+          Bạn đã báo gửi quà mừng{claim.amount ? ` ${formatVnd(claim.amount)}` : ''}. Cảm ơn bạn nhiều!
+        </span>
+        <button type="button" className={styles.undo} onClick={undo}>Huỷ</button>
+      </div>
+    );
+  }
+  if (!isOpen) {
+    return (
+      <button type="button" className={styles.claimButton} onClick={() => setIsOpen(true)}>
+        Mình đã chuyển khoản rồi
+      </button>
+    );
+  }
+  return (
+    <form className={styles.claimForm} onSubmit={send}>
+      <label htmlFor="gift-claim-amount">Số tiền (không bắt buộc)</label>
+      <div className={styles.claimChips} role="group" aria-label="Số tiền gợi ý">
+        {CLAIM_AMOUNTS.map(a => (
+          <button key={a} type="button" aria-pressed={amount === a} onClick={() => setText(formatVnd(a).replace(' đ', ''))}>
+            {shortVnd(a)}
+          </button>
+        ))}
+      </div>
+      <input
+        id="gift-claim-amount"
+        value={text}
+        onChange={e => setText(e.target.value)}
+        placeholder="VD: 500k, 1tr2"
+        autoComplete="off"
+        inputMode="text"
+        aria-invalid={unreadable}
+        aria-describedby="gift-claim-help"
+      />
+      <span id="gift-claim-help" className={clsx(styles.claimHelp, unreadable && styles.claimError)}>
+        {unreadable ? 'Chưa hiểu số tiền, thử 500k hoặc 1.000.000' : amount ? `= ${formatVnd(amount)}` : `Chỉ ${who} thấy, để ghi vào sổ mừng.`}
+      </span>
+      <div className={styles.claimActions}>
+        <button type="submit" className={styles.claimSend} disabled={isSaving || unreadable}>
+          {isSaving ? 'Đang gửi…' : `Báo cho ${who}`}
+        </button>
+        <button type="button" className={styles.undo} onClick={() => setIsOpen(false)}>Thôi</button>
+      </div>
+    </form>
+  );
+}
+
+/**
  * "Hộp mừng": a red envelope that opens on the host's bank account(s) as a
  * VietQR code, scanned by any Vietnamese banking app with the note prefilled.
  * In samples (`demo`) the code is not a real account.
  */
-export default function GiftBox({ event, guest, demo }) {
+export default function GiftBox({ event, guest, demo, onGuestChange }) {
   const gifts = event.gifts ?? [];
   const [isOpen, setIsOpen] = useState(false);
   const [side, setSide] = useState(gifts[0]?.side);
@@ -117,6 +211,9 @@ export default function GiftBox({ event, guest, demo }) {
                 ? 'Đây là thiệp mẫu, mã QR chỉ để minh hoạ.'
                 : 'Mở app ngân hàng và quét mã, lời nhắn đã được điền sẵn.'}
             </p>
+            {!demo && guest?._id && (
+              <GiftClaim guest={guest} side={gifts.length > 1 ? gift.side : undefined} couple={couple} onGuestChange={onGuestChange} />
+            )}
           </div>
         )}
       </div>
