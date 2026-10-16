@@ -25,6 +25,7 @@ export const TASK_LINKS = {
   ledger: { label: 'Sổ mừng', to: id => `/events/${id}/so-mung` },
   thanks: { label: 'Cảm ơn khách', to: id => `/events/${id}#khach-moi` },
   guestbook: { label: 'In sổ', to: id => `/events/${id}/loi-chuc/in` },
+  labels: { label: 'In tem', to: id => `/events/${id}/tem-thiep/in` },
 };
 
 // [days from the event (negative: before), label, link]
@@ -38,6 +39,7 @@ const STARTERS = {
     [-60, 'Lên danh sách khách mời', 'guests'],
     [-60, 'Đặt MC, ban nhạc, trang trí', 'budget'],
     [-45, 'Thêm chương trình tiệc vào thiệp', 'program'],
+    [-35, 'In tem tên, mã QR dán thiệp giấy', 'labels'],
     [-30, 'Gửi thiệp mời', 'send'],
     [-30, 'Chuẩn bị mâm quả, sính lễ', null],
     [-14, 'Nhắc khách chưa trả lời', 'remind'],
