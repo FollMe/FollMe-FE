@@ -1,0 +1,161 @@
+/* Menu cards: A4 landscape, two standing A5 cards a page, in the
+   invitation's colors on white paper (night: navy ink, gold). */
+
+@page {
+  size: A4 landscape;
+  margin: 0;
+}
+
+.page {
+  --ink: #1f1b16;
+  --accent: #846838;
+  --line: #e9e1d4;
+  --title: 'Cormorant Garamond', 'Lora', Georgia, serif;
+}
+
+.blush {
+  --ink: #4a2730;
+  --accent: #9d4a5d;
+  --line: #f1d3da;
+}
+
+.classic {
+  --ink: #5c1212;
+  --accent: #a3201e;
+  --line: #e6cf9f;
+}
+
+.minimal {
+  --ink: #18181b;
+  --accent: #18181b;
+  --line: #e4e4e7;
+}
+
+.night {
+  --ink: #111734;
+  --accent: #9a7a2e;
+  --line: #e8dcc0;
+}
+
+.garden {
+  --ink: #23362a;
+  --accent: #476847;
+  --line: #d3dfcf;
+}
+
+.sheet {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 297mm;
+  height: 210mm;
+  max-width: 100%;
+  margin: 0 auto 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
+  background: #fff;
+  color: var(--ink);
+  break-after: page;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3mm;
+  margin: 8mm;
+  padding: 10mm 8mm;
+  border: 0.6mm solid var(--line);
+  outline: 0.3mm solid var(--line);
+  outline-offset: -2.4mm;
+  text-align: center;
+
+  & + & {
+    border-left-style: solid;
+  }
+}
+
+.kicker {
+  margin: 0;
+  color: var(--accent);
+  font-size: 10pt;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+}
+
+.couple {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  font-family: var(--title);
+  font-size: 28pt;
+  font-style: italic;
+  font-weight: 600;
+  line-height: 1.05;
+
+  span {
+    color: var(--accent);
+    font-size: 18pt;
+  }
+}
+
+.title {
+  margin: 0;
+  font-family: var(--title);
+  font-size: 22pt;
+  line-height: 1.15;
+}
+
+.day {
+  margin: 0;
+  color: var(--accent);
+  font-size: 10pt;
+  letter-spacing: 0.2em;
+}
+
+.ornament {
+  color: var(--accent);
+  font-size: 14pt;
+  line-height: 1;
+}
+
+.dishes {
+  display: flex;
+  flex-direction: column;
+  gap: 2.4mm;
+  margin: 1mm 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--title);
+  font-size: 14pt;
+  line-height: 1.2;
+}
+
+.wish {
+  margin: 0;
+  color: var(--accent);
+  font-family: var(--title);
+  font-size: 12pt;
+  font-style: italic;
+}
+
+@media print {
+  .page {
+    padding: 0;
+    background: #fff;
+  }
+
+  .sheet {
+    margin: 0;
+    box-shadow: none;
+  }
+}
+
+/* Phones: a preview, scaled to fit */
+@media (max-width: 760px) {
+  .sheet {
+    zoom: 0.4;
+  }
+}

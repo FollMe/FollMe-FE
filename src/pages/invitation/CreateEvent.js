@@ -1,4 +1,4 @@
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import { TextField } from '@mui/material';
@@ -21,10 +21,12 @@ import PhotoManager from 'components/invitation/PhotoManager';
 import ProgramField, { programError, toRows } from 'components/invitation/ProgramField';
 import ShuttleField from 'components/invitation/ShuttleField';
 import NotesField from 'components/invitation/NotesField';
+import MenuField from 'components/invitation/MenuField';
 import StoryField from 'components/invitation/StoryField';
 import { tidyStory, toStoryRows } from 'util/story';
 import { shuttleRowError, tidyShuttleRows, toShuttleRows } from 'util/shuttles';
 import { tidyNotes, toNoteRows } from 'util/notes';
+import { tidyMenu, toMenuRows } from 'util/menu';
 import OvalLoading from 'components/loading/OvalLoading';
 import {
   DEFAULT_MESSAGES, EVENT_TYPES, THEMES, invitationApi, isCoupleEvent, suggestTitle,
@@ -86,6 +88,8 @@ function CreateEventForm() {
       shuttles: [],
       // Notes for guests ({ id, kind, title, text })
       notes: [],
+      // The dishes ({ id, dish })
+      menu: [],
     };
   });
   // Managed on the event page; shown here in the preview only
@@ -111,6 +115,14 @@ function CreateEventForm() {
   useEffect(() => {
     document.title = `${isEditing ? 'Sửa thiệp' : 'Tạo thiệp mời'} | FollMe`;
   }, [isEditing]);
+
+  // Shortcuts from the event page ("#thuc-don") land on their part of the form
+  const { hash } = useLocation();
+  useEffect(() => {
+    if (!isLoading && hash) {
+      document.getElementById(hash.slice(1))?.scrollIntoView({ block: 'start' });
+    }
+  }, [isLoading, hash]);
 
   useEffect(() => {
     if (!isEditing) {
@@ -139,6 +151,7 @@ function CreateEventForm() {
           story: toStoryRows(invitation.story),
           shuttles: toShuttleRows(invitation.shuttles),
           notes: toNoteRows(invitation.notes),
+          menu: toMenuRows(invitation.menu),
         });
         setPhotos(invitation.photos ?? []);
         setInvitedNames((invitation.guests ?? []).map(g => g.name));
@@ -233,6 +246,7 @@ function CreateEventForm() {
       story: couple ? tidyStory(form.story) : [],
       shuttles: tidyShuttleRows(form.shuttles),
       notes: tidyNotes(form.notes),
+      menu: tidyMenu(form.menu),
     };
     try {
       if (isEditing) {
@@ -384,6 +398,11 @@ function CreateEventForm() {
               startTime={form.startAt?.isValid() ? form.startAt.format('HH:mm') : null}
               showErrors={Boolean(errors.program)}
             />
+          </fieldset>
+
+          <fieldset className={styles.group} id="thuc-don">
+            <legend>Thực đơn (không bắt buộc)</legend>
+            <MenuField value={form.menu} onChange={menu => set({ menu })} />
           </fieldset>
 
           <fieldset className={styles.group}>
