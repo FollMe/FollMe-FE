@@ -39,6 +39,7 @@ import {
 import { downloadCsv } from 'util/csv';
 import { formatVnd, shortVnd } from 'util/gifts';
 import { budgetSummary } from 'util/budget';
+import { cldUrl } from 'util/photos';
 import { dueText, nextTask } from 'util/checklist';
 import { ago, loadSeen, newsText, saveSeen, whatsNew } from 'util/whatsNew';
 import { DEFAULT_SEATS, seatingPlan, tableLabel } from 'util/seating';
@@ -393,6 +394,84 @@ function CohostPanel({ event, userId, onChange }) {
           </>
         )}
       </div>
+    </section>
+  );
+}
+
+/** Photos guests sent from the party: the host hides or deletes any. */
+function GuestPhotosPanel({ event, onChange }) {
+  const photos = event.guestPhotos ?? [];
+  const [busy, setBusy] = useState(null);
+  if (!photos.length) {
+    return null;
+  }
+  const sorted = [...photos].sort((a, b) => new Date(b.at) - new Date(a.at));
+  const hidden = photos.filter(p => p.hidden).length;
+
+  async function toggle(photo) {
+    setBusy(photo._id);
+    try {
+      await (photo.hidden ? invitationApi.showGuestPhoto : invitationApi.hideGuestPhoto)(event._id, photo._id);
+      onChange(photos.map(p => (p._id === photo._id ? { ...p, hidden: !photo.hidden } : p)));
+    } catch (err) {
+      console.log(err);
+    }
+    setBusy(null);
+  }
+
+  async function remove(photo) {
+    if (!window.confirm(`Xoá hẳn ảnh của ${photo.name || 'khách'}? Không lấy lại được.`)) {
+      return;
+    }
+    setBusy(photo._id);
+    try {
+      await invitationApi.deleteGuestPhoto(event._id, photo._id);
+      onChange(photos.filter(p => p._id !== photo._id));
+    } catch (err) {
+      console.log(err);
+    }
+    setBusy(null);
+  }
+
+  return (
+    <section id="anh-khach" className={styles.panel}>
+      <div className={styles.panelHead}>
+        <h2>Ảnh khách gửi <span className={styles.headCount}>{photos.length}</span></h2>
+        {hidden > 0 && <span className={styles.muted}>{hidden} ảnh đang ẩn</span>}
+      </div>
+      <p className={styles.panelHint}>Khách gửi từ thiệp của họ, ai mở thiệp cũng xem được. Ẩn những tấm bạn không muốn hiện.</p>
+      <ul className={styles.guestPhotos}>
+        {sorted.map(photo => (
+          <li key={photo._id} className={clsx(photo.hidden && styles.hidden)}>
+            <a href={cldUrl(photo.url, 'w_1600,c_limit')} target="_blank" rel="noreferrer" aria-label={`Mở ảnh của ${photo.name || 'khách'}`}>
+              <img src={cldUrl(photo.url, 'w_300,h_300,c_fill,g_auto')} alt="" loading="lazy" />
+            </a>
+            <span className={styles.photoBy}>{photo.name}{photo.hidden ? ' · Đang ẩn' : ''}</span>
+            <span className={styles.photoTools}>
+              <button
+                type="button"
+                className={styles.iconButton}
+                onClick={() => toggle(photo)}
+                disabled={busy === photo._id}
+                aria-label={photo.hidden ? `Hiện lại ảnh của ${photo.name}` : `Ẩn ảnh của ${photo.name}`}
+                title={photo.hidden ? 'Hiện lại' : 'Ẩn khỏi thiệp'}
+              >
+                {photo.hidden ? <IoEyeOutline /> : <IoEyeOffOutline />}
+              </button>
+              <button
+                type="button"
+                className={styles.iconButton}
+                onClick={() => remove(photo)}
+                disabled={busy === photo._id}
+                aria-label={`Xoá ảnh của ${photo.name}`}
+                title="Xoá hẳn"
+              >
+                <IoTrashOutline />
+              </button>
+            </span>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
@@ -1051,6 +1130,8 @@ function EventPage() {
       </section>
 
       <SongsPanel event={event} />
+
+      <GuestPhotosPanel event={event} onChange={guestPhotos => setEvent(e => ({ ...e, guestPhotos }))} />
 
       <section className={styles.panel}>
         <div className={styles.panelHead}>
