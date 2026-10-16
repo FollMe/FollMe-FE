@@ -141,10 +141,16 @@ export function isGoneError(err) {
 }
 
 /** Who answered what, how many are coming and how many came (live, as the host edits). */
+/** How many of a guest's party eat vegetarian (suất chay), if they come or may. */
+export function vegetarianOf(guest) {
+  const { status, vegetarian } = guest.rsvp ?? {};
+  return status === 'attending' || status === 'maybe' ? vegetarian || 0 : 0;
+}
+
 export function summarizeGuests(guests) {
   const summary = {
     invited: guests.length, sent: 0, opened: 0, attending: 0, maybe: 0, declined: 0, pending: 0, headcount: 0,
-    arrived: 0, arrivedPeople: 0, gifts: 0, giftTotal: 0,
+    arrived: 0, arrivedPeople: 0, gifts: 0, giftTotal: 0, vegetarian: 0,
   };
   for (const guest of guests) {
     if (guest.sentAt) {
@@ -162,6 +168,7 @@ export function summarizeGuests(guests) {
     }
     if (status === 'attending') {
       summary.headcount += guest.rsvp.count || 1;
+      summary.vegetarian += guest.rsvp.vegetarian || 0;
     }
     if (guest.arrivedAt) {
       summary.arrived += 1;

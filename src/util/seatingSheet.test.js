@@ -1,7 +1,7 @@
 import { byName, byTable, nameLetter } from './seatingSheet';
 
 const guests = [
-  { _id: '1', name: 'Đức Huy', table: '2', rsvp: { status: 'attending', count: 2 } },
+  { _id: '1', name: 'Đức Huy', table: '2', rsvp: { status: 'attending', count: 2, vegetarian: 1 } },
   { _id: '2', name: 'Anh Tuấn', table: '10' },
   { _id: '3', name: 'Út Lan', table: '2', group: 'Nhà gái' },
   { _id: '4', name: 'anh Ba', table: 'VIP' },
@@ -29,6 +29,13 @@ describe('byName', () => {
 });
 
 describe('byTable', () => {
+  it('counts vegetarian places per table and guest', () => {
+    const two = byTable(guests).find(t => t.table === '2');
+    expect(two.vegetarian).toBe(1);
+    expect(two.guests.find(g => g.name === 'Đức Huy').vegetarian).toBe(1);
+    expect(byTable(guests).find(t => t.table === '1').vegetarian).toBe(0);
+  });
+
   it('lists tables in order with their guests and people', () => {
     expect(byTable(guests).map(t => [t.table, t.people, t.guests.map(g => g.name)])).toEqual([
       ['1', 1, ['Dũng']],

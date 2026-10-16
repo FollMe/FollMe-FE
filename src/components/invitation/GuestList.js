@@ -16,7 +16,7 @@ import {
   IoPaperPlaneOutline, IoEllipsisHorizontal, IoCopyOutline, IoEyeOutline, IoCreateOutline, IoCheckmarkDoneOutline,
   IoArrowUndoOutline, IoTrashOutline, IoSearch, IoNotificationsOutline, IoHeartOutline,
 } from 'react-icons/io5';
-import { RSVP_LABELS, awaitsAnswer, hasPersonalLink, invitationApi, personalInvitationUrl } from 'util/invitation';
+import { RSVP_LABELS, awaitsAnswer, hasPersonalLink, invitationApi, personalInvitationUrl, vegetarianOf } from 'util/invitation';
 import { inviteMessage, sendInvite } from 'util/inviteMessage';
 import { normalizeText } from 'util/search';
 import GroupPicker from './GroupPicker';
@@ -260,6 +260,7 @@ export default function GuestList({ event, guests, template, reminderTemplate, t
                     <span className={clsx(styles.tag, styles[guest.rsvp.status])}>
                       {RSVP_LABELS[guest.rsvp.status]}
                       {guest.rsvp.status !== 'declined' && guest.rsvp.count > 1 ? ` · ${guest.rsvp.count} người` : ''}
+                      {vegetarianOf(guest) > 0 ? ` · ${vegetarianOf(guest)} ăn chay` : ''}
                     </span>
                   )}
                   {guest.thankedAt && <span className={clsx(styles.tag, styles.sent)}>Đã cảm ơn</span>}

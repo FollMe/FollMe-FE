@@ -1,5 +1,5 @@
 import { filterGuests } from './GuestList';
-import { groupSummary, reminderQueue, summarizeGuests, thankQueue } from 'util/invitation';
+import { groupSummary, reminderQueue, summarizeGuests, thankQueue, vegetarianOf } from 'util/invitation';
 
 const guests = [
   { _id: '1', name: 'Cô Ba', source: 'host', sentAt: '2026-10-01', viewed: 2, rsvp: { status: 'attending', count: 2 } },
@@ -29,8 +29,18 @@ describe('summarizeGuests', () => {
   it('counts sent, opened, answers and headcount', () => {
     expect(summarizeGuests(guests)).toEqual({
       invited: 4, sent: 2, opened: 2, attending: 1, maybe: 1, declined: 1, pending: 1, headcount: 2,
-      arrived: 0, arrivedPeople: 0, gifts: 0, giftTotal: 0,
+      arrived: 0, arrivedPeople: 0, gifts: 0, giftTotal: 0, vegetarian: 0,
     });
+  });
+
+  it('counts vegetarian places of guests coming', () => {
+    const veg = [
+      { _id: 'a', rsvp: { status: 'attending', count: 3, vegetarian: 2 } },
+      { _id: 'b', rsvp: { status: 'maybe', count: 1, vegetarian: 1 } },
+      { _id: 'c', rsvp: { status: 'declined', count: 0, vegetarian: 1 } },
+    ];
+    expect(summarizeGuests(veg).vegetarian).toBe(2);
+    expect(veg.map(vegetarianOf)).toEqual([2, 1, 0]);
   });
 
   it('counts who came; a walk-in is never waited on for an answer', () => {

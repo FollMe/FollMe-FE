@@ -471,6 +471,9 @@ function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
   const existing = guest?.rsvp;
   const [status, setStatus] = useState(existing?.status ?? 'attending');
   const [count, setCount] = useState(existing?.count || 1);
+  // How many of them eat vegetarian; the counter shows once asked for
+  const [vegetarian, setVegetarian] = useState(existing?.vegetarian || 0);
+  const [askVegetarian, setAskVegetarian] = useState((existing?.vegetarian || 0) > 0);
   const [note, setNote] = useState(existing?.note ?? '');
   const [name, setName] = useState(guest?.name ?? '');
   const [isSending, setIsSending] = useState(false);
@@ -487,11 +490,12 @@ function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
       return;
     }
     setIsSending(true);
-    const payload = { status, count: status === 'declined' ? 1 : Number(count) || 1, note };
+    const people = status === 'declined' ? 1 : Number(count) || 1;
+    const payload = { status, count: people, vegetarian: status === 'declined' ? 0 : Math.min(vegetarian, people), note };
     try {
       let res;
       if (demo) {
-        res = { guestId: 'demo', rsvp: { ...payload, count: status === 'declined' ? 0 : payload.count } };
+        res = { guestId: 'demo', rsvp: { ...payload, count: status === 'declined' ? 0 : payload.count, vegetarian: payload.vegetarian || undefined } };
       } else if (guest?._id) {
         res = await invitationApi.rsvp(guest._id, payload);
       } else {
@@ -521,7 +525,9 @@ function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
         <h2 className={styles.h2}>Xác nhận tham dự</h2>
         <p className={styles.answered}>
           <IoCheckmarkCircle /> Bạn đã trả lời: <strong>{RSVP_LABELS[current.status]}</strong>
-          {current.status !== 'declined' && current.count > 1 ? ` (${current.count} người)` : ''}
+          {current.status !== 'declined' && (current.count > 1 || current.vegetarian > 0)
+            ? ` (${[current.count > 1 && `${current.count} người`, current.vegetarian > 0 && `${current.vegetarian} ăn chay`].filter(Boolean).join(', ')})`
+            : ''}
         </p>
         <Button size="small" className={styles.textButton} onClick={() => setIsEditing(true)}>Đổi câu trả lời</Button>
       </div>
@@ -555,11 +561,40 @@ function RsvpForm({ event, guest, isPublic, onGuestChange, demo }) {
         {status !== 'declined' && (
           <div className={styles.counter}>
             <span>Đi mấy người?</span>
-            <button type="button" aria-label="Bớt một người" onClick={() => setCount(c => Math.max(1, Number(c) - 1))}>−</button>
+            <button
+              type="button"
+              aria-label="Bớt một người"
+              onClick={() => {
+                const next = Math.max(1, Number(count) - 1);
+                setCount(next);
+                setVegetarian(v => Math.min(v, next));
+              }}
+            >
+              −
+            </button>
             <strong aria-live="polite">{count}</strong>
             <button type="button" aria-label="Thêm một người" onClick={() => setCount(c => Math.min(20, Number(c) + 1))}>+</button>
           </div>
         )}
+        {status !== 'declined' && (askVegetarian ? (
+          <div className={styles.counter}>
+            <span>Trong đó ăn chay</span>
+            <button type="button" aria-label="Bớt một người ăn chay" onClick={() => setVegetarian(v => Math.max(0, v - 1))}>−</button>
+            <strong aria-live="polite">{vegetarian}</strong>
+            <button type="button" aria-label="Thêm một người ăn chay" onClick={() => setVegetarian(v => Math.min(Number(count) || 1, v + 1))}>+</button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            className={styles.askVegetarian}
+            onClick={() => {
+              setAskVegetarian(true);
+              setVegetarian(1);
+            }}
+          >
+            Có người ăn chay?
+          </button>
+        ))}
         <TextField size="small" label="Nhắn gia chủ (không bắt buộc)" value={note} inputProps={{ maxLength: 300 }} onChange={e => setNote(e.target.value)} />
         <LoadingButton type="submit" variant="contained" size="large" loading={isSending}>Gửi xác nhận</LoadingButton>
       </form>

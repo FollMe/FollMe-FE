@@ -22,6 +22,8 @@ describe('partySize', () => {
 describe('rsvpHint', () => {
   it('says what the guest answered', () => {
     expect(guests.map(rsvpHint)).toEqual(['Báo đến · 3 người', 'Chưa trả lời', 'Báo không đến', 'Chưa chắc đến', 'Thêm tại tiệc']);
+    expect(rsvpHint({ rsvp: { status: 'attending', count: 3, vegetarian: 1 } })).toBe('Báo đến · 3 người · 1 ăn chay');
+    expect(rsvpHint({ rsvp: { status: 'attending', count: 1, vegetarian: 1 } })).toBe('Báo đến · 1 ăn chay');
     expect(rsvpHint({ rsvp: { status: 'attending', count: 1 } })).toBe('Báo đến');
   });
 });
