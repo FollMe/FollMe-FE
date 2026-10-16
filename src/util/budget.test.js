@@ -1,5 +1,5 @@
 import {
-  BUDGET_TABS, balanceText, budgetRows, budgetSummary, categoryOf, expenseStatus, starterExpenses,
+  BUDGET_TABS, balanceText, budgetRows, budgetSummary, categoryOf, expenseStatus, payerLabel, payerSplit, starterExpenses,
 } from './budget';
 import { formatVnd } from './gifts';
 
@@ -71,9 +71,31 @@ describe('lists', () => {
 
   it('exports rows with totals', () => {
     const rows = budgetRows(expenses);
-    expect(rows[0]).toEqual(['Khoản chi', 'Nhóm', 'Chi phí', 'Đã trả', 'Còn lại', 'Ghi chú']);
-    expect(rows[5]).toEqual(['Xe hoa', 'Xe & đi lại', 3_000_000, 5_000_000, 0, 'Thuê 4 tiếng']);
-    expect(rows[4]).toEqual(['Nhẫn cưới', 'Nhẫn & trang sức', '', '', '', '']);
-    expect(rows[rows.length - 1]).toEqual(['Tổng', '', 183_000_000, 74_000_000, 110_000_000, '']);
+    expect(rows[0]).toEqual(['Khoản chi', 'Nhóm', 'Ai trả', 'Chi phí', 'Đã trả', 'Còn lại', 'Ghi chú']);
+    expect(rows[5]).toEqual(['Xe hoa', 'Xe & đi lại', '', 3_000_000, 5_000_000, 0, 'Thuê 4 tiếng']);
+    expect(rows[4]).toEqual(['Nhẫn cưới', 'Nhẫn & trang sức', '', '', '', '', '']);
+    expect(rows[rows.length - 1]).toEqual(['Tổng', '', '', 183_000_000, 74_000_000, 110_000_000, '']);
+  });
+});
+
+describe('who pays', () => {
+  it('splits by family, shared lines half each', () => {
+    const lines = [
+      { label: 'Tiệc', category: 'venue', amount: 100_000_000, paid: 40_000_000, payer: 'shared' },
+      { label: 'Mâm quả', category: 'ceremony', amount: 20_000_000, paid: 20_000_000, payer: 'groom' },
+      { label: 'Váy', category: 'attire', amount: 15_000_000, payer: 'bride' },
+      { label: 'Nhẫn', category: 'rings', amount: 30_000_000, paid: 30_000_000 },
+    ];
+    expect(payerSplit(lines)).toEqual({
+      groom: { total: 70_000_000, paid: 40_000_000 },
+      bride: { total: 65_000_000, paid: 20_000_000 },
+      couple: { total: 30_000_000, paid: 30_000_000 },
+    });
+    expect(budgetRows(lines)[1][2]).toBe('Chia đôi');
+  });
+
+  it('says nothing until a line names who pays', () => {
+    expect(payerSplit([{ label: 'Tiệc', amount: 1 }])).toBeNull();
+    expect(payerLabel(undefined)).toBe('Đôi bạn trẻ');
   });
 });

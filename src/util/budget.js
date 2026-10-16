@@ -19,6 +19,15 @@ export const EXPENSE_CATEGORIES = [
   { value: 'other', label: 'Khác', emoji: '🧾' },
 ];
 
+// Who pays a line at a wedding: the couple (none set), one family, or half each
+export const EXPENSE_PAYERS = [
+  { value: '', label: 'Đôi bạn trẻ' },
+  { value: 'groom', label: 'Nhà trai' },
+  { value: 'bride', label: 'Nhà gái' },
+  { value: 'shared', label: 'Chia đôi' },
+];
+export const payerLabel = value => EXPENSE_PAYERS.find(p => p.value === (value ?? ''))?.label ?? '';
+
 const CATEGORY = Object.fromEntries(EXPENSE_CATEGORIES.map(c => [c.value, c]));
 export const categoryOf = value => CATEGORY[value] ?? CATEGORY.other;
 
@@ -128,15 +137,43 @@ export const BUDGET_TABS = [
 export function budgetRows(expenses = []) {
   const summary = budgetSummary(expenses);
   return [
-    ['Khoản chi', 'Nhóm', 'Chi phí', 'Đã trả', 'Còn lại', 'Ghi chú'],
+    ['Khoản chi', 'Nhóm', 'Ai trả', 'Chi phí', 'Đã trả', 'Còn lại', 'Ghi chú'],
     ...expenses.map(e => [
       e.label,
       categoryOf(e.category).label,
+      e.payer ? payerLabel(e.payer) : '',
       e.amount ?? '',
       e.paid ?? '',
       e.amount ? Math.max(e.amount - paidOf(e), 0) : '',
       e.note ?? '',
     ]),
-    ['Tổng', '', summary.total, summary.paid, summary.owed, ''],
+    ['Tổng', '', '', summary.total, summary.paid, summary.owed, ''],
   ];
+}
+
+/**
+ * What each side carries, once any line says who pays: { groom, bride,
+ * couple } with total and paid each; a shared line counts half on each
+ * family. null when no line names a payer.
+ */
+export function payerSplit(expenses = []) {
+  if (!expenses.some(e => e.payer)) {
+    return null;
+  }
+  const sides = { groom: { total: 0, paid: 0 }, bride: { total: 0, paid: 0 }, couple: { total: 0, paid: 0 } };
+  for (const e of expenses) {
+    const amount = e.amount || 0;
+    const paid = e.amount ? paidOf(e) : e.paid || 0;
+    const shares = e.payer === 'shared' ? [['groom', 0.5], ['bride', 0.5]]
+      : [[e.payer === 'groom' || e.payer === 'bride' ? e.payer : 'couple', 1]];
+    for (const [side, part] of shares) {
+      sides[side].total += amount * part;
+      sides[side].paid += paid * part;
+    }
+  }
+  for (const side of Object.values(sides)) {
+    side.total = Math.round(side.total);
+    side.paid = Math.round(side.paid);
+  }
+  return sides;
 }

@@ -415,3 +415,26 @@
     }
   }
 }
+
+.groupLabel {
+  display: block;
+  color: var(--text-2);
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+/* Hai nhà: what each family carries */
+.breakdown li.payerRow {
+  grid-template-columns: minmax(0, 11em) minmax(0, 1fr) auto;
+}
+
+.payerPaid {
+  color: var(--text-3);
+  font-size: 1.25rem;
+}
+
+.splitNote {
+  margin: 4px 0 0;
+  color: var(--text-3);
+  font-size: 1.25rem;
+}
