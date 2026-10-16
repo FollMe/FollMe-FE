@@ -10,7 +10,9 @@ import TextField from '@mui/material/TextField';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
-import { IoSearch, IoCloseCircle, IoCheckmarkCircle, IoAdd, IoRemove, IoPersonAddOutline, IoCloudOfflineOutline } from 'react-icons/io5';
+import {
+  IoSearch, IoCloseCircle, IoCheckmarkCircle, IoAdd, IoRemove, IoPersonAddOutline, IoCloudOfflineOutline, IoBusOutline,
+} from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
 import ProgramNow from 'components/invitation/ProgramNow';
 import GroupPicker from 'components/invitation/GroupPicker';
@@ -21,6 +23,7 @@ import {
 } from 'util/desk';
 import { groupPresets } from 'util/guestList';
 import { DEFAULT_SEATS, seatingPlan, tableLabel } from 'util/seating';
+import { guestShuttle, shuttleWhen } from 'util/shuttles';
 import { vnWallClock } from 'util/date';
 import { setPageMeta } from 'util/meta';
 import { track } from 'util/analytics';
@@ -188,6 +191,60 @@ function GuestRow({ guest, busy, canSeat, onArrive, onCount, onUndo, onSeat }) {
  * link from the host, no account): find a guest, tap "Đã đến", fix how
  * many came. Several phones can share it; each catches up every few seconds.
  */
+/**
+ * The buses (xe đưa đón): who has arrived on each, and one tap when a bus
+ * pulls up to check in everyone on it. Tapping a bus shows its riders.
+ */
+function BusArrivals({ buses, shown, onShow, onArrive }) {
+  return (
+    <section className={styles.buses} aria-label="Xe đưa đón">
+      {buses.map(bus => {
+        const left = bus.riders.filter(g => !g.arrivedAt);
+        const isShown = shown === bus._id;
+        return (
+          <div key={bus._id} className={clsx(styles.bus, isShown && styles.busShown)}>
+            <button type="button" className={styles.busName} aria-pressed={isShown} onClick={() => onShow(isShown ? null : bus._id)}>
+              <IoBusOutline aria-hidden />
+              <span>
+                <strong>{bus.label}</strong>
+                <small>{shuttleWhen(bus)} · {bus.riders.length - left.length}/{bus.riders.length} khách đã tới</small>
+              </span>
+            </button>
+            {left.length > 0 ? (
+              <Button size="small" variant="contained" onClick={() => onArrive(bus, left)}>Cả xe đã tới</Button>
+            ) : (
+              <span className={styles.busDone}><IoCheckmarkCircle aria-hidden /> {bus.riders.length ? 'Đã tới hết' : 'Chưa có khách'}</span>
+            )}
+          </div>
+        );
+      })}
+    </section>
+  );
+}
+
+/** "Xe từ TP.HCM đã tới?": the names on it not checked in yet, before checking them all in. */
+function BusDialog({ bus, guests, onClose, onConfirm }) {
+  const people = guests.reduce((n, g) => n + partySize(g), 0);
+  return (
+    <Dialog open onClose={onClose} fullWidth maxWidth="xs">
+      <DialogTitle>{bus.label} đã tới?</DialogTitle>
+      <DialogContent>
+        <p className={styles.busNote}>Đánh dấu đã đến cho {guests.length} khách ({people} người) trên xe:</p>
+        <ul className={styles.busList}>
+          {guests.map(g => (
+            <li key={g._id}>{g.name}{partySize(g) > 1 && <span> · {partySize(g)} người</span>}</li>
+          ))}
+        </ul>
+        <p className={styles.busNote}>Ai không lên xe thì sau đó bấm "Huỷ" ở tên họ, trong mục "Đã đến".</p>
+      </DialogContent>
+      <DialogActions sx={{ px: 3, pb: 2 }}>
+        <Button onClick={onClose}>Thôi</Button>
+        <Button variant="contained" onClick={onConfirm}>Đã tới cả</Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
 export default function Desk() {
   const { eventId, key } = useParams();
   const [event, setEvent] = useState(null);
@@ -203,6 +260,9 @@ export default function Desk() {
   const [walkIn, setWalkIn] = useState(null);
   const [seating, setSeating] = useState(null);
   const [busy, setBusy] = useState(() => new Set());
+  // A bus whose riders the list shows, and one about to be checked in whole
+  const [bus, setBus] = useState(null);
+  const [busArrival, setBusArrival] = useState(null);
   // Check-ins not on the server yet (no signal): sent again until they are
   const [pending, setPending] = useState(() => loadPending(eventId));
   const pendingRef = useRef(pending);
@@ -339,6 +399,26 @@ export default function Desk() {
     flush();
   }
 
+  /** A whole bus pulled up: everyone on it not checked in yet, in one go (queued like any check-in). */
+  function arriveBus(list) {
+    const at = new Date().toISOString();
+    let ops = {};
+    // As one check-in each: a table picked offline and still waiting stays
+    updatePending(p => {
+      ops = Object.fromEntries(list.map(g => {
+        const change = { arrived: true, count: partySize(g), at };
+        return [g._id, p[g._id]?.arrived ? { ...p[g._id], ...change } : change];
+      }));
+      return { ...p, ...ops };
+    });
+    setGuests(current => applyPending(current, ops));
+    setKeep(k => new Set([...k, ...list.map(g => g._id)]));
+    track('desk_bus_arrived', { guests: list.length });
+    toast.success(`Đã đánh dấu ${list.length} khách đã đến`);
+    setBusArrival(null);
+    flush();
+  }
+
   function seat(guest, table) {
     track('desk_seated');
     arrival(guest, true, guest.arrivedCount || 1, table);
@@ -399,7 +479,11 @@ export default function Desk() {
   const summary = useMemo(() => deskSummary(guests), [guests]);
   const plan = useMemo(() => seatingPlan(guests, event?.seatsPerTable ?? DEFAULT_SEATS), [guests, event]);
   const waiting = Object.keys(pending).length;
-  const shownGuests = useMemo(() => deskGuests(guests, { tab, query, group, keep }), [guests, tab, query, group, keep]);
+  const buses = useMemo(() => (event?.shuttles ?? []).map(b => ({ ...b, riders: guests.filter(g => guestShuttle(event, g) === b) })), [event, guests]);
+  const shownGuests = useMemo(() => {
+    const list = deskGuests(guests, { tab, query, group, keep });
+    return bus ? list.filter(g => String(guestShuttle(event, g)?._id) === String(bus)) : list;
+  }, [guests, tab, query, group, keep, bus, event]);
   const tabCounts = useMemo(
     () => Object.fromEntries(DESK_TABS.map(([k, , test]) => [k, guests.filter(test).length])),
     [guests],
@@ -455,6 +539,15 @@ export default function Desk() {
             ? `Chưa gửi được ${waiting} lượt đánh dấu, sẽ tự gửi khi có mạng. Cứ đón khách tiếp.`
             : 'Mất kết nối, đang thử lại. Danh sách có thể chưa mới nhất.'}
         </p>
+      )}
+
+      {buses.length > 0 && (
+        <BusArrivals
+          buses={buses}
+          shown={bus}
+          onShow={id => { setBus(id); setShown(PAGE); }}
+          onArrive={(b, list) => setBusArrival({ bus: b, guests: list })}
+        />
       )}
 
       <div className={styles.tools}>
@@ -557,6 +650,14 @@ export default function Desk() {
 
       {walkIn !== null && (
         <WalkInDialog initialName={walkIn} groups={groupOptions} plan={plan} onClose={() => setWalkIn(null)} onAdd={addWalkIn} />
+      )}
+      {busArrival && (
+        <BusDialog
+          bus={busArrival.bus}
+          guests={busArrival.guests}
+          onClose={() => setBusArrival(null)}
+          onConfirm={() => arriveBus(busArrival.guests)}
+        />
       )}
       {seating && (
         <SeatDialog
