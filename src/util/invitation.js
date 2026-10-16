@@ -63,6 +63,7 @@ export const invitationApi = {
   create: (payload) => request.post('api/events', payload),
   update: (eventId, payload) => request.put(`api/events/${eventId}`, payload),
   remove: (eventId) => request.del(`api/events/${eventId}`),
+  duplicate: (eventId, payload) => request.post(`api/events/${eventId}/duplicate`, payload),
   hostGet: (eventId) => request.get(`api/events/${eventId}`),
   hideWish: (eventId, wishId) => request.put(`api/events/${eventId}/wishes/${wishId}/hide`),
   unhideWish: (eventId, wishId) => request.del(`api/events/${eventId}/wishes/${wishId}/hide`),
