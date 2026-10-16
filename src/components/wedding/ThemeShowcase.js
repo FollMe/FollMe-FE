@@ -8,6 +8,7 @@ const SAMPLES = {
   classic: { groomName: 'Hùng', brideName: 'Mai', startAt: '10:30 · 06/02/2027' },
   minimal: { groomName: 'Tuấn', brideName: 'Vy', startAt: '18:00 · 20/03/2027' },
   night: { groomName: 'Khoa', brideName: 'Ngân', startAt: '18:30 · 15/05/2027' },
+  garden: { groomName: 'Bảo', brideName: 'Thư', startAt: '16:30 · 10/04/2027' },
 };
 
 /** The invitation themes as small samples linking to the editor. */

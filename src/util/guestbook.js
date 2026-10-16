@@ -14,6 +14,7 @@ export const BOOK_ACCENTS = {
   classic: '#8f1c1a',
   minimal: '#27272a',
   night: '#7a5d1f',
+  garden: '#3f5f40',
 };
 
 /** "128 lời chúc từ những người thương" and the like. */

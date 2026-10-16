@@ -19,6 +19,6 @@ describe('guestbook', () => {
   it('counts and inks', () => {
     expect(bookCount(128)).toBe('128 lời chúc từ những người thương');
     expect(bookCount(0)).toBe('Chưa có lời chúc nào');
-    expect(Object.keys(BOOK_ACCENTS)).toEqual(['blush', 'classic', 'minimal', 'night']);
+    expect(Object.keys(BOOK_ACCENTS)).toEqual(['blush', 'classic', 'minimal', 'night', 'garden']);
   });
 });

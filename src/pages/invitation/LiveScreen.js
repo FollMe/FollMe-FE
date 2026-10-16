@@ -26,6 +26,7 @@ const CONFETTI = {
   classic: ['#a3201e', '#e0b04a', '#f3dc94', '#fff4e2'],
   minimal: ['#18181b', '#a1a1aa', '#e4e4e7', '#d4af37'],
   night: ['#d9b66b', '#f3ead7', '#8aa0ff', '#ffffff'],
+  garden: ['#5f7f5f', '#9fb89a', '#e8d9a8', '#ffffff', '#c9b27a'],
 };
 
 // Sample wishes that "arrive" on the sample screen
@@ -340,7 +341,7 @@ export default function LiveScreen({ demo = false }) {
         )}
       </aside>
 
-      <main className={styles.stage}>
+      <section className={styles.stage} aria-label="Lời chúc">
         <ProgramNow
           className={styles.program}
           program={event.program}
@@ -368,7 +369,7 @@ export default function LiveScreen({ demo = false }) {
           </div>
         )}
         {wall.length > 0 && <WishWall wishes={wall} />}
-      </main>
+      </section>
 
       <footer className={styles.brand}>Thiệp &amp; màn hình lời chúc miễn phí tại FollMe</footer>
 

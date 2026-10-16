@@ -82,6 +82,25 @@
   background-size: 300px 300px, 260px 260px, 340px 340px, 280px 280px, 100% 100%;
 }
 
+.garden {
+  --inv-bg: #eef2ea;
+  --inv-paper: #fbfcf8;
+  --inv-ink: #23362a;
+  --inv-muted: #56685b;
+  --inv-accent: #5f7f5f;
+  --inv-accent-text: #476847;
+  --inv-accent-fill: #476847;
+  --inv-line: #d3dfcf;
+  --inv-soft: #e3ebdd;
+
+  // Light through leaves
+  background:
+    radial-gradient(circle at 12% 8%, rgba(159, 184, 154, 0.35), transparent 40%),
+    radial-gradient(circle at 90% 30%, rgba(232, 217, 168, 0.3), transparent 35%),
+    var(--paper-grain),
+    var(--inv-bg);
+}
+
 /* ---------- Cover ---------- */
 .cover {
   display: grid;

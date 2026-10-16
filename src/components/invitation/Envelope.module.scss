@@ -51,6 +51,23 @@
   }
 }
 
+.garden {
+  --env: #6f8f6c;
+  --env-dark: #4f6d4d;
+  --seal: #e8d9a8;
+  --letter: #fbfcf8;
+  --letter-ink: #23362a;
+  background: radial-gradient(circle at 50% 40%, #f7faf3, #dfe8d8 70%);
+
+  .to {
+    color: #23362a;
+  }
+
+  .hint {
+    color: #476847;
+  }
+}
+
 .to {
   display: flex;
   flex-direction: column;

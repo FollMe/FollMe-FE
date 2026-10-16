@@ -6,6 +6,7 @@ export const DEMO_COUPLES = {
   classic: { groomName: 'Hùng', brideName: 'Mai' },
   minimal: { groomName: 'Tuấn', brideName: 'Vy' },
   night: { groomName: 'Khoa', brideName: 'Ngân' },
+  garden: { groomName: 'Bảo', brideName: 'Thư' },
 };
 
 /** A sample wedding about two months from now, at 11:00. */
