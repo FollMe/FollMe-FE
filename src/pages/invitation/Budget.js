@@ -16,11 +16,11 @@ import {
 } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
 import ArticleHeader from 'components/article/ArticleHeader';
-import { eventHeadline, invitationApi } from 'util/invitation';
+import { eventHeadline, invitationApi, isCoupleEvent } from 'util/invitation';
 import { formatVnd, giftSummary, parseAmount, shortVnd } from 'util/gifts';
 import {
-  BUDGET_TABS, EXPENSE_CATEGORIES, MAX_EXPENSES, MAX_EXPENSE_LABEL, MAX_EXPENSE_NOTE, balanceText, budgetRows,
-  budgetSummary, categoryOf, expenseStatus, starterExpenses,
+  BUDGET_TABS, EXPENSE_CATEGORIES, EXPENSE_PAYERS, MAX_EXPENSES, MAX_EXPENSE_LABEL, MAX_EXPENSE_NOTE, balanceText,
+  budgetRows, budgetSummary, categoryOf, expenseStatus, familyGifts, payerLabel, payerSplit, starterExpenses,
 } from 'util/budget';
 import { downloadCsv } from 'util/csv';
 import { vnWallClock } from 'util/date';
@@ -61,8 +61,9 @@ function AmountField({ label, field, placeholder, helper, autoFocus }) {
 }
 
 /** Writes a line of the budget, new (`expense` null) or existing. */
-function ExpenseDialog({ expense, onClose, onSave, onRemove }) {
+function ExpenseDialog({ expense, couple, onClose, onSave, onRemove }) {
   const [category, setCategory] = useState(expense?.category ?? 'venue');
+  const [payer, setPayer] = useState(expense?.payer ?? '');
   const [label, setLabel] = useState(expense?.label ?? '');
   const [note, setNote] = useState(expense?.note ?? '');
   const amount = useAmount(expense?.amount);
@@ -85,6 +86,7 @@ function ExpenseDialog({ expense, onClose, onSave, onRemove }) {
         amount: amount.amount ?? (expense ? null : undefined),
         paid: paid.amount ?? (expense ? null : undefined),
         note: note.trim() || (expense ? null : undefined),
+        ...(couple ? { payer: payer || (expense ? null : undefined) } : {}),
       });
     } catch (err) {
       setIsSaving(false);
@@ -152,6 +154,24 @@ function ExpenseDialog({ expense, onClose, onSave, onRemove }) {
               )}
             </div>
           </div>
+          {couple && (
+            <div>
+              <span className={styles.groupLabel} id="payer-label">Ai trả</span>
+              <div className={styles.quick} role="group" aria-labelledby="payer-label">
+                {EXPENSE_PAYERS.map(p => (
+                  <button
+                    key={p.value || 'couple'}
+                    type="button"
+                    aria-pressed={payer === p.value}
+                    className={clsx(payer === p.value && styles.on)}
+                    onClick={() => setPayer(p.value)}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <TextField
             fullWidth
             label="Ghi chú"
@@ -303,6 +323,9 @@ export default function Budget() {
 
   const paidShare = summary.total ? Math.min(summary.paid / summary.total, 1) : 0;
   const priced = summary.categories.filter(c => c.total > 0);
+  const split = isCoupleEvent(event.type) ? payerSplit(expenses) : null;
+  // What each family's guests gave, from the ledger's groups ("Nhà trai", "Nhà gái")
+  const sideGifts = familyGifts(gifts.groups);
   const maxCategory = Math.max(...priced.map(c => c.total), 1);
   return (
     <div className={`container page ${styles.page}`}>
@@ -365,6 +388,32 @@ export default function Budget() {
         </section>
       )}
 
+      {split && (
+        <section className={styles.breakdown} aria-labelledby="by-payer">
+          <h2 id="by-payer">Hai nhà</h2>
+          <ul>
+            {[['groom', 'Nhà trai'], ['bride', 'Nhà gái'], ['couple', 'Đôi bạn trẻ']]
+              .filter(([key]) => split[key].total > 0 || key !== 'couple')
+              .map(([key, label]) => (
+                <li key={key} className={styles.payerRow}>
+                  <span className={styles.what}>{label}</span>
+                  <span className={styles.payerPaid}>
+                    {[
+                      split[key].total > split[key].paid ? `còn ${formatVnd(split[key].total - split[key].paid)}` : 'đã trả đủ',
+                      sideGifts[key] > 0 && `khách mừng ${formatVnd(sideGifts[key])}`,
+                    ].filter(Boolean).join(' · ')}
+                  </span>
+                  <strong>{formatVnd(split[key].total)}</strong>
+                </li>
+              ))}
+          </ul>
+          <p className={styles.splitNote}>
+            Khoản “Chia đôi” tính mỗi nhà một nửa.
+            {(sideGifts.groom > 0 || sideGifts.bride > 0) && ' Tiền mừng lấy từ Sổ mừng, theo nhóm khách Nhà trai, Nhà gái.'}
+          </p>
+        </section>
+      )}
+
       <p className={styles.private}>
         <IoLockClosedOutline aria-hidden /> Chỉ bạn xem được trang thu chi.
       </p>
@@ -407,7 +456,7 @@ export default function Budget() {
                       <span className={styles.icon} aria-hidden>{category.emoji}</span>
                       <span className={styles.what}>
                         <strong>{expense.label}</strong>
-                        <span>{[category.label, expense.note].filter(Boolean).join(' · ')}</span>
+                        <span>{[category.label, expense.payer && payerLabel(expense.payer), expense.note].filter(Boolean).join(' · ')}</span>
                       </span>
                       <span className={styles.money}>
                         <strong>{expense.amount ? formatVnd(expense.amount) : '—'}</strong>
@@ -445,6 +494,7 @@ export default function Budget() {
         <ExpenseDialog
           key={editing._id ?? 'new'}
           expense={editing._id ? editing : null}
+          couple={isCoupleEvent(event.type)}
           onClose={() => setEditing(null)}
           onSave={values => (editing._id ? update(editing, values) : add(values))}
           onRemove={() => remove(editing)}
