@@ -24,6 +24,7 @@ export default function Footer() {
             <Link to="/fortune/hop-tuoi">Xem tuổi hợp nhau</Link>
             <Link to="/cuoi-hoi/chon-ngay">Chọn ngày cưới</Link>
             <Link to="/cuoi-hoi">Thiệp cưới online</Link>
+            <Link to="/cuoi-hoi/tien-mung">Đi cưới mừng bao nhiêu</Link>
             <Link to="/events">Thiệp của tôi</Link>
           </div>
           <div className={styles.column}>

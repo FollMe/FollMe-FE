@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import clsx from 'clsx';
 import Button from '@mui/material/Button';
 import QRCode from 'react-qr-code';
 import Accordion from '@mui/material/Accordion';
@@ -92,6 +93,17 @@ export default function WeddingHub() {
             </Button>
           </div>
         </div>
+      </section>
+
+      <section className={clsx(styles.section, styles.guestTool)}>
+        <div>
+          <div className="eyebrow">Đi ăn cưới</div>
+          <h2 className={styles.h2}>Đi đám cưới mừng bao nhiêu?</h2>
+          <p>Chọn bạn là gì của cô dâu chú rể, đi mấy người, tiệc ở đâu: FollMe gợi ý số tiền tròn, đẹp kèm cách tính.</p>
+        </div>
+        <Button component={Link} to="/cuoi-hoi/tien-mung" variant="outlined" endIcon={<IoArrowForward />}>
+          Tính tiền mừng
+        </Button>
       </section>
 
       <section className={styles.section}>

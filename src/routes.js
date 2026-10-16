@@ -38,6 +38,7 @@ const Compat = lazy(() => import("pages/fortune/Compat"));
 const ReadingListPage = lazy(() => import("pages/reading/ReadingListPage"));
 const WeddingHub = lazy(() => import("pages/wedding/WeddingHub"));
 const ChooseDate = lazy(() => import("pages/wedding/ChooseDate"));
+const GiftCalculator = lazy(() => import("pages/wedding/GiftCalculator"));
 const PublicInvitation = lazy(() => import("pages/invitation/PublicInvitation"));
 const DemoInvitation = lazy(() => import("pages/invitation/DemoInvitation"));
 const LiveScreen = lazy(() => import("pages/invitation/LiveScreen"));
@@ -98,6 +99,7 @@ export default function Router() {
         { path: '/doc-sau', element: withSuspense(<ReadingListPage />) },
         { path: '/cuoi-hoi', element: withSuspense(<WeddingHub />) },
         { path: '/cuoi-hoi/chon-ngay', element: withSuspense(<ChooseDate />) },
+        { path: '/cuoi-hoi/tien-mung', element: withSuspense(<GiftCalculator />) },
       ]
     },
 
