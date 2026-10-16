@@ -30,9 +30,10 @@ import GuestList from 'components/invitation/GuestList';
 import GroupPicker from 'components/invitation/GroupPicker';
 import SendQueue, { TemplateEditor } from 'components/invitation/SendQueue';
 import ShuttlePanel from 'components/invitation/ShuttlePanel';
+import ShortLinkField from 'components/invitation/ShortLinkField';
 import {
   MAX_COHOSTS, MAX_PHOTOS, RSVP_LABELS, cohostUrl, dayOfQueue, deskUrl, eventHeadline, groupSummary, hasPersonalLink, invitationApi, isCoupleEvent,
-  personalInvitationUrl, publicInvitationUrl, reminderQueue, screenUrl, summarizeGuests, thankQueue, vegetarianOf,
+  personalInvitationUrl, reminderQueue, screenUrl, sharedInvitationUrl, summarizeGuests, thankQueue, vegetarianOf,
 } from 'util/invitation';
 import {
   daysToAnswer, deadlineText, defaultDayOf, defaultMessage, defaultReminder, defaultTemplate, defaultThanks, isEnglishGuest, loadTemplate, saveTemplate,
@@ -879,7 +880,8 @@ function EventPage() {
   }
 
   const status = new Date(event.startAt) > new Date() ? 'upcoming' : 'happened';
-  const publicUrl = publicInvitationUrl(event._id);
+  // The short link (/c/minh-lan) once the host set one
+  const publicUrl = sharedInvitationUrl(event);
   const guests = event.guests ?? [];
   const summary = summarizeGuests(guests);
   // Before the party: invite and nudge. After it: thank.
@@ -990,6 +992,7 @@ function EventPage() {
               </h2>
               <p>Ai có link này đều xem được thiệp, xác nhận tham dự và gửi lời chúc. Hợp để gửi vào nhóm hoặc in mã QR lên thiệp giấy.</p>
               <code className={styles.url}>{publicUrl}</code>
+              <ShortLinkField event={event} onChange={slug => setEvent(e => ({ ...e, slug: slug ?? undefined }))} />
               <div className={styles.shareActions}>
                 <CopyButton text={publicUrl} variant="button" label="Copy link" />
                 <CopyButton text={`${publicUrl}?lang=en`} variant="button" label="Link tiếng Anh" />

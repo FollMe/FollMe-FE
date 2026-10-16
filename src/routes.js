@@ -43,6 +43,7 @@ const WeddingHub = lazy(() => import("pages/wedding/WeddingHub"));
 const ChooseDate = lazy(() => import("pages/wedding/ChooseDate"));
 const GiftCalculator = lazy(() => import("pages/wedding/GiftCalculator"));
 const PublicInvitation = lazy(() => import("pages/invitation/PublicInvitation"));
+const ShortLink = lazy(() => import("pages/invitation/ShortLink"));
 const DemoInvitation = lazy(() => import("pages/invitation/DemoInvitation"));
 const LiveScreen = lazy(() => import("pages/invitation/LiveScreen"));
 const Desk = lazy(() => import("pages/invitation/Desk"));
@@ -62,6 +63,8 @@ export default function Router() {
         // The e-card has its own full-screen design
         { path: '/invitations/:id', element: withSuspense(<InvitationCard />) },
         { path: '/e/:eventId', element: withSuspense(<PublicInvitation />) },
+        // The shared card by its short link (/c/minh-lan)
+        { path: '/c/:slug', element: withSuspense(<ShortLink />) },
         { path: '/thiep-mau', element: withSuspense(<DemoInvitation />) },
         { path: '/thiep-mau/:theme', element: withSuspense(<DemoInvitation />) },
         // The wishes wall shown on a TV at the party

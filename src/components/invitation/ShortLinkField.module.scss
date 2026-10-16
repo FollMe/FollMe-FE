@@ -1,0 +1,90 @@
+.current {
+  margin: 8px 0 0;
+  color: var(--text-2);
+  font-size: 1.3rem;
+
+  strong {
+    color: var(--text);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+}
+
+.linkButton {
+  margin-left: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--brand-text);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+
+  &:focus-within {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 1px var(--brand);
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 10px 8px 0;
+    border: none;
+    background: none;
+    color: var(--text);
+    font: inherit;
+    font-size: 1.4rem;
+    font-weight: 600;
+    outline: none;
+  }
+}
+
+.prefix {
+  flex: none;
+  max-width: 55%;
+  overflow: hidden;
+  padding-left: 10px;
+  color: var(--text-2);
+  font-size: 1.35rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.help,
+.error {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.help {
+  color: var(--text-2);
+}
+
+.error {
+  color: var(--danger);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}

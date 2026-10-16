@@ -66,6 +66,8 @@ export const invitationApi = {
   wishPublic: (eventId, payload) => request.post(`api/events/${eventId}/public/wishes`, payload),
   create: (payload) => request.post('api/events', payload),
   update: (eventId, payload) => request.put(`api/events/${eventId}`, payload),
+  setSlug: (eventId, slug) => request.put(`api/events/${eventId}/slug`, { slug }),
+  bySlug: (slug, opts) => request.get(`api/slugs/${encodeURIComponent(slug)}`, opts),
   remove: (eventId) => request.del(`api/events/${eventId}`),
   duplicate: (eventId, payload) => request.post(`api/events/${eventId}/duplicate`, payload),
   hostGet: (eventId) => request.get(`api/events/${eventId}`),
@@ -269,6 +271,46 @@ export function rememberOpened(key) {
 
 export function publicInvitationUrl(eventId) {
   return `${window.location.origin}/e/${eventId}`;
+}
+
+/** The shared link as guests get it: the short one (/c/minh-lan) when the host set it. */
+export function sharedInvitationUrl(event) {
+  return event.slug ? `${window.location.origin}/c/${event.slug}` : publicInvitationUrl(event._id);
+}
+
+// Short links: 3 to 40 of a-z, 0-9 and single hyphens, not at either end
+export const MIN_SLUG = 3;
+export const MAX_SLUG = 40;
+export const SLUG_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
+/** "Minh & Lan" -> "minh-lan": no accents, lowercase, hyphens between words. */
+export function slugify(text = '') {
+  return String(text)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[đĐ]/g, 'd')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, MAX_SLUG)
+    .replace(/-+$/, '');
+}
+
+/** A short link to offer: the couple's names, else the title. */
+export function suggestSlug(event) {
+  const couple = isCoupleEvent(event.type) && event.groomName && event.brideName;
+  return slugify(couple ? `${event.groomName} ${event.brideName}` : event.title);
+}
+
+/** Why a short link can't be used, or null. */
+export function slugError(slug) {
+  if (slug.length < MIN_SLUG) {
+    return `Link cần ít nhất ${MIN_SLUG} ký tự`;
+  }
+  if (slug.length > MAX_SLUG) {
+    return `Link tối đa ${MAX_SLUG} ký tự`;
+  }
+  return SLUG_RE.test(slug) ? null : 'Chỉ dùng chữ thường không dấu, số và dấu gạch ngang';
 }
 
 /** Where guests at the party land from the QR on the venue screen. */
