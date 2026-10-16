@@ -1,5 +1,5 @@
 import {
-  BUDGET_TABS, balanceText, budgetRows, budgetSummary, categoryOf, expenseStatus, payerLabel, payerSplit, starterExpenses,
+  BUDGET_TABS, balanceText, budgetRows, budgetSummary, categoryOf, expenseStatus, familyGifts, payerLabel, payerSplit, starterExpenses,
 } from './budget';
 import { formatVnd } from './gifts';
 
@@ -97,5 +97,17 @@ describe('who pays', () => {
   it('says nothing until a line names who pays', () => {
     expect(payerSplit([{ label: 'Tiệc', amount: 1 }])).toBeNull();
     expect(payerLabel(undefined)).toBe('Đôi bạn trẻ');
+  });
+});
+
+describe('gifts per family', () => {
+  it('reads the ledger groups by name', () => {
+    expect(familyGifts([
+      { group: 'Nhà trai', total: 30_000_000 },
+      { group: 'Họ nhà trai', total: 5_000_000 },
+      { group: 'Nhà Gái', total: 12_000_000 },
+      { group: 'Bạn bè', total: 8_000_000 },
+      { group: '', total: 1_000_000 },
+    ])).toEqual({ groom: 35_000_000, bride: 12_000_000 });
   });
 });

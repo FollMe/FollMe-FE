@@ -20,7 +20,7 @@ import { eventHeadline, invitationApi, isCoupleEvent } from 'util/invitation';
 import { formatVnd, giftSummary, parseAmount, shortVnd } from 'util/gifts';
 import {
   BUDGET_TABS, EXPENSE_CATEGORIES, EXPENSE_PAYERS, MAX_EXPENSES, MAX_EXPENSE_LABEL, MAX_EXPENSE_NOTE, balanceText,
-  budgetRows, budgetSummary, categoryOf, expenseStatus, payerLabel, payerSplit, starterExpenses,
+  budgetRows, budgetSummary, categoryOf, expenseStatus, familyGifts, payerLabel, payerSplit, starterExpenses,
 } from 'util/budget';
 import { downloadCsv } from 'util/csv';
 import { vnWallClock } from 'util/date';
@@ -324,6 +324,8 @@ export default function Budget() {
   const paidShare = summary.total ? Math.min(summary.paid / summary.total, 1) : 0;
   const priced = summary.categories.filter(c => c.total > 0);
   const split = isCoupleEvent(event.type) ? payerSplit(expenses) : null;
+  // What each family's guests gave, from the ledger's groups ("Nhà trai", "Nhà gái")
+  const sideGifts = familyGifts(gifts.groups);
   const maxCategory = Math.max(...priced.map(c => c.total), 1);
   return (
     <div className={`container page ${styles.page}`}>
@@ -396,13 +398,19 @@ export default function Budget() {
                 <li key={key} className={styles.payerRow}>
                   <span className={styles.what}>{label}</span>
                   <span className={styles.payerPaid}>
-                    {split[key].total > split[key].paid ? `còn ${formatVnd(split[key].total - split[key].paid)}` : 'đã trả đủ'}
+                    {[
+                      split[key].total > split[key].paid ? `còn ${formatVnd(split[key].total - split[key].paid)}` : 'đã trả đủ',
+                      sideGifts[key] > 0 && `khách mừng ${formatVnd(sideGifts[key])}`,
+                    ].filter(Boolean).join(' · ')}
                   </span>
                   <strong>{formatVnd(split[key].total)}</strong>
                 </li>
               ))}
           </ul>
-          <p className={styles.splitNote}>Khoản “Chia đôi” tính mỗi nhà một nửa.</p>
+          <p className={styles.splitNote}>
+            Khoản “Chia đôi” tính mỗi nhà một nửa.
+            {(sideGifts.groom > 0 || sideGifts.bride > 0) && ' Tiền mừng lấy từ Sổ mừng, theo nhóm khách Nhà trai, Nhà gái.'}
+          </p>
         </section>
       )}
 

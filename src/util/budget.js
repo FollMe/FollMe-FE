@@ -177,3 +177,23 @@ export function payerSplit(expenses = []) {
   }
   return sides;
 }
+
+const foldGroup = text => (text ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd');
+
+/**
+ * Gifts per family, from the ledger's guest groups: groups named like
+ * "Nhà trai" / "Họ nhà trai" count for the groom's side, "Nhà gái" for the
+ * bride's. `groups` = giftSummary(...).groups.
+ */
+export function familyGifts(groups = []) {
+  const gifts = { groom: 0, bride: 0 };
+  for (const row of groups) {
+    const name = foldGroup(row.group);
+    if (/nha trai|ben trai|ho trai/.test(name)) {
+      gifts.groom += row.total;
+    } else if (/nha gai|ben gai|ho gai/.test(name)) {
+      gifts.bride += row.total;
+    }
+  }
+  return gifts;
+}

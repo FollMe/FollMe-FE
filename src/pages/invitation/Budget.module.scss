@@ -423,12 +423,28 @@
   font-weight: 600;
 }
 
-/* Hai nhà: what each family carries */
+/* Hai nhà: what each family carries; the details on a line of their own */
 .breakdown li.payerRow {
-  grid-template-columns: minmax(0, 11em) minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'name total'
+    'detail detail';
+  row-gap: 0;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+
+  .what {
+    grid-area: name;
+    font-weight: 600;
+  }
+
+  strong {
+    grid-area: total;
+  }
 }
 
 .payerPaid {
+  grid-area: detail;
   color: var(--text-3);
   font-size: 1.25rem;
 }
