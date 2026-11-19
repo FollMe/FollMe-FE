@@ -49,6 +49,10 @@ const DemoInvitation = lazy(() => import("pages/invitation/DemoInvitation"));
 const LiveScreen = lazy(() => import("pages/invitation/LiveScreen"));
 const Desk = lazy(() => import("pages/invitation/Desk"));
 const JoinCohost = lazy(() => import("pages/invitation/JoinCohost"));
+const SurpriseOpen = lazy(() => import("pages/surprise/SurpriseOpen"));
+const SurpriseList = lazy(() => import("pages/surprise/SurpriseList"));
+const SurpriseForm = lazy(() => import("pages/surprise/SurpriseForm"));
+const SurpriseDetail = lazy(() => import("pages/surprise/SurpriseDetail"));
 
 const withSuspense = (element) => (
   <Suspense fallback={<OvalLoading />}>{element}</Suspense>
@@ -85,6 +89,8 @@ export default function Router() {
         { path: '/events/:eventId/thuc-don/in', element: withSuspense(<MenuSheet />) },
         // The lucky draw, full screen on the projector at the party
         { path: '/events/:eventId/quay-so', element: withSuspense(<LuckyDraw />) },
+        // A birthday surprise: the password, the candles, the letter, the gift
+        { path: '/qua/:id', element: withSuspense(<SurpriseOpen />) },
       ]
     },
     {
@@ -136,6 +142,10 @@ export default function Router() {
         { path: '/events/:eventId/viec-can-lam', element: withSuspense(<Checklist />) },
         { path: '/events/:eventId/xep-ban', element: withSuspense(<Seating />) },
         { path: '/fortune/profiles', element: withSuspense(<FortuneProfiles />) },
+        { path: '/qua-bi-mat', element: withSuspense(<SurpriseList />) },
+        { path: '/qua-bi-mat/tao', element: withSuspense(<SurpriseForm key="new" />) },
+        { path: '/qua-bi-mat/:id', element: withSuspense(<SurpriseDetail />) },
+        { path: '/qua-bi-mat/:id/sua', element: withSuspense(<SurpriseForm key="edit" />) },
       ]
     },
 

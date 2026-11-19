@@ -61,6 +61,23 @@ it('keeps invitations out of search engines, not other pages', () => {
   expect(handler.isPrivatePath('/events')).toBe(false);
 });
 
+it('names her in a surprise preview, nothing more', async () => {
+  const id = '64b0000000000000000000f2';
+  mockFetch({
+    '/index.html': INDEX,
+    [`/api/surprises/${id}/public`]: { _id: id, recipientName: 'Vy <3', hint: 'Ngày mình quen nhau', mascot: 'bunny', isOpen: true, picked: false },
+  });
+  const res = await call(`/qua/${id}`);
+  expect(res.body).toContain('<title>Một món quà cho Vy &lt;3 🎁 | FollMe</title>');
+  expect(res.body).toContain('content="https://follme.vercel.app/imgs/og-surprise.jpg"');
+  expect(res.body).not.toContain('Ngày mình quen nhau');
+  expect(res.headers['X-Robots-Tag']).toBe('noindex, nofollow');
+  // A box that is gone keeps the plain page
+  mockFetch({ '/index.html': INDEX });
+  handler.resetCache();
+  expect((await call(`/qua/${id}`)).body).toBe(INDEX);
+});
+
 it('uses the blog cover and static pages', async () => {
   mockFetch({
     '/index.html': INDEX,

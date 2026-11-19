@@ -1,0 +1,422 @@
+/* Hộp quà bí mật, owner side: the list, the form and one surprise.
+   Phone first; the pastel pink is only an accent on the app's paper. */
+
+$pink: #e86a92;
+$pink-soft: color-mix(in srgb, #e86a92 14%, var(--surface));
+
+.eyebrow {
+  margin: 0;
+  color: var(--text-3);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.meta {
+  margin: 4px 0 0;
+  color: var(--text-2);
+  font-size: 1.35rem;
+}
+
+.help {
+  margin: 8px 0 0;
+  color: var(--text-3);
+  font-size: 1.3rem;
+}
+
+.error {
+  margin: 6px 0 0;
+  color: var(--danger);
+  font-size: 1.3rem;
+}
+
+/* ---------- list ---------- */
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
+  padding: 28px 16px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  color: var(--text-2);
+  font-size: 1.5rem;
+  text-align: center;
+
+  p {
+    max-width: 420px;
+    margin: 0;
+  }
+}
+
+.list {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0 48px;
+  padding: 0;
+  list-style: none;
+
+  @media (min-width: 720px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:hover,
+  &:focus-visible {
+    border-color: $pink;
+    box-shadow: var(--shadow-md);
+  }
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  strong {
+    font-size: 1.7rem;
+  }
+
+  span {
+    overflow: hidden;
+    color: var(--text-2);
+    font-size: 1.35rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* ---------- form ---------- */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 760px;
+  margin: 12px 0 48px;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  margin: 0;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+
+  legend {
+    padding: 0 6px;
+    font-family: var(--font-serif);
+    font-size: 2rem;
+    font-weight: 600;
+  }
+}
+
+.row {
+  display: grid;
+  gap: 14px;
+
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.mascots {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.mascotChoice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 6px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+
+  &:hover {
+    border-color: var(--border-strong);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--ring);
+  }
+
+  &.on {
+    border-color: $pink;
+    background: $pink-soft;
+    font-weight: 600;
+  }
+}
+
+.gifts {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+.emoji {
+  flex: 0 0 64px;
+
+  input {
+    font-size: 2rem;
+    text-align: center;
+  }
+}
+
+.giftText {
+  display: grid;
+  flex: 1;
+  gap: 8px;
+  min-width: 0;
+
+  @media (min-width: 640px) {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  }
+}
+
+.ideas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 1.35rem;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $pink;
+    background: $pink-soft;
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--ring);
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin: 8px 0 48px;
+}
+
+/* ---------- detail ---------- */
+
+.detailHead {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  h1 {
+    margin: 2px 0 0;
+    font-family: var(--font-serif);
+    font-size: 3.2rem;
+    line-height: 1.15;
+  }
+}
+
+.created {
+  margin: 16px 0 0;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  background: $pink-soft;
+  font-size: 1.45rem;
+}
+
+.status {
+  margin-top: 16px;
+}
+
+.waiting {
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  color: var(--text-2);
+  font-size: 1.45rem;
+}
+
+.picked {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  padding: 16px;
+  border: 2px solid $pink;
+  border-radius: var(--radius-lg);
+  background: $pink-soft;
+
+  > div {
+    flex: 1;
+    min-width: 180px;
+  }
+
+  strong {
+    font-size: 2rem;
+  }
+}
+
+.pickEmoji {
+  font-size: 4.4rem;
+  line-height: 1;
+}
+
+.pickNote {
+  margin: 6px 0 0;
+  font-family: var(--font-reading);
+  font-size: 1.5rem;
+  font-style: italic;
+}
+
+.share {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 20px;
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+
+  h2 {
+    margin: 0 0 6px;
+    font-size: 1.7rem;
+  }
+
+  code {
+    display: block;
+    overflow-wrap: anywhere;
+    font-family: var(--font-mono);
+    font-size: 1.3rem;
+  }
+}
+
+.qr {
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  background: #fff;
+  line-height: 0;
+}
+
+.shareText {
+  flex: 1;
+  min-width: 220px;
+}
+
+.shareActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.summary {
+  margin-top: 20px;
+
+  h2 {
+    margin: 18px 0 8px;
+    font-size: 1.7rem;
+  }
+
+  ul {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @media (min-width: 640px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+
+    > span {
+      font-size: 2.6rem;
+    }
+
+    div {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    div span {
+      color: var(--text-2);
+      font-size: 1.3rem;
+    }
+
+    &.isPicked {
+      border-color: $pink;
+      background: $pink-soft;
+    }
+  }
+}
+
+.letter {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  font-family: var(--font-reading);
+  font-size: 1.55rem;
+  line-height: 1.6;
+  white-space: pre-line;
+}

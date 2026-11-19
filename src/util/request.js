@@ -116,6 +116,8 @@ const put = (url, data = {}, opts) => send('PUT', url, data, opts);
 // Multipart PUT, e.g. to replace a blog's thumbnail
 const putForm = (url, formData) => post(url, formData, true, 'PUT');
 const del = (url) => send('DELETE', url);
+// JSON POST that can stay quiet on failure (the caller says what went wrong)
+const postJson = (url, data = {}, opts) => send('POST', url, data, opts);
 
 async function authenticate(route, data) {
     const response = await post(route, data);
@@ -143,4 +145,4 @@ export const authRouteList = {
     'default': 'api/auth/local'
 }
 
-export const request = { get, post, put, putForm, del, authenticate };
+export const request = { get, post, postJson, put, putForm, del, authenticate };

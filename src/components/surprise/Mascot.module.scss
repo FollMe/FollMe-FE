@@ -1,0 +1,207 @@
+/* The mascot's moods are CSS: it breathes and blinks, covers its eyes,
+   shakes its head, hops. Still for people who prefer reduced motion. */
+
+.mascot {
+  display: block;
+  overflow: visible;
+  user-select: none;
+
+  * {
+    transform-box: fill-box;
+  }
+}
+
+.body {
+  transform-origin: 50% 100%;
+  animation: breathe 3.4s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+
+  50% {
+    transform: scale(1.015, 0.985);
+  }
+}
+
+.eye {
+  transform-origin: center;
+  animation: blink 4.6s infinite;
+}
+
+.eye + .eye {
+  animation-delay: 0.04s;
+}
+
+@keyframes blink {
+  0%,
+  94%,
+  100% {
+    transform: scaleY(1);
+  }
+
+  96% {
+    transform: scaleY(0.08);
+  }
+}
+
+.head {
+  transform-origin: 50% 85%;
+}
+
+/* Paws: from the sides up over the eyes */
+.paw {
+  transition: transform 0.35s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+
+.pawLeft.up {
+  transform: translate(28px, -76px) rotate(-12deg);
+}
+
+.pawRight.up {
+  transform: translate(-28px, -76px) rotate(12deg);
+}
+
+/* Peeking: the left paw lets one eye see */
+.pawLeft.up.peekPaw {
+  transform: translate(10px, -56px) rotate(-30deg);
+}
+
+.sad .head {
+  animation: nope 0.7s ease-in-out;
+}
+
+@keyframes nope {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+
+  20% {
+    transform: rotate(-9deg);
+  }
+
+  40% {
+    transform: rotate(9deg);
+  }
+
+  60% {
+    transform: rotate(-6deg);
+  }
+
+  80% {
+    transform: rotate(4deg);
+  }
+}
+
+.tear {
+  animation: tear 1.6s ease-in infinite;
+}
+
+@keyframes tear {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+
+  30% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+.happy,
+.love {
+  animation: hop 0.8s cubic-bezier(0.3, 0, 0.5, 1) 3;
+}
+
+@keyframes hop {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  40% {
+    transform: translateY(-16px);
+  }
+}
+
+.hearts path {
+  transform-origin: center;
+  animation: floatHeart 2.4s ease-in-out infinite;
+
+  &:nth-child(2) {
+    animation-delay: 0.6s;
+  }
+
+  &:nth-child(3) {
+    animation-delay: 1.2s;
+  }
+}
+
+@keyframes floatHeart {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.6);
+  }
+
+  30% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-26px) scale(1.1);
+  }
+}
+
+.sleep .body {
+  animation-duration: 5s;
+}
+
+.zzz text {
+  animation: floatHeart 3s ease-in-out infinite;
+
+  &:nth-child(2) {
+    animation-delay: 0.8s;
+  }
+
+  &:nth-child(3) {
+    animation-delay: 1.6s;
+  }
+}
+
+/* Holding the present: paws on it */
+.gift .pawLeft {
+  transform: translate(28px, 0) rotate(-8deg);
+}
+
+.gift .pawRight {
+  transform: translate(-28px, 0) rotate(8deg);
+}
+
+.present {
+  transform-origin: 50% 100%;
+  animation: presentIn 0.5s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+
+@keyframes presentIn {
+  from {
+    transform: scale(0.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mascot,
+  .mascot * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
