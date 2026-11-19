@@ -11,11 +11,13 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
 import {
-  IoSearch, IoCloseCircle, IoCheckmarkCircle, IoAdd, IoRemove, IoPersonAddOutline, IoCloudOfflineOutline, IoBusOutline,
+  IoSearch, IoCloseCircle, IoCheckmarkCircle, IoAdd, IoRemove, IoPersonAddOutline, IoCloudOfflineOutline, IoBusOutline, IoQrCodeOutline,
 } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
 import ProgramNow from 'components/invitation/ProgramNow';
 import GroupPicker from 'components/invitation/GroupPicker';
+import QrCheckIn from 'components/invitation/QrCheckIn';
+import { canScan } from 'util/qrScan';
 import { eventHeadline, invitationApi, isGoneError } from 'util/invitation';
 import {
   DESK_TABS, MAX_PARTY, applyPending, cacheDesk, deskGuests, deskSummary, forgetDesk, loadCachedDesk, loadPending, partySize,
@@ -263,6 +265,7 @@ export default function Desk() {
   // A bus whose riders the list shows, and one about to be checked in whole
   const [bus, setBus] = useState(null);
   const [busArrival, setBusArrival] = useState(null);
+  const [isScanning, setIsScanning] = useState(false);
   // Check-ins not on the server yet (no signal): sent again until they are
   const [pending, setPending] = useState(() => loadPending(eventId));
   const pendingRef = useRef(pending);
@@ -551,32 +554,39 @@ export default function Desk() {
       )}
 
       <div className={styles.tools}>
-        <label className={styles.search}>
-          <IoSearch aria-hidden />
-          <input
-            ref={searchRef}
-            type="search"
-            value={query}
-            placeholder="Tìm tên khách"
-            aria-label="Tìm tên khách"
-            autoComplete="off"
-            enterKeyHint="search"
-            onChange={e => search(e.target.value)}
-          />
-          {query && (
-            <button
-              type="button"
-              className={styles.clear}
-              aria-label="Xoá tìm kiếm"
-              onClick={() => {
-                search('');
-                searchRef.current?.focus();
-              }}
-            >
-              <IoCloseCircle />
-            </button>
+        <div className={styles.searchRow}>
+          <label className={styles.search}>
+            <IoSearch aria-hidden />
+            <input
+              ref={searchRef}
+              type="search"
+              value={query}
+              placeholder="Tìm tên khách"
+              aria-label="Tìm tên khách"
+              autoComplete="off"
+              enterKeyHint="search"
+              onChange={e => search(e.target.value)}
+            />
+            {query && (
+              <button
+                type="button"
+                className={styles.clear}
+                aria-label="Xoá tìm kiếm"
+                onClick={() => {
+                  search('');
+                  searchRef.current?.focus();
+                }}
+              >
+                <IoCloseCircle />
+              </button>
+            )}
+          </label>
+          {canScan() && (
+            <Button className={styles.scan} variant="contained" startIcon={<IoQrCodeOutline />} onClick={() => setIsScanning(true)}>
+              Quét mã
+            </Button>
           )}
-        </label>
+        </div>
         {!query && (
           <div className={styles.chips} role="tablist" aria-label="Lọc khách">
             {DESK_TABS.map(([k, label]) => (
@@ -650,6 +660,17 @@ export default function Desk() {
 
       {walkIn !== null && (
         <WalkInDialog initialName={walkIn} groups={groupOptions} plan={plan} onClose={() => setWalkIn(null)} onAdd={addWalkIn} />
+      )}
+      {isScanning && (
+        <QrCheckIn
+          guests={guests}
+          onArrive={guest => {
+            track('desk_qr_checked_in');
+            arrival(guest, true, partySize(guest));
+            setKeep(k => new Set(k).add(guest._id));
+          }}
+          onClose={() => setIsScanning(false)}
+        />
       )}
       {busArrival && (
         <BusDialog

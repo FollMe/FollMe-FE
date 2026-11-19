@@ -1,0 +1,107 @@
+/* The camera full screen, dark, with a frame to aim at and the result below. */
+.paper {
+  display: flex;
+  flex-direction: column;
+  background: #0d0b0a !important;
+  color: #fff !important;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: max(12px, env(safe-area-inset-top)) 16px 12px;
+
+  h2 {
+    margin: 0;
+    font-size: 1.8rem;
+  }
+}
+
+.stage {
+  position: relative;
+  display: grid;
+  flex: 1;
+  place-items: center;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.frame {
+  position: relative;
+  width: min(68vw, 300px);
+  aspect-ratio: 1;
+  border-radius: 20px;
+  box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.45);
+  outline: 3px solid rgba(255, 255, 255, 0.9);
+  outline-offset: -3px;
+}
+
+.hint {
+  position: relative;
+  max-width: 320px;
+  margin: 0 auto;
+  padding: 0 16px;
+  color: #f2f2f2;
+  font-size: 1.45rem;
+  text-align: center;
+}
+
+.bottom {
+  display: grid;
+  place-items: center;
+  min-height: 112px;
+  padding: 12px 16px max(16px, env(safe-area-inset-bottom));
+}
+
+.result {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 420px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  color: #fff;
+
+  > svg {
+    flex: none;
+    font-size: 3.2rem;
+  }
+
+  div {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  strong {
+    font-size: 1.8rem;
+  }
+
+  span {
+    font-size: 1.4rem;
+    opacity: 0.92;
+  }
+}
+
+.ok {
+  background: #2f6a2b;
+}
+
+.again {
+  background: #3a4f7a;
+}
+
+.unknown {
+  background: #8a2a1e;
+}

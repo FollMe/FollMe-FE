@@ -63,3 +63,37 @@
     outline-offset: 3px;
   }
 }
+
+/* The guest's own QR code, for the desk to scan */
+.codeToggle {
+  margin-top: 12px;
+  padding: 4px 0;
+  border: none;
+  background: none;
+  color: var(--inv-accent-text);
+  font: inherit;
+  font-size: 1.35rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.code {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 0;
+
+  svg {
+    padding: 10px;
+    border-radius: 12px;
+    background: #fff;
+  }
+
+  figcaption {
+    color: var(--inv-muted);
+    font-size: 1.3rem;
+  }
+}
