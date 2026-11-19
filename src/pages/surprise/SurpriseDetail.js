@@ -22,26 +22,25 @@ export default function SurpriseDetail() {
   const [params] = useSearchParams();
   const [surprise, setSurprise] = useState(null);
 
-  const load = useCallback(() => surpriseApi.get(id)
-    .then(s => {
-      document.title = `Hộp quà cho ${s.recipientName} | FollMe`;
-      setSurprise(s);
-    })
-    .catch(() => navigate('/qua-bi-mat')), [id, navigate]);
+  const load = useCallback(opts => surpriseApi.get(id, opts).then(s => {
+    document.title = `Hộp quà cho ${s.recipientName} | FollMe`;
+    setSurprise(s);
+  }), [id]);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    load().catch(() => navigate('/qua-bi-mat'));
+  }, [load, navigate]);
 
-  // Waiting for their pick: the page catches up on its own
+  // Waiting for their pick: the page catches up on its own (a missed check is no reason to leave)
+  const isLoaded = Boolean(surprise);
   const picked = Boolean(surprise?.pick);
   useEffect(() => {
-    if (!surprise || picked) {
+    if (!isLoaded || picked) {
       return undefined;
     }
-    const timer = setInterval(() => !document.hidden && load(), POLL_MS);
+    const timer = setInterval(() => !document.hidden && load({ quiet: true }).catch(() => {}), POLL_MS);
     return () => clearInterval(timer);
-  }, [surprise, picked, load]);
+  }, [isLoaded, picked, load]);
 
   if (!surprise) {
     return <OvalLoading />;

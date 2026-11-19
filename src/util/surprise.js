@@ -39,7 +39,7 @@ export const GIFT_IDEAS = [
 
 export const surpriseApi = {
   list: () => request.get('api/surprises'),
-  get: id => request.get(`api/surprises/${id}`),
+  get: (id, opts) => request.get(`api/surprises/${id}`, opts),
   create: payload => request.post('api/surprises', payload),
   update: (id, payload) => request.put(`api/surprises/${id}`, payload),
   reopen: id => request.put(`api/surprises/${id}/reopen`),
