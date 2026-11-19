@@ -58,6 +58,41 @@ export function buildScore() {
 
 export const LOOP_SECONDS = (MELODIES.length * CHORD_BEATS * BEAT);
 
+// "Happy Birthday to You" (public domain): 3/4, in C, a one-beat pickup
+const BIRTHDAY_BEAT = 0.5;
+const BIRTHDAY_MELODY = [
+  [67, 0.75], [67, 0.25], [69, 1], [67, 1], [72, 1], [71, 2],
+  [67, 0.75], [67, 0.25], [69, 1], [67, 1], [74, 1], [72, 2],
+  [67, 0.75], [67, 0.25], [79, 1], [76, 1], [72, 1], [71, 1], [69, 2],
+  [77, 0.75], [77, 0.25], [76, 1], [72, 1], [74, 1], [72, 3],
+];
+// One chord per bar after the pickup: C G G C C F C C
+const BIRTHDAY_BARS = [
+  { root: 48, tones: [60, 64, 67] }, { root: 43, tones: [59, 62, 67] }, { root: 43, tones: [59, 62, 65] },
+  { root: 48, tones: [60, 64, 67] }, { root: 48, tones: [60, 64, 67] }, { root: 41, tones: [60, 65, 69] },
+  { root: 43, tones: [60, 64, 67] }, { root: 48, tones: [60, 64, 67] },
+];
+// The song and two beats of rest before it starts again
+export const BIRTHDAY_LOOP_SECONDS = (1 + BIRTHDAY_BARS.length * 3 + 2) * BIRTHDAY_BEAT;
+
+/** The notes of "Happy Birthday", like buildScore. */
+export function birthdayScore() {
+  const notes = [];
+  let t = 0;
+  for (const [midi, beats] of BIRTHDAY_MELODY) {
+    notes.push({ time: t * BIRTHDAY_BEAT, midi, velocity: 0.55, length: 1.6 });
+    t += beats;
+  }
+  BIRTHDAY_BARS.forEach((bar, i) => {
+    const start = (1 + i * 3) * BIRTHDAY_BEAT;
+    notes.push({ time: start, midi: bar.root, velocity: 0.45, length: 2.2 });
+    bar.tones.forEach((midi, k) => {
+      notes.push({ time: start + (k + 1) * BIRTHDAY_BEAT * 0.75, midi, velocity: 0.18, length: 1.2 });
+    });
+  });
+  return notes.sort((a, b) => a.time - b.time);
+}
+
 const LOOKAHEAD = 1.2; // seconds of notes scheduled ahead
 const TICK_MS = 300;
 
@@ -86,10 +121,12 @@ function makeReverb(ctx) {
  * let audio start from a user gesture.
  */
 export class MusicBox {
-  constructor() {
+  /** `song`: 'canon' (the wedding default) or 'birthday'. */
+  constructor({ song = 'canon' } = {}) {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     this.ctx = new AudioContext();
-    this.score = buildScore();
+    this.score = song === 'birthday' ? birthdayScore() : buildScore();
+    this.loopSeconds = song === 'birthday' ? BIRTHDAY_LOOP_SECONDS : LOOP_SECONDS;
     this.master = this.ctx.createGain();
     this.master.gain.value = 0;
     const dry = this.ctx.createGain();
@@ -140,7 +177,7 @@ export class MusicBox {
     while (true) {
       if (this.next >= this.score.length) {
         this.next = 0;
-        this.loopStart += LOOP_SECONDS;
+        this.loopStart += this.loopSeconds;
       }
       const note = this.score[this.next];
       const when = this.loopStart + note.time;

@@ -3,6 +3,7 @@
     { "source": "/invitations/:id", "destination": "/api/share?path=/invitations/:id" },
     { "source": "/e/:id", "destination": "/api/share?path=/e/:id" },
     { "source": "/c/:slug", "destination": "/api/share?path=/c/:slug" },
+    { "source": "/qua/:id", "destination": "/api/share?path=/qua/:id" },
     { "source": "/blogs/:slug", "destination": "/api/share?path=/blogs/:slug" },
     { "source": "/cuoi-hoi", "destination": "/api/share?path=/cuoi-hoi" },
     { "source": "/cuoi-hoi/chon-ngay", "destination": "/api/share?path=/cuoi-hoi/chon-ngay" },

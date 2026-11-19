@@ -8,6 +8,7 @@
 const SITE = 'FollMe';
 const DEFAULT_IMAGE = '/imgs/og-default.png';
 const WEDDING_IMAGE = '/imgs/og-wedding.png';
+const SURPRISE_IMAGE = '/imgs/og-surprise.jpg';
 
 // Pages whose preview does not depend on data.
 const PAGES = {
@@ -111,6 +112,19 @@ async function resolveMeta(pathname, apiBase) {
     }
     return null;
   }
+  m = pathname.match(/^\/qua\/([^/]+)$/);
+  if (m && ID_RE.test(m[1]) && apiBase) {
+    // A birthday surprise: her name only, never the hint or what is inside
+    const data = await getJson(`${apiBase}/api/surprises/${m[1]}/public`);
+    if (data?.recipientName) {
+      return {
+        title: `Một món quà cho ${data.recipientName} 🎁`,
+        description: 'Có một hộp quà sinh nhật đang chờ bạn. Nhập mật khẩu để mở nha 💝',
+        image: SURPRISE_IMAGE,
+      };
+    }
+    return null;
+  }
   m = pathname.match(/^\/blogs\/([^/]+)$/);
   if (m && SLUG_RE.test(m[1]) && apiBase) {
     const data = await getJson(`${apiBase}/api/blogs/${m[1]}/preview`);
@@ -190,9 +204,9 @@ async function handler(req, res) {
   res.end(out);
 }
 
-/** Invitations name the guest and the couple: not for search results (short links too). */
+/** Invitations name the guest and the couple, surprises the one they are for: not for search results. */
 function isPrivatePath(pathname) {
-  return /^\/(invitations|e|c)\//.test(pathname);
+  return /^\/(invitations|e|c|qua)\//.test(pathname);
 }
 
 function absolute(image, origin) {
