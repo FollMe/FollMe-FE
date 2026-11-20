@@ -2,9 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
-import { IoEyeOutline, IoEyeOffOutline, IoMusicalNotes, IoVolumeMuteOutline } from 'react-icons/io5';
+import { IoEyeOutline, IoEyeOffOutline, IoMicOutline, IoMusicalNotes, IoVolumeMuteOutline } from 'react-icons/io5';
 import GiftScene from 'components/surprise/GiftScene';
 import { burst } from 'util/confetti';
+import { canListen, listenForBlows } from 'util/blow';
 import { MusicBox, canPlayMusic } from 'util/musicBox';
 import { vnWallClock } from 'util/date';
 import { setPageMeta } from 'util/meta';
@@ -40,6 +41,26 @@ function Candles({ lit, onBlow }) {
       ))}
       <span className={styles.ledge} aria-hidden />
     </div>
+  );
+}
+
+/** The letter, word by word as if being written; a tap shows it all. */
+function WrittenText({ text, className }) {
+  const [all, setAll] = useState(false);
+  let word = 0;
+  return (
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
+    <p className={clsx(className, styles.written, all && styles.writtenAll)} onClick={() => setAll(true)}>
+      {text.split(/(\s+)/).map((part, i) => {
+        if (!part.trim()) {
+          return part;
+        }
+        // 45ms a word, at most ~5s for a long letter
+        const delay = Math.min(word++, 110) * 45;
+        // eslint-disable-next-line react/no-array-index-key
+        return <span key={i} style={{ animationDelay: `${delay}ms` }}>{part}</span>;
+      })}
+    </p>
   );
 }
 
@@ -90,6 +111,13 @@ export default function SurpriseOpen() {
   const music = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const pickRef = useRef(null);
+  const [celebrate, setCelebrate] = useState(0);
+  const [flash, setFlash] = useState(0);
+  const [listening, setListening] = useState('off'); // off | starting | on | denied
+  const stopListening = useRef(null);
+  const litRef = useRef(lit);
+  litRef.current = lit;
+  const blowRef = useRef(null);
 
   const kind = view?.mascot ?? data?.mascot ?? 'bear';
   const friend = mascotOf(kind);
@@ -151,7 +179,20 @@ export default function SurpriseOpen() {
     return () => clearInterval(timer);
   }, [stage, view]);
 
-  useEffect(() => () => music.current?.close(), []);
+  useEffect(() => () => {
+    music.current?.close();
+    stopListening.current?.();
+  }, []);
+
+  // The microphone only listens while there are candles to blow
+  const candlesOut = lit.every(on => !on);
+  useEffect(() => {
+    if ((candlesOut || stage !== 'cake') && stopListening.current) {
+      stopListening.current();
+      stopListening.current = null;
+      setListening('off');
+    }
+  }, [candlesOut, stage]);
 
   useEffect(() => {
     if (!reaction || reaction === 'happy') {
@@ -206,6 +247,7 @@ export default function SurpriseOpen() {
     try {
       await open(password);
       setReaction('happy');
+      setFlash(f => f + 1);
       navigator.vibrate?.(40);
       track('surprise_unlocked');
     } catch (err) {
@@ -220,7 +262,8 @@ export default function SurpriseOpen() {
     const next = lit.map((on, k) => (k === i ? false : on));
     setLit(next);
     if (next.every(on => !on)) {
-      // The lid lifts in the scene; gold falls a moment later
+      // The lid lifts in the scene, fireworks go up; gold falls a moment later
+      setTimeout(() => setCelebrate(c => c + 1), 700);
       setTimeout(() => burst({ colors: CHAMPAGNE, y: window.innerHeight * 0.3 }), 500);
       setTimeout(() => burst({ colors: CHAMPAGNE, x: window.innerWidth * 0.25, y: window.innerHeight * 0.35, count: 50 }), 750);
       setTimeout(() => burst({ colors: CHAMPAGNE, x: window.innerWidth * 0.75, y: window.innerHeight * 0.35, count: 50 }), 900);
@@ -229,6 +272,24 @@ export default function SurpriseOpen() {
         setIsPlaying(true);
       }
       track('surprise_candles');
+    }
+  }
+
+  blowRef.current = blow;
+
+  async function listen() {
+    setListening('starting');
+    try {
+      stopListening.current = await listenForBlows(() => {
+        const i = litRef.current.indexOf(true);
+        if (i >= 0) {
+          blowRef.current(i);
+        }
+      });
+      setListening('on');
+      track('surprise_mic');
+    } catch (err) {
+      setListening('denied');
     }
   }
 
@@ -245,6 +306,7 @@ export default function SurpriseOpen() {
       setStage('done');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       burst({ colors: CHAMPAGNE });
+      setCelebrate(c => c + 1);
       track('surprise_picked');
     } catch (err) {
       if (err?.status === 409) {
@@ -263,7 +325,6 @@ export default function SurpriseOpen() {
   }
 
   // ---------- What the mascot does, and the line under the stage ----------
-  const candlesOut = lit.every(on => !on);
   let mood = 'idle';
   let say = '';
   if (stage === 'sleep') {
@@ -287,7 +348,15 @@ export default function SurpriseOpen() {
     }
   } else if (stage === 'cake') {
     mood = candlesOut ? 'happy' : 'idle';
-    say = candlesOut ? `Chúc ${name} sinh nhật thật hạnh phúc.` : 'Nhắm mắt, ước một điều, rồi chạm để thổi nến.';
+    if (candlesOut) {
+      say = `Chúc ${name} sinh nhật thật hạnh phúc.`;
+    } else if (listening === 'on') {
+      say = 'Đang nghe… thổi thật mạnh vào micro nhé.';
+    } else if (listening === 'denied') {
+      say = 'Không mở được micro. Chạm vào nến để thổi nhé.';
+    } else {
+      say = 'Nhắm mắt, ước một điều, rồi thổi nến.';
+    }
   } else if (stage === 'letter') {
     mood = 'love';
     say = `Một lá thư từ ${from}.`;
@@ -328,7 +397,9 @@ export default function SurpriseOpen() {
 
   return (
     <main className={styles.page} data-stage={stage}>
+      <div className={styles.stars} aria-hidden><span /><span /></div>
       <div className={styles.glow} aria-hidden />
+      {flash > 0 && <div key={flash} className={styles.flash} aria-hidden />}
       {data && canPlayMusic() && (
         <button
           type="button"
@@ -350,7 +421,14 @@ export default function SurpriseOpen() {
         )}
 
         <div className={styles.stage}>
-          <GiftScene kind={kind} mood={mood} opened={opened} label={`${friend.label}: ${say}`} />
+          <GiftScene
+            kind={kind}
+            mood={mood}
+            opened={opened}
+            celebrate={celebrate}
+            gift={stage === 'done' && pick ? pick.emoji || '🎁' : null}
+            label={`${friend.label}: ${say}`}
+          />
         </div>
         <p className={styles.caption} role="status" aria-live="polite">{say}</p>
 
@@ -404,6 +482,12 @@ export default function SurpriseOpen() {
         {stage === 'cake' && (
           <div className={styles.wish}>
             <Candles lit={lit} onBlow={blow} />
+            {!candlesOut && canListen() && listening !== 'on' && listening !== 'denied' && (
+              <button type="button" className={styles.secondary} onClick={listen} disabled={listening === 'starting'}>
+                <IoMicOutline aria-hidden /> Thổi thật vào micro
+              </button>
+            )}
+            {!candlesOut && listening === 'on' && <span className={styles.listening} aria-hidden><i /><i /><i /></span>}
             {candlesOut && (
               <button type="button" className={styles.primary} onClick={() => goTo('letter')}>Đọc thư</button>
             )}
@@ -414,7 +498,7 @@ export default function SurpriseOpen() {
           <article className={styles.letter} aria-labelledby="surprise-letter">
             <p className={styles.letterMark}>Thư tay</p>
             <h2 id="surprise-letter">Gửi {data.recipientName},</h2>
-            {data.message && <p className={styles.message}>{data.message}</p>}
+            {data.message && <WrittenText text={data.message} className={styles.message} />}
             {data.fromName && <p className={styles.signature}>{data.fromName}</p>}
             {stage === 'letter' ? (
               <button type="button" className={styles.ink} onClick={() => goTo('gifts')}>Xem quà</button>

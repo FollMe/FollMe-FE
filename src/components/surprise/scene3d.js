@@ -243,6 +243,57 @@ function buildSparks(texture, count) {
   return { points, positions, velocities, count };
 }
 
+const FIREWORK_COLORS = [0xf6e4b8, 0xe3c288, 0xff9ec0, 0xfff3d6, 0xd98aa6];
+const BURSTS = 7;
+const PER_BURST = 110;
+
+/** Gold bursts in the sky above the pedestal: a pool reused by each celebration. */
+function buildFireworks(texture) {
+  const count = BURSTS * PER_BURST;
+  const positions = new Float32Array(count * 3).fill(0);
+  const colors = new Float32Array(count * 3).fill(0);
+  const velocities = new Float32Array(count * 3);
+  const base = new Float32Array(count * 3);
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  const points = new THREE.Points(geometry, new THREE.PointsMaterial({
+    size: 0.13, map: texture, vertexColors: true, transparent: true,
+    depthWrite: false, blending: THREE.AdditiveBlending,
+  }));
+  points.frustumCulled = false;
+  // born: when each burst goes off (Infinity = resting)
+  return { points, positions, colors, velocities, base, born: new Array(BURSTS).fill(Infinity), next: 0 };
+}
+
+/** The gift she picked, as a glowing picture that rises out of the box. */
+function buildChosen(texture) {
+  const group = new THREE.Group();
+  group.visible = false;
+  const halo = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: texture, color: 0xffd99a, transparent: true, opacity: 0.9, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending,
+  }));
+  halo.scale.setScalar(1.7);
+  // Drawn over everything: it floats in front of the open lid
+  const picture = new THREE.Sprite(new THREE.SpriteMaterial({ transparent: true, depthWrite: false, depthTest: false }));
+  picture.scale.setScalar(0.72);
+  halo.renderOrder = 10;
+  picture.renderOrder = 11;
+  group.add(halo, picture);
+  return { group, picture, halo, emoji: null };
+}
+
+function emojiTexture(emoji) {
+  return canvasTexture(256, (ctx, size) => {
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = `${size * 0.7}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+    ctx.fillText(emoji, size / 2, size * 0.55);
+  });
+}
+
+const easeOut = x => 1 - (1 - x) ** 3;
+
 /** Where each mood puts the arms, head and eyes (the loop eases toward it). */
 function poseFor(mood) {
   const pose = { aX: 0, aZ: -0.2, bX: 0, bZ: 0.2, nod: 0, tilt: 0, eyes: 1, crouch: 0, dim: 0, ears: 0 };
@@ -313,6 +364,8 @@ export function createGiftScene(canvas, { kind = 'bear', variant = 'stage', redu
   let box = null;
   let dust = null;
   let sparks = null;
+  let fireworks = null;
+  let chosen = null;
   const dot = dotTexture();
   if (variant === 'portrait') {
     mascot.root.rotation.y = -0.3;
@@ -344,12 +397,22 @@ export function createGiftScene(canvas, { kind = 'bear', variant = 'stage', redu
     scene.add(dust.points);
     sparks = buildSparks(dot, 110);
     scene.add(sparks.points);
+    fireworks = buildFireworks(dot);
+    scene.add(fireworks.points);
+    chosen = buildChosen(dot);
+    box.group.add(chosen.group);
   }
 
-  const state = { mood: 'idle', opened: false, moodAt: 0, openedAt: -1 };
+  const state = { mood: 'idle', opened: false, moodAt: 0, openedAt: -1, celebrate: 0, giftAt: -1 };
+  // The camera's resting place (set on resize); the intro glides into it
+  const framing = { dist: 6, y: 1.9 };
+  const introSeconds = variant === 'stage' && !reducedMotion ? 2.8 : 0;
   const pose = { ...poseFor('idle'), lid: 0, glow: 0 };
   const pointer = { x: 0, y: 0, lx: 0, ly: 0 };
   const clock = new THREE.Clock();
+  // Scene time; settle() moves it on without the clock
+  let skip = 0;
+  const now = () => clock.elapsedTime + skip;
   let nextBlink = 2;
   let frame = 0;
   let running = false;
@@ -370,6 +433,67 @@ export function createGiftScene(canvas, { kind = 'bear', variant = 'stage', redu
       velocities.set([Math.cos(a) * spread, 1.6 + Math.random() * 1.8, Math.sin(a) * spread], i * 3);
     }
     sparks.points.geometry.attributes.position.needsUpdate = true;
+  }
+
+  function launchFireworks(t, bursts = 5) {
+    for (let k = 0; k < bursts; k++) {
+      const slot = fireworks.next;
+      fireworks.next = (slot + 1) % BURSTS;
+      fireworks.born[slot] = t + k * 0.38 + Math.random() * 0.15;
+      // In the sky behind the pedestal, inside the frame
+      const center = [(Math.random() - 0.5) * 3, 1.5 + Math.random() * 0.55, -0.4 - Math.random() * 0.9];
+      const color = new THREE.Color(FIREWORK_COLORS[(slot + k) % FIREWORK_COLORS.length]);
+      const speed = 1.25 + Math.random() * 0.45;
+      for (let i = slot * PER_BURST; i < (slot + 1) * PER_BURST; i++) {
+        // An even sphere of sparks
+        const u = Math.random() * 2 - 1;
+        const a = Math.random() * Math.PI * 2;
+        const r = Math.sqrt(1 - u * u);
+        const v = speed * (0.75 + Math.random() * 0.25);
+        fireworks.positions.set(center, i * 3);
+        fireworks.velocities.set([r * Math.cos(a) * v, u * v, r * Math.sin(a) * v], i * 3);
+        fireworks.base.set([color.r, color.g, color.b], i * 3);
+        fireworks.colors.set([0, 0, 0], i * 3);
+      }
+    }
+  }
+
+  function updateFireworks(dt, t) {
+    const { positions, colors, velocities, base, born } = fireworks;
+    const life = 2.2;
+    for (let slot = 0; slot < BURSTS; slot++) {
+      const age = t - born[slot];
+      if (!(age >= 0 && age < life + 0.1)) {
+        continue;
+      }
+      const fade = Math.max(0, 1 - age / life) ** 1.6;
+      const flash = age < 0.12 ? 2.2 : 1;
+      for (let i = slot * PER_BURST; i < (slot + 1) * PER_BURST; i++) {
+        const j = i * 3;
+        velocities[j] *= 0.985;
+        velocities[j + 1] = velocities[j + 1] * 0.985 - 0.9 * dt;
+        velocities[j + 2] *= 0.985;
+        positions[j] += velocities[j] * dt;
+        positions[j + 1] += velocities[j + 1] * dt;
+        positions[j + 2] += velocities[j + 2] * dt;
+        const twinkle = age > 0.8 ? 0.6 + 0.4 * Math.sin(t * 30 + i) : 1;
+        const k = fade * flash * twinkle;
+        colors[j] = base[j] * k;
+        colors[j + 1] = base[j + 1] * k;
+        colors[j + 2] = base[j + 2] * k;
+      }
+    }
+    fireworks.points.geometry.attributes.position.needsUpdate = true;
+    fireworks.points.geometry.attributes.color.needsUpdate = true;
+  }
+
+  function placeCamera(t) {
+    const x = introSeconds ? easeOut(Math.min(1, t / introSeconds)) : 1;
+    // From high, far and to the side, down to the stage
+    const dist = framing.dist * (1 + 0.9 * (1 - x));
+    const angle = 0.5 * (1 - x);
+    camera.position.set(Math.sin(angle) * dist, framing.y + 1.6 * (1 - x), Math.cos(angle) * dist);
+    camera.lookAt(lookAt);
   }
 
   function update(dt, t) {
@@ -454,12 +578,28 @@ export function createGiftScene(canvas, { kind = 'bear', variant = 'stage', redu
       } else {
         sparks.points.material.opacity = 0;
       }
+
+      updateFireworks(dt, t);
+
+      if (chosen.emoji) {
+        const rise = easeOut(Math.min(1, Math.max(0, t - state.giftAt) / (reducedMotion ? 0.01 : 1.8)));
+        chosen.group.visible = true;
+        chosen.group.position.set(0, 0.45 + 1.35 * rise + Math.sin(t * 1.6) * 0.04 * rise * motion, 0.25 * rise);
+        chosen.group.scale.setScalar(0.4 + 0.6 * rise);
+        chosen.picture.material.rotation = Math.sin(t * 1.2) * 0.12 * motion;
+        chosen.halo.material.opacity = 0.75 + 0.2 * Math.sin(t * 2.4) * motion;
+      } else {
+        chosen.group.visible = false;
+      }
+    }
+    if (variant === 'stage') {
+      placeCamera(t);
     }
   }
 
   function render() {
     const dt = Math.min(clock.getDelta(), 0.05);
-    update(dt, clock.elapsedTime);
+    update(dt, now());
     renderer.render(scene, camera);
   }
 
@@ -478,7 +618,9 @@ export function createGiftScene(canvas, { kind = 'bear', variant = 'stage', redu
     const halfH = variant === 'portrait' ? 0.92 : 1.4;
     const tan = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
     const dist = Math.max(halfW / (tan * camera.aspect), halfH / tan);
-    camera.position.set(0, lookAt.y + dist * (variant === 'portrait' ? 0.08 : 0.2), dist);
+    framing.dist = dist;
+    framing.y = lookAt.y + dist * (variant === 'portrait' ? 0.08 : 0.2);
+    camera.position.set(0, framing.y, dist);
     camera.lookAt(lookAt);
     camera.updateProjectionMatrix();
     if (!running) {
@@ -487,8 +629,25 @@ export function createGiftScene(canvas, { kind = 'bear', variant = 'stage', redu
   }
 
   return {
-    setState({ mood = state.mood, opened = state.opened }) {
-      const t = clock.elapsedTime;
+    /**
+     * celebrate: a number; each new value sets off fireworks.
+     * gift: the emoji of the chosen gift, which rises out of the open box (null: none).
+     */
+    setState({ mood = state.mood, opened = state.opened, celebrate = state.celebrate, gift = chosen?.emoji ?? null }) {
+      const t = now();
+      if (celebrate !== state.celebrate) {
+        state.celebrate = celebrate;
+        if (fireworks && celebrate && !reducedMotion) {
+          launchFireworks(t);
+        }
+      }
+      if (chosen && gift !== chosen.emoji) {
+        chosen.picture.material.map?.dispose();
+        chosen.picture.material.map = gift ? emojiTexture(gift) : null;
+        chosen.picture.material.needsUpdate = true;
+        chosen.emoji = gift;
+        state.giftAt = t;
+      }
       if (mood !== state.mood) {
         state.mood = mood;
         state.moodAt = t;
@@ -517,9 +676,13 @@ export function createGiftScene(canvas, { kind = 'bear', variant = 'stage', redu
     },
     /** Runs the animation for `seconds` without the clock (for still pictures). */
     settle(seconds = 2) {
+      // Starts after the intro: a still shows the stage at rest
+      skip = Math.max(skip, introSeconds);
+      const start = now();
       for (let s = 0; s < seconds; s += 1 / 60) {
-        update(1 / 60, s);
+        update(1 / 60, start + s);
       }
+      skip += seconds;
       renderer.render(scene, camera);
     },
     dispose() {
