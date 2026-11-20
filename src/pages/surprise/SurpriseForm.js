@@ -10,7 +10,7 @@ import { toast } from 'react-toastify';
 import { IoAdd, IoClose } from 'react-icons/io5';
 import PageHeader from 'components/PageHeader';
 import OvalLoading from 'components/loading/OvalLoading';
-import Mascot from 'components/surprise/Mascot';
+import MascotPortrait from 'components/surprise/MascotPortrait';
 import { fromVnWallClock, isAwayFromVietnam, vnWallClock } from 'util/date';
 import { track } from 'util/analytics';
 import {
@@ -203,7 +203,7 @@ export default function SurpriseForm() {
                 className={clsx(styles.mascotChoice, form.mascot === m.key && styles.on)}
                 onClick={() => set({ mascot: m.key })}
               >
-                <Mascot kind={m.key} mood={form.mascot === m.key ? 'happy' : 'idle'} size={84} label="" />
+                <MascotPortrait kind={m.key} size={76} />
                 <span>{m.label}</span>
               </button>
             ))}

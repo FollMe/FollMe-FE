@@ -8,7 +8,7 @@ import {
   IoCopyOutline, IoShareSocialOutline, IoOpenOutline, IoCreateOutline, IoTrashOutline, IoRefreshOutline, IoArrowBack,
 } from 'react-icons/io5';
 import OvalLoading from 'components/loading/OvalLoading';
-import Mascot from 'components/surprise/Mascot';
+import MascotPortrait from 'components/surprise/MascotPortrait';
 import { vnWallClock } from 'util/date';
 import { mascotOf, surpriseApi, surpriseUrl } from 'util/surprise';
 import styles from './Surprise.module.scss';
@@ -100,7 +100,7 @@ export default function SurpriseDetail() {
     <div className="container page">
       <Button component={Link} to="/qua-bi-mat" startIcon={<IoArrowBack />} sx={{ mb: 1 }}>Hộp quà bí mật</Button>
       <header className={styles.detailHead}>
-        <Mascot kind={surprise.mascot} mood={pick ? 'gift' : 'idle'} size={110} label={friend.label} />
+        <MascotPortrait kind={surprise.mascot} size={88} label={friend.label} />
         <div>
           <p className={styles.eyebrow}>Hộp quà bí mật</p>
           <h1>Cho {surprise.recipientName}</h1>

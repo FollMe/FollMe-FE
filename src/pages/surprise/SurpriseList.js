@@ -5,7 +5,7 @@ import Button from '@mui/material/Button';
 import { IoAdd } from 'react-icons/io5';
 import PageHeader from 'components/PageHeader';
 import OvalLoading from 'components/loading/OvalLoading';
-import Mascot from 'components/surprise/Mascot';
+import MascotPortrait from 'components/surprise/MascotPortrait';
 import { vnWallClock } from 'util/date';
 import { surpriseApi } from 'util/surprise';
 import styles from './Surprise.module.scss';
@@ -37,7 +37,7 @@ export default function SurpriseList() {
       />
       {surprises.length === 0 ? (
         <div className={styles.empty}>
-          <Mascot kind="bear" mood="love" size={150} label="Gấu Bông" />
+          <MascotPortrait kind="bear" size={120} label="Gấu Bông" />
           <p>Chưa có hộp quà nào. Sắp tới sinh nhật ai đó đặc biệt?</p>
           <Button variant="contained" onClick={() => navigate('/qua-bi-mat/tao')}>Tạo hộp quà đầu tiên 🎁</Button>
         </div>
@@ -46,7 +46,7 @@ export default function SurpriseList() {
           {surprises.map(s => (
             <li key={s._id}>
               <Link to={`/qua-bi-mat/${s._id}`} className={styles.item}>
-                <Mascot kind={s.mascot} mood={s.pick ? 'gift' : 'idle'} size={64} label="" />
+                <MascotPortrait kind={s.mascot} size={52} />
                 <div>
                   <strong>Cho {s.recipientName}</strong>
                   <span>
