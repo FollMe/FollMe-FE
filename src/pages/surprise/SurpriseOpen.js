@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 import { IoEyeOutline, IoEyeOffOutline, IoMusicalNotes, IoVolumeMuteOutline } from 'react-icons/io5';
-import Mascot from 'components/surprise/Mascot';
+import GiftScene from 'components/surprise/GiftScene';
 import { burst } from 'util/confetti';
 import { MusicBox, canPlayMusic } from 'util/musicBox';
 import { vnWallClock } from 'util/date';
@@ -15,60 +15,62 @@ import {
 import styles from './SurpriseOpen.module.scss';
 
 const CANDLES = 3;
-const PARTY = ['#ff6b8b', '#ffd166', '#8fd3ff', '#b28dff', '#7ee0b0', '#ffffff'];
+const CHAMPAGNE = ['#f6e4b8', '#e3c288', '#c9a063', '#fff7e6', '#d9879f'];
 
-function Bubble({ children }) {
+/** Slim candles on a glass ledge: tap each to blow it out. */
+function Candles({ lit, onBlow }) {
   return (
-    <p className={styles.bubble} role="status" aria-live="polite">
-      {children}
-    </p>
-  );
-}
-
-/** Balloons drifting up behind everything. */
-function Balloons() {
-  return (
-    <div className={styles.balloons} aria-hidden>
-      {['#ff8fab', '#ffd166', '#8fd3ff', '#b28dff', '#7ee0b0', '#ff6b8b'].map((color, i) => (
-        <span key={color} style={{ '--c': color, '--i': i }} />
+    <div className={styles.candles}>
+      {lit.map((on, i) => (
+        <button
+          // eslint-disable-next-line react/no-array-index-key
+          key={i}
+          type="button"
+          className={clsx(styles.candle, !on && styles.out)}
+          style={{ '--i': i }}
+          onClick={() => onBlow(i)}
+          disabled={!on}
+          aria-label={on ? `Thổi ngọn nến ${i + 1}` : `Nến ${i + 1} đã tắt`}
+        >
+          <span className={styles.halo} aria-hidden />
+          <span className={styles.flame} aria-hidden />
+          <span className={styles.smoke} aria-hidden />
+          <span className={styles.wax} aria-hidden />
+        </button>
       ))}
+      <span className={styles.ledge} aria-hidden />
     </div>
   );
 }
 
-/** A cake: tap each candle to blow it out. */
-function Cake({ lit, onBlow }) {
+/** A gift card that leans toward the finger or the mouse. */
+function GiftCard({ gift, index, onChoose }) {
+  const ref = useRef(null);
+  function lean(e) {
+    const el = ref.current;
+    const r = el.getBoundingClientRect();
+    el.style.setProperty('--ry', `${((e.clientX - r.left) / r.width - 0.5) * 14}deg`);
+    el.style.setProperty('--rx', `${(0.5 - (e.clientY - r.top) / r.height) * 14}deg`);
+  }
+  function rest() {
+    ref.current.style.setProperty('--ry', '0deg');
+    ref.current.style.setProperty('--rx', '0deg');
+  }
   return (
-    <div className={styles.cake}>
-      <div className={styles.candles}>
-        {lit.map((on, i) => (
-          <button
-            // eslint-disable-next-line react/no-array-index-key
-            key={i}
-            type="button"
-            className={clsx(styles.candle, !on && styles.out)}
-            onClick={() => onBlow(i)}
-            disabled={!on}
-            aria-label={on ? `Thổi ngọn nến ${i + 1}` : `Nến ${i + 1} đã tắt`}
-          >
-            <span className={styles.flame} aria-hidden />
-            <span className={styles.smoke} aria-hidden />
-          </button>
-        ))}
-      </div>
-      <div className={styles.cakeTop} aria-hidden />
-      <div className={styles.cakeBody} aria-hidden>
-        <span /><span /><span />
-      </div>
-      <div className={styles.plate} aria-hidden />
-    </div>
+    <li style={{ '--i': index }}>
+      <button ref={ref} type="button" className={styles.gift} onClick={() => onChoose(gift)} onPointerMove={lean} onPointerLeave={rest}>
+        <span className={styles.medal} aria-hidden>{gift.emoji || '🎁'}</span>
+        <strong>{gift.title}</strong>
+        {gift.note && <span className={styles.giftNote}>{gift.note}</span>}
+      </button>
+    </li>
   );
 }
 
 /**
- * "Hộp quà bí mật" (/qua/:id): the birthday surprise. A mascot asks for
- * the password (covering its eyes as she types), then candles to blow,
- * the letter, and the gifts to pick one from.
+ * "Hộp quà bí mật" (/qua/:id): the birthday surprise. A gift box on a 3D
+ * stage, a mascot that covers its eyes while she types the password, then
+ * candles to blow (the box opens), the letter, and the gifts to pick one from.
  */
 export default function SurpriseOpen() {
   const { id } = useParams();
@@ -159,6 +161,12 @@ export default function SurpriseOpen() {
     return () => clearTimeout(timer);
   }, [reaction, password]);
 
+  useEffect(() => {
+    if (chosen) {
+      pickRef.current?.focus();
+    }
+  }, [chosen]);
+
   function startMusic() {
     if (!canPlayMusic()) {
       return;
@@ -198,7 +206,6 @@ export default function SurpriseOpen() {
     try {
       await open(password);
       setReaction('happy');
-      burst({ colors: PARTY });
       navigator.vibrate?.(40);
       track('surprise_unlocked');
     } catch (err) {
@@ -213,9 +220,10 @@ export default function SurpriseOpen() {
     const next = lit.map((on, k) => (k === i ? false : on));
     setLit(next);
     if (next.every(on => !on)) {
-      burst({ colors: PARTY });
-      setTimeout(() => burst({ colors: PARTY, x: window.innerWidth * 0.2, y: window.innerHeight * 0.4 }), 250);
-      setTimeout(() => burst({ colors: PARTY, x: window.innerWidth * 0.8, y: window.innerHeight * 0.4 }), 450);
+      // The lid lifts in the scene; gold falls a moment later
+      setTimeout(() => burst({ colors: CHAMPAGNE, y: window.innerHeight * 0.3 }), 500);
+      setTimeout(() => burst({ colors: CHAMPAGNE, x: window.innerWidth * 0.25, y: window.innerHeight * 0.35, count: 50 }), 750);
+      setTimeout(() => burst({ colors: CHAMPAGNE, x: window.innerWidth * 0.75, y: window.innerHeight * 0.35, count: 50 }), 900);
       if (music.current && !isPlaying) {
         music.current.play();
         setIsPlaying(true);
@@ -235,8 +243,8 @@ export default function SurpriseOpen() {
       setData(d => ({ ...d, pick: res.pick }));
       setChosen(null);
       setStage('done');
-      burst({ colors: PARTY });
-      setTimeout(() => burst({ colors: PARTY }), 400);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      burst({ colors: CHAMPAGNE });
       track('surprise_picked');
     } catch (err) {
       if (err?.status === 409) {
@@ -249,70 +257,78 @@ export default function SurpriseOpen() {
     }
   }
 
-  useEffect(() => {
-    if (chosen) {
-      pickRef.current?.focus();
-    }
-  }, [chosen]);
+  function goTo(next) {
+    setStage(next);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
-  // ---------- What the mascot does and says ----------
+  // ---------- What the mascot does, and the line under the stage ----------
+  const candlesOut = lit.every(on => !on);
   let mood = 'idle';
   let say = '';
   if (stage === 'sleep') {
     mood = 'sleep';
-    say = `Suỵt… ${friend.hello} đang canh hộp quà. Chưa tới ngày đâu nha!`;
+    say = `${friend.hello} đang canh hộp quà. Chưa tới giờ mở đâu nhé.`;
   } else if (stage === 'lock') {
     if (reaction === 'sad') {
       mood = 'sad';
-      say = 'Hông đúng rồi 🥺 Thử lại nha!';
+      say = 'Chưa đúng rồi. Thử lại nhé.';
     } else if (reaction === 'tired') {
       mood = 'sleep';
-      say = 'Thử nhiều quá rồi, nghỉ xíu rồi thử lại nha 😴';
+      say = 'Thử nhiều quá rồi. Nghỉ một chút rồi thử lại nhé.';
     } else if (isTyping && password && showPassword) {
       mood = 'peek';
-      say = `Ơ, ${friend.hello} thấy rồi nha 👀`;
+      say = `Ơ, ${friend.hello} thấy rồi nhé.`;
     } else if (isTyping && password) {
       mood = 'cover';
-      say = `${friend.hello} không nhìn đâu 🙈`;
+      say = `${friend.hello} không nhìn đâu.`;
     } else {
-      say = `${name} ơi! 💕 Có một món quà đang chờ ${name} đó. Nhập mật khẩu để mở nha!`;
+      say = 'Nhập mật khẩu để mở hộp quà.';
     }
   } else if (stage === 'cake') {
-    mood = lit.every(on => !on) ? 'love' : 'happy';
-    say = lit.every(on => !on)
-      ? `Chúc mừng sinh nhật ${name}! 🎉`
-      : 'Nhắm mắt ước một điều, rồi chạm vào từng ngọn nến để thổi nha 🕯️';
+    mood = candlesOut ? 'happy' : 'idle';
+    say = candlesOut ? `Chúc ${name} sinh nhật thật hạnh phúc.` : 'Nhắm mắt, ước một điều, rồi chạm để thổi nến.';
   } else if (stage === 'letter') {
     mood = 'love';
-    say = `${data?.fromName ? `${data.fromName} gửi` : 'Có'} thư cho ${name} nè 💌`;
+    say = `Một lá thư từ ${from}.`;
   } else if (stage === 'gifts') {
-    mood = 'happy';
-    say = `Chọn một món ${name} thích nhất nha 🎁`;
+    mood = 'love';
+    say = `Món nào cũng được chọn riêng cho ${name}.`;
   } else if (stage === 'done') {
-    mood = 'gift';
-    say = `Yay! ${from[0].toUpperCase()}${from.slice(1)} biết rồi nha 💝`;
+    mood = 'happy';
+    say = `Đã gửi lựa chọn đến ${from}.`;
   } else if (stage === 'missing') {
     mood = 'sad';
-    say = 'Hộp quà này không còn nữa rồi 🥺';
+    say = 'Hộp quà này không còn nữa.';
   } else if (stage === 'offline') {
     mood = 'sad';
-    say = 'Mạng chập chờn rồi, thử lại sau xíu nha';
+    say = 'Mạng đang chập chờn. Thử lại sau một chút nhé.';
   }
 
   if (stage === 'loading') {
     return (
-      <main className={styles.page}>
-        <div className={styles.center}><Mascot kind="bear" mood="idle" size={150} label="Đang mở hộp quà" /></div>
+      <main className={styles.page} data-stage="loading">
+        <div className={styles.loading} role="status">
+          <span className={styles.spinner} aria-hidden />
+          Đang mở hộp quà…
+        </div>
       </main>
     );
   }
 
   const left = untilOpen(view?.opensAt, now);
   const pick = data?.pick;
+  const opened = (stage === 'cake' && candlesOut) || stage === 'letter' || stage === 'gifts' || stage === 'done';
+  const heading = {
+    lock: ['Một món quà dành riêng cho', name],
+    sleep: ['Sắp tới rồi', name],
+    cake: ['Happy Birthday', name],
+    done: ['Happy Birthday', name],
+  }[stage];
 
   return (
     <main className={styles.page} data-stage={stage}>
-      <Balloons />
+      <div className={styles.glow} aria-hidden />
       {data && canPlayMusic() && (
         <button
           type="button"
@@ -325,17 +341,22 @@ export default function SurpriseOpen() {
         </button>
       )}
 
-      <section className={styles.scene}>
-        {(stage === 'cake' || stage === 'done') && <h1 className={styles.title}>Happy Birthday<span>{name}</span></h1>}
-        {stage === 'lock' && <h1 className={styles.title}>Một món quà<span>cho {name}</span></h1>}
-        {stage === 'sleep' && <h1 className={styles.title}>Sắp tới rồi<span>{name} ơi</span></h1>}
+      <section className={styles.content}>
+        {heading && (
+          <header className={styles.heading}>
+            <p className={styles.eyebrow}>{heading[0]}</p>
+            <h1>{heading[1]}</h1>
+          </header>
+        )}
 
-        <Bubble>{say}</Bubble>
-        <Mascot kind={kind} mood={mood} size={stage === 'gifts' || stage === 'letter' ? 150 : 200} label={`${friend.label}: ${say}`} className={styles.mascot} />
+        <div className={styles.stage}>
+          <GiftScene kind={kind} mood={mood} opened={opened} label={`${friend.label}: ${say}`} />
+        </div>
+        <p className={styles.caption} role="status" aria-live="polite">{say}</p>
 
         {stage === 'sleep' && left && (
           <div className={styles.countdown}>
-            <p>Hộp quà mở lúc {dayjs(vnWallClock(view.opensAt)).format('HH:mm, DD/MM/YYYY')}</p>
+            <p>Mở lúc {dayjs(vnWallClock(view.opensAt)).format('HH:mm, DD/MM/YYYY')}</p>
             <div aria-label="Đếm ngược">
               {[['days', 'ngày'], ['hours', 'giờ'], ['minutes', 'phút'], ['seconds', 'giây']].map(([k, label]) => (
                 <span key={k}><strong>{String(left[k]).padStart(2, '0')}</strong>{label}</span>
@@ -374,47 +395,41 @@ export default function SurpriseOpen() {
             </div>
             {view?.hint && <p id="surprise-hint" className={styles.hint}>Gợi ý: {view.hint}</p>}
             <button type="submit" className={styles.primary} disabled={busy || !password.trim()}>
-              {busy ? 'Đang mở…' : 'Mở quà 🎁'}
+              {busy ? 'Đang mở…' : 'Mở quà'}
             </button>
-            <p className={styles.small}>Không cần viết hoa hay gõ dấu đâu nha</p>
+            <p className={styles.small}>Không phân biệt chữ hoa, dấu hay khoảng trắng.</p>
           </form>
         )}
 
         {stage === 'cake' && (
-          <div className={styles.cakeStage}>
-            <Cake lit={lit} onBlow={blow} />
-            {lit.every(on => !on) && (
-              <button type="button" className={styles.primary} onClick={() => setStage('letter')}>Đọc thư nè 💌</button>
+          <div className={styles.wish}>
+            <Candles lit={lit} onBlow={blow} />
+            {candlesOut && (
+              <button type="button" className={styles.primary} onClick={() => goTo('letter')}>Đọc thư</button>
             )}
           </div>
         )}
 
         {(stage === 'letter' || rereading) && data && (
-          <article className={clsx(styles.card, styles.letter)} aria-labelledby="surprise-letter">
+          <article className={styles.letter} aria-labelledby="surprise-letter">
+            <p className={styles.letterMark}>Thư tay</p>
             <h2 id="surprise-letter">Gửi {data.recipientName},</h2>
             {data.message && <p className={styles.message}>{data.message}</p>}
-            {data.fromName && <p className={styles.signature}>— {data.fromName}</p>}
+            {data.fromName && <p className={styles.signature}>{data.fromName}</p>}
             {stage === 'letter' ? (
-              <button type="button" className={styles.primary} onClick={() => setStage('gifts')}>Mở quà thôi 🎁</button>
+              <button type="button" className={styles.ink} onClick={() => goTo('gifts')}>Xem quà</button>
             ) : (
-              <button type="button" className={styles.secondary} onClick={() => setRereading(false)}>Đóng thư</button>
+              <button type="button" className={styles.inkGhost} onClick={() => setRereading(false)}>Đóng thư</button>
             )}
           </article>
         )}
 
         {stage === 'gifts' && data && (
           <div className={styles.giftArea}>
-            <h2 className={styles.giftTitle}>Chọn một món quà nha</h2>
+            <h2 className={styles.sectionTitle}>Chọn một món quà</h2>
             <ul className={styles.gifts}>
               {data.gifts.map((gift, i) => (
-                <li key={gift._id} style={{ '--i': i }}>
-                  <button type="button" className={styles.gift} onClick={() => { setChosen(gift); setNote(''); }}>
-                    <span className={styles.ribbon} aria-hidden />
-                    <span className={styles.giftEmoji} aria-hidden>{gift.emoji || '🎁'}</span>
-                    <strong>{gift.title}</strong>
-                    {gift.note && <span className={styles.giftNote}>{gift.note}</span>}
-                  </button>
-                </li>
+                <GiftCard key={gift._id} gift={gift} index={i} onChoose={g => { setChosen(g); setNote(''); }} />
               ))}
             </ul>
           </div>
@@ -422,11 +437,11 @@ export default function SurpriseOpen() {
 
         {stage === 'done' && pick && !rereading && (
           <div className={clsx(styles.card, styles.done)}>
-            <span className={styles.doneEmoji} aria-hidden>{pick.emoji || '🎁'}</span>
-            <p className={styles.doneLabel}>{name} đã chọn</p>
+            <span className={styles.medal} aria-hidden>{pick.emoji || '🎁'}</span>
+            <p className={styles.eyebrow}>{name} đã chọn</p>
             <h2>{pick.title}</h2>
             {pick.note && <p className={styles.doneNote}>“{pick.note}”</p>}
-            <p className={styles.small}>Đã báo cho {from} lúc {dayjs(vnWallClock(pick.at)).format('HH:mm DD/MM')} rồi nha</p>
+            <p className={styles.small}>Gửi lúc {dayjs(vnWallClock(pick.at)).format('HH:mm, DD/MM')}</p>
             {data?.message && <button type="button" className={styles.secondary} onClick={() => setRereading(true)}>Đọc lại thư</button>}
           </div>
         )}
@@ -439,8 +454,8 @@ export default function SurpriseOpen() {
       {chosen && (
         <div className={styles.sheetBackdrop} role="presentation" onClick={e => e.target === e.currentTarget && setChosen(null)}>
           <form className={styles.sheet} role="dialog" aria-modal="true" aria-labelledby="surprise-confirm" onSubmit={confirmPick}>
-            <Mascot kind={kind} mood="love" size={96} label={friend.label} />
-            <h2 id="surprise-confirm">Chọn {chosen.emoji || '🎁'} {chosen.title} nha?</h2>
+            <span className={styles.medal} aria-hidden>{chosen.emoji || '🎁'}</span>
+            <h2 id="surprise-confirm">Chọn “{chosen.title}”?</h2>
             <label htmlFor="surprise-note">Nhắn {from} vài lời (không bắt buộc)</label>
             <textarea
               id="surprise-note"
@@ -449,7 +464,7 @@ export default function SurpriseOpen() {
               rows={2}
               maxLength={MAX_PICK_NOTE}
               onChange={e => setNote(e.target.value)}
-              placeholder="Cảm ơn nha, thương lắm 💕"
+              placeholder="Cảm ơn anh, thương lắm."
             />
             <div className={styles.sheetActions}>
               <button type="button" className={styles.secondary} onClick={() => setChosen(null)}>Xem lại</button>

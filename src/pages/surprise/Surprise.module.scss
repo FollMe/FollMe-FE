@@ -1,8 +1,8 @@
 /* Hộp quà bí mật, owner side: the list, the form and one surprise.
-   Phone first; the pastel pink is only an accent on the app's paper. */
+   Phone first; the app's gold is the accent, as on her champagne page. */
 
-$pink: #e86a92;
-$pink-soft: color-mix(in srgb, #e86a92 14%, var(--surface));
+$accent: var(--gold);
+$accent-soft: color-mix(in srgb, var(--gold) 13%, var(--surface));
 
 .eyebrow {
   margin: 0;
@@ -78,7 +78,7 @@ $pink-soft: color-mix(in srgb, #e86a92 14%, var(--surface));
 
   &:hover,
   &:focus-visible {
-    border-color: $pink;
+    border-color: $accent;
     box-shadow: var(--shadow-md);
   }
 
@@ -170,8 +170,8 @@ $pink-soft: color-mix(in srgb, #e86a92 14%, var(--surface));
   }
 
   &.on {
-    border-color: $pink;
-    background: $pink-soft;
+    border-color: $accent;
+    background: $accent-soft;
     font-weight: 600;
   }
 }
@@ -231,8 +231,8 @@ $pink-soft: color-mix(in srgb, #e86a92 14%, var(--surface));
   cursor: pointer;
 
   &:hover {
-    border-color: $pink;
-    background: $pink-soft;
+    border-color: $accent;
+    background: $accent-soft;
   }
 
   &:focus-visible {
@@ -267,7 +267,7 @@ $pink-soft: color-mix(in srgb, #e86a92 14%, var(--surface));
   margin: 16px 0 0;
   padding: 12px 16px;
   border-radius: var(--radius);
-  background: $pink-soft;
+  background: $accent-soft;
   font-size: 1.45rem;
 }
 
@@ -290,9 +290,9 @@ $pink-soft: color-mix(in srgb, #e86a92 14%, var(--surface));
   align-items: center;
   gap: 12px 16px;
   padding: 16px;
-  border: 2px solid $pink;
+  border: 2px solid $accent;
   border-radius: var(--radius-lg);
-  background: $pink-soft;
+  background: $accent-soft;
 
   > div {
     flex: 1;
@@ -404,8 +404,8 @@ $pink-soft: color-mix(in srgb, #e86a92 14%, var(--surface));
     }
 
     &.isPicked {
-      border-color: $pink;
-      background: $pink-soft;
+      border-color: $accent;
+      background: $accent-soft;
     }
   }
 }

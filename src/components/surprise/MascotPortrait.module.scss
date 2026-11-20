@@ -1,0 +1,6 @@
+.portrait {
+  display: block;
+  flex-shrink: 0;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 14px rgba(40, 18, 30, 0.22));
+}
