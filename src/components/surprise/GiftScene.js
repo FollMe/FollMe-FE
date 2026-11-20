@@ -6,9 +6,13 @@ import styles from './GiftScene.module.scss';
 
 /**
  * The 3D stage (gift box, pedestal, mascot). `mood` drives the mascot,
- * `opened` lifts the lid. Without WebGL it shows the mascot's picture.
+ * `opened` lifts the lid, each new `celebrate` number sets off fireworks,
+ * and `gift` (an emoji) rises out of the open box. Without WebGL it shows
+ * the mascot's picture.
  */
-export default function GiftScene({ kind = 'bear', mood = 'idle', opened = false, label, className }) {
+export default function GiftScene({
+  kind = 'bear', mood = 'idle', opened = false, celebrate = 0, gift = null, label, className,
+}) {
   const holder = useRef(null);
   const canvas = useRef(null);
   const scene = useRef(null);
@@ -40,8 +44,8 @@ export default function GiftScene({ kind = 'bear', mood = 'idle', opened = false
   }, [kind]);
 
   useEffect(() => {
-    scene.current?.setState({ mood, opened });
-  }, [mood, opened, kind]);
+    scene.current?.setState({ mood, opened, celebrate, gift });
+  }, [mood, opened, celebrate, gift, kind]);
 
   return (
     <div ref={holder} className={clsx(styles.scene, className)} role="img" aria-label={label}>
