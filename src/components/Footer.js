@@ -13,36 +13,29 @@ export default function Footer() {
         <div className={styles.about}>
           <BrandLogo />
           <p className={styles.tagline}>
-            Xem tuổi, chọn ngày cưới và gửi thiệp cưới online, cùng lịch vạn niên
-            và tử vi hằng ngày cho những ngày quan trọng của bạn.
+            Ghi chép của một backend engineer về thanh toán và ví điện tử ở Việt Nam:
+            tiền đi đâu sau mỗi bước, order ở state nào, và khi một bên im lặng thì làm gì.
           </p>
         </div>
 
         <div className={styles.columns}>
           <div className={styles.column}>
-            <h2>Cưới hỏi</h2>
-            <Link to="/fortune/hop-tuoi">Xem tuổi hợp nhau</Link>
-            <Link to="/cuoi-hoi/chon-ngay">Chọn ngày cưới</Link>
-            <Link to="/cuoi-hoi">Thiệp cưới online</Link>
-            <Link to="/cuoi-hoi/tien-mung">Đi cưới mừng bao nhiêu</Link>
-            <Link to="/events">Thiệp của tôi</Link>
-          </div>
-          <div className={styles.column}>
-            <h2>Xem ngày</h2>
-            <Link to="/fortune/lich">Lịch vạn niên</Link>
-            <Link to="/fortune/lich#con-giap">Tử vi hôm nay</Link>
-            <Link to="/fortune/numerology">Thần số học</Link>
-            <Link to="/fortune/tu-vi">Lá số tử vi</Link>
-          </div>
-          <div className={styles.column}>
-            <h2>Góc nhỏ</h2>
+            <h2>Đọc</h2>
+            <Link to="/fintech">Kiến thức fintech</Link>
             <Link to="/blogs">Blog</Link>
             <Link to="/stories">Truyện</Link>
-            <Link to="/fintech">Kiến thức fintech</Link>
             <Link to="/doc-sau">Đọc sau</Link>
             <a href={GITHUB_URL} target="_blank" rel="noreferrer">
               <IoLogoGithub /> GitHub
             </a>
+          </div>
+          <div className={styles.column}>
+            <h2>Góc nhỏ</h2>
+            <Link to="/cuoi-hoi">Thiệp cưới online</Link>
+            <Link to="/fortune/hop-tuoi">Xem tuổi hợp nhau</Link>
+            <Link to="/cuoi-hoi/chon-ngay">Chọn ngày cưới</Link>
+            <Link to="/fortune/lich">Lịch vạn niên</Link>
+            <Link to="/events">Thiệp của tôi</Link>
           </div>
           <div className={styles.column}>
             <h2>Pháp lý</h2>
@@ -53,7 +46,7 @@ export default function Footer() {
       </div>
 
       <div className={`container ${styles.bottom}`}>
-        <span>© {new Date().getFullYear()} FollMe · Thiết kế & phát triển bởi Sum Quốc</span>
+        <span>© {new Date().getFullYear()} FollMe · Viết và phát triển bởi Sum Quốc</span>
         <button type="button" className={styles.toTop} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
           Lên đầu trang <IoArrowUp />
         </button>

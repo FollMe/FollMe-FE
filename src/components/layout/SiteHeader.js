@@ -4,9 +4,11 @@ import clsx from 'clsx';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Drawer from '@mui/material/Drawer';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import {
   IoMenu, IoClose, IoHomeOutline, IoNewspaperOutline, IoLibraryOutline, IoTicketOutline, IoCreateOutline,
-  IoSparklesOutline, IoSearchOutline, IoHeartOutline, IoCalendarOutline, IoWalletOutline,
+  IoSparklesOutline, IoSearchOutline, IoHeartOutline, IoCalendarOutline, IoWalletOutline, IoChevronDown,
 } from 'react-icons/io5';
 import RequestSignInDialog from 'components/dialog/RequestSignInDialog';
 import UserMenu from 'components/UserMenu';
@@ -16,26 +18,26 @@ import ThemeToggle from './ThemeToggle';
 import styles from './SiteHeader.module.scss';
 
 export const NAV_ITEMS = [
-  { to: '/cuoi-hoi', label: 'Cưới hỏi', icon: <IoTicketOutline />, end: true },
+  { to: '/fintech', label: 'Fintech', icon: <IoWalletOutline /> },
+  { to: '/blogs', label: 'Blog', icon: <IoNewspaperOutline /> },
+  { to: '/stories', label: 'Truyện', icon: <IoLibraryOutline /> },
+];
+
+// The wedding tools: still there for whoever uses them, out of the main menu.
+const CORNER_ITEMS = [
+  { to: '/cuoi-hoi', label: 'Cưới hỏi & thiệp mời', icon: <IoTicketOutline /> },
   { to: '/fortune/hop-tuoi', label: 'Xem tuổi', icon: <IoHeartOutline /> },
   { to: '/cuoi-hoi/chon-ngay', label: 'Chọn ngày cưới', icon: <IoCalendarOutline /> },
   { to: '/fortune', label: 'Lịch & Tử vi', icon: <IoSparklesOutline /> },
 ];
 
-// The author's corner: still reachable, no longer in the main menu.
-const CORNER_ITEMS = [
-  { to: '/blogs', label: 'Blog', icon: <IoNewspaperOutline /> },
-  { to: '/stories', label: 'Truyện', icon: <IoLibraryOutline /> },
-  { to: '/fintech', label: 'Kiến thức fintech', icon: <IoWalletOutline /> },
-];
-
 export default function SiteHeader({ isLoggedIn, userInfo }) {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
-  // The home hero is dark lacquer: float a light header over it until scrolling.
   const { pathname } = useLocation();
-  const onDark = pathname === '/' && !isScrolled;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [cornerAnchor, setCornerAnchor] = useState(null);
+  const inCorner = CORNER_ITEMS.some(item => pathname.startsWith(item.to));
   const [showRequestLoginDialog, setShowRequestLoginDialog] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const openSearch = useCallback(() => setIsSearchOpen(true), []);
@@ -63,11 +65,11 @@ export default function SiteHeader({ isLoggedIn, userInfo }) {
       setShowRequestLoginDialog(true);
       return;
     }
-    navigate('/events/create?type=wedding');
+    navigate('/blogs/create');
   }
 
   return (
-    <header className={clsx(styles.header, isScrolled && styles.scrolled, onDark && styles.onDark)}>
+    <header className={clsx(styles.header, isScrolled && styles.scrolled)}>
       <div className={clsx('container', styles.inner)}>
         <BrandLogo />
 
@@ -83,6 +85,33 @@ export default function SiteHeader({ isLoggedIn, userInfo }) {
               {item.label}
             </NavLink>
           ))}
+          <button
+            type="button"
+            className={clsx(styles.navLink, styles.navMenu, inCorner && styles.active)}
+            aria-haspopup="menu"
+            aria-expanded={Boolean(cornerAnchor)}
+            onClick={event => setCornerAnchor(event.currentTarget)}
+          >
+            Góc nhỏ <IoChevronDown />
+          </button>
+          <Menu
+            anchorEl={cornerAnchor}
+            open={Boolean(cornerAnchor)}
+            onClose={() => setCornerAnchor(null)}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+            PaperProps={{ className: styles.cornerMenu }}
+          >
+            {CORNER_ITEMS.map(item => (
+              <MenuItem
+                key={item.to}
+                component={NavLink}
+                to={item.to}
+                onClick={() => setCornerAnchor(null)}
+              >
+                {item.icon} {item.label}
+              </MenuItem>
+            ))}
+          </Menu>
         </nav>
 
         <div className={styles.actions}>
@@ -101,7 +130,7 @@ export default function SiteHeader({ isLoggedIn, userInfo }) {
                 startIcon={<IoCreateOutline />}
                 onClick={handleClickWrite}
               >
-                Tạo thiệp
+                Viết bài
               </Button>
               <UserMenu userInfo={userInfo} />
             </>
@@ -168,7 +197,7 @@ export default function SiteHeader({ isLoggedIn, userInfo }) {
         <div className={styles.drawerFoot}>
           {isLoggedIn ? (
             <Button fullWidth variant="contained" size="large" startIcon={<IoCreateOutline />} onClick={handleClickWrite}>
-              Tạo thiệp cưới
+              Viết bài
             </Button>
           ) : (
             <Button fullWidth variant="contained" size="large" onClick={() => { setIsMenuOpen(false); navigate('/sign-in'); }}>

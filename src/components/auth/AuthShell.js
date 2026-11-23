@@ -32,17 +32,17 @@ export default function AuthShell({ title, subtitle, children, footer }) {
 
       <aside className={styles.brandSide}>
         <div className={styles.brandInner}>
-          <span className={styles.seal} aria-hidden>囍</span>
-          <p className={styles.eyebrow}>FollMe · Cưới hỏi</p>
+          <span className={styles.seal} aria-hidden>F<i /></span>
+          <p className={styles.eyebrow}>~/follme · engineering notes</p>
           <h2 className={styles.headline}>
-            Từ ngày hợp tuổi<br />đến <em>tấm thiệp</em> trao tay.
+            Thanh toán,<br />giải thích <em>từng bước</em>.
           </h2>
           <ul className={styles.points}>
-            <li><strong>Xem tuổi & chọn ngày cưới</strong> theo lịch âm, tránh Kim Lâu.</li>
-            <li><strong>Thiệp cưới online</strong> có phong bì, bản đồ, lịch và nhạc nền.</li>
-            <li><strong>Xác nhận tham dự & sổ lưu bút</strong> gom về một chỗ.</li>
+            <li><strong>Kiến thức fintech</strong>: luồng tiền vẽ thành sequence chạy được và machine state.</li>
+            <li><strong>Blog</strong>: viết bài, thả tim, bình luận theo thời gian thực.</li>
+            <li><strong>Đọc sau</strong>: lưu bài và đọc tiếp ở bất kỳ thiết bị nào.</li>
           </ul>
-          <p className={styles.free}>Miễn phí · Không cần cài ứng dụng</p>
+          <p className={styles.free}>Góc nhỏ: thiệp cưới online, xem tuổi, chọn ngày vẫn ở đây.</p>
         </div>
       </aside>
     </div>
