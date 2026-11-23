@@ -1,7 +1,8 @@
 import { FLOWS } from 'fintech/savingsFund';
+import { BILLPAY_FLOWS } from 'fintech/billpay';
 import { canTransition, layoutFlow, nextStates, nodesOverlap, sampleEdge, validateFlow } from './stateMachine';
 
-describe.each(Object.values(FLOWS))('$key flow', flow => {
+describe.each([...Object.values(FLOWS), ...Object.values(BILLPAY_FLOWS)])('$key flow', flow => {
   it('agrees with itself: scenarios and steps only take allowed moves', () => {
     expect(validateFlow(flow)).toEqual([]);
   });
@@ -36,9 +37,9 @@ describe.each(Object.values(FLOWS))('$key flow', flow => {
     edges.forEach(e => expect(e.d).toMatch(/^M [\d.-]+ [\d.-]+ Q /));
   });
 
-  it('starts every sequence at ORDER_RECEIVED and ends it COMPLETED', () => {
-    expect(flow.steps[0].state).toBe('ORDER_RECEIVED');
-    expect(flow.steps[flow.steps.length - 1].state).toBe('COMPLETED');
+  it('starts the sequence at the initial state and ends it in success', () => {
+    expect(flow.steps[0].state).toBe(flow.initial ?? 'ORDER_RECEIVED');
+    expect(flow.steps[flow.steps.length - 1].state).toBe(flow.success ?? 'COMPLETED');
   });
 });
 
@@ -67,6 +68,21 @@ describe('the rules the notes insist on', () => {
 
   it('withdraw: partner "failed" after "sent" is not a move', () => {
     expect(canTransition(withdraw, 'PARTNER_SENT', 'PARTNER_FAILED')).toBe(false);
+  });
+
+  it('billpay: the partner is called only after Core confirmed the payment', () => {
+    Object.values(BILLPAY_FLOWS).forEach(flow => {
+      const into = flow.transitions.filter(([, b]) => b === 'partner_processing').map(([a]) => a);
+      expect(into).toEqual(['pending_payment']);
+      expect(flow.transitions.filter(([, b]) => b === 'success').map(([a]) => a)).toEqual(['partner_processing']);
+    });
+  });
+
+  it('billpay: money moves only after the user confirmed at the payment screen', () => {
+    Object.values(BILLPAY_FLOWS).forEach(flow => {
+      const first = flow.steps.findIndex(s => s.moneyMoves);
+      expect(flow.steps[first]).toMatchObject({ from: 'app', to: 'core' });
+    });
   });
 
   it('flags a scenario that skips a step', () => {

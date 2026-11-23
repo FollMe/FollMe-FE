@@ -11,6 +11,7 @@
     { "source": "/fortune/lich", "destination": "/api/share?path=/fortune/lich" },
     { "source": "/fintech", "destination": "/api/share?path=/fintech" },
     { "source": "/fintech/savings-fund", "destination": "/api/share?path=/fintech/savings-fund" },
+    { "source": "/fintech/billpay", "destination": "/api/share?path=/fintech/billpay" },
     { "source": "/((?!api/|static/|imgs/|_vercel/).*)", "destination": "/index.html" }
   ]
 }

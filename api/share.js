@@ -34,6 +34,10 @@ const PAGES = {
     title: 'Nộp & rút tiền vào quỹ tiết kiệm: từng bước và state machine',
     description: 'Luồng nộp và rút tiền giữa ví điện tử và quỹ của partner: sequence chạy từng bước, tiền nằm ở đâu, state machine, compensation, idempotency và recovery.',
   },
+  '/fintech/billpay': {
+    title: 'Billpay: trả hoá đơn qua ví, từng bước và state machine',
+    description: 'Pattern cho mọi feature mà một team service điều phối payment và fulfillment: payment session, payment screen của Core, Kafka outbox, partner, hold/commit hay debit/refund, và reconciliation.',
+  },
   '/fortune/lich': {
     title: 'Lịch vạn niên & tử vi hôm nay 12 con giáp',
     description: 'Lịch âm hôm nay, ngày hoàng đạo, giờ tốt, tiết khí và tử vi hằng ngày cho 12 con giáp.',
