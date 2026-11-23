@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import ArticleHeader from 'components/article/ArticleHeader';
 import ReadingProgress from 'components/ReadingProgress';
 import FlowPlayer from 'components/fintech/FlowPlayer';
@@ -64,6 +64,10 @@ export default function BillpayFlow() {
           subtitle="Pattern này dùng được cho trả hoá đơn, bảo hiểm, mua vé, tức là bất kỳ feature nào mà một team service điều phối cả payment lẫn fulfillment. Chỗ khó là user trả tiền ở màn hình của Core, nên team service có một khoảng mù đúng lúc tiền di chuyển."
           meta={['Sequence', 'State machine', 'Reconciliation']}
         />
+
+        <p className={styles.prereq}>
+          Nên đọc trước: <Link to="/fintech/money-movement">Money movement</Link>, về hai layer ledger và bank, safeguarding account và settlement topology.
+        </p>
 
         <nav className={styles.toc} aria-label="Mục lục">
           {SECTIONS.map(([id, label]) => <a key={id} href={`#${id}`}>{label}</a>)}

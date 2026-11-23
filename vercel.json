@@ -12,6 +12,7 @@
     { "source": "/fintech", "destination": "/api/share?path=/fintech" },
     { "source": "/fintech/savings-fund", "destination": "/api/share?path=/fintech/savings-fund" },
     { "source": "/fintech/billpay", "destination": "/api/share?path=/fintech/billpay" },
+    { "source": "/fintech/money-movement", "destination": "/api/share?path=/fintech/money-movement" },
     { "source": "/((?!api/|static/|imgs/|_vercel/).*)", "destination": "/index.html" }
   ]
 }
