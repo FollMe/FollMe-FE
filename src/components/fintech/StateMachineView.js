@@ -65,7 +65,7 @@ const StateMachineView = forwardRef(function StateMachineView({ flow }, ref) {
 
       <div className={styles.smLayout}>
         <div className={styles.smCanvas}>
-          <svg viewBox={`0 0 ${layout.width} ${layout.height}`} className={styles.smSvg} role="img" aria-label={`State machine: ${flow.title}. Đang ở ${current}`}>
+          <svg viewBox={`0 0 ${layout.width} ${layout.height}`} className={styles.smSvg} style={{ maxWidth: Math.round(layout.width * 1.1) }} role="img" aria-label={`State machine: ${flow.title}. Đang ở ${current}`}>
             <defs>
               {['idle', 'lit'].map(k => (
                 <marker key={k} id={`sm-arrow-${flow.key}-${k}`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">

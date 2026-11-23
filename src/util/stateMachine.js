@@ -38,7 +38,8 @@ export function validateFlow(flow) {
   flow.states.forEach(s => {
     const out = nextStates(flow, s.id);
     if (s.terminal) {
-      if (out.length) errors.push(`terminal ${s.id} has outgoing transitions`);
+      // A failed order the user may retry keeps one way back in
+      if (out.length && !s.retryable) errors.push(`terminal ${s.id} has outgoing transitions`);
     } else {
       if (!out.length) errors.push(`${s.id} is not terminal but has no way out`);
       if (!s.actor) errors.push(`${s.id} has no next actor`);
@@ -55,9 +56,10 @@ export function validateFlow(flow) {
     }
   };
 
+  const initial = flow.initial ?? 'ORDER_RECEIVED';
   flow.scenarios.forEach(sc => {
     const path = sc.path.map(([id]) => id);
-    if (path[0] !== 'ORDER_RECEIVED') errors.push(`scenario ${sc.id} does not start at ORDER_RECEIVED`);
+    if (path[0] !== initial) errors.push(`scenario ${sc.id} does not start at ${initial}`);
     if (!stateById(flow, path[path.length - 1])?.terminal) errors.push(`scenario ${sc.id} does not end in a terminal state`);
     walk(`scenario ${sc.id}`, path);
   });

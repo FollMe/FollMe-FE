@@ -130,7 +130,7 @@ export default function Home() {
                   <span className={styles.featuredCta}>Mở flow <IoArrowForward /></span>
                 </div>
                 <div className={styles.featuredArt} aria-hidden="true">
-                  {['ORDER_RECEIVED', 'WALLET_HELD', 'PARTNER_RESERVED', 'WALLET_DEBITED', 'PAYOUT_SUCCEEDED', 'COMPLETED'].map((s, i) => (
+                  {a.ladder.map((s, i) => (
                     <span key={s} style={{ '--i': i }}>{s}</span>
                   ))}
                 </div>

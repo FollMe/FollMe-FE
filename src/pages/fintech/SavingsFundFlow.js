@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import clsx from 'clsx';
 import ArticleHeader from 'components/article/ArticleHeader';
 import ReadingProgress from 'components/ReadingProgress';
 import FlowPlayer from 'components/fintech/FlowPlayer';
 import StateMachineView from 'components/fintech/StateMachineView';
+import FlowTabs from 'components/fintech/FlowTabs';
 import {
   CAS_SQL, DECISIONS, FLOWS, INSERT_SQL, INVARIANTS, RECOVERY,
 } from 'fintech/savingsFund';
@@ -21,26 +21,6 @@ const SECTIONS = [
   ['idempotency', 'Idempotency'],
   ['recovery', 'Recovery'],
 ];
-
-function FlowTabs({ flowKey, onChange }) {
-  return (
-    <div className={styles.tabs} role="tablist" aria-label="Chọn luồng">
-      {Object.values(FLOWS).map(f => (
-        <button
-          key={f.key}
-          type="button"
-          role="tab"
-          aria-selected={f.key === flowKey}
-          className={clsx(f.key === flowKey && styles.tabOn)}
-          onClick={() => onChange(f.key)}
-        >
-          <strong>{f.short}</strong>
-          <span>{f.title}</span>
-        </button>
-      ))}
-    </div>
-  );
-}
 
 /** Three hops of the pass-through pocket, with dots running along them. */
 function PocketStrip({ hops }) {
@@ -146,7 +126,7 @@ export default function SavingsFundFlow() {
         </section>
 
         <div className={styles.flowBar}>
-          <FlowTabs flowKey={flowKey} onChange={setFlow} />
+          <FlowTabs flows={FLOWS} flowKey={flowKey} onChange={setFlow} />
           <p>{flow.summary}</p>
         </div>
 
