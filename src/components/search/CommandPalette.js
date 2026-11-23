@@ -4,12 +4,13 @@ import clsx from 'clsx';
 import Dialog from '@mui/material/Dialog';
 import {
   IoSearchOutline, IoNewspaperOutline, IoLibraryOutline, IoHomeOutline, IoCreateOutline, IoTicketOutline,
-  IoCalculatorOutline, IoGridOutline, IoCalendarOutline, IoBookmarksOutline, IoContrastOutline, IoReturnDownBack, IoHeartOutline, IoStarOutline, IoBookmarkOutline, IoMailOpenOutline,
+  IoCalculatorOutline, IoGridOutline, IoCalendarOutline, IoBookmarksOutline, IoContrastOutline, IoReturnDownBack, IoHeartOutline, IoStarOutline, IoBookmarkOutline, IoMailOpenOutline, IoWalletOutline,
 } from 'react-icons/io5';
 import { useColorMode } from 'customHooks/useColorMode';
 import { getStoryLink } from 'components/story/StoryItem';
 import { request } from 'util/request';
 import { normalizeText, searchItems } from 'util/search';
+import { FINTECH_ARTICLES } from 'fintech/articles';
 import styles from './CommandPalette.module.scss';
 
 const PAGES = [
@@ -28,6 +29,8 @@ const PAGES = [
   { title: 'Thần số học', to: '/fortune/numerology', icon: <IoCalculatorOutline />, keywords: 'numerology so chu dao' },
   { title: 'Lá số tử vi', to: '/fortune/tu-vi', icon: <IoGridOutline />, keywords: 'tu vi la so' },
   { title: 'Hồ sơ tử vi đã lưu', to: '/fortune/profiles', icon: <IoBookmarksOutline />, keywords: 'ho so luu' },
+  { title: 'Kiến thức fintech', to: '/fintech', icon: <IoWalletOutline />, keywords: 'fintech thanh toan vi dien tu payment' },
+  ...FINTECH_ARTICLES.map(a => ({ title: a.title, to: a.to, icon: <IoWalletOutline />, keywords: `fintech ${a.keywords}` })),
 ];
 
 // Blogs and stories are fetched once per page load, on first open.

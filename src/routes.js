@@ -53,6 +53,8 @@ const SurpriseOpen = lazy(() => import("pages/surprise/SurpriseOpen"));
 const SurpriseList = lazy(() => import("pages/surprise/SurpriseList"));
 const SurpriseForm = lazy(() => import("pages/surprise/SurpriseForm"));
 const SurpriseDetail = lazy(() => import("pages/surprise/SurpriseDetail"));
+const FintechHub = lazy(() => import("pages/fintech/FintechHub"));
+const SavingsFundFlow = lazy(() => import("pages/fintech/SavingsFundFlow"));
 
 const withSuspense = (element) => (
   <Suspense fallback={<OvalLoading />}>{element}</Suspense>
@@ -119,6 +121,8 @@ export default function Router() {
         { path: '/fortune/lich', element: withSuspense(<Almanac />) },
         { path: '/fortune/hop-tuoi', element: withSuspense(<Compat />) },
         { path: '/doc-sau', element: withSuspense(<ReadingListPage />) },
+        { path: '/fintech', element: withSuspense(<FintechHub />) },
+        { path: '/fintech/savings-fund', element: withSuspense(<SavingsFundFlow />) },
         { path: '/cuoi-hoi', element: withSuspense(<WeddingHub />) },
         { path: '/cuoi-hoi/chon-ngay', element: withSuspense(<ChooseDate />) },
         { path: '/cuoi-hoi/tien-mung', element: withSuspense(<GiftCalculator />) },

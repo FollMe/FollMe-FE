@@ -38,6 +38,7 @@ export default function Footer() {
             <h2>Góc nhỏ</h2>
             <Link to="/blogs">Blog</Link>
             <Link to="/stories">Truyện</Link>
+            <Link to="/fintech">Kiến thức fintech</Link>
             <Link to="/doc-sau">Đọc sau</Link>
             <a href={GITHUB_URL} target="_blank" rel="noreferrer">
               <IoLogoGithub /> GitHub

@@ -6,7 +6,7 @@ import IconButton from '@mui/material/IconButton';
 import Drawer from '@mui/material/Drawer';
 import {
   IoMenu, IoClose, IoHomeOutline, IoNewspaperOutline, IoLibraryOutline, IoTicketOutline, IoCreateOutline,
-  IoSparklesOutline, IoSearchOutline, IoHeartOutline, IoCalendarOutline,
+  IoSparklesOutline, IoSearchOutline, IoHeartOutline, IoCalendarOutline, IoWalletOutline,
 } from 'react-icons/io5';
 import RequestSignInDialog from 'components/dialog/RequestSignInDialog';
 import UserMenu from 'components/UserMenu';
@@ -26,6 +26,7 @@ export const NAV_ITEMS = [
 const CORNER_ITEMS = [
   { to: '/blogs', label: 'Blog', icon: <IoNewspaperOutline /> },
   { to: '/stories', label: 'Truyện', icon: <IoLibraryOutline /> },
+  { to: '/fintech', label: 'Kiến thức fintech', icon: <IoWalletOutline /> },
 ];
 
 export default function SiteHeader({ isLoggedIn, userInfo }) {
