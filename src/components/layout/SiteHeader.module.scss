@@ -11,7 +11,7 @@
 }
 
 .scrolled {
-  border-bottom-color: color-mix(in srgb, var(--gold) 45%, transparent);
+  border-bottom-color: var(--border);
 }
 
 .inner {
@@ -29,44 +29,52 @@
 }
 
 .navLink {
-  position: relative;
-  padding: 8px 12px;
-  font-size: 1.25rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  font: inherit;
+  font-size: 1.45rem;
+  font-weight: 500;
   color: var(--text-2);
   text-decoration: none;
-  transition: color 0.2s ease;
-
-  &::after {
-    content: '';
-    position: absolute;
-    left: 12px;
-    right: 12px;
-    bottom: 2px;
-    height: 1px;
-    background: var(--gold);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.3s var(--ease);
-  }
+  cursor: pointer;
+  transition: color 0.2s ease, background-color 0.2s ease;
 
   &:hover {
+    background: var(--surface-2);
     color: var(--text);
-
-    &::after {
-      transform: scaleX(1);
-    }
   }
 
   &.active {
-    color: var(--brand-text);
+    color: var(--text);
+    font-weight: 600;
+    background: var(--surface-2);
+  }
+}
 
-    &::after {
-      transform: scaleX(1);
-      background: var(--brand-fill);
-    }
+.navMenu svg {
+  font-size: 1.3rem;
+}
+
+.cornerMenu {
+  min-width: 230px;
+  margin-top: 6px;
+
+  :global(.MuiMenuItem-root) {
+    gap: 10px;
+    font-size: 1.45rem;
+    color: var(--text-2);
+
+    svg { font-size: 1.8rem; }
+  }
+
+  :global(.MuiMenuItem-root.active) {
+    color: var(--brand-text);
+    font-weight: 600;
   }
 }
 
@@ -231,51 +239,4 @@
 .drawerMinor {
   font-size: 1.45rem !important;
   color: var(--text-2);
-}
-
-/* Over the home page's dark hero */
-.onDark {
-  background: transparent !important;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-
-  :global(a),
-  .navLink,
-  .searchTrigger,
-  :global(.MuiIconButton-root) {
-    color: #f6ead6 !important;
-  }
-
-  .navLink:hover,
-  .navLink.active {
-    color: #e6c57d !important;
-  }
-
-  .searchTrigger {
-    border-color: rgba(246, 234, 214, 0.3);
-    background: rgba(246, 234, 214, 0.06);
-  }
-
-  :global(.MuiButton-outlined) {
-    border-color: rgba(246, 234, 214, 0.45) !important;
-    background: rgba(246, 234, 214, 0.06) !important;
-    color: #f6ead6 !important;
-
-    &:hover {
-      border-color: #e6c57d !important;
-      background: rgba(246, 234, 214, 0.14) !important;
-    }
-  }
-}
-
-/* Safari before 16.2: color-mix() with var() drops the whole declaration
-   (a plain fallback line before it does not help) */
-@supports not (color: color-mix(in srgb, red, blue)) {
-  .header {
-    background: var(--bg);
-  }
-
-  .scrolled {
-    border-bottom-color: var(--border);
-  }
 }

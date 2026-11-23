@@ -15,6 +15,8 @@ import styles from './CommandPalette.module.scss';
 
 const PAGES = [
   { title: 'Trang chủ', to: '/', icon: <IoHomeOutline />, keywords: 'home' },
+  { title: 'Kiến thức fintech', to: '/fintech', icon: <IoWalletOutline />, keywords: 'fintech thanh toan vi dien tu payment' },
+  ...FINTECH_ARTICLES.map(a => ({ title: a.title, to: a.to, icon: <IoWalletOutline />, keywords: `fintech ${a.keywords}` })),
   { title: 'Tạo thiệp cưới online', to: '/events/create?type=wedding', icon: <IoMailOpenOutline />, keywords: 'thiep cuoi moi online tao' },
   { title: 'Chọn ngày cưới', to: '/cuoi-hoi/chon-ngay', icon: <IoCalendarOutline />, keywords: 'ngay cuoi dep xem ngay kim lau' },
   { title: 'Cưới hỏi', to: '/cuoi-hoi', icon: <IoHeartOutline />, keywords: 'dam cuoi an hoi' },
@@ -29,8 +31,6 @@ const PAGES = [
   { title: 'Thần số học', to: '/fortune/numerology', icon: <IoCalculatorOutline />, keywords: 'numerology so chu dao' },
   { title: 'Lá số tử vi', to: '/fortune/tu-vi', icon: <IoGridOutline />, keywords: 'tu vi la so' },
   { title: 'Hồ sơ tử vi đã lưu', to: '/fortune/profiles', icon: <IoBookmarksOutline />, keywords: 'ho so luu' },
-  { title: 'Kiến thức fintech', to: '/fintech', icon: <IoWalletOutline />, keywords: 'fintech thanh toan vi dien tu payment' },
-  ...FINTECH_ARTICLES.map(a => ({ title: a.title, to: a.to, icon: <IoWalletOutline />, keywords: `fintech ${a.keywords}` })),
 ];
 
 // Blogs and stories are fetched once per page load, on first open.

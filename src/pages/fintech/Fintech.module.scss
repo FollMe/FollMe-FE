@@ -27,9 +27,9 @@
 
   h2 {
     margin: 0;
-    font-family: var(--font-serif);
-    font-size: 2.8rem;
-    font-weight: 600;
+    font-size: 2.6rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
     line-height: 1.2;
   }
 
@@ -131,9 +131,9 @@
 
   h2 {
     margin: 0 0 16px;
-    font-family: var(--font-serif);
-    font-size: clamp(2.6rem, 3.4vw, 3.4rem);
-    font-weight: 600;
+    font-size: clamp(2.6rem, 3.2vw, 3.2rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
     line-height: 1.2;
   }
 
@@ -380,7 +380,7 @@
   }
 
   span { color: var(--text-2); }
-  strong { font-family: var(--font-serif); font-size: 2.6rem; font-weight: 600; }
+  strong { font-size: 2.4rem; font-weight: 800; }
 }
 
 .tableWrap {

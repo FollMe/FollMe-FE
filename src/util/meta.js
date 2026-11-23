@@ -21,7 +21,7 @@ export function excerpt(html = '', length = 160) {
  * run JavaScript (Google) pick these up; it also keeps the tab title right.
  */
 export function setPageMeta({ title, description, image }) {
-  const fullTitle = title ? `${title} | ${SITE}` : `${SITE}: Xem tuổi, chọn ngày cưới & thiệp cưới online`;
+  const fullTitle = title ? `${title} | ${SITE}` : `${SITE}: Thanh toán, giải thích từng bước`;
   document.title = fullTitle;
   setMeta('property', 'og:title', fullTitle);
   setMeta('property', 'og:url', window.location.href.split('#')[0]);

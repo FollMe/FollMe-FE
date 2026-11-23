@@ -3,36 +3,37 @@ import { createTheme, alpha } from '@mui/material/styles';
 // Keep in sync with the tokens in index.css
 const tokens = {
   light: {
-    brand: '#a3201e',
-    brandHover: '#821614',
+    brand: '#2563eb',
+    brandHover: '#1d4ed8',
     // Behind white text: 4.5:1 or more
-    brandFill: '#a3201e',
-    brandFillHover: '#821614',
-    bg: '#f4ecdd',
-    surface: '#fbf7ef',
-    surface2: '#efe5d3',
-    border: '#e2d3ba',
-    text: '#241612',
-    text2: '#5e4b42',
-    text3: '#736257',
+    brandFill: '#2563eb',
+    brandFillHover: '#1d4ed8',
+    bg: '#ffffff',
+    surface: '#ffffff',
+    surface2: '#f6f8fa',
+    border: '#e5e7eb',
+    text: '#0f172a',
+    text2: '#475569',
+    text3: '#64748b',
   },
   dark: {
-    brand: '#d9463c',
-    brandHover: '#ee5d52',
-    brandFill: '#bf3b32',
-    brandFillHover: '#a8342c',
-    bg: '#120c0a',
-    surface: '#1b1310',
-    surface2: '#251a16',
-    border: '#33251f',
-    text: '#f3e9da',
-    text2: '#c8b8a4',
-    text3: '#9c8d7f',
+    brand: '#60a5fa',
+    brandHover: '#93c5fd',
+    brandFill: '#2563eb',
+    brandFillHover: '#1d4ed8',
+    bg: '#0b0f17',
+    surface: '#111722',
+    surface2: '#161e2c',
+    border: '#222c3c',
+    text: '#e6edf6',
+    text2: '#a8b3c4',
+    text3: '#8b96a8',
   },
 };
 
 const fontSans = "'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
-const fontSerif = "'Cormorant Garamond', 'Lora', Georgia, 'Times New Roman', serif";
+// Headings use the sans as well: an engineering blog, not a wedding card
+const fontSerif = fontSans;
 
 export function getTheme(mode = 'light') {
   const t = tokens[mode] ?? tokens.light;
@@ -61,15 +62,15 @@ export function getTheme(mode = 'light') {
       divider: t.border,
     },
     shape: {
-      borderRadius: 12,
+      borderRadius: 8,
     },
     typography: {
       // html font-size is 62.5% (1rem = 10px)
       htmlFontSize: 10,
       fontFamily: fontSans,
-      h1: { fontFamily: fontSerif, fontWeight: 600, letterSpacing: '-0.02em' },
-      h2: { fontFamily: fontSerif, fontWeight: 600, letterSpacing: '-0.02em' },
-      h3: { fontFamily: fontSerif, fontWeight: 600, letterSpacing: '-0.01em' },
+      h1: { fontFamily: fontSerif, fontWeight: 700, letterSpacing: '-0.025em' },
+      h2: { fontFamily: fontSerif, fontWeight: 700, letterSpacing: '-0.02em' },
+      h3: { fontFamily: fontSerif, fontWeight: 700, letterSpacing: '-0.01em' },
       h4: { fontWeight: 700, letterSpacing: '-0.01em' },
       h5: { fontWeight: 700 },
       h6: { fontWeight: 700 },
@@ -204,7 +205,7 @@ export function getTheme(mode = 'light') {
         styleOverrides: {
           root: {
             fontSize: '1.5rem',
-            borderRadius: 12,
+            borderRadius: 8,
             backgroundColor: t.surface,
             '& .MuiOutlinedInput-notchedOutline': {
               borderColor: t.border,

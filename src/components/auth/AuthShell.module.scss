@@ -75,23 +75,13 @@
   position: relative;
   overflow: hidden;
   margin: 12px;
-  border-radius: 28px;
-  color: #f6ead6;
+  border-radius: 20px;
+  color: #e2e8f0;
   background:
-    var(--paper-grain),
-    radial-gradient(ellipse at 80% 15%, rgba(216, 180, 106, 0.22), transparent 55%),
-    radial-gradient(ellipse at 0% 100%, rgba(163, 32, 30, 0.6), transparent 60%),
-    linear-gradient(160deg, #3a0d0b 0%, #1d0807 55%, #120605 100%);
-
-  // Thin gold frame, like the edge of a lacquer box.
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 14px;
-    border: 1px solid rgba(216, 180, 106, 0.35);
-    border-radius: 18px;
-    pointer-events: none;
-  }
+    radial-gradient(ellipse at 85% 10%, rgba(59, 130, 246, 0.28), transparent 55%),
+    linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px) 0 0 / 32px 32px,
+    linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px) 0 0 / 32px 32px,
+    #0b1220;
 }
 
 .brandInner {
@@ -107,77 +97,86 @@
 }
 
 .seal {
+  position: relative;
   display: grid;
   place-items: center;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #c8352f, #a3201e 60%, #6e1311);
-  box-shadow: 0 0 0 4px rgba(216, 180, 106, 0.3), 0 12px 30px rgba(0, 0, 0, 0.4);
-  font-size: 2.8rem;
-  transform: rotate(-8deg);
+  width: 56px;
+  height: 56px;
+  border: 1px solid #334155;
+  border-radius: 14px;
+  background: #0f172a;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 3rem;
+  font-weight: 700;
+
+  i {
+    position: absolute;
+    right: 11px;
+    bottom: 11px;
+    width: 9px;
+    height: 3px;
+    background: #3b82f6;
+  }
 }
 
 .eyebrow {
   margin: 32px 0 0;
-  font-size: 1.2rem;
-  font-weight: 700;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: #d8b46a;
+  font-family: var(--font-mono);
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: #93c5fd;
 }
 
 .headline {
   margin: 12px 0 0;
-  font-family: var(--font-serif);
   font-size: clamp(3.2rem, 3.4vw, 4.4rem);
-  font-weight: 500;
-  line-height: 1.15;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: #f8fafc;
 
   em {
-    color: #e6c57d;
-    font-family: var(--font-hand);
+    color: #60a5fa;
     font-style: normal;
-    font-size: 1.15em;
   }
 }
 
 .points {
-  margin: 40px 0 0;
+  margin: 36px 0 0;
   padding: 24px 0 0;
   list-style: none;
-  border-top: 1px solid rgba(216, 180, 106, 0.3);
+  border-top: 1px solid #1e293b;
 
   li {
     position: relative;
     margin: 14px 0;
-    padding-left: 26px;
+    padding-left: 22px;
     font-size: 1.5rem;
-    line-height: 1.5;
-    color: rgba(246, 234, 214, 0.8);
+    line-height: 1.55;
+    color: #94a3b8;
 
     &::before {
-      content: '❖';
+      content: '›';
       position: absolute;
       left: 0;
-      top: 1px;
-      color: #d8b46a;
-      font-size: 1.2rem;
+      top: -1px;
+      color: #60a5fa;
+      font-family: var(--font-mono);
+      font-weight: 700;
     }
   }
 
   strong {
-    color: #f6ead6;
+    color: #e2e8f0;
     font-weight: 600;
   }
 }
 
 .free {
   margin: 24px 0 0;
-  font-family: var(--font-serif);
-  font-size: 1.7rem;
-  font-style: italic;
-  color: #d8b46a;
+  font-size: 1.35rem;
+  color: #64748b;
 }
 
 @media (max-width: 900px) {

@@ -83,7 +83,7 @@
   border: 1px solid var(--book-accent);
   border-radius: 50%;
   color: var(--book-accent);
-  font-family: var(--font-serif);
+  font-family: var(--font-elegant);
   font-size: 30mm;
   line-height: 1;
 }
@@ -93,7 +93,7 @@
   flex-direction: column;
   align-items: center;
   margin: 10mm 0 4mm;
-  font-family: var(--font-serif);
+  font-family: var(--font-elegant);
   font-size: 40pt;
   font-style: italic;
   font-weight: 600;
@@ -109,7 +109,7 @@
 .when {
   margin: 0;
   color: var(--book-accent);
-  font-family: var(--font-serif);
+  font-family: var(--font-elegant);
   font-size: 16pt;
   font-weight: 600;
   letter-spacing: 0.3em;
@@ -128,7 +128,7 @@
   padding-top: 5mm;
   border-top: 1px solid var(--book-line);
   color: var(--book-muted);
-  font-family: var(--font-serif);
+  font-family: var(--font-elegant);
   font-size: 14pt;
   font-style: italic;
 }
@@ -147,7 +147,7 @@
 
   blockquote {
     margin: 0;
-    font-family: var(--font-serif);
+    font-family: var(--font-elegant);
     font-size: 13pt;
     line-height: 1.5;
     white-space: pre-line;
@@ -191,14 +191,14 @@
 
   span {
     color: var(--book-accent);
-    font-family: var(--font-serif);
+    font-family: var(--font-elegant);
     font-size: 22pt;
   }
 
   p {
     margin: 2mm 0 0;
     color: var(--book-muted);
-    font-family: var(--font-serif);
+    font-family: var(--font-elegant);
     font-size: 13pt;
     font-style: italic;
   }

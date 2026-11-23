@@ -311,7 +311,7 @@ $accent-soft: color-mix(in srgb, var(--gold) 13%, var(--surface));
 
 .pickNote {
   margin: 6px 0 0;
-  font-family: var(--font-reading);
+  font-family: var(--font-elegant);
   font-size: 1.5rem;
   font-style: italic;
 }
@@ -415,7 +415,7 @@ $accent-soft: color-mix(in srgb, var(--gold) 13%, var(--surface));
   padding: 14px 16px;
   border-radius: var(--radius);
   background: var(--surface-2);
-  font-family: var(--font-reading);
+  font-family: var(--font-elegant);
   font-size: 1.55rem;
   line-height: 1.6;
   white-space: pre-line;

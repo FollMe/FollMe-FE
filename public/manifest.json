@@ -1,22 +1,68 @@
 {
   "short_name": "FollMe",
-  "name": "FollMe: blog, truyện, tử vi & lịch vạn niên",
-  "description": "Blog kỹ thuật, truyện, lịch vạn niên, tử vi hằng ngày 12 con giáp và xem tuổi hợp nhau.",
+  "name": "FollMe: thanh toán, giải thích từng bước",
+  "description": "Ghi chép về thanh toán và ví điện tử ở Việt Nam: sequence chạy từng bước, machine state, blog và truyện.",
   "lang": "vi",
   "icons": [
-    { "src": "favicon.ico", "sizes": "64x64 32x32 24x24 16x16", "type": "image/x-icon" },
-    { "src": "imgs/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "imgs/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "imgs/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "imgs/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "imgs/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "imgs/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ],
   "shortcuts": [
-    { "name": "Tử vi hôm nay", "url": "/fortune/lich#con-giap", "icons": [{ "src": "imgs/icon-192.png", "sizes": "192x192" }] },
-    { "name": "Xem tuổi hợp nhau", "url": "/fortune/hop-tuoi", "icons": [{ "src": "imgs/icon-192.png", "sizes": "192x192" }] },
-    { "name": "Đọc sau", "url": "/doc-sau", "icons": [{ "src": "imgs/icon-192.png", "sizes": "192x192" }] }
+    {
+      "name": "Kiến thức fintech",
+      "url": "/fintech",
+      "icons": [
+        {
+          "src": "imgs/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Blog",
+      "url": "/blogs",
+      "icons": [
+        {
+          "src": "imgs/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Đọc sau",
+      "url": "/doc-sau",
+      "icons": [
+        {
+          "src": "imgs/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
   ],
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "theme_color": "#a3201e",
-  "background_color": "#f4ecdd"
+  "theme_color": "#0f172a",
+  "background_color": "#ffffff"
 }

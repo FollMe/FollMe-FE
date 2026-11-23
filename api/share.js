@@ -56,7 +56,7 @@ function setTag(html, pattern, tag) {
 
 /** Replaces the title, description and OG/Twitter tags of the page. */
 function injectMeta(html, meta, url) {
-  const title = escapeHtml(meta.title ? `${meta.title} | ${SITE}` : `${SITE}: Xem tuổi, chọn ngày cưới & thiệp cưới online`);
+  const title = escapeHtml(meta.title ? `${meta.title} | ${SITE}` : `${SITE}: Thanh toán, giải thích từng bước`);
   const description = escapeHtml(meta.description || '');
   const image = escapeHtml(meta.image || DEFAULT_IMAGE);
   let out = html.replace(/<title>[^<]*<\/title>/, `<title>${title}</title>`);
