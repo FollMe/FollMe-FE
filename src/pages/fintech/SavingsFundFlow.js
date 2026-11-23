@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import ArticleHeader from 'components/article/ArticleHeader';
 import ReadingProgress from 'components/ReadingProgress';
 import FlowPlayer from 'components/fintech/FlowPlayer';
@@ -74,6 +74,10 @@ export default function SavingsFundFlow() {
           subtitle="User gửi tiền từ ví sang một quỹ do partner quản lý để hưởng lãi, lúc cần thì rút về. Ví chỉ điều phối, còn tiền và lãi nằm ở partner. Bấm Chạy để xem từng bước ai gọi ai, order sang state nào, và 100k đang nằm ở đâu."
           meta={['Sequence', 'State machine', 'Saga']}
         />
+
+        <p className={styles.prereq}>
+          Nên đọc trước: <Link to="/fintech/money-movement">Money movement</Link>, về hai layer ledger và bank, safeguarding account và settlement topology.
+        </p>
 
         <nav className={styles.toc} aria-label="Mục lục">
           {SECTIONS.map(([id, label]) => <a key={id} href={`#${id}`}>{label}</a>)}
