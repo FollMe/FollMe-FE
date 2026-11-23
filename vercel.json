@@ -9,6 +9,8 @@
     { "source": "/cuoi-hoi/chon-ngay", "destination": "/api/share?path=/cuoi-hoi/chon-ngay" },
     { "source": "/fortune/hop-tuoi", "destination": "/api/share?path=/fortune/hop-tuoi" },
     { "source": "/fortune/lich", "destination": "/api/share?path=/fortune/lich" },
+    { "source": "/fintech", "destination": "/api/share?path=/fintech" },
+    { "source": "/fintech/savings-fund", "destination": "/api/share?path=/fintech/savings-fund" },
     { "source": "/((?!api/|static/|imgs/|_vercel/).*)", "destination": "/index.html" }
   ]
 }

@@ -26,6 +26,14 @@ const PAGES = {
     title: 'Xem tuổi hợp nhau',
     description: 'Hai bạn hợp nhau mấy điểm? Xem độ hợp theo con giáp, thiên can, mệnh và thần số học, kèm lời giải thích dễ hiểu.',
   },
+  '/fintech': {
+    title: 'Kiến thức fintech',
+    description: 'Các luồng tiền trong ví điện tử và thanh toán ở Việt Nam, giải thích bằng sequence chạy từng bước và machine state.',
+  },
+  '/fintech/savings-fund': {
+    title: 'Nộp & rút tiền vào quỹ tiết kiệm: từng bước và machine state',
+    description: 'Luồng nộp và rút tiền giữa ví điện tử và quỹ của partner: sequence chạy từng bước, tiền nằm ở đâu, machine state, compensation, idempotency và recovery.',
+  },
   '/fortune/lich': {
     title: 'Lịch vạn niên & tử vi hôm nay 12 con giáp',
     description: 'Lịch âm hôm nay, ngày hoàng đạo, giờ tốt, tiết khí và tử vi hằng ngày cho 12 con giáp.',
