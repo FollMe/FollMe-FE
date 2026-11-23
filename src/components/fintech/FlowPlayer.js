@@ -40,7 +40,7 @@ export default function FlowPlayer({ flow, onStatusClick }) {
   }
 
   return (
-    <div className={styles.player} tabIndex={0} onKeyDown={onKeyDown} aria-label="Trình phát từng bước, dùng phím ← →">
+    <div className={styles.player} tabIndex={0} onKeyDown={onKeyDown} aria-label="Sequence chạy từng bước, dùng phím ← →">
       <div className={styles.playerMain}>
         <SequenceDiagram flow={flow} index={index} onSelect={player.go} />
       </div>

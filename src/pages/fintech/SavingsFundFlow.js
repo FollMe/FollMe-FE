@@ -12,12 +12,12 @@ import { setPageMeta } from 'util/meta';
 import styles from './Fintech.module.scss';
 
 const SECTIONS = [
-  ['buc-tranh', 'Bức tranh'],
+  ['buc-tranh', 'Bức tranh chung'],
   ['tung-buoc', 'Từng bước'],
-  ['machine-state', 'Machine state'],
+  ['machine-state', 'State machine'],
   ['khi-co-loi', 'Khi có lỗi'],
   ['invariants', 'Invariants'],
-  ['quyet-dinh', 'Quyết định'],
+  ['quyet-dinh', 'Decisions'],
   ['idempotency', 'Idempotency'],
   ['recovery', 'Recovery'],
 ];
@@ -65,8 +65,8 @@ export default function SavingsFundFlow() {
 
   useEffect(() => {
     setPageMeta({
-      title: 'Nộp & rút tiền vào quỹ tiết kiệm: từng bước và machine state',
-      description: 'Luồng nộp và rút tiền giữa ví điện tử và quỹ của partner: sequence chạy từng bước, tiền nằm ở đâu, machine state, compensation, idempotency và recovery.',
+      title: 'Nộp & rút tiền vào quỹ tiết kiệm: từng bước và state machine',
+      description: 'Luồng nộp và rút tiền giữa ví điện tử và quỹ của partner: sequence chạy từng bước, tiền nằm ở đâu, state machine, compensation, idempotency và recovery.',
     });
   }, []);
 
@@ -91,7 +91,7 @@ export default function SavingsFundFlow() {
           back={{ to: '/fintech', label: 'Kiến thức fintech' }}
           eyebrow="Fintech · Savings fund"
           title="Nộp & rút tiền vào quỹ tiết kiệm"
-          subtitle="User gửi tiền từ ví sang một quỹ do partner quản lý để hưởng lãi, rồi rút về. Ví điều phối, partner giữ tiền và lãi. Bấm Chạy để xem từng bước: ai gọi ai, order sang state nào, và 100k đang nằm ở đâu."
+          subtitle="User gửi tiền từ ví sang một quỹ do partner quản lý để hưởng lãi, lúc cần thì rút về. Ví chỉ điều phối, còn tiền và lãi nằm ở partner. Bấm Chạy để xem từng bước ai gọi ai, order sang state nào, và 100k đang nằm ở đâu."
           meta={['Sequence', 'State machine', 'Saga']}
         />
 
@@ -100,26 +100,30 @@ export default function SavingsFundFlow() {
         </nav>
 
         <section id="buc-tranh" className={styles.section}>
-          <h2>Bức tranh</h2>
+          <h2>Bức tranh chung</h2>
           <div className={styles.prose}>
             <p>
-              <strong>Partner là nguồn sự thật về số dư và lãi.</strong> Service của mình là orchestrator, không phải ledger:
-              không tự tính lãi, không cộng các order của mình để ra số dư, mà hỏi partner trực tiếp. Khác với trả hoá đơn
-              (trả xong là hết), mỗi lần nộp thành công để lại một vị thế sống lâu, tự thay đổi mỗi ngày vì lãi.
+              Điều đầu tiên cần nhớ: partner là source of truth cho số dư và lãi. Service của mình chỉ là orchestrator,
+              không phải ledger. Nó không tự tính lãi, cũng không cộng các order lại để ra số dư, mà hỏi thẳng partner mỗi lần cần.
+            </p>
+            <p>
+              Khác với trả hoá đơn, trả xong là xong, ở đây mỗi lần nộp thành công để lại một position sống rất lâu.
+              Lãi chạy mỗi ngày dù user có mở app hay không.
             </p>
           </div>
 
           <div className={styles.concepts}>
             <div><span>Money movement</span><strong>ví + bank rails</strong><em>vài giây</em></div>
-            <div><span>Order: một lần thử di chuyển tiền</span><strong>service của mình</strong><em>có kết thúc</em></div>
-            <div><span>Position: units + lãi</span><strong>partner</strong><em>vĩnh viễn, đổi mỗi ngày</em></div>
+            <div><span>Order: một lần thử di chuyển tiền</span><strong>service của mình</strong><em>có lúc kết thúc</em></div>
+            <div><span>Position: units + lãi</span><strong>partner</strong><em>còn mãi, đổi mỗi ngày</em></div>
           </div>
 
-          <h3>Pocket là trạm trung chuyển, không phải két</h3>
+          <h3>Pocket chỉ là pass-through</h3>
           <div className={styles.prose}>
             <p>
-              Partner được đăng ký như một merchant bình thường trên ví, có pocket (merchant wallet trên ledger) và một tài khoản
-              bank liên kết. Mỗi giao dịch phía ví đi cặp 1:1 với một lệnh bank thật trong vài giây (cùng bank, settle từng giao dịch).
+              Trên ví, partner được đăng ký như một merchant bình thường: có một pocket (merchant wallet trên ledger) và một
+              tài khoản bank liên kết. Mỗi giao dịch phía ví đi cặp 1:1 với một lệnh bank thật, chỉ cách nhau vài giây,
+              vì hai tài khoản cùng bank và settlement chạy theo từng giao dịch. Tiền không nằm lại trong pocket.
             </p>
           </div>
           <div className={styles.strips}>
@@ -133,11 +137,11 @@ export default function SavingsFundFlow() {
             </div>
           </div>
           <p className={styles.callout}>
-            <strong>Bẫy tên gọi:</strong> cash-in / cash-out được viết theo góc nhìn của <em>pocket</em>, không phải của user.
-            User <em>nộp</em> sinh ra một lệnh merchant <em>cash-out</em> (pocket → bank partner); user <em>rút</em> sinh ra
-            một lệnh merchant <em>cash-in</em>. Và không ai ứng thanh khoản: khi rút, bank của partner chuyển tiền trước,
-            pocket chỉ được ghi có khi bank đã xác nhận, rồi mới tới user. Tiền trong tài khoản safeguarding không bao giờ
-            bị dùng để trả thay cho partner.
+            Cái tên dễ làm mình nhầm nhất: cash-in và cash-out được đặt theo góc nhìn của pocket, không phải của user.
+            User nộp tiền thì sinh ra một lệnh merchant cash-out (pocket → bank partner), còn user rút thì sinh ra một lệnh
+            merchant cash-in. Cũng không ai phải ứng liquidity: khi rút, bank của partner chuyển tiền trước, pocket chỉ được
+            credit khi bank xác nhận đã nhận tiền, rồi mới tới user. Tiền trong safeguarding account không bao giờ bị dùng
+            để trả thay cho partner.
           </p>
         </section>
 
@@ -154,35 +158,38 @@ export default function SavingsFundFlow() {
             ))}
           </div>
           <FlowPlayer flow={flow} onStatusClick={showStatus} />
-          <p className={styles.hint}>Bấm vào một dòng trong sequence để nhảy tới bước đó, hoặc dùng phím ← →. Bấm vào status để xem nó trong machine state.</p>
+          <p className={styles.hint}>Bấm vào một dòng trong sequence để nhảy tới bước đó, hoặc dùng phím ← →. Bấm vào status để xem nó nằm ở đâu trong state machine.</p>
         </section>
 
         <section id="machine-state" ref={smSection} className={styles.section}>
-          <h2>Machine state</h2>
+          <h2>State machine</h2>
           <div className={styles.prose}>
             <p>
-              Chọn một kịch bản rồi bấm Chạy: token đi theo từng transition, các state đã qua sáng lên. Bấm vào một state để
-              xem điều gì đang đúng, tiền đang ở đâu, và khi hết deadline thì worker làm gì. <strong>Stuck là một flag, không phải
-              một status</strong>: hết retry thì order giữ status thật, set <code>needs_manual</code> và <code>manual_reason</code>.
+              Chọn một scenario rồi bấm Chạy, token sẽ đi theo từng transition và các state đã qua sáng lên. Bấm vào một state
+              để xem lúc đó điều gì đang đúng, tiền đang ở đâu, và hết deadline thì worker làm gì.
+            </p>
+            <p>
+              Một điều mình thấy quan trọng: stuck là một flag, không phải một status. Hết retry thì order vẫn giữ status thật
+              của nó, chỉ bật <code>needs_manual</code> kèm <code>manual_reason</code>. Nhìn vào là biết nó kẹt ở đâu.
             </p>
           </div>
           <StateMachineView ref={smRef} flow={flow} />
 
           <div className={styles.rules}>
-            <h3>Luật đặt tên status</h3>
+            <h3>Cách mình đặt tên status</h3>
             <ol>
-              <li><strong>Status là một sự thật đang đúng</strong>, không phải hành động: <code>WALLET_DEBITED</code>, không bao giờ <code>DEBITING</code>.</li>
-              <li>Pattern <code>&lt;COMPONENT&gt;_&lt;PAST VERB&gt;</code>. State kết thúc chỉ một từ.</li>
-              <li><code>_REQUESTED</code> chỉ dùng khi kết quả về bất đồng bộ (event, callback).</li>
-              <li>Tên nói điều đã xảy ra; registry nói điều xảy ra tiếp theo.</li>
+              <li>Status là một điều đang đúng, không phải một hành động. Viết <code>WALLET_DEBITED</code>, đừng viết <code>DEBITING</code>.</li>
+              <li>Theo pattern <code>&lt;COMPONENT&gt;_&lt;PAST VERB&gt;</code>. Terminal state chỉ một từ.</li>
+              <li>Chỉ dùng <code>_REQUESTED</code> khi kết quả về async, qua event hay callback.</li>
+              <li>Tên nói chuyện gì đã xảy ra. Còn bước tiếp theo là gì thì để registry trả lời.</li>
             </ol>
           </div>
         </section>
 
         <section id="khi-co-loi" className={styles.section}>
-          <h2>Khi có lỗi: hai nguồn sự thật</h2>
+          <h2>Khi có lỗi: hai source of truth</h2>
           <div className={styles.truths}>
-            <div><span>Tiền mặt đã rời đi chưa?</span><strong>Bank</strong></div>
+            <div><span>Tiền đã thật sự rời đi chưa?</span><strong>Bank</strong></div>
             <div><span>Units đã chốt chưa?</span><strong>Partner</strong></div>
           </div>
 
@@ -192,12 +199,16 @@ export default function SavingsFundFlow() {
                 <table className={styles.table}>
                   <thead><tr><th>Partner báo ERROR…</th><th>Làm gì</th></tr></thead>
                   <tbody>
-                    <tr><td>trước payout, hoặc payout đã fail</td><td>compensate: cancel partner → refund</td></tr>
-                    <tr><td>sau khi payout thành công</td><td><code>DISPUTED</code>: partner phát hành units hoặc trả tiền về; chỉ refund user khi tiền đã về</td></tr>
+                    <tr><td>trước payout, hoặc payout đã fail</td><td>compensate: cancel partner rồi refund</td></tr>
+                    <tr><td>sau khi payout thành công</td><td><code>DISPUTED</code>: chờ partner phát hành units hoặc trả tiền về; tiền về rồi mới refund user</td></tr>
                   </tbody>
                 </table>
               </div>
-              <p className={styles.callout}><strong>Never refund money you can't prove you still have.</strong> Compensation chỉ chạy khi payout fail <em>dứt khoát</em>, do worker của mình điều khiển, mỗi bước idempotent theo <code>order_ref</code>, alert riêng từng bước vì cancel kẹt (partner) và refund kẹt (wallet core) có owner khác nhau.</p>
+              <p className={styles.callout}>
+                Câu mình luôn tự nhắc: never refund money you can't prove you still have. Compensation chỉ chạy khi payout fail
+                dứt khoát, do worker của mình điều khiển, và mỗi bước đều idempotent theo <code>order_ref</code>. Alert cũng tách
+                riêng từng bước, vì cancel bị kẹt là chuyện của partner, còn refund bị kẹt là chuyện của wallet core. Hai owner khác nhau.
+              </p>
             </>
           ) : (
             <>
@@ -206,14 +217,18 @@ export default function SavingsFundFlow() {
                   <thead><tr><th>Partner nói</th><th>Bank nói</th><th>Làm gì</th><th>User thấy</th></tr></thead>
                   <tbody>
                     <tr><td>sent</td><td>đã tới, đúng số</td><td>cash-in → credit → <code>COMPLETED</code></td><td>✅ thành công</td></tr>
-                    <tr><td>sent</td><td>chưa thấy</td><td>re-check có backoff</td><td>⏳ đang xử lý</td></tr>
-                    <tr><td>sent</td><td>không thấy tới deadline / lệch số</td><td><code>DISPUTED</code></td><td>⏳ đang xử lý</td></tr>
+                    <tr><td>sent</td><td>chưa thấy</td><td>check lại, có backoff</td><td>⏳ đang xử lý</td></tr>
+                    <tr><td>sent</td><td>tới deadline vẫn không thấy / lệch số</td><td><code>DISPUTED</code></td><td>⏳ đang xử lý</td></tr>
                     <tr><td>failed</td><td>không check</td><td><code>FAILED</code></td><td>❌ thất bại</td></tr>
-                    <tr><td>không trả lời</td><td>–</td><td>inquiry, không bao giờ fail</td><td>⏳ đang xử lý</td></tr>
+                    <tr><td>im lặng</td><td>–</td><td>inquiry, không bao giờ tự fail</td><td>⏳ đang xử lý</td></tr>
                   </tbody>
                 </table>
               </div>
-              <p className={styles.callout}><strong>Không có chuỗi compensation.</strong> Bên mình không có gì di chuyển trước khi bank xác nhận tiền tới. Mọi lỗi trước bước cash-in kết thúc bằng việc đóng wallet order; sau đó mọi bước là của mình và retry được. Partner báo "failed" mà tiền lại tới thì reconciliation bắt, không phải order flow.</p>
+              <p className={styles.callout}>
+                Luồng rút không cần compensation. Bên mình không động vào tiền cho tới khi bank xác nhận tiền đã tới, nên mọi lỗi
+                trước bước cash-in chỉ cần đóng wallet order là xong. Từ cash-in trở đi, mọi bước đều là của mình và retry được.
+                Còn trường hợp partner báo "failed" mà tiền vẫn tới thì để reconciliation bắt, order flow không lo phần đó.
+              </p>
             </>
           )}
         </section>
@@ -232,10 +247,10 @@ export default function SavingsFundFlow() {
         </section>
 
         <section id="quyet-dinh" className={styles.section}>
-          <h2>Các quyết định và vì sao</h2>
+          <h2>Các decision và lý do</h2>
           <div className={styles.tableWrap}>
             <table className={styles.table}>
-              <thead><tr><th>Câu hỏi</th><th>Các lựa chọn</th><th>Chọn</th><th>Vì sao</th></tr></thead>
+              <thead><tr><th>Câu hỏi</th><th>Options</th><th>Chọn</th><th>Vì sao</th></tr></thead>
               <tbody>
                 {decisions.map(d => (
                   <tr key={d.topic}>
@@ -254,26 +269,29 @@ export default function SavingsFundFlow() {
           <h2>Idempotency và compare-and-set</h2>
           <div className={styles.prose}>
             <p>
-              <strong>Bên nhận dedup; bên gửi gửi lại đúng key cũ</strong> cho mọi lần retry của cùng một hiệu ứng. Key là
-              <code>order_ref</code> (UUIDv7) sinh lúc INSERT, tồn tại trước mọi call và suốt đời order; ID của bên khác chỉ lưu
-              làm reference. Dedup không bao giờ dựa vào header. Thao tác tạo mới (refund, cash-in) có key riêng:
-              <code>refund-{'{order_ref}'}</code>, <code>cashin-{'{order_ref}'}</code>.
+              Quy tắc gói gọn trong một câu: bên nhận dedup, bên gửi thì retry bao nhiêu lần cũng gửi lại đúng key cũ.
+            </p>
+            <p>
+              Key là <code>order_ref</code> (UUIDv7), sinh ngay lúc INSERT nên có trước mọi call và đi theo order tới cuối.
+              ID của các bên khác chỉ lưu làm reference. Dedup không bao giờ dựa vào header. Thao tác nào tạo ra một giao dịch mới,
+              như refund hay cash-in, thì có key riêng: <code>refund-{'{order_ref}'}</code>, <code>cashin-{'{order_ref}'}</code>.
             </p>
           </div>
           <div className={styles.codeGrid}>
             <figure>
-              <figcaption>Request trùng <code>request_id</code> bị từ chối, không gọi wallet</figcaption>
+              <figcaption>Trùng <code>request_id</code> thì reject luôn, không gọi wallet</figcaption>
               <pre><code>{INSERT_SQL}</code></pre>
             </figure>
             <figure>
-              <figcaption>Mọi transition là một compare-and-set</figcaption>
+              <figcaption>Mọi transition đều là một compare-and-set</figcaption>
               <pre><code>{CAS_SQL}</code></pre>
             </figure>
           </div>
           <div className={styles.prose}>
             <p>
-              CAS trả 0 row thì xem status hiện tại: đã là kết quả của event (hoặc xa hơn) → duplicate, bỏ qua và log; kết quả
-              ngược lại → contradiction, không transition và alert. Reply success cho callback chỉ sau khi transition đã commit.
+              Khi CAS trả về 0 row, mình nhìn status hiện tại. Nếu nó đã là kết quả của event đó, hoặc đi xa hơn rồi, thì đây là
+              duplicate: bỏ qua và log. Nếu nó là kết quả ngược lại thì là contradiction: không transition, bắn alert. Với callback,
+              chỉ reply success sau khi transition đã commit.
             </p>
           </div>
         </section>
@@ -289,14 +307,14 @@ export default function SavingsFundFlow() {
             ))}
           </ol>
           <p className={styles.callout}>
-            Không hứa "xử lý xong trong X phút". Hứa: <strong>không ai phát hiện một order bị kẹt một cách tình cờ</strong>.
-            Retry budget kéo dài hàng giờ để vượt qua sự cố, deadline ngắn sau bước debit, và alert trên
-            <em> tuổi của order non-terminal lâu nhất</em>: worker chết thì không ai bị flag, nhưng con số đó cứ tăng.
+            Mình không hứa "xử lý xong trong X phút". Cái mình hứa là không ai phát hiện ra một order bị kẹt một cách tình cờ.
+            Retry budget kéo dài cả tiếng để sống sót qua sự cố, deadline sau bước debit thì để ngắn. Ngoài ra luôn có alert trên
+            tuổi của order non-terminal lâu nhất: nếu chính worker chết thì không order nào bị flag, nhưng con số này sẽ cứ tăng.
           </p>
         </section>
 
         <p className={styles.disclaimer}>
-          Đây là pattern tổng quát rút ra từ một hệ thống thật. Tên hệ thống, đối tác và chi tiết triển khai nội bộ đã được lược bỏ.
+          Đây là pattern tổng quát mình rút ra từ một hệ thống thật. Tên hệ thống, partner và chi tiết triển khai nội bộ đã được bỏ đi.
         </p>
       </div>
     </>

@@ -38,7 +38,7 @@ export default function AuthShell({ title, subtitle, children, footer }) {
             Thanh toán,<br />giải thích <em>từng bước</em>.
           </h2>
           <ul className={styles.points}>
-            <li><strong>Kiến thức fintech</strong>: luồng tiền vẽ thành sequence chạy được và machine state.</li>
+            <li><strong>Kiến thức fintech</strong>: luồng tiền vẽ thành sequence chạy được và state machine.</li>
             <li><strong>Blog</strong>: viết bài, thả tim, bình luận theo thời gian thực.</li>
             <li><strong>Đọc sau</strong>: lưu bài và đọc tiếp ở bất kỳ thiết bị nào.</li>
           </ul>

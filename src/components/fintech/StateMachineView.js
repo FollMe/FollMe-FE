@@ -48,7 +48,7 @@ const StateMachineView = forwardRef(function StateMachineView({ flow }, ref) {
 
   return (
     <div className={styles.sm}>
-      <div className={styles.scenarios} role="radiogroup" aria-label="Kịch bản">
+      <div className={styles.scenarios} role="radiogroup" aria-label="Scenario">
         {flow.scenarios.map(s => (
           <button
             key={s.id}
@@ -120,7 +120,7 @@ const StateMachineView = forwardRef(function StateMachineView({ flow }, ref) {
         </div>
 
         <aside className={styles.smSide}>
-          <PlayerControls player={player} total={path.length} label="Điều khiển kịch bản" />
+          <PlayerControls player={player} total={path.length} label="Điều khiển scenario" />
           <p key={`${scenario.id}-${index}`} className={styles.scenarioNote}>
             <code>{current}</code> {scenario.path[index][1]}
           </p>
@@ -142,7 +142,7 @@ const StateMachineView = forwardRef(function StateMachineView({ flow }, ref) {
                 <dd>{shown.money}</dd>
                 {shown.deadline && (
                   <>
-                    <dt>Hết deadline thì worker làm gì</dt>
+                    <dt>Hết deadline, worker làm gì</dt>
                     <dd>{shown.deadline}</dd>
                   </>
                 )}
@@ -157,7 +157,7 @@ const StateMachineView = forwardRef(function StateMachineView({ flow }, ref) {
               )}
               {selected && selected !== current && (
                 <button type="button" className={styles.backToScenario} onClick={() => setSelected(null)}>
-                  ← Quay về state của kịch bản
+                  ← Quay về state của scenario
                 </button>
               )}
             </div>
@@ -167,8 +167,8 @@ const StateMachineView = forwardRef(function StateMachineView({ flow }, ref) {
             {ACTOR_KEYS.filter(k => flow.states.some(s => s.actor === k)).map(k => (
               <li key={k}><i className={styles[`actor_${k}`]} /> chờ {ACTORS[k]}</li>
             ))}
-            <li><i className={styles.term_ok} /> kết thúc tốt</li>
-            <li><i className={styles.term_fail} /> kết thúc fail</li>
+            <li><i className={styles.term_ok} /> terminal: thành công</li>
+            <li><i className={styles.term_fail} /> terminal: fail</li>
           </ul>
         </aside>
       </div>
