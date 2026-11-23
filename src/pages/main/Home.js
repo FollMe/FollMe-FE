@@ -68,7 +68,7 @@ export default function Home() {
   useEffect(() => {
     setPageMeta({
       title: null,
-      description: 'Ghi chép của một backend engineer về thanh toán và ví điện tử ở Việt Nam: luồng tiền vẽ thành sequence chạy từng bước, machine state, idempotency và đối soát.',
+      description: 'Ghi chép của một backend engineer về thanh toán và ví điện tử ở Việt Nam: luồng tiền vẽ thành sequence chạy từng bước, state machine, idempotency và reconciliation.',
     });
 
     request.get('api/blogs')
@@ -91,9 +91,9 @@ export default function Home() {
               Thanh toán,<br />giải thích <span>từng bước</span>.
             </h1>
             <p className={clsx(styles.heroLead, 'fade-up')} style={{ animationDelay: '160ms' }}>
-              Ghi chép của một backend engineer làm ví điện tử ở Việt Nam. Mỗi luồng tiền được vẽ thành
-              sequence chạy được và machine state: tiền đang nằm ở đâu, order ở state nào, và khi một bên
-              im lặng thì làm gì.
+              Mình là backend engineer, đang làm ví điện tử ở Việt Nam. Ở đây mình vẽ lại từng luồng tiền thành
+              sequence chạy được và state machine, để thấy tiền đang nằm ở đâu, order ở state nào, và khi một bên
+              im lặng thì mình làm gì.
             </p>
             <div className={clsx(styles.heroActions, 'fade-up')} style={{ animationDelay: '240ms' }}>
               <Link to="/fintech/savings-fund" className={styles.primary}>
@@ -168,15 +168,15 @@ export default function Home() {
             <div>
               <div className="eyebrow">Về mình</div>
               <p>
-                <strong>Sum Quốc</strong>, backend engineer (Go, gRPC, GCP), làm ví điện tử và thanh toán.
-                Trang này là chỗ mình ghi lại những gì học được để đọc lại, và để ai cần thì dùng chung.
+                Mình là <strong>Sum Quốc</strong>, backend engineer (Go, gRPC, GCP), đang làm ví điện tử và thanh toán.
+                Trang này là chỗ mình ghi lại những gì học được, trước là để mình đọc lại, sau là để ai cần thì dùng chung.
               </p>
               <a href={GITHUB_URL} target="_blank" rel="noreferrer" className={styles.all}><IoLogoGithub /> GitHub</a>
             </div>
           </Reveal>
           <Reveal className={styles.corner} delay={80}>
             <div className="eyebrow">Góc nhỏ</div>
-            <p>Mấy công cụ cưới hỏi mình làm cho bạn bè, vẫn dùng được:</p>
+            <p>Mấy công cụ cưới hỏi mình từng làm cho bạn bè, giờ vẫn dùng được:</p>
             <ul>
               {CORNER.map(c => (
                 <li key={c.to}><Link to={c.to}>{c.icon} {c.label}</Link></li>

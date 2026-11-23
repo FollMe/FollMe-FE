@@ -14,7 +14,7 @@ export default function Footer() {
           <BrandLogo />
           <p className={styles.tagline}>
             Ghi chép của một backend engineer về thanh toán và ví điện tử ở Việt Nam:
-            tiền đi đâu sau mỗi bước, order ở state nào, và khi một bên im lặng thì làm gì.
+            sau mỗi bước tiền đi đâu, order ở state nào, và khi một bên im lặng thì làm gì.
           </p>
         </div>
 

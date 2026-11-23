@@ -28,10 +28,10 @@ export default function MoneyMap({ flow, index }) {
   return (
     <div className={styles.money}>
       <div className={styles.moneyHead}>
-        <span>Tiền đang ở đâu</span>
-        {step.moneyMoves === 'hold' && <span className={styles.moneyTag}>hold: chưa di chuyển</span>}
-        {from && <span className={clsx(styles.moneyTag, styles.moneyTagMove)}>tiền di chuyển</span>}
-        {!step.moneyMoves && <span className={styles.moneyTagQuiet}>không đổi</span>}
+        <span>100k đang ở đâu</span>
+        {step.moneyMoves === 'hold' && <span className={styles.moneyTag}>đang hold, chưa đi đâu</span>}
+        {from && <span className={clsx(styles.moneyTag, styles.moneyTagMove)}>tiền đang đi</span>}
+        {!step.moneyMoves && <span className={styles.moneyTagQuiet}>không đổi gì</span>}
       </div>
       <div className={styles.buckets} style={{ '--n': ids.length }}>
         {flow.buckets.map((b, i) => {

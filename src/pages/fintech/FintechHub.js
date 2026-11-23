@@ -10,7 +10,7 @@ export default function FintechHub() {
   useEffect(() => {
     setPageMeta({
       title: 'Kiến thức fintech',
-      description: 'Các luồng tiền trong ví điện tử và thanh toán ở Việt Nam, giải thích bằng sequence chạy từng bước và machine state.',
+      description: 'Các luồng tiền trong ví điện tử và thanh toán ở Việt Nam, giải thích bằng sequence chạy từng bước và state machine.',
     });
   }, []);
 
@@ -19,7 +19,7 @@ export default function FintechHub() {
       <PageHeader
         eyebrow="Fintech"
         title="Kiến thức fintech"
-        description="Các luồng tiền trong ví và thanh toán, viết theo kiểu mình muốn đọc lại: tiền nằm ở đâu sau mỗi bước, order đang ở state nào, và khi một bên im lặng thì làm gì."
+        description="Mình ghi lại các luồng tiền trong ví và thanh toán theo cách mình muốn đọc lại sau này: sau mỗi bước tiền nằm ở đâu, order đang ở state nào, và khi một bên im lặng thì mình làm gì."
       />
 
       <div className={styles.cards}>

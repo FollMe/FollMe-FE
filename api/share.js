@@ -28,11 +28,11 @@ const PAGES = {
   },
   '/fintech': {
     title: 'Kiến thức fintech',
-    description: 'Các luồng tiền trong ví điện tử và thanh toán ở Việt Nam, giải thích bằng sequence chạy từng bước và machine state.',
+    description: 'Các luồng tiền trong ví điện tử và thanh toán ở Việt Nam, giải thích bằng sequence chạy từng bước và state machine.',
   },
   '/fintech/savings-fund': {
-    title: 'Nộp & rút tiền vào quỹ tiết kiệm: từng bước và machine state',
-    description: 'Luồng nộp và rút tiền giữa ví điện tử và quỹ của partner: sequence chạy từng bước, tiền nằm ở đâu, machine state, compensation, idempotency và recovery.',
+    title: 'Nộp & rút tiền vào quỹ tiết kiệm: từng bước và state machine',
+    description: 'Luồng nộp và rút tiền giữa ví điện tử và quỹ của partner: sequence chạy từng bước, tiền nằm ở đâu, state machine, compensation, idempotency và recovery.',
   },
   '/fortune/lich': {
     title: 'Lịch vạn niên & tử vi hôm nay 12 con giáp',
