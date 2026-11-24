@@ -1,0 +1,229 @@
+.context {
+  margin: 8px 0 24px;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(ellipse 60% 80% at 0% 0%, var(--brand-soft), transparent 70%),
+    var(--surface);
+
+  @media (max-width: 600px) {
+    padding: 18px;
+  }
+}
+
+.top {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  align-items: start;
+  gap: 32px;
+
+  @media (max-width: 760px) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+}
+
+/* ---------- Phone ---------- */
+.phone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 220px;
+  min-height: 360px;
+  padding: 26px 14px 16px;
+  border: 8px solid #0f172a;
+  border-radius: 30px;
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+
+  @media (max-width: 760px) {
+    margin: 0 auto;
+  }
+}
+
+.notch {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  width: 70px;
+  height: 8px;
+  border-radius: 999px;
+  background: #0f172a;
+  transform: translateX(-50%);
+}
+
+.screenTitle {
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.screenBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  animation: swap 0.4s var(--ease);
+}
+
+@keyframes swap {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  font-size: 1.15rem;
+  color: var(--text-2);
+
+  strong {
+    font-size: 1.4rem;
+    color: var(--text);
+  }
+}
+
+.rowBig strong {
+  font-size: 2rem;
+  letter-spacing: -0.02em;
+}
+
+.rowGood strong {
+  color: var(--success-text);
+}
+
+.cta {
+  position: relative;
+  padding: 10px;
+  border-radius: 12px;
+  background: var(--brand-fill);
+  color: #fff;
+  font-size: 1.35rem;
+  font-weight: 700;
+  text-align: center;
+  transition: background 0.3s var(--ease);
+}
+
+.ctaDone {
+  background: var(--success);
+}
+
+[data-theme='dark'] .ctaDone {
+  color: #052e16;
+}
+
+.finger {
+  position: absolute;
+  right: 26px;
+  bottom: -10px;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.35);
+  animation: tap 2.2s ease-in-out infinite;
+}
+
+@keyframes tap {
+  0%, 60% { transform: scale(1); opacity: 0; }
+  70% { opacity: 1; }
+  85% { transform: scale(0.75); opacity: 1; }
+  100% { transform: scale(1); opacity: 0; }
+}
+
+/* ---------- Story ---------- */
+.story {
+  @media (max-width: 760px) {
+    order: -1;
+  }
+}
+
+.story h2 {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--brand-text);
+}
+
+.scene {
+  margin: 10px 0 18px;
+  font-size: 1.9rem;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+}
+
+.points {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+
+  div {
+    padding-left: 14px;
+    border-left: 2px solid var(--border-strong);
+  }
+
+  dt {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  dd {
+    margin: 2px 0 0;
+    font-size: 1.5rem;
+    line-height: 1.65;
+    color: var(--text-2);
+  }
+}
+
+/* ---------- Glossary ---------- */
+.glossary {
+  margin-top: 20px;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+
+  summary {
+    font-size: 1.45rem;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--brand-text);
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 10px;
+    margin: 14px 0 0;
+  }
+
+  div {
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+  }
+
+  dt {
+    font-family: var(--font-mono);
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+
+  dd {
+    margin: 4px 0 0;
+    font-size: 1.4rem;
+    line-height: 1.55;
+    color: var(--text-2);
+  }
+}

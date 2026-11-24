@@ -46,7 +46,7 @@ export default function Footer() {
       </div>
 
       <div className={`container ${styles.bottom}`}>
-        <span>© {new Date().getFullYear()} FollMe · Viết và phát triển bởi Sum Quốc</span>
+        <span>© {new Date().getFullYear()} FollMe · Viết và phát triển bởi Quốc Sum</span>
         <button type="button" className={styles.toTop} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
           Lên đầu trang <IoArrowUp />
         </button>

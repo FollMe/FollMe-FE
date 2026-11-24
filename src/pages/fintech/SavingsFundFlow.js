@@ -5,6 +5,8 @@ import ReadingProgress from 'components/ReadingProgress';
 import FlowPlayer from 'components/fintech/FlowPlayer';
 import StateMachineView from 'components/fintech/StateMachineView';
 import FlowTabs from 'components/fintech/FlowTabs';
+import ArticleContext from 'components/fintech/ArticleContext';
+import { SAVINGS_FUND_CONTEXT } from 'fintech/context';
 import {
   CAS_SQL, DECISIONS, FLOWS, INSERT_SQL, INVARIANTS, RECOVERY,
 } from 'fintech/savingsFund';
@@ -45,7 +47,7 @@ export default function SavingsFundFlow() {
 
   useEffect(() => {
     setPageMeta({
-      title: 'Nộp & rút tiền vào quỹ tiết kiệm: từng bước và state machine',
+      title: 'Gửi tiết kiệm sinh lời trong ví: flow nộp và rút, từng bước',
       description: 'Luồng nộp và rút tiền giữa ví điện tử và quỹ của partner: sequence chạy từng bước, tiền nằm ở đâu, state machine, compensation, idempotency và recovery.',
     });
   }, []);
@@ -70,10 +72,12 @@ export default function SavingsFundFlow() {
         <ArticleHeader
           back={{ to: '/fintech', label: 'Kiến thức fintech' }}
           eyebrow="Fintech · Savings fund"
-          title="Nộp & rút tiền vào quỹ tiết kiệm"
-          subtitle="User gửi tiền từ ví sang một quỹ do partner quản lý để hưởng lãi, lúc cần thì rút về. Ví chỉ điều phối, còn tiền và lãi nằm ở partner. Bấm Chạy để xem từng bước ai gọi ai, order sang state nào, và 100k đang nằm ở đâu."
+          title="Gửi tiết kiệm sinh lời trong ví: flow nộp và rút"
+          subtitle="Tiền của bạn đi đâu khi bấm Gửi tiết kiệm, và mình thiết kế flow thế nào để không bên nào làm mất tiền. Ở từng phần, bấm Chạy để xem ai gọi ai, order sang state nào, và 100k đang nằm ở đâu."
           meta={['Sequence', 'State machine', 'Saga']}
         />
+
+        <ArticleContext {...SAVINGS_FUND_CONTEXT} />
 
         <p className={styles.prereq}>
           Nên đọc trước: <Link to="/fintech/money-movement">Money movement</Link>, về hai layer ledger và bank, safeguarding account và settlement topology.

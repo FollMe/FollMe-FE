@@ -19,19 +19,30 @@ export default function FintechHub() {
       <PageHeader
         eyebrow="Fintech"
         title="Kiến thức fintech"
-        description="Mình ghi lại các luồng tiền trong ví và thanh toán theo cách mình muốn đọc lại sau này: sau mỗi bước tiền nằm ở đâu, order đang ở state nào, và khi một bên im lặng thì mình làm gì."
+        description="Mục này giải thích những gì xảy ra phía sau các nút bấm có tiền trong ví điện tử: nạp tiền, gửi tiết kiệm, trả hoá đơn. Mình viết cho backend engineer, BA, hay bất kỳ ai đang làm sản phẩm thanh toán, và cho chính mình đọc lại sau này."
       />
+
+      <ol className={styles.path} aria-label="Lộ trình đọc">
+        {FINTECH_ARTICLES.map(a => (
+          <li key={a.slug}>
+            <Link to={a.to}>
+              <span>{a.order}</span>
+              {a.title.split(':')[0]}
+            </Link>
+          </li>
+        ))}
+      </ol>
 
       <div className={styles.cards}>
         {FINTECH_ARTICLES.map(a => (
           <Link key={a.slug} to={a.to} className={styles.card}>
-            <span className={styles.cardTag}>{a.tag}</span>
+            <span className={styles.cardTag}>Bài {a.order} · {a.tag}</span>
             <h2>{a.title}</h2>
             <p>{a.description}</p>
             <ul>
               {a.topics.map(t => <li key={t}>{t}</li>)}
             </ul>
-            <span className={styles.cardCta}>Xem flow <IoArrowForward /></span>
+            <span className={styles.cardCta}>Đọc bài <IoArrowForward /></span>
           </Link>
         ))}
       </div>
