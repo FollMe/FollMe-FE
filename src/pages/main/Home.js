@@ -127,7 +127,7 @@ export default function Home() {
                   <span className={styles.featuredTag}>{a.tag}</span>
                   <h3>{a.title}</h3>
                   <p>{a.description}</p>
-                  <span className={styles.featuredCta}>Mở flow <IoArrowForward /></span>
+                  <span className={styles.featuredCta}>Đọc bài <IoArrowForward /></span>
                 </div>
                 <div className={styles.featuredArt} aria-hidden="true">
                   {a.ladder.map((s, i) => (
@@ -164,11 +164,11 @@ export default function Home() {
       <section className={`container ${styles.section}`}>
         <div className={styles.bottomGrid}>
           <Reveal className={styles.about}>
-            <img src="/imgs/3 (2).jpg" alt="Sum Quốc" loading="lazy" />
+            <img src="/imgs/3 (2).jpg" alt="Quốc Sum" loading="lazy" />
             <div>
               <div className="eyebrow">Về mình</div>
               <p>
-                Mình là <strong>Sum Quốc</strong>, backend engineer (Go, gRPC, GCP), đang làm ví điện tử và thanh toán.
+                Mình là <strong>Quốc Sum</strong>, backend engineer (Go, gRPC, GCP), đang làm ví điện tử và thanh toán.
                 Trang này là chỗ mình ghi lại những gì học được, trước là để mình đọc lại, sau là để ai cần thì dùng chung.
               </p>
               <a href={GITHUB_URL} target="_blank" rel="noreferrer" className={styles.all}><IoLogoGithub /> GitHub</a>

@@ -608,3 +608,52 @@
 
   a { font-weight: 600; }
 }
+
+.path {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &:not(:last-child)::after {
+      content: '→';
+      color: var(--text-3);
+    }
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px 6px 6px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 1.4rem;
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover { border-color: var(--brand); }
+  }
+
+  span {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--brand-fill);
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 800;
+  }
+}

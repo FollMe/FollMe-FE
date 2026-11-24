@@ -5,6 +5,8 @@ import ReadingProgress from 'components/ReadingProgress';
 import FlowPlayer from 'components/fintech/FlowPlayer';
 import FlowTabs from 'components/fintech/FlowTabs';
 import StateMachineView from 'components/fintech/StateMachineView';
+import ArticleContext from 'components/fintech/ArticleContext';
+import { BILLPAY_CONTEXT } from 'fintech/context';
 import {
   BILLPAY_FLOWS, BILLPAY_RULES, CHECKLIST, CLAIM_SQL, RECON_STEPS, TABLES_SQL,
 } from 'fintech/billpay';
@@ -37,7 +39,7 @@ export default function BillpayFlow() {
 
   useEffect(() => {
     setPageMeta({
-      title: 'Billpay: trả hoá đơn qua ví, từng bước và state machine',
+      title: 'Billpay: trả hoá đơn trong ví hoạt động thế nào',
       description: 'Pattern cho mọi feature mà một team service điều phối payment và fulfillment: payment session, payment screen của Core, Kafka outbox, partner, hold/commit hay debit/refund, và reconciliation.',
     });
   }, []);
@@ -60,10 +62,12 @@ export default function BillpayFlow() {
         <ArticleHeader
           back={{ to: '/fintech', label: 'Kiến thức fintech' }}
           eyebrow="Fintech · Billpay"
-          title="Billpay: trả hoá đơn qua ví"
-          subtitle="Pattern này dùng được cho trả hoá đơn, bảo hiểm, mua vé, tức là bất kỳ feature nào mà một team service điều phối cả payment lẫn fulfillment. Chỗ khó là user trả tiền ở màn hình của Core, nên team service có một khoảng mù đúng lúc tiền di chuyển."
+          title="Billpay: trả hoá đơn trong ví hoạt động thế nào"
+          subtitle="Từ lúc bạn bấm Thanh toán tới lúc hoá đơn được gạch nợ có ba bên tham gia, và một khoảng mù đúng lúc tiền bị trừ. Bài này đi qua từng bước, và cách xử lý khi một bên im lặng hay báo lỗi."
           meta={['Sequence', 'State machine', 'Reconciliation']}
         />
+
+        <ArticleContext {...BILLPAY_CONTEXT} />
 
         <p className={styles.prereq}>
           Nên đọc trước: <Link to="/fintech/money-movement">Money movement</Link>, về hai layer ledger và bank, safeguarding account và settlement topology.

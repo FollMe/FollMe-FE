@@ -6,6 +6,8 @@ import ReadingProgress from 'components/ReadingProgress';
 import SafeguardingSim from 'components/fintech/SafeguardingSim';
 import TopologyDemo from 'components/fintech/TopologyDemo';
 import SettlementDesigns from 'components/fintech/SettlementDesigns';
+import ArticleContext from 'components/fintech/ArticleContext';
+import { MONEY_MOVEMENT_CONTEXT } from 'fintech/context';
 import { setPageMeta } from 'util/meta';
 import styles from './Fintech.module.scss';
 
@@ -35,7 +37,7 @@ const RULES = [
 export default function MoneyMovement() {
   useEffect(() => {
     setPageMeta({
-      title: 'Money movement: tiền thật sự đi như thế nào trong một ví điện tử',
+      title: 'Money movement: tiền trong ví điện tử thật ra nằm ở đâu?',
       description: 'Hai layer ledger và bank, safeguarding account theo Nghị định 52/2024, cùng bank hay khác bank, settle từng giao dịch hay prefund + netting. Có mô phỏng để bấm thử.',
     });
   }, []);
@@ -46,11 +48,13 @@ export default function MoneyMovement() {
       <div className={`container page ${styles.page}`}>
         <ArticleHeader
           back={{ to: '/fintech', label: 'Kiến thức fintech' }}
-          eyebrow="Fintech · Nền tảng"
-          title="Money movement: tiền thật sự đi như thế nào"
-          subtitle="Mấy luật nền mà flow nào trong ví cũng phải theo, từ billpay, savings fund tới VietQR hay PayLater. Đọc bài này trước thì các bài flow sẽ dễ hiểu hơn nhiều."
+          eyebrow="Fintech · Bài nền"
+          title="Money movement: tiền trong ví thật ra nằm ở đâu?"
+          subtitle="Bài nền cho cả mục Fintech. Phía sau mỗi lần bạn nạp, chuyển hay trả tiền trong ví, tiền thật đi như thế nào, và vì sao flow nào cũng phải theo vài luật chung."
           meta={['Ledger', 'Safeguarding', 'Settlement']}
         />
+
+        <ArticleContext {...MONEY_MOVEMENT_CONTEXT} />
 
         <nav className={styles.toc} aria-label="Mục lục">
           {SECTIONS.map(([id, label]) => <a key={id} href={`#${id}`}>{label}</a>)}

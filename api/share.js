@@ -31,15 +31,15 @@ const PAGES = {
     description: 'Các luồng tiền trong ví điện tử và thanh toán ở Việt Nam, giải thích bằng sequence chạy từng bước và state machine.',
   },
   '/fintech/savings-fund': {
-    title: 'Nộp & rút tiền vào quỹ tiết kiệm: từng bước và state machine',
+    title: 'Gửi tiết kiệm sinh lời trong ví: flow nộp và rút, từng bước',
     description: 'Luồng nộp và rút tiền giữa ví điện tử và quỹ của partner: sequence chạy từng bước, tiền nằm ở đâu, state machine, compensation, idempotency và recovery.',
   },
   '/fintech/money-movement': {
-    title: 'Money movement: tiền thật sự đi như thế nào trong một ví điện tử',
+    title: 'Money movement: tiền trong ví điện tử thật ra nằm ở đâu?',
     description: 'Hai layer ledger và bank, safeguarding account theo Nghị định 52/2024, cùng bank hay khác bank, settle từng giao dịch hay prefund + netting.',
   },
   '/fintech/billpay': {
-    title: 'Billpay: trả hoá đơn qua ví, từng bước và state machine',
+    title: 'Billpay: trả hoá đơn trong ví hoạt động thế nào',
     description: 'Pattern cho mọi feature mà một team service điều phối payment và fulfillment: payment session, payment screen của Core, Kafka outbox, partner, hold/commit hay debit/refund, và reconciliation.',
   },
   '/fortune/lich': {
